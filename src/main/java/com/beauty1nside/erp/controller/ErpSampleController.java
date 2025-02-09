@@ -18,4 +18,9 @@ public class ErpSampleController {
 	public String sample() {
 		return "/erp/sample";
 	};
+	
+	@GetMapping("/layout")
+	public String layout() {
+		return "/erp/layout";
+	}
 }
