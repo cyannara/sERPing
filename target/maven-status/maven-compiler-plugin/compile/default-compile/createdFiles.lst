@@ -4,9 +4,16 @@ com\beauty1nside\erp\controller\MovieController.class
 com\beauty1nside\erp\service\MovieDTO$MovieDTOBuilder.class
 com\beauty1nside\erp\service\MovieListDTO.class
 com\beauty1nside\bsn\BsnSampleController.class
+<<<<<<< HEAD
 com\beauty1nside\erp\service\MovieDTO.class
 com\beauty1nside\bhf\BhfSampleController.class
 com\beauty1nside\hr\HrSampleController.class
 com\beauty1nside\accnut\AccnutSampleController.class
 com\beauty1nside\purchs\PurchsSampleController.class
 com\beauty1nside\erp\controller\ErpSampleController.class
+=======
+com\beauty1nside\bhf\BhfSampleController.class
+com\beauty1nside\hr\HrSampleController.class
+com\beauty1nside\accnut\AccnutSampleController.class
+com\beauty1nside\purchs\PurchsSampleController.class
+>>>>>>> refs/heads/LSH
