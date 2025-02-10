@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import com.beauty1nside.erp.service.MovieDTO;
-import com.beauty1nside.erp.service.MovieListDTO;
+import com.beauty1nside.erp.dto.MovieDTO;
+import com.beauty1nside.erp.dto.MovieListDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.AllArgsConstructor;
