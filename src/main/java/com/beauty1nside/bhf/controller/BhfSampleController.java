@@ -1,4 +1,4 @@
-package com.beauty1nside.bhf;
+package com.beauty1nside.bhf.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,4 +18,6 @@ public class BhfSampleController {
 	public String sample() {
 		return "/bhf/sample";
 	};
+	
+	
 }
