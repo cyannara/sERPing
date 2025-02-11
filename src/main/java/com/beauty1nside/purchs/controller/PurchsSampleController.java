@@ -1,4 +1,4 @@
-package com.beauty1nside.purchs;
+package com.beauty1nside.purchs.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,4 +18,7 @@ public class PurchsSampleController {
 	public String sample() {
 		return "/purchs/sample";
 	};
+	
+	
+	
 }

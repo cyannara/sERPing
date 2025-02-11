@@ -19,10 +19,7 @@ Thumbs.db
 *.log
 *.env
 *.local
+application.properties
 
 # IntelliJ IDEA / Eclipse 설정 무시
-<<<<<<< HEAD
 *.class
-=======
-*.class
->>>>>>> branch 'main' of https://github.com/hayeon8521/sERPing.git
