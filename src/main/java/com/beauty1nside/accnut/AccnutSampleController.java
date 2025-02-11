@@ -18,4 +18,6 @@ public class AccnutSampleController {
 	public String sample() {
 		return "/accnut/sample";
 	};
+	
+	
 }
