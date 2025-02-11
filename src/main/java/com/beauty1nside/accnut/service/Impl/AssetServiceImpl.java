@@ -1,5 +1,7 @@
 package com.beauty1nside.accnut.service.Impl;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.beauty1nside.accnut.dto.AssetDTO;
@@ -22,5 +24,11 @@ public class AssetServiceImpl implements AssetService{
 		public AssetDTO info(String assetsCode) {
 			// TODO Auto-generated method stub
 			return assetMapper.info(assetsCode);
+		}
+		
+		@Override
+		public List<AssetDTO> list() {
+		// TODO Auto-generated method stub
+		return assetMapper.list();
 		}
 }
