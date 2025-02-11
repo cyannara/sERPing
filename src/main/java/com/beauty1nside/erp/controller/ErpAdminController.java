@@ -32,7 +32,7 @@ public class ErpAdminController {
 	@GetMapping("/main")
 	public String main() {
 		return "/erp/main";
-	} 
+	}  
 	
 
 }
