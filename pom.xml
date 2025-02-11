@@ -87,6 +87,21 @@
 		    <artifactId>log4jdbc-log4j2-jdbc4.1</artifactId>
 		    <version>1.16</version>
 		</dependency>
+		<!-- DTO 어노테이션 정규식검증 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+		<!-- 타임리프 레이아웃 버전생략하면 최신버전으로 정리됨 -->
+		<dependency>
+		  <groupId>nz.net.ultraq.thymeleaf</groupId>
+		  <artifactId>thymeleaf-layout-dialect</artifactId>
+		</dependency>
+		<!-- AOP -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
