@@ -113,14 +113,14 @@ gulp.task('replacePath', function(){
     var replacePath1 = gulp.src(['./pages/*/*.html'], { base: "./" })
         .pipe(replace('="images/', '="/static/images/'))
         .pipe(replace('href="pages/', 'href="../../pages/'))
-        .pipe(replace('href="index.html"', 'href="../../index.html"'))
+        .pipe(replace('href="/templates/index.html"', 'href="/templates/index.html"'))
         .pipe(gulp.dest('.'));
     var replacePath2 = gulp.src(['./pages/*.html'], { base: "./" })
         .pipe(replace('="images/', '="../images/'))
         .pipe(replace('"pages/', '"../pages/'))
-        .pipe(replace('href="index.html"', 'href="../index.html"'))
+        .pipe(replace('href="/templates/index.html"', 'href="/templates/index.html"'))
         .pipe(gulp.dest('.'));
-    var replacePath3 = gulp.src(['./*/index.html'], { base: "./" })
+    var replacePath3 = gulp.src(['/templates/index.html'], { base: "./" })
         .pipe(replace('="images/', '="images/'))
         .pipe(gulp.dest('.'));
     return merge(replacePath1 , replacePath2, replacePath3);
