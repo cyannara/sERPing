@@ -1,8 +1,11 @@
 package com.beauty1nside.accnut.controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.beauty1nside.accnut.service.AssetService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -19,11 +22,17 @@ public class AccnutSampleController {
 		return "/accnut/sample";
 	};
 	
+	final AssetService assetService;
+	
 //	----------------------------------------------------------------------------
 	
 	//자산관리 페이지
 	@GetMapping("/asset")
-	public String asset() {
+	public String asset(Model model) {
+		
+		String abc = "a1000";
+		model.addAttribute("info", assetService.info(abc) );
+		
 		return "/accnut/asset";
 	};
 	
