@@ -19,6 +19,7 @@ Thumbs.db
 *.log
 *.env
 *.local
+application.properties
 
 # IntelliJ IDEA / Eclipse 설정 무시
 *.class
