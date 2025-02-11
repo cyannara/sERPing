@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.beauty1nside.hr.mapper.EmployeeMapper">
 
-	<select id="getAllEmployees" resultType="com.erp.hr.dto.EmployeeDTO">
+	<select id="getAllEmployees" resultType="EmployeeDTO">
 		SELECT * FROM hr_employee
 	</select>
 
