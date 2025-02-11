@@ -22,7 +22,7 @@ public class BhfSampleController {
 	// test 페이지
 	@GetMapping("/a")
 	public String test() {
-		return "/purchs/index";
+		return "/partials/_navbar";
 	};
 	
 	
