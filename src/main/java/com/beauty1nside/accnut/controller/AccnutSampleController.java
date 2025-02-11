@@ -1,4 +1,4 @@
-package com.beauty1nside.accnut;
+package com.beauty1nside.accnut.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
