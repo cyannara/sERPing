@@ -21,15 +21,77 @@ public class AccnutSampleController {
 	
 //	----------------------------------------------------------------------------
 	
+	//자산관리 페이지
+	@GetMapping("/asset")
+	public String asset() {
+		return "/accnut/asset";
+	};
 	
+	//채무 관리 페이지
+	@GetMapping("/debt")
+	public String debt() {
+		return "/accnut/debt";
+	};
 	
+	//거래 대장 등록 페이지
+	@GetMapping("/book_insert")
+	public String book_insert() {
+		return "/accnut/book_insert";
+	};
 	
+	//거래 대장 조회 페이지
+	@GetMapping("/book_select")
+	public String book_select() {
+		return "/accnut/book_select";
+	};
 	
+	//급여 처리 페이지
+	@GetMapping("/salary")
+	public String salary() {
+		return "/accnut/salary";
+	};
 	
+	//미지급금 처리 페이지
+	@GetMapping("/unpay")
+	public String unpay() {
+		return "/accnut/unpay";
+	};
 	
+	//기타 지급 처리 페이지
+	@GetMapping("/etc_pay")
+	public String etc_pay() {
+		return "/accnut/etc_pay";
+	};
 	
+	//부대 비용 처리 페이지
+	@GetMapping("/incidental_cost")
+	public String incidental_cost() {
+		return "/accnut/incidental_cost";
+	};
 	
+	//세금계산서 발행 페이지
+	@GetMapping("/tax_insert")
+	public String tax_insert() {
+		return "/accnut/tax_insert";
+	};
 	
+	//세금계산서 조회 페이지
+	@GetMapping("/tax_select")
+	public String tax_select() {
+		return "/accnut/tax_select";
+	};
+	
+	//매출 조회 페이지
+	@GetMapping("/selling_select")
+	public String selling_select() {
+		return "/accnut/selling_select";
+	};
+	
+	//매출 현황 페이지
+	@GetMapping("/selling_status")
+	public String selling_status() {
+		return "/accnut/selling_status";
+	};
 	
 	
 }
