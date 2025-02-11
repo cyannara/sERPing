@@ -17,5 +17,6 @@ public class HrSampleController {
 	@GetMapping("/")
 	public String sample() {
 		return "/hr/sample";
+		
 	};
 }

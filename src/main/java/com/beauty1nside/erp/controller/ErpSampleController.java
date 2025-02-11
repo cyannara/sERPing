@@ -23,9 +23,4 @@ public class ErpSampleController {
 	public String layout() {
 		return "/erp/layout";
 	}
-	
-	@GetMapping("/main")
-	public String main() {
-		return "/erp/main";
-	}
 }
