@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beauty1nside.accnut.mapper.AssetMapper">
+	<select id="info" resultType="com.beauty1nside.accnut.dto.AssetDTO" parameterType="String">
+		SELECT assets_code, assets_name, section, financial_institution, finance_information, owner, amount, register_date, quantity, fixtures_amount
+		FROM accnut_assets
+		WHERE assets_code = #{assetsCode}
+	</select>
+
+	<select id="list" resultType="com.beauty1nside.accnut.dto.AssetDTO">
+		SELECT assets_code, assets_name, section, financial_institution, finance_information, owner, amount, register_date, quantity, fixtures_amount
+		FROM accnut_assets
+		ORDER BY assets_code
+	</select>
+
+
+
+
+
+
+
+
+
+
+</mapper>
