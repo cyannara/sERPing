@@ -1,3 +1,21 @@
+<<<<<<< HEAD
+C:\Users\admin\git\sERPing\src\main\java\com\beauty1nside\accnut\AccnutSampleController.java
+C:\Users\admin\git\sERPing\src\main\java\com\beauty1nside\bhf\BhfSampleController.java
+C:\Users\admin\git\sERPing\src\main\java\com\beauty1nside\bsn\BsnSampleController.java
+C:\Users\admin\git\sERPing\src\main\java\com\beauty1nside\erp\controller\ErpAdminController.java
+C:\Users\admin\git\sERPing\src\main\java\com\beauty1nside\erp\controller\ErpAdminRestController.java
+C:\Users\admin\git\sERPing\src\main\java\com\beauty1nside\erp\controller\ErpSampleController.java
+C:\Users\admin\git\sERPing\src\main\java\com\beauty1nside\erp\controller\MovieController.java
+C:\Users\admin\git\sERPing\src\main\java\com\beauty1nside\erp\dto\MovieDTO.java
+C:\Users\admin\git\sERPing\src\main\java\com\beauty1nside\erp\dto\MovieListDTO.java
+C:\Users\admin\git\sERPing\src\main\java\com\beauty1nside\erp\dto\testDTO.java
+C:\Users\admin\git\sERPing\src\main\java\com\beauty1nside\erp\mapper\ErpAdminMapper.java
+C:\Users\admin\git\sERPing\src\main\java\com\beauty1nside\erp\service\ErpAdminService.java
+C:\Users\admin\git\sERPing\src\main\java\com\beauty1nside\erp\service\impl\ErpAdminServiceImpl.java
+C:\Users\admin\git\sERPing\src\main\java\com\beauty1nside\hr\HrSampleController.java
+C:\Users\admin\git\sERPing\src\main\java\com\beauty1nside\purchs\PurchsSampleController.java
+C:\Users\admin\git\sERPing\src\main\java\com\beauty1nside\SerpingApplication.java
+=======
 C:\Users\Hayeon\git\sERPing\src\main\java\com\beauty1nside\accnut\AccnutSampleController.java
 C:\Users\Hayeon\git\sERPing\src\main\java\com\beauty1nside\bhf\controller\BhfSampleController.java
 C:\Users\Hayeon\git\sERPing\src\main\java\com\beauty1nside\bsn\BsnSampleController.java
@@ -14,3 +32,4 @@ C:\Users\Hayeon\git\sERPing\src\main\java\com\beauty1nside\erp\service\impl\ErpA
 C:\Users\Hayeon\git\sERPing\src\main\java\com\beauty1nside\hr\HrSampleController.java
 C:\Users\Hayeon\git\sERPing\src\main\java\com\beauty1nside\purchs\PurchsSampleController.java
 C:\Users\Hayeon\git\sERPing\src\main\java\com\beauty1nside\SerpingApplication.java
+>>>>>>> refs/heads/main
