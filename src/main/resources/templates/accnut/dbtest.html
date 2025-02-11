@@ -39,6 +39,7 @@
 			<tr class="table-dark">
 				<th>자산코드</th>
 				<th>자산명</th>
+				<th>구분</th>
 			</tr>
 		</thead>
 		<tbody class="viewtable">
@@ -81,6 +82,7 @@
 			let tag = `<tr class="${rowClass}">`;
 			tag += `<td>${ele.assetsCode}</td>`;
 			tag += `<td>${ele.assetsName}</td>`;
+			tag += `<td>${ele.section}</td>`;
 			tag += `</tr>`;
 			
 			//console.log(tag);
@@ -111,8 +113,16 @@
 	// ✅ ag-Grid 설정
 	const gridOptions = {
 	  columnDefs: [
-	    { headerName: "이름", field: "testName", },
-	    { headerName: "나이", field: "testAge", },
+	    { headerName: "자산코드", field: "assetsCode", },
+	    { headerName: "자산명", field: "assetsName", },
+	    { headerName: "구분", field: "section", },
+	    { headerName: "금융기관", field: "financialInstitution", },
+	    { headerName: "결제정보", field: "financeInformation", },
+	    { headerName: "소유주", field: "owner", },
+	    { headerName: "금액", field: "amount", },
+	    { headerName: "등록일", field: "registerDate", },
+	    { headerName: "수량", field: "quantity", },
+	    { headerName: "비품금액", field: "fixturesAmount", },
 	  ],
 	  rowData: rowData, // ✅ 초기 데이터 설정 // 기초 셋팅이 필요하면 rowData로 해서 값 넣으면됨
 	  pagination: true,
