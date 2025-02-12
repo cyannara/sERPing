@@ -10,12 +10,17 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2	//log4j 가 안되면 버전높은 log4j2 사용
 @Controller
 @AllArgsConstructor
-@RequestMapping("/bns/*")
+@RequestMapping("/bsn/*")
 public class BsnSampleController {
 
 	//샘플 페이지
 	@GetMapping("/")
 	public String sample() {
-		return "/bns/sample";
+		return "/bsn/sample";
+	};
+	
+	@GetMapping("/test")
+	public String test() {
+		return "/bsn/sample2";
 	};
 }

@@ -7,20 +7,47 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.beauty1nside.common.dto.ComDTO;
+import com.beauty1nside.common.mapper.ErpComMapper;
+import com.beauty1nside.erp.dto.CompanyListDTO;
 import com.beauty1nside.erp.dto.testDTO;
 import com.beauty1nside.erp.service.ErpAdminService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
+/**
+ * ERP 회사 관리 사용하는 정보를 CURD한다
+ * @author ERP 관리자 개발팀 표하연
+ * @since 2025.02.12
+ * @version 1.0
+ * @see
+ *
+ * <pre>
+ * << 개정이력(Modification Information) >>
+ *
+ *   수정일      수정자          수정내용
+ *  -------    --------    ---------------------------
+ *  2025.02.12  표하연          최초 생성
+ *
+ *  </pre>
+*/
 @Log4j2	//log4j 가 안되면 버전높은 log4j2 사용
 @Controller
 @AllArgsConstructor
 @RequestMapping("/erp/*")
 public class ErpAdminController {
 	
-	private ErpAdminService erpAdminService;
+	/**
+     * ErpAdminMapper 맵퍼를 사용하기 위한 의존성 주입 {서비스}
+     */
+	private final ErpAdminService erpAdminService;
 	
+	/**
+     * DB연결 확인을 위하여 샘플 데이터를 조회
+     *
+     * @return String
+     */
 	@GetMapping("dbtest")
 	public String dbtest(Model model) {
 		List<testDTO> list = erpAdminService.test();
@@ -29,10 +56,24 @@ public class ErpAdminController {
 		return "/erp/dbtest";
 	}
 	
+	/**
+     * ERP 관리자 페이지 연결
+     *
+     * @return String
+     */
+	@GetMapping("/admin")
+	public String layout() {
+		return "/erp/admin";
+	}
+	
+	/**
+     * ERP 소개 페이지 연결
+     *
+     * @return String
+     */
 	@GetMapping("/main")
 	public String main() {
 		return "/erp/main";
 	}
-	
 
 }
