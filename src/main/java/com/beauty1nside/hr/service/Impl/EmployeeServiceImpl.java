@@ -3,6 +3,7 @@ package com.beauty1nside.hr.service.Impl;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.beauty1nside.hr.dto.EmployeeDTO;
 import com.beauty1nside.hr.mapper.EmployeeMapper;
@@ -21,32 +22,32 @@ public class EmployeeServiceImpl implements EmployeeService{
 		private final EmployeeMapper employeeMapper;
 
 		@Override
+		@Transactional
 		public List<EmployeeDTO> getAllEmployees() {
-			// TODO Auto-generated method stub
-			return null;
+			return employeeMapper.getAllEmployees();
 		}
 
 		@Override
+		@Transactional
 		public EmployeeDTO getEmployeeById(Long employeeNum) {
-			// TODO Auto-generated method stub
-			return null;
+			return employeeMapper.getEmployeeById(employeeNum);
 		}
 
 		@Override
 		public void insertEmployee(EmployeeDTO employee) {
-			// TODO Auto-generated method stub
+			employeeMapper.insertEmployee(employee);
 			
 		}
 
 		@Override
 		public void updateEmployee(EmployeeDTO employee) {
-			// TODO Auto-generated method stub
+			employeeMapper.updateEmployee(employee);
 			
 		}
 
 		@Override
 		public void deleteEmployee(Long employeeNum) {
-			// TODO Auto-generated method stub
+			employeeMapper.deleteEmployee(employeeNum);
 			
 		}
 		

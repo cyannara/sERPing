@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" layout:decorate="~{/erp/layouts/main}">
+<div class="container w-100 mw-1600" layout:fragment="content">
+	<div class="d-flex flex-column mb-1">
+		<div class="d-flex justify-content-start p-0 mt-2">
+			<h2>사원 관리</h2>
+		</div>
+		<!-- 사원 검색 영역 -->
+		<div class="p-2">
+			<div class="d-flex justify-content-center border border-primary-subtle rounded-3 bg-primary-subtle p-3">
+				<select class="form-select me-2" id="searchDepartment">
+					<option value="">부서 선택</option>
+					<option value="HR">인사팀</option>
+					<option value="IT">IT팀</option>
+				</select> <select class="form-select me-2" id="searchPosition">
+					<option value="">직급 선택</option>
+					<option value="P001">사원</option>
+					<option value="P002">대리</option>
+					<option value="P003">과장</option>
+				</select> <select class="form-select me-2" id="searchStatus">
+					<option value="">재직 상태</option>
+					<option value="ST001">재직</option>
+					<option value="ST002">휴직</option>
+					<option value="ST003">퇴사</option>
+				</select>
+
+				<button class="btn btn-primary" onclick="searchEmployees()">조회</button>
+			</div>
+		</div>
+		<!-- 사원 검색 영역 끝 -->
+
+		<!-- 토스트 그리드 영역 -->
+		<div class="p-2">
+			<div class="d-flex justify-content-center">
+				<div id="grid"></div>
+				<div id="pagination" class="tui-pagination"></div>
+			</div>
+		</div>
+		<!-- 토스트 그리드 영역 끝 -->
+
+		<!-- 버튼 영역 -->
+		<div class="pt-2">
+			<button class="btn btn-success" onclick="openEmployeeForm()">사원 등록</button>
+			<button class="btn btn-danger" onclick="deleteEmployee()">삭제</button>
+		</div>
+	</div>
+
+	<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+    });
+    //그리드 선언
+    var Grid = tui.Grid;
+    const dataSource = {
+      api: {
+        readData: { url: '/hr/rest/employee', method: 'GET' },
+        //createData: { url: '/api/createData', method: 'POST' },
+        //updateData: { url: '/api/updateData', method: 'PUT' },
+        //modifyData: { url: 'http://localhost:81/api/board/modifyData', method: 'PUT' },
+        //deleteData: { url: '/api/deleteData', method: 'DELETE' },
+      },
+      contentType: 'application/json',
+    };
+
+    //그리드 생성
+    const grid = new Grid({
+      el: document.getElementById('grid'), // 컨테이너 엘리먼트
+      pageOptions: {
+        useClient: false, //페이지 네이션 할꺼면 false // 자동으로 하게할껴면 true
+        perPage: 5, //한페이지에 몇개 보여줄지
+      },
+      
+      //칼럼 정하기
+      columns: [
+        { header: "사원번호", name: "employeeNum", width: 100 },
+        { header: "사원명", name: "employeeName", width: 150 },
+        { header: "부서", name: "departmentName", width: 100 },
+        { header: "직급", name: "position", width: 100 },
+        { header: "재직 상태", name: "status", width: 100 },
+        { header: "근무 유형", name: "employmentType", width: 100 },
+        { header: "입사일", name: "hireDate", width: 150 },
+        { header: "연락처", name: "phone", width: 150 },
+        { header: "이메일", name: "email", width: 200 }
+      ],
+      
+      //초기 데이터 뭘로 할지
+		data : dataSource,
+
+      rowHeaders: ['checkbox'],
+
+
+
+    });
+
+
+
+  </script>
+</div>
+
+</html>
