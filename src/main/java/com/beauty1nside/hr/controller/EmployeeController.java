@@ -15,16 +15,18 @@ import org.springframework.web.bind.annotation.RestController;
 import com.beauty1nside.hr.dto.EmployeeDTO;
 import com.beauty1nside.hr.service.EmployeeService;
 
+import groovy.util.logging.Log4j2;
 import lombok.RequiredArgsConstructor;
 
+@Log4j2
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/employees")
+@RequestMapping("/hr/rest")
 public class EmployeeController {
 	private final EmployeeService employeeService;
 	
 	
-	@GetMapping
+	@GetMapping("list")
 	public List<EmployeeDTO> getAllEmployees(){
 		return employeeService.getAllEmployees();
 	}
