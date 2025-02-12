@@ -1,68 +1,186 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"  layout:decorate="~{/erp/layouts/main}">
+<!-- =======================================================
+	* ERP회사 관리자페이지 사용회사 관리 페이지
+	* @author ERP 관리자 개발팀 표하연
+	* @since 2025.02.12
+	* @version 1.0
+	* @see
+	*
+	* <pre>
+	* << 개정이력(Modification Information) >>
+	*
+	*   수정일      수정자          수정내용
+	*  ======    =======    ==============================
+	*  2025.02.12  표하연          최초생성
+	*
+	*  </pre>
+======================================================== -->
+<html xmlns:th="http://www.thymeleaf.org"
+	layout:decorate="~{/erp/layouts/main}">
+
 
 <div class="container" layout:fragment="content">
 	<div class="d-flex flex-column mb-3">
 		<div class="d-flex justify-content-start p-1 mt-2">
 			<h3>회사관리</h3>
 		</div>
-	  <div class="p-2">
-	  	<div class="d-flex justify-content-center border border-primary-subtle rounded-3 bg-primary-subtle p-3">
-	  		<div class="form-check me-3">
-			  <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-			  <label class="form-check-label" for="flexCheckDefault">
-			    계약
-			  </label>
+		<!-- 회사 검색 영역 -->
+		<div class="p-2">
+			<div
+				class="d-flex justify-content-center border border-primary-subtle rounded-3 bg-primary-subtle p-3">
+				<div class="form-check me-3">
+					<input class="form-check-input" type="checkbox" value=""
+						id="flexCheckDefault"> <label class="form-check-label"
+						for="flexCheckDefault"> 계약 </label>
+				</div>
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" value=""
+						id="flexCheckChecked" checked> <label
+						class="form-check-label" for="flexCheckChecked"> 미계약 </label>
+				</div>
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" value=""
+						id="flexCheckChecked" checked> <label
+						class="form-check-label" for="flexCheckChecked"> 서비스 </label>
+				</div>
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" value=""
+						id="flexCheckChecked" checked> <label
+						class="form-check-label" for="flexCheckChecked"> 일시정지 </label>
+				</div>
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" value=""
+						id="flexCheckChecked" checked> <label
+						class="form-check-label" for="flexCheckChecked"> 종료 </label>
+				</div>
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" value=""
+						id="flexCheckChecked" checked> <label
+						class="form-check-label" for="flexCheckChecked"> 남은기간 10일
+						미만 </label>
+				</div>
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" value=""
+						id="flexCheckChecked" checked> <label
+						class="form-check-label" for="flexCheckChecked"> 정기구독 </label>
+				</div>
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" value=""
+						id="flexCheckChecked" checked> <label
+						class="form-check-label" for="flexCheckChecked"> 기간구독 </label>
+				</div>
 			</div>
-			<div class="form-check">
-			  <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
-			  <label class="form-check-label" for="flexCheckChecked">
-			    미계약
-			  </label>
+		</div>
+		<!-- 회사 검색 영역 끝 -->
+		<!-- 토스트 그리드 영역 -->
+		<div class="p-2">
+			<div class="d-flex justify-content-center">
+				<!--  -->
+				<div id="grid"></div>
+				<div id="pagination" class="tui-pagination"></div>
 			</div>
-			<div class="form-check">
-			  <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
-			  <label class="form-check-label" for="flexCheckChecked">
-			    서비스
-			  </label>
-			</div>
-			<div class="form-check">
-			  <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
-			  <label class="form-check-label" for="flexCheckChecked">
-			    일시정지
-			  </label>
-			</div>
-			<div class="form-check">
-			  <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
-			  <label class="form-check-label" for="flexCheckChecked">
-			    종료
-			  </label>
-			</div>
-			<div class="form-check">
-			  <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
-			  <label class="form-check-label" for="flexCheckChecked">
-			    남은기간 10일 미만
-			  </label>
-			</div>
-			<div class="form-check">
-			  <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
-			  <label class="form-check-label" for="flexCheckChecked">
-			    정기구독
-			  </label>
-			</div>
-			<div class="form-check">
-			  <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
-			  <label class="form-check-label" for="flexCheckChecked">
-			    기간구독
-			  </label>
-			</div>
-	  	</div>
-	  </div>
-	  <div class="p-2">
-	  	<div class="d-flex justify-content-center">그리드리스트</div>
-	  </div>
-	  <div class="p-2">
-	  	<div class="d-flex justify-content-center">데이터처리화면</div>
-	  </div>
+		</div>
+		<!-- 토스트 그리드 영역 끝 -->
+		<!-- 데이터 처리 영역 -->
+		<div class="p-2">
+			<div class="d-flex justify-content-center">데이터처리화면</div>
+		</div>
+		<!-- 데이터 처리 영역 끝-->
 	</div>
+
+
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+		});
+		//그리드 선언
+		var Grid = tui.Grid;
+		const dataSource = {
+			api : {
+				readData : { url : '/erp/rest/comlist', method : 'GET', initParams : { param : 'param' } },
+			//createData: { url: '/api/createData', method: 'POST' },
+			//updateData: { url: '/api/updateData', method: 'PUT' },
+			//modifyData: { url: 'http://localhost:81/api/board/modifyData', method: 'PUT' },
+			//deleteData: { url: '/api/deleteData', method: 'DELETE' },
+			},
+			contentType : 'application/json',
+		};
+
+		//그리드 생성
+		const grid = new Grid({
+			el : document.getElementById('grid'), // 컨테이너 엘리먼트
+			pageOptions : {
+				useClient : true, //페이지 네이션 할꺼면 false // 자동으로 하게할껴면 true
+				perPage : 2, //한페이지에 몇개 보여줄지
+			},
+			//칼럼 정하기
+			columns: [
+				{ header: "회사번호", name: "companyNum", editor: 'text' },
+				{ header: "회사명", name: "companyName", editor: 'text' },
+				{ header: "대표자명", name: "representationName", editor: 'text' },
+				{ header: "담당자명", name: "chargerName", editor: 'text' },
+				{ header: "담당자연락처", name: "chargerPhone", editor: 'text' },
+				{ header: "이메일", name: "chargerEmail", editor: 'text' },
+				{ header: "사업자등록증", name: "businessLicense", editor: 'text' },
+				{ header: "계약서", 
+			        name: "contractNum", 
+			        formatter: function({ value }) {
+			            if (value === 0) {
+			            	return `미계약`;
+			            } else {
+			                return `<button class="btn btn-info" data-id="${value}" onclick="contractAction(${value})">계약</button>`;
+			            }
+			        },
+			        editor: 'text',
+				},
+				{ header: "상태", name: "serviceState", 
+					formatter: function({ value }) {
+			            if (value === 'EC01') {
+			            	return `서비스`;
+			            } else if (value === 'EC02') {
+			            	return `일시정지`;
+			            } else {
+			                return `종료`;
+			            }
+			        },
+			        editor: 'text',
+				},
+				{ header: "남은기간", name: "remainingDays", editor: 'text',
+					//해당행 전체 데이터 가져오기
+					formatter: function({ row }) {
+						// 만료일 가져오기
+			            const endDateStr = row.subscriptionEndDate; 
+			          	//마지막 날짜 만들기
+			            const endDate = new Date(endDateStr);	
+			         	// 오늘 날짜 만들기
+			            const today = new Date();	
+			         	// 만료일 - 오늘날짜 (미리초로 데이터 반환)
+			            const timeDiff = endDate.getTime() - today.getTime();
+			            // 미리초 데이터를 일 단위로 변환
+			            const remainingDays = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+
+			            if(remainingDays > 0){
+			            	return `${remainingDays}일 남음`;
+			            }else if(remainingDays <= 0 && remainingDays >= 9){
+			            	//나중에 붉은색 스타일 넣을꺼 가만하고 분리
+			            	return `${remainingDays}일 남음`;
+			            }else{
+				            return `종료`;
+			            }
+			        },
+			    },
+				{ header: "구독형태", name: "subscriptionForm", editor: 'text',
+					formatter: function({ value }) {
+			            if (value === 'EL01') {
+			            	return `기간구독`;
+			            } else if (value === 'EL02') {
+			            	return `정기구독`;
+			            }
+			        },
+			    },
+				{ header: "만료일", name: "subscriptionEndDate", editor: 'text' },
+			],
+			//초기 데이터 뭘로 할지
+			data : dataSource,
+		});
+	</script>
 </div>
