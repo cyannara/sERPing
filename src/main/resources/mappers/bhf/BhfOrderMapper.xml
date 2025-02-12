@@ -14,7 +14,7 @@
 	</insert>
 	
 	<!-- 상품조회 -->
-	<select id="">
+	<select id="goodsInfo">
 		select goods_code,
 	           goods_name,
 	           goods_standard
@@ -22,7 +22,7 @@
 	</select>
 	
 	<!-- 상품 선택시 옵션조회 -->
-	<select id="">
+	<select id="goodsOptionInfo">
 		select g.goods_code,
 		       o.option_code,
 		       o.option_name

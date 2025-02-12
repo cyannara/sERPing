@@ -6,4 +6,8 @@ public interface BhfOrderMapper {
 
 	public void orderPrd(BhfOrdVO vo);
 	
+	public void goodsInfo();
+	
+	public void goodsOptionInfo();
+	
 }
