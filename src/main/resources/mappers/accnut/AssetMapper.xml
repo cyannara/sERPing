@@ -12,7 +12,11 @@
 		FROM accnut_assets
 		ORDER BY assets_code
 	</select>
-
+	
+	<select id="count">
+		SELECT COUNT(assets_code)
+		FROM accnut_assets
+	</select>
 
 
 
