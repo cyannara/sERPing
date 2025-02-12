@@ -23,4 +23,8 @@ public class BsnSampleController {
 	public String test() {
 		return "/bsn/sample2";
 	};
+	@GetMapping("/order")
+	public String test2() {
+		return "/bsn/order";
+	};
 }
