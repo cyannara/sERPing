@@ -18,18 +18,18 @@
         <div class="row mb-3">
             <div class="col-md-6">
                 <label class="form-label">상품명</label>
-                <input type="text" class="form-control" name="productName" th:value="${product.name}">
+                <input type="text" class="form-control" name="goodsName" th:value="${ProductDTO.goodsName}">
             </div>
             <div class="col-md-6">
                 <label class="form-label">상품번호</label>
-                <input type="text" class="form-control" name="productCode" th:value="${product.code}" readonly>
+                <input type="text" class="form-control" name="goodsCost" th:value="${ProductDTO.goodsCost}" readonly>
             </div>
         </div>
 
         <div class="row mb-3">
             <div class="col-md-6">
                 <label class="form-label">상품분류</label>
-                <select class="form-select" name="category">
+                <select class="form-select" name="classificationId" th:value="${ProductDTO.classificationId}">
                     <option value="makeup" selected>아이메이크업</option>
                     <option value="makeup" selected>스킨케어</option>
                     <option value="makeup" selected>베이스메이크업</option>
@@ -39,7 +39,7 @@
             <div class="col-md-6">
                 <label class="form-label">브랜드</label>
                 <div class="input-group">
-                    <input type="text" class="form-control" name="brand" th:value="${product.brand}" readonly>
+                    <input type="text" class="form-control" name="blandId" th:value="${ProductDTO.blandId}" readonly>
                     <button class="btn btn-secondary">🔍</button>
                 </div>
             </div>
@@ -49,35 +49,35 @@
             <div class="col-md-6">
                 <label class="form-label">공급처</label>
                 <div class="input-group">
-                    <input type="text" class="form-control" name="supplier" th:value="${product.supplier}" readonly>
+                    <input type="text" class="form-control" name="vendorId" th:value="${ProductDTO.vendorId}" readonly>
                     <button class="btn btn-secondary">🔍</button>
                 </div>
             </div>
             <div class="col-md-6">
                 <label class="form-label">원가</label>
-                <input type="text" class="form-control" name="cost" th:value="${product.cost}">
+                <input type="text" class="form-control" name="goodsCost" th:value="${ProductDTO.goodsCost}">
             </div>
         </div>
 
         <div class="row mb-3">
             <div class="col-md-6">
                 <label class="form-label">판매가</label>
-                <input type="text" class="form-control" name="price" th:value="${product.price}">
+                <input type="text" class="form-control" name="goodsPrice" th:value="${ProductDTO.goodsPrice}">
             </div>
             <div class="col-md-6">
                 <label class="form-label">공급가액</label>
-                <input type="text" class="form-control" name="supplyAmount" th:value="${product.supplyAmount}">
+                <input type="text" class="form-control" name="goodsSupplyPrice" th:value="${ProductDTO.goodsSupplyPrice}">
             </div>
         </div>
 
         <div class="row mb-3">
             <div class="col-md-6">
                 <label class="form-label">규격</label>
-                <input type="text" class="form-control" name="size" th:value="${product.size}">
+                <input type="text" class="form-control" name="goodsStandard" th:value="${ProductDTO.goodsStandard}">
             </div>
             <div class="col-md-6">
                 <label class="form-label">담당자</label>
-                <input type="text" class="form-control" name="manager" th:value="${product.manager}" readonly>
+                <input type="text" class="form-control" name="employeeNum" th:value="${ProductDTO.employeeNum}" readonly>
             </div>
         </div>
 
@@ -85,14 +85,14 @@
             <div class="col-md-6">
                 <label class="form-label">대표 이미지</label>
                 <div class="input-group">
-                    <input type="text" class="form-control" name="image" th:value="${product?.image}" readonly>
+                    <input type="text" class="form-control" name="goodsImage" th:value="${ProductDTO.goodsImage}" readonly>
                     <button class="btn btn-secondary">📂</button>
                 </div>
             </div>
             <div class="col-md-6">
                 <label class="form-label">상품설명</label>
                 <div class="input-group">
-                    <textarea class="form-control" name="description" rows="2"></textarea>
+                    <textarea class="form-control" name="goodsDescription" rows="2" th:value="${ProductDTO.goodsDescription}"></textarea>
                 </div>
             </div>
         </div>
