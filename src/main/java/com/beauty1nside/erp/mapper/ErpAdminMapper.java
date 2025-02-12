@@ -3,6 +3,7 @@ package com.beauty1nside.erp.mapper;
 import java.util.List;
 
 import com.beauty1nside.erp.dto.CompanyListDTO;
+import com.beauty1nside.erp.dto.CompanyListSearchDTO;
 import com.beauty1nside.erp.dto.testDTO;
 
 /**
@@ -32,7 +33,16 @@ public interface ErpAdminMapper {
 	/**
      * ERP 사용 회사 전체 리스트를 조회한다
      *
+     * @param CompanyListSearchDTO
      * @return List<CompanyListDTO>
      */
-	public List<CompanyListDTO> companyList();
+	public List<CompanyListDTO> companyList(CompanyListSearchDTO searchDTO);
+	
+	/**
+     * ERP 사용 회사 전체 리스트 갯수를 조회
+     *
+     * @param CompanyListSearchDTO
+     * @return int
+     */
+	public int getCount(CompanyListSearchDTO searchDTO);
 }

@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.beauty1nside.common.Paging;
 import com.beauty1nside.common.dto.ComDTO;
 import com.beauty1nside.common.mapper.ErpComMapper;
+import com.beauty1nside.erp.dto.CompanyListDTO;
+import com.beauty1nside.erp.dto.CompanyListSearchDTO;
 import com.beauty1nside.erp.dto.testDTO;
 import com.beauty1nside.erp.service.ErpAdminService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -67,22 +69,31 @@ public class ErpAdminRestController {
 	/**
      * ERP 사용 회사 전체 리스트 조회
      *
+     * @param int
+     * @param CompanyListSearchDTO
+     * @param Paging
      * @return Map<String, Object>
+     * @throws JsonMappingException
+     * @throws JsonProcessingException
      */
 	@GetMapping("/comlist")
-	public Map<String, Object> comlist( @RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
-										//BoardSearchDTO searchDTO,
+	public Map<String, Object> comlist( 
+										@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
+										CompanyListSearchDTO searchDTO,
 										Paging paging
 			) throws JsonMappingException, JsonProcessingException{
 		
+		//한페이지에 몇개 나오게 할껀지
 		paging.setPageUnit(perPage);
+		
+		//log.info("★★★"+paging.getPage());
 
-//		// 페이징 조건
-//		searchDTO.setStart(paging.getFirst());
-//		searchDTO.setEnd(paging.getLast());
-//
-//		// 페이징처리
-//		paging.setTotalRecord(service.getCount(searchDTO));
+		// 페이징 조건
+		searchDTO.setStart(paging.getFirst());
+		searchDTO.setEnd(paging.getLast());
+		
+		// 페이징처리
+		paging.setTotalRecord(erpAdminService.getCount(searchDTO));
 		
 		String str = """
 								{
@@ -106,14 +117,13 @@ public class ErpAdminRestController {
 		
 		//거기에 전체 페이지랑 페이지번호 읽어옴
 		// 페이징처리
-		pagination.put("page", 1);
-		pagination.put("totalCount", 3);
+		pagination.put("page", paging.getPage());
+		pagination.put("totalCount", paging.getTotalRecord());
+		//pagination.put("totalCount", erpAdminService.getCount(searchDTO));
 	
-		//회사 리스팅할 정보를 조회 한다.
-//		List<CompanyListDTO> companyList = erpAdminService.companyList();
-//		log.info(companyList.toString());
-				
-		data.put("contents", erpAdminService.companyList());
+		//log.info(searchDTO.toString());
+		data.put("contents", erpAdminService.companyList(searchDTO));
+		//log.info(map.toString());
 		return map;
 	}
 	

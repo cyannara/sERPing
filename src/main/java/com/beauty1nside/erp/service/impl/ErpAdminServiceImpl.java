@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.beauty1nside.erp.dto.CompanyListDTO;
+import com.beauty1nside.erp.dto.CompanyListSearchDTO;
 import com.beauty1nside.erp.dto.testDTO;
 import com.beauty1nside.erp.mapper.ErpAdminMapper;
 import com.beauty1nside.erp.service.ErpAdminService;
@@ -55,12 +56,24 @@ public class ErpAdminServiceImpl implements ErpAdminService {
 
 	/**
      * ERP 사용 회사 전체 리스트를 조회한다
-     *
+     * 
+     * @param CompanyListSearchDTO
      * @return List<CompanyListDTO>
      */
 	@Override
 	@Transactional	// 트랜잭션 적용: 실행 중 예외 발생 시 롤백, 정상 종료 시 커밋
-	public List<CompanyListDTO> companyList() {
-		return erpAdminMapper.companyList();
+	public List<CompanyListDTO> companyList(CompanyListSearchDTO searchDTO) {
+		return erpAdminMapper.companyList(searchDTO);
+	}
+
+	/**
+     * ERP 사용 회사 전체 리스트 갯수를 조회
+     *
+     * @param CompanyListSearchDTO
+     * @return int
+     */
+	@Override
+	public int getCount(CompanyListSearchDTO searchDTO) {
+		return erpAdminMapper.getCount(searchDTO);
 	}
 }

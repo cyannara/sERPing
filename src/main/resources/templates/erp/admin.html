@@ -19,15 +19,14 @@
 	layout:decorate="~{/erp/layouts/main}">
 
 
-<div class="container" layout:fragment="content">
-	<div class="d-flex flex-column mb-3">
-		<div class="d-flex justify-content-start p-1 mt-2">
-			<h3>회사관리</h3>
+<div class="container w-100 mw-1600" layout:fragment="content">
+	<div class="d-flex flex-column mb-1">
+		<div class="d-flex justify-content-start p-0 mt-2">
+			<h2>회사관리</h2>
 		</div>
 		<!-- 회사 검색 영역 -->
 		<div class="p-2">
-			<div
-				class="d-flex justify-content-center border border-primary-subtle rounded-3 bg-primary-subtle p-3">
+			<div class="d-flex justify-content-center border border-primary-subtle rounded-3 bg-primary-subtle p-3">
 				<div class="form-check me-3">
 					<input class="form-check-input" type="checkbox" value=""
 						id="flexCheckDefault"> <label class="form-check-label"
@@ -82,8 +81,104 @@
 		</div>
 		<!-- 토스트 그리드 영역 끝 -->
 		<!-- 데이터 처리 영역 -->
-		<div class="p-2">
-			<div class="d-flex justify-content-center">데이터처리화면</div>
+		<div class="pt-2 ps-2 pe-2">
+		    <div class="d-flex justify-content-center border border-primary-subtle rounded-3 p-0" style="height: 320px;">
+		        <!-- 왼쪽 영역 -->
+		        <div class="d-flex flex-column flex-grow-1 flex-wrap p-1 btn-list" style="max-width: 50%;">
+		            <div class="d-flex flex-wrap mb-1 justify-content-end">
+		                <div class="p-1"><button type="button" class="btn btn-outline-success btn-sm">회사등록</button></div>
+		                <div class="p-1"><button type="button" class="btn btn-outline-danger btn-sm">닫기</button></div>
+		            </div>
+		            <div class="d-flex flex-wrap mb-1">
+		            	<div class="p-0">
+		                	<div class="input-group input-group-sm mb-1 pe-1">
+								<span class="input-group-text">회사번호</span>
+								<input type="number" class="form-control" id="companyNum" name="companyNum" readonly="readonly" style="width: 50px">
+							</div>
+		                </div>
+		                <div class="p-0">
+		                	<div class="input-group input-group-sm mb-1 pe-1">
+								<span class="input-group-text">회사명</span>
+								<input type="text" class="form-control" id="companyName" name="companyName" style="width: 125px">
+							</div>
+		                </div>
+		                <div class="p-0">
+		                	<div class="input-group input-group-sm mb-1 pe-1">
+								<span class="input-group-text" id="inputGroup-sizing-sm">회사영문명</span>
+								<input type="text" class="form-control" id="companyEngName" name="companyEngName" style="width: 125px">
+							</div>
+		                </div>
+		                <div class="p-0">
+							<div class="input-group input-group-sm mb-1">
+								<span class="input-group-text">사업자번호</span>
+								<input type="text" class="form-control" id="businessNum1" name="businessNum1" style="width: 50px">
+								<input type="text" class="form-control" id="businessNum2" name="businessNum2" style="width: 40px">
+								<input type="text" class="form-control" id="businessNum3" name="businessNum3" style="width: 60px">
+							</div>
+						</div>
+		            </div>
+		            <div class="d-flex flex-wrap mb-1">
+		                <div class="p-0">
+		                	<div class="input-group input-group-sm mb-1 pe-1">
+								<span class="input-group-text" id="inputGroup-sizing-sm">대표자명</span>
+								<input type="text" class="form-control" id="representationName" name="representationName" style="width: 75px">
+							</div>
+		                </div>
+		                <div class="p-0">
+		                	<div class="input-group input-group-sm mb-1 pe-1">
+								<span class="input-group-text" id="inputGroup-sizing-sm">대표자연락처</span>
+								<input type="text" class="form-control" id="representationPhone" name="representationPhone" style="width: 120px">
+							</div>
+		                </div>
+		                <div class="p-0">
+		                	<div class="input-group input-group-sm mb-1 pe-1">
+								<span class="input-group-text" id="inputGroup-sizing-sm">담당자명</span>
+								<input type="text" class="form-control" id="chargerName" name="chargerName" style="width: 75px">
+							</div>
+		                </div>
+		                <div class="p-0">
+		                	<div class="input-group input-group-sm mb-1">
+								<span class="input-group-text" id="inputGroup-sizing-sm">담당자연락처</span>
+								<input type="text" class="form-control" id="chargerPhone" name="chargerPhone" style="width: 120px">
+							</div>
+		                </div>
+		            </div>
+		            <div class="d-flex flex-wrap mb-1">
+		                <div class="p-0">
+		                	<div class="input-group input-group-sm mb-1">
+								<span class="input-group-text" id="inputGroup-sizing-sm">email</span>
+								<input type="text" class="form-control">
+							</div>
+		                </div>
+		                <div class="p-0">
+		                	<div class="input-group input-group-sm mb-1">
+								<span class="input-group-text" id="inputGroup-sizing-sm">주소</span>
+								<input type="text" class="form-control">
+							</div>
+		                </div>
+		            </div>
+		            <div class="d-flex flex-wrap mb-1">
+		                <div class="p-0">
+		                	사업자등록증[업로드]
+		                </div>
+		            </div>
+		            <div class="d-flex flex-wrap mb-1">
+		                <div class="p-0">
+		                	내용등록 텍스트 에리아
+		                </div>
+		            </div>
+		        </div>
+		
+		        <!-- 가운데 구분선 -->
+		        <div class="d-flex justify-content-center align-items-center">
+		            <div class="vr border-start border-primary-subtle" style="width: 2px; height: 100%;"></div>
+		        </div>
+		
+		        <!-- 오른쪽 영역 -->
+		        <div class="d-flex justify-content-center flex-grow-1 p-1" style="max-width: 50%;">
+		            처리
+		        </div>
+		    </div>
 		</div>
 		<!-- 데이터 처리 영역 끝-->
 	</div>
@@ -109,8 +204,8 @@
 		const grid = new Grid({
 			el : document.getElementById('grid'), // 컨테이너 엘리먼트
 			pageOptions : {
-				useClient : true, //페이지 네이션 할꺼면 false // 자동으로 하게할껴면 true
-				perPage : 2, //한페이지에 몇개 보여줄지
+				useClient : false, //페이지 네이션 할꺼면 false // 자동으로 하게할껴면 true
+				perPage : 5, //한페이지에 몇개 보여줄지
 			},
 			//칼럼 정하기
 			columns: [
