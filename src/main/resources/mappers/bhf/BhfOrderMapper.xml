@@ -2,4 +2,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.beauty1nside.bhf.mapper.BhfOrderMapper">
 	
+	<!-- 발주 요청 프로시져 호출 -->
+	<insert id="orderPrd" statementType="CALLABLE">
+		call order_prd(
+		  #{branchOfficeId},
+		  #{dueDate},
+		  #{remark},
+		  #{companyNum},
+		  #{files, typeHandler=com.beauty1nside.bhf.OracleArrayStructHandler} 
+		)
+	</insert>
+	
 </mapper>
