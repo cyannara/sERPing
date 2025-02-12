@@ -1,4 +1,4 @@
-package com.beauty1nside.bhf.dto;
+package com.beauty1nside.bhf.dto.goodsorder;
 
 import lombok.Data;
 

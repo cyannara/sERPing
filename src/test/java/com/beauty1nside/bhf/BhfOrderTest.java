@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.beauty1nside.bhf.dto.BhfOrdDtlVO;
-import com.beauty1nside.bhf.dto.BhfOrdVO;
+import com.beauty1nside.bhf.dto.goodsorder.BhfOrdDtlVO;
+import com.beauty1nside.bhf.dto.goodsorder.BhfOrdVO;
 import com.beauty1nside.bhf.mapper.BhfOrderMapper;
 
 @SpringBootTest
@@ -30,7 +30,8 @@ public class BhfOrderTest {
 				   ));
 		
 		Mapper.orderPrd(vo);
-		System.out.println("TEST실행");
+		
+		System.out.println("TEST실행성공");
 	}
 	
 }

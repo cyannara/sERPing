@@ -13,7 +13,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 import org.springframework.util.StringUtils;
 
-import com.beauty1nside.bhf.dto.BhfOrdDtlVO;
+import com.beauty1nside.bhf.dto.goodsorder.BhfOrdDtlVO;
 
 public class OracleArrayStructHandler implements TypeHandler<Object> {
 
@@ -33,6 +33,7 @@ public class OracleArrayStructHandler implements TypeHandler<Object> {
 			return;
 		OracleConnection conn = ps.getConnection().unwrap(OracleConnection.class); 	
 		List<BhfOrdDtlVO> files = (List<BhfOrdDtlVO>)parameter;
+		//배열의 크기를 6으로 지정
 	    Object[] filetype = new Object[6]; 
 	    Struct[] array = new Struct[files.size()];
 
@@ -44,9 +45,9 @@ public class OracleArrayStructHandler implements TypeHandler<Object> {
 	    	filetype[3] = file.getOptionName();
 	    	filetype[4] = file.getGoodsStandard();
 	    	filetype[5] = file.getQuantity();
-	    	array[arrayIndex++] = conn.createStruct("FILETYPE", filetype);
+	    	array[arrayIndex++] = conn.createStruct("FILETYPE", filetype);//FILETYPE은 Oracle에서 지정한 배열타입 이름 
 	    }		
-		Array filearray = (Array)conn.createOracleArray("FILEARRAY", (Struct[]) array);		
+		Array filearray = (Array)conn.createOracleArray("FILEARRAY", (Struct[]) array);//FILEARRAY는 Oracle에서 지정한 배열타입 이름		
 		ps.setArray(i, filearray);
 	}
 
