@@ -8,4 +8,5 @@ public interface AssetMapper {
 
 	AssetDTO info(String assetsCode);
 	List<AssetDTO> list();
+	int count();
 }
