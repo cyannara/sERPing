@@ -4,6 +4,8 @@
       lang="en"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:sec=""
 >
 <body>
 <div class="row" layout:fragment="content">
@@ -11,7 +13,18 @@
     <div class="row">
       <div class="col-12 col-xl-8 mb-4 mb-xl-0">
         <h3 class="font-weight-bold">메인페이지</h3>
-        <h6 class="font-weight-normal mb-0">All systems are running smoothly! You have <span class="text-primary">3 unread alerts!</span></h6>
+        <div sec:authorize="isAnonymous()">
+          로그인 전
+        </div>
+        <div sec:authorize="isAuthenticated()">
+          환영합니다. <span sec:authentication="name" class="h4"></span>님!
+<!--          <p sec:authentication="principal.username"></p>-->
+<!--          <p sec:authentication="principal.userDTO.deptName"></p>-->
+<!--          <p th:text="${session.deptName}"></p>-->
+        </div>
+        <div sec:authorize="hasRole('ROLE_ADMIN')">
+          어드민 권한이 있으면
+        </div>
       </div>
       <div class="col-12 col-xl-4">
         <div class="justify-content-end d-flex">
