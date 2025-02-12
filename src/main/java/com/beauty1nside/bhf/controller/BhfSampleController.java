@@ -18,6 +18,12 @@ public class BhfSampleController {
 	public String sample() {
 		return "/bhf/sample";
 	};
+
+	// test 페이지
+	@GetMapping("/a")
+	public String test() {
+		return "/partials/_navbar";
+	};
 	
 	
 }

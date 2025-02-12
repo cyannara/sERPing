@@ -34,5 +34,10 @@ public class ErpAdminController {
 		return "/erp/main";
 	}
 	
+	@GetMapping("/admin")
+	public String layout() {
+		return "/erp/admin";
+	}
+	
 
 }
