@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<!-- =======================================================
+	* ERP회사 관리자페이지 사용회사 관리 페이지
+	* @author ERP 관리자 개발팀 표하연
+	* @since 2025.02.12
+	* @version 1.0
+	* @see
+	*
+	* <pre>
+	* << 개정이력(Modification Information) >>
+	*
+	*   수정일      수정자          수정내용
+	*  ======    =======    ==============================
+	*  2025.02.12  표하연          최초생성
+	*
+	*  </pre>
+======================================================== -->
+<html xmlns:th="http://www.thymeleaf.org"
+	layout:decorate="~{/erp/layouts/main}">
+
+
+<div class="container w-100 mw-1600" layout:fragment="content">
+	<div class="d-flex flex-column mb-1">
+		<div class="d-flex justify-content-start p-0 mt-2">
+			<h2>회사관리</h2>
+		</div>
+		<!-- 회사 검색 영역 -->
+		<div class="p-2">
+			<div class="d-flex justify-content-center border border-primary-subtle rounded-3 bg-primary-subtle p-3">
+				<div class="form-check me-3">
+					<input class="form-check-input" type="checkbox" value=""
+						id="flexCheckDefault"> <label class="form-check-label"
+						for="flexCheckDefault"> 계약 </label>
+				</div>
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" value=""
+						id="flexCheckChecked" checked> <label
+						class="form-check-label" for="flexCheckChecked"> 미계약 </label>
+				</div>
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" value=""
+						id="flexCheckChecked" checked> <label
+						class="form-check-label" for="flexCheckChecked"> 서비스 </label>
+				</div>
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" value=""
+						id="flexCheckChecked" checked> <label
+						class="form-check-label" for="flexCheckChecked"> 일시정지 </label>
+				</div>
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" value=""
+						id="flexCheckChecked" checked> <label
+						class="form-check-label" for="flexCheckChecked"> 종료 </label>
+				</div>
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" value=""
+						id="flexCheckChecked" checked> <label
+						class="form-check-label" for="flexCheckChecked"> 남은기간 10일
+						미만 </label>
+				</div>
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" value=""
+						id="flexCheckChecked" checked> <label
+						class="form-check-label" for="flexCheckChecked"> 정기구독 </label>
+				</div>
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" value=""
+						id="flexCheckChecked" checked> <label
+						class="form-check-label" for="flexCheckChecked"> 기간구독 </label>
+				</div>
+			</div>
+		</div>
+		<!-- 회사 검색 영역 끝 -->
+		<!-- 토스트 그리드 영역 -->
+		<div class="p-2">
+			<div class="d-flex justify-content-center">
+				<!--  -->
+				<div id="grid"></div>
+				<div id="pagination" class="tui-pagination"></div>
+			</div>
+		</div>
+		<!-- 토스트 그리드 영역 끝 -->
+		<!-- 데이터 처리 영역 -->
+		<div class="pt-2 ps-2 pe-2" style="width: 1600px;">
+		    <div class="d-flex justify-content-center border border-primary-subtle rounded-3 p-0" style="height: 400px;">
+		        <!-- 왼쪽 영역 -->
+		        <div class="d-flex flex-column flex-grow-1 flex-wrap p-1 btn-list" style="max-width: 50%;">
+		            <div class="d-flex flex-wrap mb-1 justify-content-end">
+		                <div class="p-1"><button type="button" class="btn btn-success btn-sm inputComInser">회사등록</button></div>
+		                <div class="p-1"><button type="button" class="btn btn-danger btn-sm allCance" style="display: none;">닫기</button></div>
+		            </div>
+		            <!-- 폼시작 -->
+		            <div id="formSection" style="display: none;">
+			            <form action="#" id="inputComFrom">
+			            <!-- EQ01=단순문의 / EQ02=상태변경 / EQ03=발행 / EQ04=신규등록 -->
+			            <input type="hidden" value="EQ04" id="customerServiceDivision" name="customerServiceDivision">
+			            <input type="hidden" value="" id="businessFullNumber" name="businessFullNumber">
+			            <input type="hidden" value="" id="fullAddress" name="fullAddress">
+			            <div class="d-flex flex-wrap mb-1">
+			            	<div class="p-0">
+			                	<div class="input-group input-group-sm mb-1 pe-1">
+									<span class="input-group-text">회사번호</span>
+									<input type="number" class="form-control" id="companyNum" name="companyNum" readonly="readonly" style="width: 50px">
+								</div>
+			                </div>
+			                <div class="p-0">
+			                	<div class="input-group input-group-sm mb-1 pe-1">
+									<span class="input-group-text">회사명</span>
+									<input type="text" class="form-control" id="companyName" name="companyName" style="width: 120px">
+								</div>
+			                </div>
+			                <div class="p-0">
+			                	<div class="input-group input-group-sm mb-1 pe-1">
+									<span class="input-group-text">회사영문명</span>
+									<input type="text" class="form-control" placeholder="20자 이하 소문자" id="companyEngName" name="companyEngName" style="width: 130px">
+								</div>
+			                </div>
+			                <div class="p-0">
+								<div class="input-group input-group-sm mb-1">
+									<span class="input-group-text">사업자번호</span>
+									<input type="text" class="form-control" id="businessNum1" name="businessNum1" style="width: 50px">
+									<input type="text" class="form-control" id="businessNum2" name="businessNum2" style="width: 40px">
+									<input type="text" class="form-control" id="businessNum3" name="businessNum3" style="width: 60px">
+								</div>
+							</div>
+			            </div>
+			            <div class="d-flex flex-wrap mb-1">
+			                <div class="p-0">
+			                	<div class="input-group input-group-sm mb-1 pe-1">
+									<span class="input-group-text">대표자명</span>
+									<input type="text" class="form-control" id="representationName" name="representationName" style="width: 75px">
+								</div>
+			                </div>
+			                <div class="p-0">
+			                	<div class="input-group input-group-sm mb-1 pe-1">
+									<span class="input-group-text">대표자연락처</span>
+									<input type="text" class="form-control" id="representationPhone" name="representationPhone" style="width: 120px">
+								</div>
+			                </div>
+			                <div class="p-0">
+			                	<div class="input-group input-group-sm mb-1 pe-1">
+									<span class="input-group-text">담당자명</span>
+									<input type="text" class="form-control" id="chargerName" name="chargerName" style="width: 75px">
+								</div>
+			                </div>
+			                <div class="p-0">
+			                	<div class="input-group input-group-sm mb-1">
+									<span class="input-group-text">담당자연락처</span>
+									<input type="text" class="form-control" id="chargerPhone" name="chargerPhone" style="width: 120px">
+								</div>
+			                </div>
+			            </div>
+			            <div class="d-flex flex-wrap mb-1">
+			                <div class="p-0">
+			                	<div class="input-group input-group-sm mb-1 pe-1">
+									<span class="input-group-text">email</span>
+									<input type="text" class="form-control" id="chargerEmail" name="chargerEmail" style="width: 240px;">
+								</div>
+			                </div>
+			                <div class="p-0">
+				                <div class="input-group input-group-sm mb-1">
+								  <input type="file" class="form-control" placeholder="png, jpg, pdf 가능" id="businessLicense" name="businessLicense" style="width: 400px;">
+								  <button class="btn btn-outline-secondary" type="button" id="businessLicense_upload">업로드</button>
+								</div>
+			                </div>
+			            </div>
+			            <div class="d-flex flex-wrap mb-1">
+			                <div class="p-0">
+								<div class="input-group input-group-sm mb-1 pe-1">
+									<span class="input-group-text">주소</span>
+									<input type="text" class="form-control" id="companyAddress" readonly="readonly" name="companyAddress" style="width: 300px;">
+									<button class="btn btn-outline-secondary" type="button" id="companyAddress_search">주소검색</button>
+								</div>
+			                </div>
+			                <div class="p-0">
+			                	<div class="input-group input-group-sm mb-1">
+									<span class="input-group-text">나머지주소</span>
+									<input type="text" class="form-control" id="companyAddressMOD" name="companyAddressMOD" style="width: 240px;">
+								</div>
+			                </div>
+			            </div>
+			            <div class="d-flex align-items-stretch mb-1">
+						    <div class="p-0 flex-grow-1 me-2">
+						        <div class="mb-1">
+						            <label class="form-label">내용 등록 &nbsp;&nbsp;&nbsp;&nbsp;<span class="errMessage" style="font-weight: bold; color: red;"></span></label>
+						            <textarea class="form-control" id="customerServiceContent" name="customerServiceContent" rows="4"></textarea>
+						        </div>
+						    </div>
+						    <div class="p-0">
+						        <div class="mb-1 h-100">
+						            <button type="button" class="btn btn-success h-100" id="insertAndUpdate"><b>회 사<br><br>등 록</b></button>
+						        </div>
+						    </div>
+						</div>
+			            </form>
+		            </div>
+		            <!-- 폼시작 끝 -->
+		        </div>
+		        <!-- 왼쪽 영역 끝 -->
+		
+		        <!-- 가운데 구분선 -->
+		        <div class="d-flex justify-content-center align-items-center">
+		            <div class="vr border-start border-primary-subtle" style="width: 2px; height: 100%;"></div>
+		        </div>
+		
+		        <!-- 오른쪽 영역 -->
+		        <div class="d-flex justify-content-center flex-grow-1 p-1" style="max-width: 50%;">
+		            처리
+		        </div>
+		    </div>
+		</div>
+		<!-- 데이터 처리 영역 끝-->
+	</div>
+
+
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+		});
+		//그리드 선언
+		var Grid = tui.Grid;
+		const dataSource = {
+			api : {
+				readData : { url : '/erp/rest/comlist', method : 'GET', initParams : { param : 'param' } },
+			//createData: { url: '/api/createData', method: 'POST' },
+			//updateData: { url: '/api/updateData', method: 'PUT' },
+			//modifyData: { url: 'http://localhost:81/api/board/modifyData', method: 'PUT' },
+			//deleteData: { url: '/api/deleteData', method: 'DELETE' },
+			},
+			contentType : 'application/json',
+		};
+
+		//그리드 생성
+		const grid = new Grid({
+			el : document.getElementById('grid'), // 컨테이너 엘리먼트
+			pageOptions : {
+				useClient : false, //페이지 네이션 할꺼면 false // 자동으로 하게할껴면 true
+				perPage : 5, //한페이지에 몇개 보여줄지
+			},
+			//칼럼 정하기
+			columns: [
+				{ header: "회사번호", name: "companyNum", editor: 'text' },
+				{ header: "회사명", name: "companyName", editor: 'text' },
+				{ header: "대표자명", name: "representationName", editor: 'text' },
+				{ header: "담당자명", name: "chargerName", editor: 'text' },
+				{ header: "담당자연락처", name: "chargerPhone", editor: 'text' },
+				{ header: "이메일", name: "chargerEmail", editor: 'text' },
+				{ header: "사업자등록증", name: "businessLicense", editor: 'text' },
+				{ header: "계약서", 
+			        name: "contractNum", 
+			        formatter: function({ value }) {
+			            if (value === 0) {
+			            	return `미계약`;
+			            } else {
+			                return `<button class="btn btn-info" data-id="${value}" onclick="contractAction(${value})">계약</button>`;
+			            }
+			        },
+			        editor: 'text',
+				},
+				{ header: "상태", name: "serviceState", 
+					formatter: function({ value }) {
+			            if (value === 'EC01') {
+			            	return `서비스`;
+			            } else if (value === 'EC02') {
+			            	return `일시정지`;
+			            } else {
+			                return `종료`;
+			            }
+			        },
+			        editor: 'text',
+				},
+				{ header: "남은기간", name: "remainingDays", editor: 'text',
+					//해당행 전체 데이터 가져오기
+					formatter: function({ row }) {
+						// 만료일 가져오기
+			            const endDateStr = row.subscriptionEndDate; 
+			          	//마지막 날짜 만들기
+			            const endDate = new Date(endDateStr);	
+			         	// 오늘 날짜 만들기
+			            const today = new Date();	
+			         	// 만료일 - 오늘날짜 (미리초로 데이터 반환)
+			            const timeDiff = endDate.getTime() - today.getTime();
+			            // 미리초 데이터를 일 단위로 변환
+			            const remainingDays = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+
+			            if(remainingDays > 0){
+			            	return `${remainingDays}일 남음`;
+			            }else if(remainingDays <= 0 && remainingDays >= 9){
+			            	//나중에 붉은색 스타일 넣을꺼 가만하고 분리
+			            	return `${remainingDays}일 남음`;
+			            }else{
+				            return `종료`;
+			            }
+			        },
+			    },
+				{ header: "구독형태", name: "subscriptionForm", editor: 'text',
+					formatter: function({ value }) {
+			            if (value === 'EL01') {
+			            	return `기간구독`;
+			            } else if (value === 'EL02') {
+			            	return `정기구독`;
+			            }
+			        },
+			    },
+				{ header: "만료일", name: "subscriptionEndDate", editor: 'text' },
+			],
+			//초기 데이터 뭘로 할지
+			data : dataSource,
+		});
+		
+		// 주소검색 api
+		document.addEventListener("DOMContentLoaded", function() {
+		    // 주소 검색 버튼 클릭 이벤트
+		    document.querySelectorAll("#companyAddress_search, #companyAddress").forEach(el => {
+		        el.addEventListener("click", function() {
+		            new daum.Postcode({
+		                oncomplete: function(data) {
+		                    // 검색된 주소 데이터 처리
+		                    var fullAddress = data.address; // 기본 주소
+		                    var extraAddress = ''; // 참고항목 (예: 건물명)
+		
+		                    if (data.addressType === 'R') { // 도로명 주소인 경우
+		                        if (data.bname !== '') {
+		                            extraAddress += data.bname;
+		                        }
+		                        if (data.buildingName !== '') {
+		                            extraAddress += (extraAddress !== '' ? ', ' + data.buildingName : data.buildingName);
+		                        }
+		                        fullAddress += (extraAddress !== '' ? ' (' + extraAddress + ')' : '');
+		                    }
+		
+		                    // 주소 입력 필드에 값 설정
+		                    document.getElementById("companyAddress").value = fullAddress;
+		                }
+		            }).open();
+		        });
+		    });
+		});
+		// 주소검색 api 끝
+		
+		//파일 업로드 버튼 클릭시 파일 선택 처리
+		// 파일 입력 필드
+        const fileInput = document.getElementById("businessLicense");
+        // 파일명 표시하는 텍스트 입력 필드
+        const fileNameDisplay = document.getElementById("fileName");
+        // 업로드 버튼
+        const uploadButton = document.getElementById("businessLicense_upload");
+        // 업로드 버튼 클릭 시 파일 선택 창 열기
+        uploadButton.addEventListener("click", function() {
+            fileInput.click();  // 파일 선택창 열기
+        });
+        // 파일 선택 후 파일명 표시
+        fileInput.addEventListener("change", function() {
+            if (fileInput.files.length > 0) {
+                fileNameDisplay.value = fileInput.files[0].name;  // 파일명 표시
+            } else {
+                fileNameDisplay.value = "";  // 파일 선택 취소 시 초기화
+            }
+        });
+      	//파일 업로드 버튼 클릭시 파일 선택 처리 끝
+		
+		// 회사등록버튼
+		const inputComInserbtn = document.querySelector(".inputComInser");
+		// 닫기버튼
+		const allCanceinbtn = document.querySelector(".allCance");
+		
+		// 회사등록버튼처리
+		inputComInserbtn.addEventListener("click", function(){
+			//alert('a');
+			// 회사등록버튼 비활성화
+			inputComInserbtn.style.display="none";
+			// 등록양식 활성화
+			document.querySelector("#formSection").style.display="block";
+			// 회사신규등록 처리
+			document.querySelector("#customerServiceDivision").value = "EQ04";
+			// 닫기버튼 활성화
+			allCanceinbtn.style.display="block";
+		});
+		
+		// 닫기버튼 => 폼 초기화 => 폼 영역 none
+		allCanceinbtn.addEventListener("click", function(){
+			//alert('a');
+			//폼 초기화
+			document.querySelector("#inputComFrom").reset();
+			document.querySelector(".errMessage").innerHTML = '';
+			//폼 숨기기
+			document.querySelector("#formSection").style.display = "none";
+			//회사 등록버튼 다시보이게
+			inputComInserbtn.style.display="block";
+			// 닫기버튼 비활성화
+			allCanceinbtn.style.display="none";
+		});
+		
+		let isOkNo = false;
+		// 회사삽입 (실제 등록해서 유효성 검사하는 부분)
+		document.querySelector("#insertAndUpdate").addEventListener("click", async function(){
+			let isOkNo = false;
+			let errorMessage = "";
+			//회사명 논리 검증
+			let companyName = document.querySelector("#companyName").value;
+			companyName = "좋은회사";	//★★★★★★검증후 지우기
+			if(getByteLength(companyName) < 50 && getByteLength(companyName) >= 1){
+				isOkNo = true;
+				errorMessage = "";
+			}else{
+				isOkNo = false;
+				errorMessage = '회사명 15자 이하 입니다';
+			}
+			if(isOkNo){
+				//회사영문명 논리 검증
+				let companyEngName = document.querySelector("#companyEngName").value;
+				companyEngName = "oliveyoungsa";	//★★★★★★검증후 지우기
+				if(getByteLength(companyEngName) <= 20 && isAllLowerCase(companyEngName) && getByteLength(companyEngName) >= 1){
+					//호출해야함 companyEngName
+					let enboolean = await iscomapnyEngName(companyEngName);
+					//console.log(enboolean);
+					if(!enboolean){
+						isOkNo = true;
+						errorMessage = "";
+					}else{
+						isOkNo = false;
+						errorMessage = "영문명이 중복됩니다.";
+					}
+				}else{
+					isOkNo = false;
+					errorMessage = '회사영문명은 소문자 20자 이하 입니다';
+				}
+			}
+			if(isOkNo){
+				//사업자번호 논리 검증
+				let businessNum1 = document.querySelector("#businessNum1").value;
+				let businessNum2 = document.querySelector("#businessNum2").value;
+				let businessNum3 = document.querySelector("#businessNum3").value;
+				let businessNumber = businessNum1+businessNum2+businessNum3;
+				businessNumber = "6478100749";	//★★★★★★검증후 지우기
+				if(getByteLength(businessNumber) == 10 && isAllNumberCase(businessNumber)){
+					document.querySelector("#businessFullNumber").value = businessNum1+"-"+businessNum2+"-"+businessNum3;
+					isOkNo = true;
+					errorMessage = "";
+				}else{
+					document.querySelector("#businessFullNumber").value = "";
+					isOkNo = false;
+					errorMessage = '사업자번호는 숫자로 10자리 입니다';
+				}
+			}
+			if(isOkNo){
+				//대표자명 논리 검증
+				let representationName = document.querySelector("#representationName").value;
+				representationName = "나대표";	//★★★★★★검증후 지우기
+				if(getByteLength(representationName) <= 12 && getByteLength(representationName) >= 1 && isAllKoreanCase(representationName)){
+					isOkNo = true;
+					errorMessage = "";
+				}else{
+					isOkNo = false;
+					errorMessage = '대표자명은 한글로 4자리 이하 입니다';
+				}
+			}
+			if(isOkNo){
+				//담당자명 논리 검증
+				let chargerName = document.querySelector("#chargerName").value;
+				chargerName = "나사원";	//★★★★★★검증후 지우기
+				if(getByteLength(chargerName) <= 12 && getByteLength(chargerName) >= 1 && isAllKoreanCase(chargerName)){
+					isOkNo = true;
+					errorMessage = "";
+				}else{
+					isOkNo = false;
+					errorMessage = '담당자명은 한글로 4자리 이하 입니다';
+				}
+			}
+			if(isOkNo){
+				//대표자 번호 논리 검증
+				let representationPhone = document.querySelector("#representationPhone").value;
+				representationPhone = "01085216704";	//★★★★★★검증후 지우기
+				representationPhone = representationPhone.replaceAll("-","").trim();
+				if(isAllNumberCase(representationPhone) && getByteLength(representationPhone) == 11){
+					isOkNo = true;
+					errorMessage = "";
+					document.querySelector("#representationPhone").value = formatPhoneNumber(representationPhone);
+				}else{
+					isOkNo = false;
+					errorMessage = '대표자번호는 숫자(11자리) 하이픈포함(13자리)입니다';
+				}
+			}
+			if(isOkNo){
+				//담당자 번호 논리 검증
+				let chargerPhone = document.querySelector("#chargerPhone").value;
+				chargerPhone = "01085216704";	//★★★★★★검증후 지우기
+				chargerPhone = chargerPhone.replaceAll("-","").trim();
+				if(isAllNumberCase(chargerPhone) && getByteLength(chargerPhone) == 11){
+					isOkNo = true;
+					errorMessage = "";
+					document.querySelector("#chargerPhone").value = formatPhoneNumber(chargerPhone);
+				}else{
+					isOkNo = false;
+					errorMessage = '담당자번호는 숫자(11자리) 하이픈포함(13자리)입니다';
+				}
+			}
+			if(isOkNo){
+				//이메일 논리 검증
+				let chargerEmail = document.querySelector("#chargerEmail").value;
+				chargerEmail = "hayeon8521@kakao.com";	//★★★★★★검증후 지우기
+				if(isValidEmail(chargerEmail)){
+					isOkNo = true;
+					errorMessage = "";
+				}else{
+					isOkNo = false;
+					errorMessage = '이메일 형식이 맞지 않습니다.';
+				}
+			}
+			if(isOkNo){
+				//파일명 확인
+				let businessLicense = document.querySelector("#businessLicense").value;
+				businessLicense = "abad.png";	//★★★★★★검증후 지우기
+				if(businessLicense && isValidFileExtension(businessLicense)){
+					isOkNo = true;
+					errorMessage = "";
+				}else{
+					isOkNo = false;
+					errorMessage = '이미지 또는 PDF 파일이 아닙니다.';
+				}
+				
+			}
+			if(isOkNo){
+				//주소 논리 검증
+				let companyAddress = document.querySelector("#companyAddress").value;
+				let companyAddressMOD = document.querySelector("#companyAddressMOD").value;
+				companyAddress = "서울시 강남구 개포동";	//★★★★★★검증후 지우기
+				companyAddressMOD = "1188-2";	//★★★★★★검증후 지우기
+				if(getByteLength(companyAddress) >= 1 && getByteLength(companyAddressMOD) >= 1){
+					isOkNo = true;
+					errorMessage = "";
+					document.querySelector("#fullAddress").value = companyAddress+" "+companyAddressMOD;
+				}else{
+					isOkNo = false;
+					errorMessage = '주소를 입력 해주세요.';
+				}
+				
+			}
+			if(isOkNo){
+				//사유 기입해야 버튼 처리 가능
+				let customerServiceContent = document.querySelector("#customerServiceContent").value;
+				customerServiceContent = "서울시 강남구 개포동";	//★★★★★★검증후 지우기
+				if(customerServiceContent){
+					isOkNo = true;
+					errorMessage = "";
+				}else{
+					isOkNo = false;
+					errorMessage = '내용을 입력 해주세요.';
+				}
+					
+			}
+			document.querySelector(".errMessage").innerHTML = errorMessage;
+			if (isOkNo) {
+				let companyName = document.querySelector("#companyName").value;
+				let companyEngName = document.querySelector("#companyEngName").value;
+				let businessNum = document.querySelector("#businessFullNumber").value;
+				let representationName = document.querySelector("#representationName").value;
+				let chargerName = document.querySelector("#chargerName").value;
+				let representationPhone = document.querySelector("#representationPhone").value;
+				let chargerPhone = document.querySelector("#chargerPhone").value;
+				let chargerEmail = document.querySelector("#chargerEmail").value;
+				let businessLicense = document.querySelector("#businessLicense").value;
+				let companyAddress = document.querySelector("#fullAddress").value;
+				let customerServiceContent = document.querySelector("#customerServiceContent").value;
+				let customerServiceDivision = document.querySelector("#customerServiceDivision").value;
+				companyName = "좋은회사";	//★★★★★★검증후 지우기
+				companyEngName = "oliveyoung";	//★★★★★★검증후 지우기
+				businessNum = "647-81-00749"
+				representationName = "나대표";	//★★★★★★검증후 지우기
+				chargerName = "나사원";	//★★★★★★검증후 지우기
+				representationPhone = "010-8521-6704";	//★★★★★★검증후 지우기
+				chargerPhone = "010-8521-6704";	//★★★★★★검증후 지우기
+				chargerEmail = "hayeon8521@kakao.com";	//★★★★★★검증후 지우기
+				businessLicense = "abc.png";
+				companyAddress = "서울시 좋은곳에 위치";
+				customerServiceContent = "문의내용이에요";
+				customerServiceDivision = "질의 분류";
+				
+				
+				
+				const url = "/erp/rest/newcomapny";
+				
+				const param = {
+							companyName, companyEngName, businessFullNumber,
+							representationName, chargerName, representationPhone,
+							chargerPhone, chargerEmail, businessLicense,
+							fullAddress, customerServiceContent, customerServiceDivision,
+							companyAddress, businessNum
+						}
+				
+				//등록 요청
+				fetch(url, {
+					method:"post",
+					headers: {
+					      "Content-Type": "application/json",
+					      // 'Content-Type': 'application/x-www-form-urlencoded',
+					    },
+					body : JSON.stringify(param), 
+				})
+				.then( result => result.text() )
+		    }
+		});
+
+		//문자 길이 구하는 함수 ( 바이트 형식 )
+		function getByteLength(str) {
+		    let byteLength = 0;
+		    for (let i = 0; i < str.length; i++) {
+		        const char = str.charAt(i);
+		        byteLength += (char.charCodeAt(0) > 127) ? 3 : 1; // 한글 특분 3바이트 (DB 일치)
+		    }
+		    return byteLength;
+		}
+		//소문자 확인하는 함수 ( 정규식 )
+		function isAllLowerCase(str) {
+		    const lowerCaseRegex = /^[a-z]+$/;	//^[a-z\s]+$ = 띄워쓰기 허용
+		    return lowerCaseRegex.test(str);
+		}
+		//숫자 확인하는 함수 ( 정규식 )
+		function isAllNumberCase(str){
+			return /^\d+$/.test(str);
+		}
+		//완성형 한글만 확인하는 함수 ( 정규식 )
+		function isAllKoreanCase(str) {
+		    const KoreanCaseRegex = /^[가-힣]+$/;
+		    return KoreanCaseRegex.test(str);
+		}
+		//전화번호 변환 함수 ( 정규식 )
+		function formatPhoneNumber(phoneNumber) {
+		    return phoneNumber.replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3");
+		}
+		//이메일 확인하는 함수 ( 정규식 )
+		function isValidEmail(email) {
+		    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+		    return emailRegex.test(email);
+		}
+		// 이미지 또는 pdf 파일명 확인하는 함수
+		function isValidFileExtension(filename) {
+		    const fileRegex = /\.(jpg|jpeg|png|gif|pdf)$/i;
+		    return fileRegex.test(filename);
+		}
+		// 회사영문명 중복코드 확인
+		async function iscomapnyEngName(str){
+			const url = `/erp/rest/comenname/${str}`;
+			return fetch ( url )
+			.then ( result => result.json() )
+			.then ( result => {
+				//alert(result);
+				return result;
+			})
+		}
+      
+	</script>
+</div>

@@ -18,6 +18,12 @@ public class BhfSampleController {
 	public String sample() {
 		return "/bhf/sample";
 	};
+
+	// 상품 발주 요청 페이지
+	@GetMapping("/order")
+	public String test() {
+		return "/bhf/orderRequest";
+	};
 	
 	
 }
