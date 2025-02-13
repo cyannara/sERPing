@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.beauty1nside.bsn.Paging;
 import com.beauty1nside.bsn.dto.OrderSearchDTO;
 import com.beauty1nside.bsn.service.BsnOrderService;
+import com.beauty1nside.common.Paging;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
