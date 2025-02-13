@@ -13,7 +13,7 @@ public interface BhfOrderMapper {
 	
 	//상품 조회
 	public List<BhfGoodsOpDTO> goodsList(BhfOrdSearchDTO dto);
-	
+	//페이징 할떄 조회되는 전체값
 	int count(BhfOrdSearchDTO dto);
 	
 	//옵션 조회
