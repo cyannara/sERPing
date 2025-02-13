@@ -2,8 +2,9 @@
 <html lang="utf-8">
 
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <title>sERPing - beauty1ndide</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -14,9 +15,31 @@
   <link href="/templates/erp/assets/img/favicon.png" rel="icon">
   <link href="/templates/erp/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
    -->
+   
+  <!-- timePicker -->
+  <link rel="stylesheet" href="https://uicdn.toast.com/tui.time-picker/latest/tui-time-picker.css" />
+  <script src="https://uicdn.toast.com/tui.time-picker/latest/tui-time-picker.js"></script>
+
+  <!-- datePicker -->
+  <link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+  <script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+
+  <!-- paging -->
+  <link rel="stylesheet" href="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.css" />
+  <script src="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.js"></script>
+
+  <!-- toast grid -->
+  <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+  <script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+
+  <!-- 엑셀 -->
+  <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 
   <!-- Main CSS File -->
   <link href="/templates/erp/assets/css/main.css" rel="stylesheet">
+  
+  <!-- 카카오 주소 검색 API -->
+  <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
   <!-- =======================================================
 	 * ERP서비스를 위한 관리자 페이지
@@ -31,9 +54,40 @@
 	 *   수정일      수정자          수정내용
 	 *  -------    --------    ---------------------------
 	 *  2025.02.11  표하연          템플릿 연결
+	 *  2025.02.12  표하연          토스트 그리드 스크립트 연결
 	 *
 	 *  </pre>
   ======================================================== -->
+<style>
+	#grid {
+		width: 100%; /* 그리드 너비 100% 설정 */
+	}
+	.mw-1600 {
+	    max-width: 1600px !important; /* 컨테이너 div 넓이 설정 */
+	}
+	/* 푸터 바닥에 붙이기 위한 방법 */
+	html, body {
+	    height: 100%;  /* 전체 화면 높이를 100%로 설정 */
+	    display: flex;
+	    flex-direction: column;
+	}
+	.main {
+	    flex: 1; /* main이 남은 공간을 모두 차지하도록 설정 */
+	}
+	.footer {
+	    width: 100%; /* 가로 너비 100% */
+	    height: 55px;
+	}
+	/* 푸터 바닥에 붙이기 위한 방법 끝 */
+	.tui-grid-pagination {
+    	margin: 0px !important;
+	}
+	.copyright {
+		padding-top: 0 !important;
+		padding-bottom: 0 !important;
+	}
+</style>
+
 </head>
 
 <body class="index-page">
@@ -64,8 +118,8 @@
 
   </main>
 
-  <footer id="footer" class="footer text-bg-info">
-    <div class="container copyright text-center mt-4">
+  <footer id="footer" class="footer bg-primary-subtle text-primary-emphasis">
+    <div class="container copyright text-center mt-0">
       <p>© <span>Copyright</span> <strong class="px-1 sitename">sERPing</strong> <span>All Rights Reserved</span></p>
       <div class="credits">
         Designed by BootstrapMade development by beauty1nside

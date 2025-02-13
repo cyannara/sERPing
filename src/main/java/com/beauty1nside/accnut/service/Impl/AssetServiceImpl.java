@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.beauty1nside.accnut.dto.AssetDTO;
+import com.beauty1nside.accnut.dto.AssetSearchDTO;
 import com.beauty1nside.accnut.mapper.AssetMapper;
 import com.beauty1nside.accnut.service.AssetService;
 
@@ -27,8 +28,15 @@ public class AssetServiceImpl implements AssetService{
 		}
 		
 		@Override
-		public List<AssetDTO> list() {
+		public List<AssetDTO> list(AssetSearchDTO dto) {
 		// TODO Auto-generated method stub
-		return assetMapper.list();
+		return assetMapper.list(dto);
 		}
-}
+		
+		@Override
+		public int count(AssetSearchDTO dto) {
+		// TODO Auto-generated method stub
+		return assetMapper.count(dto);
+		}
+}		
+

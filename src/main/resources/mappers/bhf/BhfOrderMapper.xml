@@ -2,4 +2,47 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.beauty1nside.bhf.mapper.BhfOrderMapper">
 	
+	<!-- 발주 요청 프로시져 호출 -->
+	<insert id="orderPrd" statementType="CALLABLE">
+		call order_prd(
+		  #{branchOfficeId},
+		  #{dueDate},
+		  #{remark},
+		  #{companyNum},
+		  #{files, typeHandler=com.beauty1nside.bhf.OracleArrayStructHandler} 
+		)
+	</insert>
+	
+	<!-- 상품조회 -->
+	<select id="goodsList" resultType="BhfGoodsOpDTO">
+		select goods_code,
+	           goods_name,
+	           goods_standard
+		from   purchse_goods 
+	</select>
+	
+	<!-- 상품 선택시 옵션조회 -->
+	<select id="optionList" resultType="BhfGoodsOpDTO">
+		select g.goods_code,
+		       o.option_code,
+		       o.option_name
+		from   purchse_goods g join purchse_option o on g.goods_num = o.goods_num
+		where g.goods_code = #{goodsCode}
+	</select>
+	
+	
+	<!-- 검색조건 -->
+	<sql id="searchInfo">
+			company_num LIKE '%' || #{companyNum} || '%'
+			<if test="goodsCode != null and ! goodsCode.equals('')">
+				AND g.goods_code Like '%' || #{goodsCode} || '%'
+			</if>
+			<if test="section != null and ! section.equals('')">
+				AND section = #{section}
+			</if>
+			<if test="financialInstitution != null and ! financialInstitution.equals('')">
+				AND financial_institution = fn_get_cmmn_code( #{financialInstitution} )
+			</if>
+	</sql>
+	
 </mapper>
