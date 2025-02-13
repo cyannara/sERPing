@@ -1,8 +1,11 @@
 package com.beauty1nside.bhf.service.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.beauty1nside.bhf.dto.goodsorder.BhfGoodsOpDTO;
 import com.beauty1nside.bhf.dto.goodsorder.BhfOrdVO;
 import com.beauty1nside.bhf.mapper.BhfOrderMapper;
 import com.beauty1nside.bhf.service.BhfOrderService;
@@ -17,6 +20,18 @@ public class BhfOrderServiceImpl implements BhfOrderService {
 	public void orderPrd(BhfOrdVO vo) {
 		
 		mapper.orderPrd(vo);
+	}
+
+	@Override
+	public List<BhfGoodsOpDTO> goodsList() {
+		
+		return mapper.goodsList();
+	}
+
+	@Override
+	public BhfGoodsOpDTO optionList(String goodsCode) {
+		
+		return mapper.optionList(goodsCode);
 	}
 
 }

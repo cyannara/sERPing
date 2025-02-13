@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.beauty1nside.bhf.dto.goodsorder.BhfGoodsOpDTO;
 import com.beauty1nside.bhf.dto.goodsorder.BhfOrdDtlVO;
 import com.beauty1nside.bhf.dto.goodsorder.BhfOrdVO;
 import com.beauty1nside.bhf.mapper.BhfOrderMapper;
@@ -15,9 +16,9 @@ import com.beauty1nside.bhf.mapper.BhfOrderMapper;
 public class BhfOrderTest {
 
 	@Autowired 
-	BhfOrderMapper Mapper;
+	BhfOrderMapper mapper;
 	
-	@Test
+	//@Test
 	public void testStruct() {
 		BhfOrdVO vo = new BhfOrdVO();
 		vo.setBranchOfficeId("Yedam");
@@ -29,9 +30,22 @@ public class BhfOrderTest {
 				            new BhfOrdDtlVO("g1","lotion","o1","50ml","1b/6p",10)
 				   ));
 		
-		Mapper.orderPrd(vo);
+		mapper.orderPrd(vo);
 		
 		System.out.println("TEST실행성공");
+	}
+	
+	//@Test
+	public void goodsListTest() {
+		List<BhfGoodsOpDTO> list = mapper.goodsList();
+		System.out.println(list);
+	}
+	
+	@Test
+	public void optionListTest() {
+		String goodsCode = "LH001";
+		BhfGoodsOpDTO list = mapper.optionList(goodsCode);
+		System.out.println(list);
 	}
 	
 }
