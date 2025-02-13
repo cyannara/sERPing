@@ -6,10 +6,14 @@ import java.util.Map;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.beauty1nside.accnut.dto.AssetDTO;
+import com.beauty1nside.accnut.dto.AssetSearchDTO;
 import com.beauty1nside.accnut.service.AssetService;
+import com.beauty1nside.common.GridArray;
+import com.beauty1nside.common.Paging;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,38 +30,29 @@ public class AccnutRestController {
 	final AssetService assetService;
 	
 	@GetMapping("/list")
-	public List<AssetDTO> list() {
-		return assetService.list();
+	public Object list(@RequestParam(name = "perPage", defaultValue = "2", required = false) int perPage, 
+			@RequestParam(name = "page", defaultValue = "1", required = false) int page, 
+			AssetSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
+		// 페이징 유닛 수
+		paging.setPageUnit(perPage);
+		paging.setPage(page);
+		
+		log.info(dto);
+		
+		// 페이징 조건
+		dto.setStart(paging.getFirst());
+		dto.setEnd(paging.getLast());
+		
+		// 페이징 처리
+		paging.setTotalRecord(assetService.count(dto));
+		
+		// grid 배열 처리
+		GridArray grid = new GridArray();
+		Object result = grid.getArray( paging.getPage(), assetService.count(dto), assetService.list(dto) );
+		return result;
 	}
 	
-	@GetMapping("/listTest")
-	public Object listTest() throws JsonMappingException, JsonProcessingException {
-		List<AssetDTO> result = assetService.list();
-		String str = """
-		{
-		  "result": true,
-		  "data": {
-				  "contents": []
-				  
-				  }
-		}
-						""";
-		/*
-		 ,"pagination": {
-								  "page": 1,
-								  "totalCount": 100
-								}
-		 */
-		
-		ObjectMapper objectMapper = new ObjectMapper();
-		Map<String, Object> map = objectMapper.readValue(str, Map.class);
-		Map<String, Object> data = (Map) map.get("data");
-		Map<String, Object> pagination = (Map) data.get("pagination");
-		
-		data.put("contents", result);
-		
-		return map;
-	}
+	
 	
 	
 }

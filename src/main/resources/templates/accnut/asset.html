@@ -29,6 +29,11 @@
 </head>
 <body>
 	<div class="container">
+		<!-- 메뉴이름 -->
+		 <div>
+			 <h2>자산관리</h3>
+		 </div>
+
 		<!-- 검색창 -->
 		<div class="search-grid">
 			<div class="row 1row">
@@ -52,10 +57,21 @@
 					<span class="label-search col-4">은행 및 카드사</span>
 					<input type="text" name="financialInstitution" id="financialInstitution" class="col-8 input-box">
 				</div>
+				<div class="col-1"></div>
+				<div class="col-5 row ">
+					<span class="label-search col-4">표시수량</span>
+					<select name="display_amount" id="display_amount" class="col-8 input-box" onchange="changeDisplay()">
+						<option value="5" selected>5</option>
+						<option value="10">10</option>
+						<option value="20">20</option>
+						<option value="50">50</option>
+						<option value="100">100</option>
+					</select>
+				</div>
 			</div>
 			<div class="row 3row">
 				<div class="col-4"></div>
-				<button type="button" class="btn btn-primary col-1">검색</button>
+				<button type="button" class="btn btn-primary col-1" onclick="search()">검색</button>
 				<div class="col-1"></div>
 				<button type="button" class="btn btn-secondary col-1">초기화</button>
 			</div>
@@ -125,18 +141,17 @@
 	
 	const dataSource = {
 		api: {
-			readData: { url: 'http://localhost:81/accnut/rest/listTest', method: 'GET' },
+			readData: { url: 'http://localhost:81/accnut/rest/list', method: 'GET', initParams: { page: 1 }},
 			
 		},
 		contentType: 'application/json'
 			
 	};
-	
 	const grid = new Grid({
 		el : document.querySelector('#grid'),
 		pageOptions: {
-			useClient : true,
-			perPage: 5,
+			useClient : false,
+			perPage: parseInt(document.querySelector('#display_amount').value) ,
 		},
 		columns: [
 			{ header : "자산코드", name : "assetsCode",  },
@@ -151,6 +166,19 @@
 		],
 		data : dataSource,
 	});
+
+	function changeDisplay() {
+		let gap = parseInt(document.querySelector('#display_amount').value);
+		grid.setPerPage(gap,dataSource)
+	}
+	function search(){
+		let assetName = document.querySelector('#assetsName').value;
+		let section = document.querySelector('#section').value.toString();
+		let institution = document.querySelector('#financialInstitution').value.toString();
+		console.log(institution.toString());
+		grid.setRequestParams({"assetsName" : assetName, "section" : section, "financialInstitution" : institution })
+		grid.readData();
+	}
 
 </script>
 	
