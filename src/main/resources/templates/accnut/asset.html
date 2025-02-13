@@ -73,7 +73,7 @@
 				<div class="col-4"></div>
 				<button type="button" class="btn btn-primary col-1" onclick="search()">검색</button>
 				<div class="col-1"></div>
-				<button type="button" class="btn btn-secondary col-1">초기화</button>
+				<button type="button" class="btn btn-secondary col-1" onclick="reset()">초기화</button>
 			</div>
 
 		</div>
@@ -175,6 +175,14 @@
 		let assetName = document.querySelector('#assetsName').value;
 		let section = document.querySelector('#section').value.toString();
 		let institution = document.querySelector('#financialInstitution').value.toString();
+		console.log(institution.toString());
+		grid.setRequestParams({"assetsName" : assetName, "section" : section, "financialInstitution" : institution })
+		grid.readData();
+	}
+	function reset(){
+		let assetName = document.querySelector('#assetsName').value = '';
+		let section = document.querySelector('#section').value = '';
+		let institution = document.querySelector('#financialInstitution').value = '';
 		console.log(institution.toString());
 		grid.setRequestParams({"assetsName" : assetName, "section" : section, "financialInstitution" : institution })
 		grid.readData();

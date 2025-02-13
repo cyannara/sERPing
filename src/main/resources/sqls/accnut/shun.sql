@@ -66,34 +66,12 @@ INSERT INTO accnut_assets
 SELECT assets_seq.NEXTVAL, assets_name, section, financial_institution, finance_information, owner, amount, register_date, quantity, fixtures_amount, company_num
 FROM accnut_assets;
 
-update accnut_assets set company_num = 0;
+update accnut_assets set company_num = 1;
 
 commit;
 
--- 2025-02-13
 select fn_get_cmmn_code('가')
 from dual;
 
-select fn_get_cmmn_name('AC08')
-from dual;
-
-select * from cmmn where upper_cmmn_code = 'AC';
-
-insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('AC07','AC','대출금');
-insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('AC08','AC','미지급금');
-COMMIT;
-
-select * from accnut_debt;
-
-create sequence accnut_debt_seq;
-
-insert into accnut_debt(debt_code, debt_name, section, register_date, creditor, amount, interest, time_limit, prearrangement_due_date, company_num)
-values (ACCNUT_DEBT_SEQ.nextval,'미지급급4','AC08',sysdate, 'A회사', 100000, 0, sysdate+90, sysdate+50, 1);
-
-insert into accnut_debt
-select accnut_debt_seq.nextval, debt_name, section, register_date, creditor, amount, interest, time_limit, prearrangement_due_date, company_num
-from accnut_debt;
-commit;
-
-update accnut_debt
-set company_num = 0;
+select * from erp_company;
+select * from hr_employee;

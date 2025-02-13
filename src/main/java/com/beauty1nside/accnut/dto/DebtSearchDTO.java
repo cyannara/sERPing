@@ -7,4 +7,5 @@ public class DebtSearchDTO extends DebtDTO{
 	int start;
 	int end;
 	int pageUnit;
+	
 }

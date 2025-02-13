@@ -31,7 +31,7 @@
 	<div class="container">
 		<!-- 메뉴이름 -->
 		<div>
-			<h2>자산관리</h3>
+			<h2>채무관리</h3>
 		</div>
 
     <!-- 검색창 -->
@@ -75,7 +75,7 @@
 				<div class="col-4"></div>
 				<button type="button" class="btn btn-primary col-1" onclick="search()">검색</button>
 				<div class="col-1"></div>
-				<button type="button" class="btn btn-secondary col-1">초기화</button>
+				<button type="button" class="btn btn-secondary col-1" onclick="reset()">초기화</button>
 			</div>
 
 		</div>
@@ -167,7 +167,7 @@
 	
 	function changeDisplay() {
 		let gap = parseInt(document.querySelector('#display_amount').value);
-		grid.setPerPage(gap,dataSource)
+		grid.setPerPage(gap, dataSource)
 	}
 	
 	function search(){
@@ -179,6 +179,20 @@
 		grid.readData();
 	}
 	
+	function reset(){
+		let debtName = document.querySelector('#debtName');
+		let section = document.querySelector('#section');
+		let creditor = document.querySelector('#creditor');
+
+		debtName.value = '';
+		section.value = '';
+		creditor.value = '';
+
+
+		grid.setRequestParams({"debtName" : debtName.value, "section" : section.value, "creditor" : creditor.value })
+		grid.readData();
+
+	}
 
 </script>
 	
