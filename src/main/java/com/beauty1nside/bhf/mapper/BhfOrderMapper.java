@@ -15,5 +15,6 @@ public interface BhfOrderMapper {
 	
 	//옵션 조회
 	public BhfGoodsOpDTO optionList(String goodsCode);
+
 	
 }

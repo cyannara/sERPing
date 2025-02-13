@@ -7,13 +7,39 @@
 		WHERE assets_code = #{assetsCode}
 	</select>
 
-	<select id="list" resultType="com.beauty1nside.accnut.dto.AssetDTO">
-		SELECT assets_code, assets_name, section, financial_institution, finance_information, owner, amount, register_date, quantity, fixtures_amount
+	<select id="list" resultType="com.beauty1nside.accnut.dto.AssetDTO" parameterType="com.beauty1nside.accnut.dto.AssetSearchDTO">
+		SELECT assets_code, assets_name, section, financial_institution, finance_information, owner, amount, register_date
+		FROM (SELECT /*+INDEX_DESC(accnut_accets pk_accnut_accets)*/ rownum rn, assets_code, assets_name, fn_get_cmmn_name(section) as section, fn_get_cmmn_name(financial_institution) as financial_institution, finance_information, owner, NVL(amount,0) as amount, register_date
+		      FROM accnut_assets
+		<![CDATA[
+		      WHERE rownum <= #{end} 
+		      AND 
+		]]>
+		<include refid="searchInfo"></include>
+			  ) 
+		WHERE rn >= #{start}
+	</select>
+	
+	<select id="count" parameterType="com.beauty1nside.accnut.dto.AssetSearchDTO">
+		SELECT COUNT(assets_code)
 		FROM accnut_assets
-		ORDER BY assets_code
+		<where>
+			<include refid="searchInfo"></include>
+		</where>
 	</select>
 
-
+	<sql id="searchInfo">
+			company_num LIKE '%' || #{companyNum} || '%'
+			<if test="assetsName != null and ! assetsName.equals('')">
+				AND assets_name Like '%' || #{assetsName} || '%'
+			</if>
+			<if test="section != null and ! section.equals('')">
+				AND section = #{section}
+			</if>
+			<if test="financialInstitution != null and ! financialInstitution.equals('')">
+				AND financial_institution = fn_get_cmmn_code( #{financialInstitution} )
+			</if>
+	</sql>
 
 
 
