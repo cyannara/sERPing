@@ -20,8 +20,17 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
     UserDTO userDTO = ((CustomerUser) authentication.getPrincipal()).getUserDTO();
     
     //session
-    request.getSession().setAttribute("userid", userDTO.getId());
-    request.getSession().setAttribute("deptName", userDTO.getDeptName());
+    request.getSession().setAttribute("employeeNum", userDTO.getEmployeeNum());
+    request.getSession().setAttribute("employeeId", userDTO.getEmployeeId());
+    request.getSession().setAttribute("employeeName", userDTO.getEmployeeName());
+    request.getSession().setAttribute("email", userDTO.getEmail());
+    request.getSession().setAttribute("phone", userDTO.getPhone());
+    request.getSession().setAttribute("position", userDTO.getPosition());
+    request.getSession().setAttribute("authority", userDTO.getAuthority());
+    request.getSession().setAttribute("roles", userDTO.getRoles());
+    request.getSession().setAttribute("companyNum", userDTO.getCompanyNum());
+    request.getSession().setAttribute("companyEngName", userDTO.getCompanyEngName());
+    request.getSession().setAttribute("departmentNum", userDTO.getDepartmentNum());
     
     // user한명이 롤 여러개 가지고 있을 수 있으니까
     List<String> roleNames = new ArrayList<>();
@@ -36,6 +45,8 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
 //    } else if(roleNames.contains("ROLE_USER")){
 //      response.sendRedirect("/hello");
 //    } else {
+    // 이전 페이지 정보 삭제
+//    request.getSession().removeAttribute("SPRING_SECURITY_SAVED_REQUEST");
       response.sendRedirect("/");
 //    }
   }

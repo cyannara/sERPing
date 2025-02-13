@@ -20,8 +20,14 @@ public class ProductDTO {
 	private String goodsStandard;
 	private String goodsDescription;
 	private String goodsImage;
-	private Long classificationId;
-	private Long blandId;
+	
+	private String classificationName;
+	private String classificationCode;
+	private int classificationId;
+	
+	private Long brandId;
+	private String brandName;
+	
 	private Long employeeNum;
 	private Long vendorId;
 	
@@ -30,6 +36,9 @@ public class ProductDTO {
 	private String optionCode;
 	private String optionName;
 	private int optionSafetyInvoice;
-	private Long warehouseId;
+	private String warehouseName;
+	
+
+	
 	
 }

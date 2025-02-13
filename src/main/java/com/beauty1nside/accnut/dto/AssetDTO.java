@@ -2,9 +2,9 @@ package com.beauty1nside.accnut.dto;
 
 import java.sql.Date;
 
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
+@Data
 public class AssetDTO {
 	
 	String assetsCode;
@@ -17,5 +17,6 @@ public class AssetDTO {
 	Date registerDate;
 	int quantity;
 	int fixturesAmount;
+	int companyNum;
 
 }

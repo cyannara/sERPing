@@ -30,17 +30,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ComDTO {
-	private int companyNum;
-	private String companyName;
-	private String companyEngName;
-	private String representationName;
-	private String representationPhone;
-	private String chargerName;
-	private String chargerPhone;
-	private String chargerEmail;
-	private String companyAddress;
-	private String businessNum;
-	private String businessLicense;
+	private int companyNum;	//회사번호
+	private String companyName;	//회사명
+	private String companyEngName;	//회사영문명
+	private String representationName;	//대표자명
+	private String representationPhone;	//대표자연락처
+	private String chargerName;		//담당자명
+	private String chargerPhone;	//담당자연락처
+	private String chargerEmail;	//이메일
+	private String companyAddress;	//회사주소
+	private String businessNum;		//시업자번호
+	private String businessLicense;	//등록증파일주소
 	private String serviceState;
 	private Date registerDate;
 }

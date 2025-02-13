@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"></head>
+<body>
+
+    <table id="brandTable" class="table table-bordered text-center">
+        <thead>
+            <tr>
+                <th>브랜드 ID</th>
+                <th>브랜드명</th>
+                <th>선택</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- AJAX로 데이터가 추가될 영역 -->
+        </tbody>
+    </table>
+</body>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+	const brandTableBody = document.querySelector("#brandTable tbody");
+
+    document.getElementById("brandModal").addEventListener("show.bs.modal", function () {
+    	fetch("/purchs/brandTable")
+            .then(response => response.json())
+            .then(data => {
+            	console.log(data);
+                brandTableBody.innerHTML = ""; // 기존 내용 지우기
+                data.forEach(brand => {
+                    const row = `<tr>
+                        <td>${brand.brandId}</td>
+                        <td>${brand.brandName}</td>
+                        <td><button class="btn btn-primary" onclick="selectBrand('${brand.brandId}','${brand.brandName}')">선택</button></td>
+                    </tr>`;
+                    brandTableBody.innerHTML += row;
+                });
+            });
+    });
+});
+
+	//선택된 내용 을 세션에 잠시 저장 하고 다른 html 파일로 넘어갈때 정보를 저장 하고 있다 -> 그 후 다시 불러오기
+	function selectBrand(brandId, brandName) {
+		 console.log("선택된 브랜드 ID:", brandId);
+		 console.log("선택된 브랜드명:", brandName);
+	    // 세션 스토리지에 데이터 저장
+	    sessionStorage.setItem("selectedBrandId", brandId);
+	    sessionStorage.setItem("selectedBrandName", brandName);
+	    
+		console.log("sessionStorage 저장된 브랜드 ID:", sessionStorage.getItem("selectedBrandId"));
+	  
+	}
+
+</script>
+</html>

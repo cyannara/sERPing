@@ -2,17 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.beauty1nside.hr.mapper.EmployeeMapper">
 
-	<select id="getAllEmployeesWithPagination" resultType="com.beauty1nside.hr.dto.EmployeeDTO">
-	    SELECT * FROM hr_employee
-	    ORDER BY employee_num DESC
-	    LIMIT #{pageable.pageSize} OFFSET #{pageable.offset}
-	</select>
 	
 	<select id="countTotalEmployees" resultType="int">
 	    SELECT COUNT(*) FROM employees
 	</select>
-
-
 
 	<!-- 전체 사원 조회 -->
     <select id="getAllEmployees" resultType="com.beauty1nside.hr.dto.EmployeeDTO">
