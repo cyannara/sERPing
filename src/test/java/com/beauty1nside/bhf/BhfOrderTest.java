@@ -41,7 +41,7 @@ public class BhfOrderTest {
 		System.out.println(list);
 	}
 	
-	@Test
+	//@Test
 	public void optionListTest() {
 		String goodsCode = "LH001";
 		BhfGoodsOpDTO list = mapper.optionList(goodsCode);

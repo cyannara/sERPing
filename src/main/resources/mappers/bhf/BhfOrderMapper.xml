@@ -15,10 +15,13 @@
 	
 	<!-- 상품조회 -->
 	<select id="goodsList" resultType="BhfGoodsOpDTO">
-		select goods_code,
-	           goods_name,
-	           goods_standard
-		from   purchse_goods 
+		select g.goods_code,
+	           g.goods_name,
+	           g.goods_standard
+		from   purchse_goods g
+		<where>
+			<include refid="searchInfo"></include>
+		</where>
 	</select>
 	
 	<!-- 상품 선택시 옵션조회 -->
@@ -27,13 +30,15 @@
 		       o.option_code,
 		       o.option_name
 		from   purchse_goods g join purchse_option o on g.goods_num = o.goods_num
-		where g.goods_code = #{goodsCode}
+		<where>
+			<include refid="searchInfo"></include>
+		</where>
 	</select>
 	
 	
 	<!-- 검색조건 -->
 	<sql id="searchInfo">
-			company_num LIKE '%' || #{companyNum} || '%'
+			g.company_num LIKE '%' || #{companyNum} || '%'
 			<if test="goodsCode != null and ! goodsCode.equals('')">
 				AND g.goods_code Like '%' || #{goodsCode} || '%'
 			</if>
