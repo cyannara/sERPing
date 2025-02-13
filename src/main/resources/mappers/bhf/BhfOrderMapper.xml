@@ -18,7 +18,7 @@
 		select goods_code,
 	           goods_name,
 	           goods_standard
-		from   purchse_goods
+		from   purchse_goods 
 	</select>
 	
 	<!-- 상품 선택시 옵션조회 -->
@@ -29,5 +29,20 @@
 		from   purchse_goods g join purchse_option o on g.goods_num = o.goods_num
 		where g.goods_code = #{goodsCode}
 	</select>
+	
+	
+	<!-- 검색조건 -->
+	<sql id="searchInfo">
+			company_num LIKE '%' || #{companyNum} || '%'
+			<if test="goodsCode != null and ! goodsCode.equals('')">
+				AND g.goods_code Like '%' || #{goodsCode} || '%'
+			</if>
+			<if test="section != null and ! section.equals('')">
+				AND section = #{section}
+			</if>
+			<if test="financialInstitution != null and ! financialInstitution.equals('')">
+				AND financial_institution = fn_get_cmmn_code( #{financialInstitution} )
+			</if>
+	</sql>
 	
 </mapper>
