@@ -91,11 +91,13 @@
 		            </div>
 		            <!-- 폼시작 -->
 		            <div id="formSection" style="display: none;">
-			            <form action="#" id="inputComFrom">
+			            <form action="#" id="inputComFrom" enctype="multipart/form-data">
 			            <!-- EQ01=단순문의 / EQ02=상태변경 / EQ03=발행 / EQ04=신규등록 -->
 			            <input type="hidden" value="EQ04" id="customerServiceDivision" name="customerServiceDivision">
 			            <input type="hidden" value="" id="businessFullNumber" name="businessFullNumber">
 			            <input type="hidden" value="" id="fullAddress" name="fullAddress">
+			            <!-- 현재 로그인한 사원번호 -->
+			            <input type="hidden" value="" id="employeeNum" name="employeeNum">
 			            <div class="d-flex flex-wrap mb-1">
 			            	<div class="p-0">
 			                	<div class="input-group input-group-sm mb-1 pe-1">
@@ -159,7 +161,8 @@
 			                </div>
 			                <div class="p-0">
 				                <div class="input-group input-group-sm mb-1">
-								  <input type="file" class="form-control" placeholder="png, jpg, pdf 가능" id="businessLicense" name="businessLicense" style="width: 400px;">
+								  <input type="file" class="form-control" placeholder="png, jpg, pdf 가능" 
+								  			accept=".jpg, .jpeg, .png, .pdf" id="businessLicense" name="businessLicense" style="width: 400px;">
 								  <button class="btn btn-outline-secondary" type="button" id="businessLicense_upload">업로드</button>
 								</div>
 			                </div>
@@ -509,7 +512,7 @@
 			if(isOkNo){
 				//파일명 확인
 				let businessLicense = document.querySelector("#businessLicense").value;
-				businessLicense = "abad.png";	//★★★★★★검증후 지우기
+				//businessLicense = "abad.png";	//★★★★★★검증후 지우기
 				if(businessLicense && isValidFileExtension(businessLicense)){
 					isOkNo = true;
 					errorMessage = "";
@@ -558,7 +561,7 @@
 				let representationPhone = document.querySelector("#representationPhone").value;
 				let chargerPhone = document.querySelector("#chargerPhone").value;
 				let chargerEmail = document.querySelector("#chargerEmail").value;
-				let businessLicense = document.querySelector("#businessLicense").value;
+				//let businessLicense = document.querySelector("#businessLicense").value;
 				let companyAddress = document.querySelector("#fullAddress").value;
 				let customerServiceContent = document.querySelector("#customerServiceContent").value;
 				let customerServiceDivision = document.querySelector("#customerServiceDivision").value;
@@ -570,12 +573,23 @@
 				representationPhone = "010-8521-6704";	//★★★★★★검증후 지우기
 				chargerPhone = "010-8521-6704";	//★★★★★★검증후 지우기
 				chargerEmail = "hayeon8521@kakao.com";	//★★★★★★검증후 지우기
-				businessLicense = "abc.png";
+				//businessLicense = "abc.png";
 				companyAddress = "서울시 좋은곳에 위치";
 				customerServiceContent = "문의내용이에요";
 				customerServiceDivision = "질의 분류";
 				
-				 
+				//로그인 처리할때 까지 이건 계속 있어야함
+				let employeeNum = document.querySelector("#employeeNum").value;
+				employeeNum = 1;
+				
+				//이미지 먼저 저장하고
+				const uploadedFileName = await imgSave();
+				if (uploadedFileName === "FAIL") {
+					alert('치명적 이미지 오류발생 관리자 문의');
+			        return;
+			    }
+				let businessLicense = uploadedFileName;
+    		    
 				
 				const url = "/erp/rest/newcomapny";
 				const param = {
@@ -587,7 +601,8 @@
 				const requestData = {
 										dto: param,
 									    customerServiceDivision: customerServiceDivision,
-									    customerServiceContent: customerServiceContent
+									    customerServiceContent: customerServiceContent,
+									    employeeNum: employeeNum
 				};
 				fetch(url, {
 					method:"post",
@@ -647,6 +662,24 @@
 				//alert(result);
 				return result;
 			})
+		}
+		// 이미지 저장 함수
+		async function imgSave(){
+			const fileInput = document.getElementById("businessLicense");
+			const file = fileInput.files[0];
+			const formData = new FormData();
+		    formData.append("file", file);
+		    return fetch("/erp/rest/uploadBusinessLicense", {
+		        method: "POST",
+		        body: formData
+		    })
+		    .then(response => response.text())
+		    .then(data => {
+		    	return data;
+		    })
+		    .catch(error => {
+		        console.error("파일 업로드 중 오류 발생:", error);
+		    });
 		}
       
 	</script>
