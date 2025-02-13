@@ -9,7 +9,7 @@
 	</select>
 	<select id="list" resultType="com.beauty1nside.accnut.dto.DebtDTO" parameterType="com.beauty1nside.accnut.dto.DebtSearchDTO">
 		SELECT debt_code, debt_name, section, creditor, amount, interest, register_date
-		FROM (SELECT /*+INDEX_DESC(accnut_debt pk_accnut_debt)*/ rownum rn, debt_code, debt_name, section, creditor, amount, interest, register_date
+		FROM (SELECT /*+INDEX_DESC(accnut_debt pk_accnut_debt)*/ rownum rn, debt_code, debt_name, fn_get_cmmn_name(section) as section, creditor, amount, interest, register_date
 		FROM accnut_debt
 		<![CDATA[
 		      WHERE rownum <= #{end} 
@@ -36,7 +36,7 @@
 			AND section = #{section}
 		</if>
 		<if test="creditor != null and ! creditor.equals('')">
-			AND creditor = #{creditor}
+			AND creditor LIKE '%' || #{creditor} || '%'
 		</if>
 	</sql>
 	
