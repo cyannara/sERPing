@@ -29,13 +29,18 @@
 </head>
 <body>
 	<div class="container">
+		<!-- 메뉴이름 -->
+		<div>
+			<h2>자산관리</h3>
+		</div>
+
     <!-- 검색창 -->
 		<div class="search-grid">
 			<div class="row 1row">
 				<div class="col-1"></div>
 				<div class="col-5 row ">
 					<span class="label-search col-4">채무명</span>
-					<input type="text" name="assetsName" id="assetsName" class="col-8 input-box">
+					<input type="text" name="debtName" id="debtName" class="col-8 input-box">
 				</div>
 				<div class="col-1"></div>
 				<div class="col-5 row ">
@@ -50,12 +55,23 @@
 				<div class="col-1"></div>
 				<div class="col-5 row ">
 					<span class="label-search col-4">채권자</span>
-					<input type="text" name="financialInstitution" id="financialInstitution" class="col-8 input-box">
+					<input type="text" name="creditor" id="creditor" class="col-8 input-box">
+				</div>
+				<div class="col-1"></div>
+				<div class="col-5 row ">
+					<span class="label-search col-4">표시수량</span>
+					<select name="display_amount" id="display_amount" class="col-8 input-box" onchange="changeDisplay()">
+						<option value="5" selected>5</option>
+						<option value="10">10</option>
+						<option value="20">20</option>
+						<option value="50">50</option>
+						<option value="100">100</option>
+					</select>
 				</div>
 			</div>
 			<div class="row 3row">
 				<div class="col-4"></div>
-				<button type="button" class="btn btn-primary col-1">검색</button>
+				<button type="button" class="btn btn-primary col-1" onclick="search()">검색</button>
 				<div class="col-1"></div>
 				<button type="button" class="btn btn-secondary col-1">초기화</button>
 			</div>
@@ -73,13 +89,14 @@
 			<button type="button" class="btn btn-secondary col-1">PDF</button>
 			<div class="col-7"></div>
 			<div class="btn-group dropup col-2">
-				<button type="button" class="btn btn-success cash">미지급금등록</button>
+				<button type="button" class="btn btn-success unpay">미지급금등록</button>
 				<button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split" id="dropupMenuSplitButton3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 					<span class="sr-only"></span>
 				</button>
 				<div class="dropdown-menu" aria-labelledby="dropupMenuSplitButton3">
-					<h6 class="dropdown-header">대출금 등록</h6>
-					<a class="dropdown-item" href="#">외상매입금</a>
+					<h6 class="dropdown-header">채무 등록</h6>
+					<a class="dropdown-item" href="#">외상매입금 등록</a>
+					<a class="dropdown-item" href="#">대출금 등록</a>
 					<div class="dropdown-divider"></div>
 					<a class="dropdown-item" href="#">미지급금 등록</a>
 				</div>
@@ -95,21 +112,18 @@
 	})
 	function gotobtn(){
 		document.querySelector(".dropup").addEventListener("click", ()=>{
-			if(event.target.className.includes("cash")){
-				console.log("현금");
+			if(event.target.className.includes("unpay")){
+				console.log("미지급금");
 			} else if(event.target.className.includes("dropdown-item")){
 				switch (event.target.innerHTML) {
-					case "통장 등록":
-						console.log("통장")
+					case "외상매입금 등록":
+						console.log("외상매입금")
 						break;
-					case "카드 등록":
-						console.log("카드")
+					case "대출금 등록":
+						console.log("대출금")
 						break;
-					case "비품등록":
-						console.log("비품")
-						break;
-					case "현금등록":
-						console.log("현금")
+					case "미지급금 등록":
+						console.log("미지급금")
 						break;
 					default:
 						break;
@@ -123,7 +137,7 @@
 	
 	const dataSource = {
 		api: {
-			readData: { url: 'http://localhost:81/accnut/rest/listTest', method: 'GET' },
+			readData: { url: 'http://localhost:81/accnut/rest/debt/list', method: 'GET', initParams: { page: 1 } },
 			
 		},
 		contentType: 'application/json'
@@ -133,22 +147,35 @@
 	const grid = new Grid({
 		el : document.querySelector('#grid'),
 		pageOptions: {
-			useClient : true,
+			useClient : false,
 			perPage: 5,
 		},
 		columns: [
-			{ header : "자산코드", name : "assetsCode",  },
-			{ header : "자산명", name : "assetsName",  },
+			{ header : "채무코드", name : "debtCode",  },
+			{ header : "채무명", name : "debtName",  },
 			{ header : "구분", name : "section",  },
-			{ header : "금융기관", name : "financialInstitution",  },
-			{ header : "결제정보", name : "financeInformation",  },
-			{ header : "소유주", name : "owner",  },
+			{ header : "채권자", name : "creditor",  },
 			{ header : "금액", name : "amount",  },
+			{ header : "이자", name : "interest",  },
 			{ header : "등록일", name : "registerDate",  },
 			
 		],
 		data : dataSource,
 	});
+	
+	function changeDisplay() {
+		let gap = parseInt(document.querySelector('#display_amount').value);
+		grid.setPerPage(gap,dataSource)
+	}
+	function search(){
+		let debtName = document.querySelector('#debtName').value;
+		let section = document.querySelector('#section').value.toString();
+		let creditor = document.querySelector('#creditor').value.toString();
+		console.log(creditor.toString());
+		grid.setRequestParams({"debtName" : debtName, "section" : section, "creditor" : creditor })
+		grid.readData();
+	}
+	
 
 </script>
 	
