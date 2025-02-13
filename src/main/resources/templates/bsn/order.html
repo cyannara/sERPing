@@ -60,45 +60,48 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
     function toggleDateInputs(enable) {
       document.getElementById("startDate").disabled = !enable;
       document.getElementById("endDate").disabled = !enable;
+      
+     
     }
+    
+    var Grid = tui.Grid;
+
+    const dataSource = {
+      api: {
+        readData: { url: 'http://localhost:81/bsn/rest/order', method: 'GET', initParams: { page: 1 } },
+        
+      },
+      contentType: 'application/json',
+      
+    };
+
+
+    
+    const grid = new Grid({
+      //el:document.querySelector('#grid'), //컨테이너
+      el:document.getElementById('grid'),
+      pageOptions: {
+        useClient : false,
+        perPage: 5
+      },
+      columns: [
+        {header : "주문번호", name:"orderCode"},
+        {header : "지점번호", name:"branchOfficeId"},
+        {header : "주문일", name:"orderDate"},
+        {header : "납기일자", name:"dueDate"},
+        {header : "비고", name:"remark"},
+      ],
+
+      data: dataSource
+    })
+    
   </script>
   
   
   
   
   <script>
-      var Grid = tui.Grid;
-
-      const dataSource = {
-        api: {
-          readData: { url: 'http://localhost:81/bsn/api/order', method: 'GET', initParams: { param: 'param' } },
-          // createData: { url: '/api/createData', method: 'POST' },
-          // updateData: { url: '/api/updateData', method: 'PUT' },
-          // modifyData: { url: 'http://localhost:81/api/board/modifyData', method: 'PUT' },
-          // deleteData: { url: '/api/deleteData', method: 'DELETE' }
-        },
-        contentType: 'application/json',
-        
-      };
-
-
-      
-      const grid = new Grid({
-        el:document.getElementById('grid'), //컨테이너
-        pageOptions: {
-          useClient : false,
-          perPage: 2
-        },
-        columns: [
-          {header : "주문번호", name:"orderCode", editor: 'text'},
-          {header : "지점번호", name:"branchOfficeId", editor: 'text'},
-          {header : "주문일", name:"orderDate", editor: 'text'},
-          {header : "납기일자", name:"dueDate", editor: 'text'},
-          {header : "비고", name:"remark", editor: 'text'},
-        ],
-
-        data: dataSource
-      })
+     
       </script>
 
 </head>
@@ -301,8 +304,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
                 </tbody>
                 </table>
                 
-                <div id="grid"></div>
-    			<div id="pagination" class="tui-pagination"></div>
+                
               </div>
             </div>
           </div>
@@ -322,6 +324,12 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
             </div>
           </div>
           
+        </div>
+        <div class="container">
+        	<!-- 그리드 -->
+				<div id="grid"></div>
+				<div id="pagination" class="tui-pagination"></div>
+			 
         </div>
         
         
