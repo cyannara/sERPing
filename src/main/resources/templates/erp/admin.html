@@ -575,28 +575,29 @@
 				customerServiceContent = "문의내용이에요";
 				customerServiceDivision = "질의 분류";
 				
-				
+				 
 				
 				const url = "/erp/rest/newcomapny";
-				
 				const param = {
-							companyName, companyEngName, businessFullNumber,
-							representationName, chargerName, representationPhone,
-							chargerPhone, chargerEmail, businessLicense,
-							fullAddress, customerServiceContent, customerServiceDivision,
-							companyAddress, businessNum
-						}
-				
-				//등록 요청
+								companyName, companyEngName,
+								representationName, chargerName, representationPhone,
+								chargerPhone, chargerEmail, businessLicense,
+								companyAddress, businessNum
+				};
+				const requestData = {
+										dto: param,
+									    customerServiceDivision: customerServiceDivision,
+									    customerServiceContent: customerServiceContent
+				};
 				fetch(url, {
 					method:"post",
 					headers: {
 					      "Content-Type": "application/json",
 					      // 'Content-Type': 'application/x-www-form-urlencoded',
 					    },
-					body : JSON.stringify(param), 
+					body : JSON.stringify(requestData),
 				})
-				.then( result => result.text() )
+				.then( result => result.json() )
 		    }
 		});
 

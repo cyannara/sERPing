@@ -160,15 +160,40 @@ public class ErpAdminRestController {
 	/**
      * 회사를 신규등록한다
      * @param 
-     * @return 
+     * @return String
      */
 	@PostMapping("/newcomapny")
-	public String register(@RequestBody ComDTO dto
-			) {
-		log.info(dto.toString());
-//		log.info(customerServiceContent.toString());
-//		log.info(customerServiceDivision.toString());
-		return "OK";
+	public String register(@RequestBody Map<String, Object> requestData) {
+		
+		log.info("Received requestData: " + requestData.toString());
+
+	    ObjectMapper objectMapper = new ObjectMapper();
+	    
+	    //칼럼이 과하게 많은경우 칼럼을 제거하고 dto에 넣으면된다
+//	    // DTO이용해서 맵 하나 초기화 안의 데이터 가져오기
+//	    Map<String, Object> dtoMap = (Map<String, Object>) requestData.get("dto");
+//
+//	    // DTO에 없는 불필요한 필드 제거
+//	    dtoMap.remove("customerServiceDivision");
+//	    dtoMap.remove("customerServiceContent");
+//		ComDTO dto = objectMapper.convertValue(dtoMap, ComDTO.class);	    
+
+	    // ComDTO로 변환
+	    ComDTO dto = objectMapper.convertValue(requestData.get("dto"), ComDTO.class);
+
+	    // 추가 필드 가져오기
+	    String customerServiceDivision = (String) requestData.get("customerServiceDivision");
+	    String customerServiceContent = (String) requestData.get("customerServiceContent");
+
+	    // 로그 출력 (정상적으로 변환되었는지 확인)
+	    log.info("DTO: " + dto.toString());
+	    log.info("customerServiceDivision: " + customerServiceDivision);
+	    log.info("customerServiceContent: " + customerServiceContent);
+	    
+	    //이제 이값들로 인서트 투닥투닥 처리하면 됨
+	    //이미지파일은 어떻게 처리되는지 봐야함
+
+	    return "OK";
 	}
 
 }
