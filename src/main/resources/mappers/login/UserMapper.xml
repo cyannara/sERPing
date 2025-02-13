@@ -13,7 +13,9 @@
         <result property="phone" column="phone"/>
         <result property="position" column="position"/>
         <result property="companyNum" column="company_num"/>
+        <result property="companyEngName" column="company_eng_name"/>
         <result property="departmentNum" column="department_num"/>
+        <result property="authority" column="authority"/>
         <collection
                 property="roles"
                 ofType="RoleDTO"
@@ -22,17 +24,20 @@
         />
     </resultMap>
     <select id="getUser" resultMap="userMap">
-        select employee_num,
-               employee_id,
-               employee_pw,
-               employee_name,
-               email,
-               phone,
-               position,
-               company_num,
-               department_num
-        from hr_employee
-        where employee_id = #{employeeId}
+        select h.employee_num,
+               h.employee_id,
+               h.employee_pw,
+               h.employee_name,
+               h.email,
+               h.phone,
+               h.position,
+               h.company_num,
+               h.department_num,
+               h.authority,
+               e.company_eng_name
+        from hr_employee h join erp_company e
+         on   h.company_num = e.company_num
+        where h.employee_id = #{employeeId}
     </select>
 
     <!--
@@ -46,7 +51,7 @@
 <!--        where id = #{id}-->
 <!--    </select>-->
     <select id="getRole" resultType="com.beauty1nside.security.service.RoleDTO">
-        select role_name
+        select c.cmmn_code as role_name
         from hr_employee h
                  join cmmn c on (h.authority = c.cmmn_code)
         where employee_num = #{employeeNum}
