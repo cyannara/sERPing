@@ -19,10 +19,10 @@ public class BhfSampleController {
 		return "/bhf/sample";
 	};
 
-	// test 페이지
-	@GetMapping("/a")
+	// 상품 발주 요청 페이지
+	@GetMapping("/order")
 	public String test() {
-		return "/partials/_navbar";
+		return "/bhf/orderRequest";
 	};
 	
 	
