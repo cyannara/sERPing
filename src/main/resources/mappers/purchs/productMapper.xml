@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beauty1nside.purchs.mapper.productMapper">
+<!-- catelist 카테고리 조회-->
+<select id="catelist" resultType="ProductDTO">
+select *
+from stdr_classification
+order by classification_id desc
+</select>
+
+<!-- brandlist 브랜드 조회 -->
+<select id="brandlist" resultType="ProductDTO">
+select *
+from stdr_brand
+order by brand_id desc
+</select>
+
+</mapper>
