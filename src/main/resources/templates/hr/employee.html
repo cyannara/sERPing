@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layouts/layout}" lang="en"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns="http://www.w3.org/1999/xhtml" xmlns:sec="">
+
+<head>
+<meta charset="UTF-8">
+<!-- timePicker -->
+<link rel="stylesheet"
+	href="https://uicdn.toast.com/tui.time-picker/latest/tui-time-picker.css" />
+<script
+	src="https://uicdn.toast.com/tui.time-picker/latest/tui-time-picker.js"></script>
+
+<!-- datePicker -->
+<link rel="stylesheet"
+	href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+<script
+	src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+
+
+<!-- paging -->
+<link rel="stylesheet"
+	href="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.css" />
+<script
+	src="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.js"></script>
+
+<!-- toast grid -->
+<link rel="stylesheet"
+	href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+
+<!-- 엑셀 -->
+<script lang="javascript"
+	src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+<!-- bootsStrap -->
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+	rel="stylesheet"
+	integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+	crossorigin="anonymous">
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+	integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+	crossorigin="anonymous"></script>
+
+<!-- custom CSS -->
+<link rel="stylesheet" th:href="@{/css/hr/style.css}">
+
+<title>사원 관리</title>
+</head>
+
+<body layout:fragment="content">
+
+	<div class="container">
+		<div class="d-flex justify-content-start p-0 mt-2">
+			<h2>사원 관리</h2>
+		</div>
+		<div class="d-flex flex-column mb-1">
+
+			<!-- 사원 검색 영역 -->
+			<div class="search-box bg-light p-3 rounded shadow-sm">
+				<!-- 검색 기준 -->
+				<div class="mb-2">
+					<label class="fw-bold d-block">검색 기준</label>
+					<div class="d-flex">
+						<select class="form-select me-2" style="width: 120px;"
+							id="searchCategory">
+							<option value="전체">전체</option>
+							<option value="이름">이름</option>
+							<option value="부서">부서</option>
+						</select> <input type="text" class="form-control" style="width: 250px;"
+							placeholder="검색어 입력">
+					</div>
+				</div>
+
+				<!-- 부서 -->
+				<div class="mb-2">
+					<label class="fw-bold d-block">부서</label> <select
+						class="form-select" style="width: 100%;" id="searchDepartment">
+						<option value="">부서 선택</option>
+						<option value="HR">인사팀</option>
+						<option value="IT">IT팀</option>
+					</select>
+				</div>
+
+				<!-- 직급 -->
+				<div class="mb-2">
+					<label class="fw-bold d-block">직급</label> <select
+						class="form-select" style="width: 100%;" id="searchPosition">
+						<option value="">직급 선택</option>
+						<option value="P001">사원</option>
+						<option value="P002">대리</option>
+						<option value="P003">과장</option>
+					</select>
+				</div>
+
+				<!-- 재직 상태 -->
+				<div class="mb-2">
+					<label class="fw-bold d-block">재직 상태</label>
+					<div class="btn-group w-100" role="group">
+						<input type="radio" class="btn-check" name="searchStatus"
+							id="statusAll" checked> <label
+							class="btn btn-outline-primary" for="statusAll">전체</label> <input
+							type="radio" class="btn-check" name="searchStatus"
+							id="statusActive"> <label class="btn btn-outline-primary"
+							for="statusActive">재직</label> <input type="radio"
+							class="btn-check" name="searchStatus" id="statusLeave"> <label
+							class="btn btn-outline-primary" for="statusLeave">휴직</label> <input
+							type="radio" class="btn-check" name="searchStatus"
+							id="statusRetired"> <label
+							class="btn btn-outline-primary" for="statusRetired">퇴직</label>
+					</div>
+				</div>
+
+				<!-- 근무 유형 -->
+				<div class="mb-3">
+					<label class="fw-bold d-block">근무 유형</label>
+					<div class="btn-group w-100" role="group">
+						<input type="radio" class="btn-check" name="employmentType"
+							id="typeAll" checked> <label
+							class="btn btn-outline-primary" for="typeAll">전체</label> <input
+							type="radio" class="btn-check" name="employmentType"
+							id="typeRegular"> <label class="btn btn-outline-primary"
+							for="typeRegular">정규직</label> <input type="radio"
+							class="btn-check" name="employmentType" id="typeContract">
+						<label class="btn btn-outline-primary" for="typeContract">계약직</label>
+					</div>
+				</div>
+
+				<!-- 조회 및 초기화 버튼 (중앙 정렬) -->
+				<div class="w-100 text-center mt-3">
+					<button class="btn btn-primary me-2" onclick="searchEmployees()">🔍
+						조회</button>
+					<button class="btn btn-outline-success" onclick="resetFilters()">🔄
+						초기화</button>
+				</div>
+			</div>
+			<!-- 사원 검색 영역 끝 -->
+
+			<!-- 토스트 그리드 영역 -->
+			<div id="table-container">
+				<div id="grid"></div>
+				<div id="pagination" class="tui-pagination"></div>
+			</div>
+			<!-- 토스트 그리드 영역 끝 -->
+
+			<!-- 버튼 영역 -->
+			<div class="pt-2">
+				<button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#employeeRegisterModal" onclick="openEmployeeForm()">사원
+					등록</button>
+			<!-- ✅ 모달을 다른 HTML에서 불러오기 -->
+			<div th:replace="~{hr/employee_register_modal :: employeeRegisterModal}"></div>
+
+				<button class="btn btn-danger" onclick="deleteEmployee()">삭제</button>
+			</div>
+		</div>
+		
+
+
+		<script th:inline="javascript">
+			document.addEventListener("DOMContentLoaded", function() {
+			});
+			//그리드 선언
+			var gridData = [[${employees}]];
+			var Grid = tui.Grid;
+			const dataSource = {
+				api : {
+					readData : {
+						url : '/api/hr/employees',
+						method : 'GET'
+					},
+				//createData: { url: '/api/createData', method: 'POST' },
+				//updateData: { url: '/api/updateData', method: 'PUT' },
+				//modifyData: { url: 'http://localhost:81/api/board/modifyData', method: 'PUT' },
+				//deleteData: { url: '/api/deleteData', method: 'DELETE' },
+				},
+				contentType : 'application/json',
+			};
+
+			Grid.applyTheme('stripe');
+			//그리드 생성
+			const grid = new Grid({
+				el : document.getElementById('grid'), // 컨테이너 엘리먼트
+				width: "100%", // 그리드 가로 크기를 자동 조정
+				autoWidth: true,  // 컬럼 크기 자동 조정
+				pageOptions : {
+					useClient : false, //페이지 네이션 할꺼면 false // 자동으로 하게할껴면 true
+					perPage : 5, //한페이지에 몇개 보여줄지
+				},
+				
+                rowHeaders: [{
+                    type: 'rowNum',
+                    header: "순번",
+                    width: 50,
+                }],
+
+				//칼럼 정하기
+				columns : [ {
+					header : "사원ID",
+					name : "employeeId",
+					align: "center",
+					width : 100,
+					
+				}, {
+					header : "사원명",
+					name : "employeeName",
+					align: "center",
+					sortable: true,
+					width : 150,
+				}, {
+					header : "부서",
+					name : "departmentName",
+					align: "center",
+					sortable: true,
+					width : 100,
+				}, {
+					header : "직급",
+					name : "position",
+					align: "center",
+					sortable: true,
+					width : 100,
+					formatter: function({value}) {
+                        const positionMap = { "PO001": "사원", "PO002": "대리", "PO003": "과장" };
+                        return positionMap[value] || value;
+                    }
+					
+				}, {
+					header : "재직 상태",
+					name : "status",
+					align: "center",
+					sortable: true,
+					width : 100,
+					formatter: function({value}) {
+                        const statusMap = { "ST001": "재직", "ST002": "휴직", "ST003": "퇴직" };
+                        return statusMap[value] || value;
+                    }
+				}, {
+					header : "근무 유형",
+					name : "employmentType",
+					align: "center",
+					sortable: true,
+					width : 100,
+					formatter: function({value}) {
+                        const employmentMap = { "ET001": "정규직", "ET002": "계약직" };
+                        return employmentMap[value] || value;
+                    }
+				}, {
+					header : "입사일",
+					name : "hireDate",
+					align: "center",
+					sortable: true,
+					width : 150,
+					formatter: function({value}) {
+                        return value ? value.split('T')[0] : '';
+                    }
+				}, {
+					header : "연락처",
+					align: "center",
+					name : "phone",
+					sortable: true,
+					width : 150
+				}, {
+					header : "이메일",
+					name : "email",
+					align: "center",
+					sortable: true,
+					width : 200
+				} ],
+
+				//초기 데이터 뭘로 할지
+				data : gridData,
+
+				rowHeaders : [ 'checkbox' ],
+
+			});
+			
+			
+			
+		</script>
+	</div>
+</body>
+</html>

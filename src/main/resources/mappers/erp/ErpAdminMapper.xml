@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- =======================================================
+	* ERP회사 데이터를 CURD 처리한다
+	* @author ERP 관리자 개발팀 표하연
+	* @since 2025.02.12
+	* @version 1.0
+	* @see
+	*
+	* <pre>
+	* << 개정이력(Modification Information) >>
+	*
+	*   수정일      수정자          수정내용
+	*  ======    =======    ==============================
+	*  2025.02.12  표하연          최초생성
+	*  2025.02.13  표하연          회사영문코드 중복처리
+	*
+	*  </pre>
+======================================================== -->
+<mapper namespace="com.beauty1nside.erp.mapper.ErpAdminMapper">
+
+	<!-- 
+     * DB연결 확인을 위하여 샘플 데이터를 조회
+     *
+     * @return testDTO
+	-->
+	<select id="test" resultType="testDTO">
+		select test_name, test_age from test
+	</select>
+	
+	<!-- 
+     * 신규회사 등록시 회사 코드 중복 확인
+     *
+     * @param String
+     * @return int
+	-->
+	<select id="comenname" resultType="int">
+		select
+		    count(*)
+		from erp_company
+		where COMPANY_ENG_NAME = #{companyEngName}
+	</select>
+	
+	<!-- 
+     * ERP 사용 회사 전체 리스트를 조회한다
+     *
+     * @param CompanyListSearchDTO
+     * @return List<CompanyListDTO>
+	-->
+	<select id="companyList" resultType="CompanyListDTO">
+		SELECT *
+		FROM (
+		    SELECT A.*, ROWNUM RN
+		    FROM (
+				SELECT
+				    c.COMPANY_NUM,
+				    c.COMPANY_NAME,
+				    c.COMPANY_ENG_NAME,
+				    c.REPRESENTATION_NAME,
+				    c.REPRESENTATION_PHONE,
+				    c.CHARGER_NAME,
+				    c.CHARGER_PHONE,
+				    c.CHARGER_EMAIL,
+				    c.COMPANY_ADDRESS,
+				    c.BUSINESS_NUM,
+				    c.BUSINESS_LICENSE,
+				    c.SERVICE_STATE,
+				    c.REGISTER_DATE,
+				    d.contract_num,
+				    l.subscription_num,
+				    l.subscription_end_date,
+				    l.subscription_form
+				from erp_company c
+				left join erp_contract_document d
+				    on c.company_num = d.company_num
+				left join erp_subscription_info_list l
+				    on c.company_num = l.company_num
+				    and l.subscription_name_num in (1, 6)
+				order by c.COMPANY_NUM DESC
+				) A
+			<![CDATA[
+		     WHERE ROWNUM <= #{end}
+		    ]]>
+	    )
+	    <![CDATA[
+			WHERE RN >= #{start}
+		]]>
+	</select>
+	
+	<!-- 
+     * ERP 사용 회사 전체 리스트의 갯수를 구한다
+     *
+     * @param CompanyListSearchDTO
+     * @return int
+	-->
+	<select id="getCount" resultType="int">
+	  select 
+		    count(*)
+		from erp_company c
+		left join erp_contract_document d
+		    on c.company_num = d.company_num
+		left join erp_subscription_info_list l
+		    on c.company_num = l.company_num
+		    and l.subscription_name_num in (1, 6)
+	</select>
+</mapper>
