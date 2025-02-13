@@ -1,4 +1,4 @@
-package com.beauty1nside.bsn;
+package com.beauty1nside.hr.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,21 +10,12 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2	//log4j 가 안되면 버전높은 log4j2 사용
 @Controller
 @AllArgsConstructor
-@RequestMapping("/bsn/*")
-public class BsnSampleController {
+@RequestMapping("/hr/*")
+public class HrSampleController {
 
 	//샘플 페이지
 	@GetMapping("/")
 	public String sample() {
-		return "/bsn/sample";
-	};
-	
-	@GetMapping("/test")
-	public String test() {
-		return "/bsn/sample2";
-	};
-	@GetMapping("/order")
-	public String test2() {
-		return "/bsn/order";
+		return "/hr/sample";
 	};
 }

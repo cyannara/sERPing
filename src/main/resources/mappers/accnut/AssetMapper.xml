@@ -29,16 +29,16 @@
 	</select>
 
 	<sql id="searchInfo">
-			company_num LIKE '%' || #{companyNum} || '%'
-			<if test="assetsName != null and ! assetsName.equals('')">
-				AND assets_name Like '%' || #{assetsName} || '%'
-			</if>
-			<if test="section != null and ! section.equals('')">
-				AND section = #{section}
-			</if>
-			<if test="financialInstitution != null and ! financialInstitution.equals('')">
-				AND financial_institution = fn_get_cmmn_code( #{financialInstitution} )
-			</if>
+		company_num LIKE '%' || #{companyNum} || '%'
+		<if test="assetsName != null and ! assetsName.equals('')">
+			AND assets_name Like '%' || #{assetsName} || '%'
+		</if>
+		<if test="section != null and ! section.equals('')">
+			AND section = #{section}
+		</if>
+		<if test="financialInstitution != null and ! financialInstitution.equals('')">
+			AND financial_institution = fn_get_cmmn_code( #{financialInstitution} )
+		</if>
 	</sql>
 
 

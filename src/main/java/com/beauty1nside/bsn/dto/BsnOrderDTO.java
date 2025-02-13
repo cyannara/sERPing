@@ -1,4 +1,4 @@
-package com.beauty1nside.bsn;
+package com.beauty1nside.bsn.dto;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -18,8 +18,8 @@ public class BsnOrderDTO {
 	private String orderCode;
 	private String branchOfficeId;
 	private String orderName;
-	private BigDecimal total_amount;
-	private BigDecimal purchaseVat;
+	private Long total_amount;
+	private Long purchaseVat;
 	private Date orderDate;
 	private Date registerDate;
 	private Date cancleDate;
@@ -33,7 +33,7 @@ public class BsnOrderDTO {
 	private List<BsnOrderDetailDTO> details;
 
 	public BsnOrderDTO(String orderId, String orderCode, String branchOfficeId, String orderName,
-			BigDecimal total_amount, BigDecimal purchaseVat, Date orderDate, Date registerDate, Date cancleDate,
+			Long total_amount, Long purchaseVat, Date orderDate, Date registerDate, Date cancleDate,
 			Date dueDate, Date sendingDate, String orderStatus, int employeeNum, String remark, int companyNum) {
 		super();
 		this.orderId = orderId;

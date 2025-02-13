@@ -73,6 +73,4 @@ commit;
 select fn_get_cmmn_code('°¡')
 from dual;
 
-
-select * from hr_employee;
-
+select *

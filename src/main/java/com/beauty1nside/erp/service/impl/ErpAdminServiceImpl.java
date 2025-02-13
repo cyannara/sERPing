@@ -27,6 +27,7 @@ import lombok.extern.log4j.Log4j2;
  *   수정일      수정자          수정내용
  *  -------    --------    ---------------------------
  *  2025.02.12  표하연          최초 생성
+ *  2025.02.13  표하연          회사영문코드 중복처리
  *
  *  </pre>
 */
@@ -75,5 +76,16 @@ public class ErpAdminServiceImpl implements ErpAdminService {
 	@Override
 	public int getCount(CompanyListSearchDTO searchDTO) {
 		return erpAdminMapper.getCount(searchDTO);
+	}
+
+	/**
+     * 신규회사 등록시 회사 코드 중복 확인
+     *
+     * @param String
+     * @return boolean
+     */
+	@Override
+	public boolean comenname(String companyEngName) {
+		return erpAdminMapper.comenname(companyEngName) == 1 ? true : false;
 	}
 }
