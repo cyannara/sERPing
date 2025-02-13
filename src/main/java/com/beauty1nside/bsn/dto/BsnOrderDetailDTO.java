@@ -1,4 +1,4 @@
-package com.beauty1nside.bsn;
+package com.beauty1nside.bsn.dto;
 
 import java.math.BigDecimal;
 import java.util.Date;
