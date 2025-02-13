@@ -1,8 +1,13 @@
 package com.beauty1nside.erp.controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.beauty1nside.common.Paging;
 import com.beauty1nside.common.dto.ComDTO;
@@ -159,16 +165,90 @@ public class ErpAdminRestController {
 	
 	/**
      * 회사를 신규등록한다
-     * @param 
-     * @return 
+     * @param Map<String, Object>
+     * @return String
      */
 	@PostMapping("/newcomapny")
-	public String register(@RequestBody ComDTO dto
-			) {
-		log.info(dto.toString());
-//		log.info(customerServiceContent.toString());
-//		log.info(customerServiceDivision.toString());
-		return "OK";
+	public String register(@RequestBody Map<String, Object> requestData) {
+		
+		log.info("Received requestData: " + requestData.toString());
+
+	    ObjectMapper objectMapper = new ObjectMapper();
+	    
+	    //칼럼이 과하게 많은경우 칼럼을 제거하고 dto에 넣으면된다
+//	    // DTO이용해서 맵 하나 초기화 안의 데이터 가져오기
+//	    Map<String, Object> dtoMap = (Map<String, Object>) requestData.get("dto");
+//
+//	    // DTO에 없는 불필요한 필드 제거
+//	    dtoMap.remove("customerServiceDivision");
+//	    dtoMap.remove("customerServiceContent");
+//		ComDTO dto = objectMapper.convertValue(dtoMap, ComDTO.class);	    
+
+	    // ComDTO로 변환
+	    ComDTO dto = objectMapper.convertValue(requestData.get("dto"), ComDTO.class);
+
+	    // 추가 필드 가져오기
+	    String customerServiceDivision = (String) requestData.get("customerServiceDivision");
+	    String customerServiceContent = (String) requestData.get("customerServiceContent");
+	    int employeeNum = (int) requestData.get("employeeNum");
+
+	    customerServiceContent = """
+	    		[신규 업체 등록]
+	    		
+	    		
+	    		""" + customerServiceContent;
+	    // 로그 출력 (정상적으로 변환되었는지 확인)
+	    log.info("DTO: " + dto.toString());
+	    log.info("customerServiceDivision: " + customerServiceDivision);
+	    log.info("customerServiceContent: " + customerServiceContent);
+	    log.info("employeeNum: " + employeeNum);
+	    
+	    //이제 이값들로 인서트 투닥투닥 처리하면 됨
+	    //이미지파일은 어떻게 처리되는지 봐야함
+
+	    return "OK";
 	}
+	
+	/**
+     * 사업자 등록증 이미지를 서버에 저장한다 [사용중지 FTP서버변경하려고]
+     * 미사용 FTPFileUploadController.java에서 처리중
+     * 
+     * @param MultipartFile
+     * @return ResponseEntity<Map<String, Object>>
+     */
+	//@PostMapping("/uploadBusinessLicense")
+    public ResponseEntity<Map<String, Object>> uploadFile(@RequestParam("file") MultipartFile file) {
+        Map<String, Object> response = new HashMap<>();
+        
+        String UPLOAD_DIR = "C:/atest/";
+       
+        try {
+            if (file.isEmpty()) {
+                response.put("success", false);
+                response.put("message", "업로드할 파일이 없습니다.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+
+            // 파일 저장
+            File saveFile = new File(UPLOAD_DIR + file.getOriginalFilename());
+            file.transferTo(saveFile);
+
+            response.put("success", true);
+            response.put("message", "파일 업로드 성공");
+            response.put("fileName", file.getOriginalFilename());
+
+            return ResponseEntity.ok(response);
+        } catch (IOException e) {
+            e.printStackTrace();  // 콘솔에 오류 출력
+            response.put("success", false);
+            response.put("message", "파일 저장 중 오류 발생: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("success", false);
+            response.put("message", "예상치 못한 오류 발생: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
 
 }

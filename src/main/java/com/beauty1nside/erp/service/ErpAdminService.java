@@ -2,6 +2,7 @@ package com.beauty1nside.erp.service;
 
 import java.util.List;
 
+import com.beauty1nside.common.dto.ComDTO;
 import com.beauty1nside.erp.dto.CompanyListDTO;
 import com.beauty1nside.erp.dto.CompanyListSearchDTO;
 import com.beauty1nside.erp.dto.testDTO;
@@ -20,6 +21,7 @@ import com.beauty1nside.erp.dto.testDTO;
  *  -------    --------    ---------------------------
  *  2025.02.12  표하연          최초 생성
  *  2025.02.13  표하연          회사영문코드 중복처리
+ *  2025.02.14  표하연          회사신규등록(회사,cs,최고관리자,구독정보목록생성)
  *
  *  </pre>
 */
@@ -54,4 +56,15 @@ public interface ErpAdminService {
      * @return boolean
      */
 	public boolean comenname(String companyEngName);
+	
+	/**
+    * ERP 신규회사 정보를 등록한다
+    *
+    * @param ComDTO
+    * @param String
+    * @param String
+    * @return boolean
+    */
+	public boolean insertCompany(ComDTO comdto, String customerServiceDivision, String customerServiceContent, int employeeNum);
+	
 }
