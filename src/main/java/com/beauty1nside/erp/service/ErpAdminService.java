@@ -19,6 +19,7 @@ import com.beauty1nside.erp.dto.testDTO;
  *   수정일      수정자          수정내용
  *  -------    --------    ---------------------------
  *  2025.02.12  표하연          최초 생성
+ *  2025.02.13  표하연          회사영문코드 중복처리
  *
  *  </pre>
 */
@@ -45,4 +46,12 @@ public interface ErpAdminService {
      * @return int
      */
 	public int getCount(CompanyListSearchDTO searchDTO);
+	
+	/**
+     * 신규회사 등록시 회사 코드 중복 확인
+     *
+     * @param String
+     * @return boolean
+     */
+	public boolean comenname(String companyEngName);
 }

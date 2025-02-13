@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.beauty1nside.common.Paging;
 import com.beauty1nside.common.dto.ComDTO;
 import com.beauty1nside.common.mapper.ErpComMapper;
-import com.beauty1nside.erp.dto.CompanyListDTO;
 import com.beauty1nside.erp.dto.CompanyListSearchDTO;
 import com.beauty1nside.erp.dto.testDTO;
 import com.beauty1nside.erp.service.ErpAdminService;
@@ -35,6 +37,7 @@ import lombok.extern.log4j.Log4j2;
  *   수정일      수정자          수정내용
  *  -------    --------    ---------------------------
  *  2025.02.12  표하연          최초 생성
+ *  2025.02.13  표하연          회사영문명(코드명) 중복검사, 회사등록
  *
  *  </pre>
 */
@@ -143,6 +146,29 @@ public class ErpAdminRestController {
 		return "OK";
 	}
 	
+	/**
+     * 회사 코드를 중복 검사한다
+     * @param companyEngName
+     * @return boolean
+     */
+	@GetMapping("/comenname/{companyEngName}")
+	public boolean comenname(@PathVariable(name="companyEngName") String companyEngName) {
+		log.info(erpAdminService.comenname(companyEngName));
+		return erpAdminService.comenname(companyEngName); 
+	}
 	
+	/**
+     * 회사를 신규등록한다
+     * @param 
+     * @return 
+     */
+	@PostMapping("/newcomapny")
+	public String register(@RequestBody ComDTO dto
+			) {
+		log.info(dto.toString());
+//		log.info(customerServiceContent.toString());
+//		log.info(customerServiceDivision.toString());
+		return "OK";
+	}
 
 }
