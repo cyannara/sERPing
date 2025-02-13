@@ -1,5 +1,7 @@
 package com.beauty1nside.purchs.service.impl;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.beauty1nside.purchs.dto.ProductDTO;
@@ -19,6 +21,16 @@ public class productServiceImpl implements productService{
 	public void register(ProductDTO product) {
 		productMapper.insert(product);
 		
+	}
+
+	@Override
+	public List<ProductDTO> getCatelist() {
+		return productMapper.catelist();
+	}
+
+	@Override
+	public List<ProductDTO> getBrandlist() {
+		return productMapper.brandlist();
 	}
 
 }
