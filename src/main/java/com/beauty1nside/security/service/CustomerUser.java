@@ -41,11 +41,11 @@ public class CustomerUser implements UserDetails {
   
   @Override
   public String getPassword() {
-    return userDTO.getPassword();
+    return userDTO.getEmployeePw();
   }
   
   @Override
   public String getUsername() {
-    return userDTO.getLoginId();
+    return userDTO.getEmployeeId();
   }
 }

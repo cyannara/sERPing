@@ -20,8 +20,8 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
     UserDTO userDTO = ((CustomerUser) authentication.getPrincipal()).getUserDTO();
     
     //session
-    request.getSession().setAttribute("userid", userDTO.getId());
-    request.getSession().setAttribute("deptName", userDTO.getDeptName());
+    request.getSession().setAttribute("employeeNum", userDTO.getEmployeeNum());
+    request.getSession().setAttribute("departmentNum", userDTO.getDepartmentNum());
     
     // user한명이 롤 여러개 가지고 있을 수 있으니까
     List<String> roleNames = new ArrayList<>();

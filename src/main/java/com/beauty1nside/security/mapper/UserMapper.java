@@ -6,6 +6,6 @@ import com.beauty1nside.security.service.UserDTO;
 import java.util.List;
 
 public interface UserMapper {
-  UserDTO getUser(String loginId);
-  List<RoleDTO> getRole(Long id);
+  UserDTO getUser(String employeeId);
+  List<RoleDTO> getRole(Long employeeNum);
 }
