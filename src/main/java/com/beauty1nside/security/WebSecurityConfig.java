@@ -4,12 +4,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -53,7 +49,11 @@ public class WebSecurityConfig {
         .successHandler(authenticationSuccessHandler())
         .permitAll()
       )
-      .logout((logout) -> logout.permitAll());
+      .logout((logout) -> logout.permitAll())
+      .csrf(csrf -> csrf.disable())	// 기본적으로 사용으로 되어있음 이거 없애면 사용임
+		.cors(cors -> cors
+              .configurationSource(CorsConfig.corsConfigurationSource())
+      );
     // 활성화가 디폴트임
     // from tag 안에 인풋 히든으로 해서 name="_csrf" value="암호화된 토큰값"이 넘어감
     // 타임리프에서 넣어줌(<form th:action="@{/login}" 타임리프 문법 th 사용해야함)
