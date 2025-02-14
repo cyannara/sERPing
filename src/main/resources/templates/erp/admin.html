@@ -566,7 +566,7 @@
 				let customerServiceContent = document.querySelector("#customerServiceContent").value;
 				let customerServiceDivision = document.querySelector("#customerServiceDivision").value;
 				companyName = "좋은회사";	//★★★★★★검증후 지우기
-				companyEngName = "oliveyoung";	//★★★★★★검증후 지우기
+				companyEngName = "olivia";	//★★★★★★검증후 지우기
 				businessNum = "647-81-00749"
 				representationName = "나대표";	//★★★★★★검증후 지우기
 				chargerName = "나사원";	//★★★★★★검증후 지우기
@@ -613,6 +613,7 @@
 					body : JSON.stringify(requestData),
 				})
 				.then( result => result.json() )
+				.then( result => console.log("회사등록결과" + result) )
 		    }
 		});
 

@@ -203,10 +203,13 @@ public class ErpAdminRestController {
 	    log.info("customerServiceContent: " + customerServiceContent);
 	    log.info("employeeNum: " + employeeNum);
 	    
-	    //이제 이값들로 인서트 투닥투닥 처리하면 됨
-	    //이미지파일은 어떻게 처리되는지 봐야함
-
-	    return "OK";
+	    //회사 등록
+	    Boolean isBoolean = erpAdminService.insertCompany(dto, customerServiceDivision, customerServiceContent, employeeNum);
+	    if(isBoolean) {
+	    	return "OK";
+	    }else {
+	    	return "NO";
+	    }
 	}
 	
 	/**
