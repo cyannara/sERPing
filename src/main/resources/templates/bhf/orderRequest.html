@@ -58,8 +58,9 @@
 					<div class="card-body">
 						<div class="row mb-3">
 							<label class="col-sm-2">상품명</label> 
-							<input type="text" class="col-sm-8">
-							<button class="col-sm-2">검색</button>
+							<input type="text" class="col-sm-6" id="goodsName">
+							<button type="button" class="col-sm-2" onclick="search()">검색</button>
+							<button type="button" class="col-sm-2">초기화</button>
 						</div>
 						<div id="goods"></div>
 						<div id="pagination" class="tui-pagination"></div>
@@ -94,23 +95,66 @@
 
 <script>
 	var Grid = tui.Grid;
+	
+	const dataSource = {
+			api: {
+				readData: { url: 'http://localhost:81/bhf/rest/goods/list', method: 'GET', initParams: { page: 1 }},
+			},
+			contentType: 'application/json'
+		};
+	//상품 테이블
 	const grid = new Grid({
 			el: document.getElementById('goods'), // 컨테이너 엘리먼트
 			pageOptions: {
 			useClient: true,
-			perPage: 5
+			perPage: 5,
 		},
 		columns: [ 
 			{ header : "상품코드", name : "goodsCode"},
 			{ header : "상품명", name : "goodsName"},
 			{ header : "규격", name : "goodsStandard"}
 		],
-		data: [{}]
+		data: dataSource
 	});
+/*  	grid.on("click", (ev) =>{     
+		if(ev.columnName == "goodsCode"){         
+			let id = grid.getValue(ev.rowKey, "goodsCode")         
+			console.log("id : " + id);     
+		} 
+	});
+ 	let rowData = [];
+	grid.on('click', (ev) => {
+	    const rowKey = ev.rowKey; // 클릭된 행의 키값
+	    rowData = [grid.getRow(rowKey)]; // 해당 행의 데이터 가져오기
+        console.log(rowData); // 선택된 행의 데이터 가져오기
+        grid2.resetData(rowData); // 두번째 그리드 없데이트
+	});  */
+	grid.on('click', (ev) => {
+		const rowKey = ev.rowKey;  
+		const rowData = grid.getRow(rowKey);  
+		console.log(rowData.goodsCode); 
+		const goodsCode = rowData.goodsCode;
+		
+		// 옵션조회 쿼리 호출(goodsCode)
+	    fetch('http://localhost:81/bhf/rest/option/list?goodsCode=' + goodsCode + '&perPage=5&page=1', {
+	        method: 'GET',
+	        headers: {
+	            'Content-Type': 'application/json'
+	        }
+	    })
+	    .then(response => response.json())
+	    .then(data => {
+	        console.log("옵션 데이터:", data);
+	        grid2.resetData(data);  // 옵션 테이블 데이터 업데이트
+	    })
+	    .catch(error => console.error("데이터 요청 실패:", error));
+	});
+	
+	//옵션 테이블
 	const grid2 = new Grid({
 			el: document.getElementById('option'), // 컨테이너 엘리먼트
 			pageOptions: {
-			useClient: true,
+			useClient: false,
 			perPage: 5
 		},
 		columns: [ 
@@ -120,6 +164,7 @@
 		],
 		data: [{}]
 	});
+	//발주 테이블
 	const grid3 = new Grid({
 			el: document.getElementById('order'), // 컨테이너 엘리먼트
 			pageOptions: {
@@ -136,5 +181,13 @@
 		],
 		data: [{}]
 	});
+	
+	function search(){
+		console.log("click")
+		let goodsName = document.querySelector('#goodsName').value;
+		grid.setRequestParams({"goodsName" : goodsName})
+		grid.readData();
+	}
+	
 </script>
 </html>

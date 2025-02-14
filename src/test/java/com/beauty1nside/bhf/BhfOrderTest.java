@@ -37,10 +37,11 @@ public class BhfOrderTest {
 	
 	//@Test
 	public void goodsListTest() {
-		List<BhfGoodsOpDTO> list = mapper.goodsList();
+		List<BhfGoodsOpDTO> list = mapper.goodsList(null);
 		System.out.println(list);
 	}
 	
+
 //	@Test
 	public void optionListTest() {
 		String goodsCode = "LH001";

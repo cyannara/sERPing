@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.beauty1nside.bsn.dto.OrderSearchDTO;
 import com.beauty1nside.bsn.service.BsnOrderService;
+import com.beauty1nside.common.GridArray;
 import com.beauty1nside.common.Paging;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -27,41 +28,54 @@ public class BsnRestController {
 	final private BsnOrderService bsnOrderService;
 	
 	@GetMapping("/order")
-	public Map<String, Object> order(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
+	public Object order(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
+			@RequestParam(name ="page", defaultValue = "1", required = false) int page,
 			OrderSearchDTO searchDTO, Paging paging) throws JsonMappingException, JsonProcessingException  {
 		
 		//한 페이지에 출력할 수 : 기본값: 5
 		paging.setPageUnit(perPage);
+		//현재 페이지(기본값: 1)
+		paging.setPage(page);
 		
-		//rest 데이터 형태
-		String str = """
-				{
-		  "result": true,
-		  "data": {
-		    "contents": [],
-		    "pagination": {
-		      "page": 1,
-		      "totalCount": 100
-		    }
-		  }
-		}
-						""";
 		
-		ObjectMapper objectMapper = new ObjectMapper();
-		Map<String, Object> map = objectMapper.readValue(str, Map.class);
-		Map<String, Object> data = (Map) map.get("data");
 		
-		//페이징을 위해 검색결과 수 구하기
-		paging.setTotalRecord(bsnOrderService.getCountOfBhfOrder(searchDTO));
+//		//rest 데이터 형태
+//		String str = """
+//				{
+//		  "result": true,
+//		  "data": {
+//		    "contents": [],
+//		    "pagination": {
+//		      "page": 1,
+//		      "totalCount": 100
+//		    }
+//		  }
+//		}
+//						""";
+//		
+//		ObjectMapper objectMapper = new ObjectMapper();
+//		Map<String, Object> map = objectMapper.readValue(str, Map.class);
+//		Map<String, Object> data = (Map) map.get("data");
 		
 		//첫 페이지, 마지막 페이지
 		searchDTO.setStart(paging.getFirst());
 		searchDTO.setEnd(paging.getLast());
 		
+		GridArray grid = new GridArray();
+		Object result = grid.getArray(paging.getPage(), bsnOrderService.getCountOfBhfOrder(searchDTO), bsnOrderService.getBhfOrder(searchDTO) );
+		
+		//페이징을 위해 검색결과 수 구하기
+		//paging.setTotalRecord(bsnOrderService.getCountOfBhfOrder(searchDTO));
+		
+		
+		
 		//검색결과 - 해당 페이지 내용
-		data.put("contents", bsnOrderService.getBhfOrder(searchDTO));
+//		data.put("contents", bsnOrderService.getBhfOrder(searchDTO));
 //		data.put("pagination", bsnOrderService.getCountOfBhfOrder(searchDTO));
-		return map;
+//		return map;
+		
+		return result;		
+				
 		
 	};
 }
