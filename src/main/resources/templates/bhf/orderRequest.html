@@ -79,7 +79,7 @@
 			<div class="col-md-12 stretch-card mt-3 mb-5">
 				<div class="card">
 					<div class="card-body">
-						<h6 class="mb-4">발주</h6>
+						<h6 class="mb-4">발주서 작성</h6>
 						<div id="order"></div>
 						<div id="pagination" class="tui-pagination"></div>
 						<div style="text-align : center">
@@ -96,16 +96,23 @@
 <script>
 	var Grid = tui.Grid;
 	
+	document.addEventListener("DOMContentLoaded",()=>{
+		OPnodata();
+		ODnodata();
+	})
+	
+	// 상품조회 쿼리 호출
 	const dataSource = {
-			api: {
-				readData: { url: 'http://localhost:81/bhf/rest/goods/list', method: 'GET', initParams: { page: 1 }},
-			},
-			contentType: 'application/json'
-		};
+		api: {
+			readData: { url: 'http://localhost:81/bhf/rest/goods/list', method: 'GET', initParams: { page: 1 }},
+		},
+		contentType: 'application/json'
+		
+	};
 	//상품 테이블
 	const grid = new Grid({
-			el: document.getElementById('goods'), // 컨테이너 엘리먼트
-			pageOptions: {
+		el: document.getElementById('goods'), // 컨테이너 엘리먼트
+		pageOptions: {
 			useClient: true,
 			perPage: 5,
 		},
@@ -116,27 +123,13 @@
 		],
 		data: dataSource
 	});
-/*  	grid.on("click", (ev) =>{     
-		if(ev.columnName == "goodsCode"){         
-			let id = grid.getValue(ev.rowKey, "goodsCode")         
-			console.log("id : " + id);     
-		} 
-	});
- 	let rowData = [];
+	// 상품 테이블 행 선택
 	grid.on('click', (ev) => {
-	    const rowKey = ev.rowKey; // 클릭된 행의 키값
-	    rowData = [grid.getRow(rowKey)]; // 해당 행의 데이터 가져오기
-        console.log(rowData); // 선택된 행의 데이터 가져오기
-        grid2.resetData(rowData); // 두번째 그리드 없데이트
-	});  */
-	grid.on('click', (ev) => {
-		const rowKey = ev.rowKey;  
-		const rowData = grid.getRow(rowKey);  
-		console.log(rowData.goodsCode); 
-		const goodsCode = rowData.goodsCode;
-		
+		const rowKey = ev.rowKey;  // 클릭된 행의 키값
+		const rowData = grid.getRow(rowKey);  //해당 행의 데이터 가져오기
+		const goodsCode = rowData.goodsCode;  //url의 보내기 위해서 변수담기	
 		// 옵션조회 쿼리 호출(goodsCode)
-	    fetch('http://localhost:81/bhf/rest/option/list?goodsCode=' + goodsCode + '&perPage=5&page=1', {
+	    fetch('http://localhost:81/bhf/rest/option/list?goodsCode=' + goodsCode, {
 	        method: 'GET',
 	        headers: {
 	            'Content-Type': 'application/json'
@@ -144,16 +137,15 @@
 	    })
 	    .then(response => response.json())
 	    .then(data => {
-	        console.log("옵션 데이터:", data);
-	        grid2.resetData(data);  // 옵션 테이블 데이터 업데이트
+	    	console.log(data.data.contents)
+	        grid2.resetData(data.data.contents);  // 옵션 테이블 데이터 업데이트
 	    })
 	    .catch(error => console.error("데이터 요청 실패:", error));
 	});
-	
-	//옵션 테이블
+	// 옵션 테이블
 	const grid2 = new Grid({
-			el: document.getElementById('option'), // 컨테이너 엘리먼트
-			pageOptions: {
+		el: document.getElementById('option'), 
+		pageOptions: {
 			useClient: false,
 			perPage: 5
 		},
@@ -162,12 +154,24 @@
 			{ header : "옵션코드", name : "optionCode"},
 			{ header : "옵션명", name : "optionName"}
 		],
-		data: [{}]
+		data: "",
+		language: {
+	        emptyMessage: "데이터가 없습니다. 상품을 선택해 주세요." // "NO DATA" 메시지 변경
+	    }
 	});
-	//발주 테이블
+	// 옵션 테이블 행 선택
+	grid2.on('click', (ev) => {
+	    const rowData = grid2.getRow(ev.rowKey); // 해당 행의 데이터 가져오기
+        if (rowData) {
+	        const currentData = grid3.getData(); // 기존 데이터 가져오기
+	        grid3.resetData([...currentData, rowData]); // 기존 데이터에 새로운 행 추가하여 발주테이블 업데이트
+	    }
+	});
+	
+	// 발주 테이블
 	const grid3 = new Grid({
-			el: document.getElementById('order'), // 컨테이너 엘리먼트
-			pageOptions: {
+		el: document.getElementById('order'), // 컨테이너 엘리먼트
+		pageOptions: {
 			useClient: true,
 			perPage: 5
 		},
@@ -179,14 +183,30 @@
 			{ header : "규격", name : "goodsStandard"},
 			{ header : "발주수량", name : "quantity", editor: 'text'}
 		],
-		data: [{}]
+		data: ""
 	});
 	
+	// 검색 함수
 	function search(){
 		console.log("click")
 		let goodsName = document.querySelector('#goodsName').value;
 		grid.setRequestParams({"goodsName" : goodsName})
 		grid.readData();
+	}
+	
+	// 옵션 테이블 데이터 없을때 나오는 문구
+	function OPnodata(){
+		setTimeout( () => {
+			let nodata = document.querySelectorAll('.tui-grid-layer-state-content p')[1];
+			nodata.innerHTML = '상품을 선택 해주세요.';
+		}, 10)
+	}
+	// 발주 테이블 데이터 없을때 나오는 문구
+	function ODnodata(){
+		setTimeout( () => {
+			let nodata = document.querySelectorAll('.tui-grid-layer-state-content p')[2];
+			nodata.innerHTML = '옵션을 선택 해주세요';
+		}, 10)
 	}
 	
 </script>
