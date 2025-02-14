@@ -130,9 +130,9 @@
 
 				<!-- 조회 및 초기화 버튼 (중앙 정렬) -->
 				<div class="w-100 text-center mt-3">
-					<button class="btn btn-primary me-2" onclick="searchEmployees()">🔍
+					<button class="btn btn-primary me-2" onclick="searchEmployees()">
 						조회</button>
-					<button class="btn btn-outline-success" onclick="resetFilters()">🔄
+					<button class="btn btn-outline-success" onclick="resetFilters()">
 						초기화</button>
 				</div>
 			</div>
@@ -147,10 +147,10 @@
 
 			<!-- 버튼 영역 -->
 			<div class="pt-2">
-				<button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#employeeRegisterModal" onclick="openEmployeeForm()">사원
+				<button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#empRegisterModal" onclick="openEmployeeForm()">사원
 					등록</button>
-			<!-- ✅ 모달을 다른 HTML에서 불러오기 -->
-			<div th:replace="~{hr/employee_register_modal :: employeeRegisterModal}"></div>
+			<!-- 모달을 다른 HTML에서 불러오기 -->
+			<div th:replace="~{hr/emp_register_modal :: empRegisterModal}"></div>
 
 				<button class="btn btn-danger" onclick="deleteEmployee()">삭제</button>
 			</div>
@@ -167,8 +167,9 @@
 			const dataSource = {
 				api : {
 					readData : {
-						url : '/api/hr/employees',
-						method : 'GET'
+						url : 'http://localhost:81/hr/rest/emp/list',
+						method : 'GET',
+						initParams: { page: 1 }
 					},
 				//createData: { url: '/api/createData', method: 'POST' },
 				//updateData: { url: '/api/updateData', method: 'PUT' },
@@ -269,11 +270,13 @@
 				} ],
 
 				//초기 데이터 뭘로 할지
-				data : gridData,
+				data : dataSource,
 
 				rowHeaders : [ 'checkbox' ],
 
 			});
+			
+
 			
 			
 			

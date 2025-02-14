@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beauty1nside.hr.mapper.EmpMapper">
+
+	
+	<!-- 특정 사원 조회 -->
+	<select id="info" resultType="com.beauty1nside.hr.dto.EmpDTO" parameterType="Long">
+		SELECT 
+		    e.employee_num AS employeeNum,
+		    e.employee_id AS employeeId,
+		    e.employee_name AS employeeName,
+		    e.email AS email,
+		    e.phone AS phone,
+		    e.hire_date AS hireDate,
+		    fn_get_cmmn_name(e.position) AS position,
+		    fn_get_cmmn_name(e.status) AS status,
+		    fn_get_cmmn_name(e.employment_type) AS employmentType,
+		    d.department_name AS departmentName
+		FROM hr_employee e
+		LEFT JOIN hr_department d ON e.department_num = d.department_num
+		WHERE e.employee_num = #{employee_num}
+		ORDER BY e.employee_num DESC;
+	</select>
+	
+	<!-- 전체 사원 조회 -->
+	<select id="list" resultType="com.beauty1nside.hr.dto.EmpDTO" parameterType="com.beauty1nside.hr.dto.EmpSearchDTO">
+	    SELECT * FROM (
+	        SELECT ROWNUM rn, employeeNum, employeeId, employeeName, email, phone, hireDate, position, status, employmentType, departmentName
+	        FROM (
+	            SELECT 
+	                e.employee_num AS employeeNum,
+	                e.employee_id AS employeeId,
+	                e.employee_name AS employeeName,
+	                e.email AS email,
+	                e.phone AS phone,
+	                e.hire_date AS hireDate,
+	                fn_get_cmmn_name(e.position) AS position,
+	                fn_get_cmmn_name(e.status) AS status,
+	                fn_get_cmmn_name(e.employment_type) AS employmentType,
+	                d.department_name AS departmentName
+	            FROM hr_employee e
+	            LEFT JOIN hr_department d ON e.department_num = d.department_num
+	            <include refid="searchInfo"/> 
+	            ORDER BY e.employee_num DESC
+	        ) 
+	        <![CDATA[
+	        WHERE ROWNUM <= #{end} 
+	        ]]>
+	    ) 
+	    WHERE rn >= #{start}
+	</select>
+	
+	
+	<select id="count" parameterType="com.beauty1nside.accnut.dto.AssetSearchDTO">
+		SELECT COUNT(employee_num)
+		FROM hr_employee
+		<where>
+			<include refid="searchInfo"></include>
+		</where>
+	</select>
+	
+	
+	<sql id="searchInfo">
+	    <if test="searchType != null and searchKeyword != null">
+	        <choose>
+	            <when test="searchType == 'name'">
+	                AND e.employee_name LIKE '%' || #{searchKeyword} || '%'
+	            </when>
+	            <when test="searchType == 'id'">
+	                AND e.employee_id LIKE '%' || #{searchKeyword} || '%'
+	            </when>
+	            <when test="searchType == 'phone'">
+	                AND e.phone LIKE '%' || #{searchKeyword} || '%'
+	            </when>
+	        </choose>
+	    </if>
+	    <if test="department != null and department != ''">
+	        AND d.department_name = #{department}
+	    </if>
+	    <if test="position != null and position != ''">
+	        AND e.position = #{position}
+	    </if>
+	    <if test="status != null and status != ''">
+	        AND e.status = #{status}
+	    </if>
+	    <if test="employmentType != null and employmentType != ''">
+	        AND e.employment_type = #{employmentType}
+	    </if>
+	</sql>
+
+
+</mapper>
