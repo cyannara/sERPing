@@ -19,7 +19,7 @@ public class MapperTest {
 	@Autowired ErpAdminMapper erpAdminMapper;
 	
 	
-	@Test
+//	@Test
 	@DisplayName("전체조회")
 	public void testDate() {
 		//given

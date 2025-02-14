@@ -2,20 +2,46 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.beauty1nside.accnut.mapper.DealBookMapper">
 	<select id="info" parameterType="com.beauty1nside.accnut.dto.DealBookDTO">
-		SELECT 
+		SELECT dealings_account_book_code, section, types_of_transaction, amount, vat_alternative, dealings_contents, deal_date, department, company_num
+		FROM accnut_dealings_account_book
+		WHERE dealings_account_book_code = #{dealingsAccountBookCode} 
 	
 	</select>
 	<select id="list" resultType="com.beauty1nside.accnut.dto.DealBookDTO" parameterType="com.beauty1nside.accnut.dto.DealBookSearchDTO">
-	
-	
+		SELECT dealings_account_book_code, section, types_of_transaction, amount, vat_alternative, dealings_contents, deal_date, department, company_num
+		FROM (SELECT /*+INDEX_DESC(accnut_dealings_account_book pk_accnut_deal_account_book)*/ rownum rn, dealings_account_book_code, fn_get_cmmn_name(section) section, fn_get_cmmn_name(types_of_transaction) types_of_transaction, amount, vat_alternative, dealings_contents, deal_date, department, company_num
+			  FROM accnut_dealings_account_book
+		<![CDATA[
+			  WHERE rownum <= #{end}
+			  AND
+		]]>
+		<include refid="searchInfo"></include>	
+			)
+		WHERE rn >= #{start}
 	
 	</select>
 	<select id="count" parameterType="com.beauty1nside.accnut.dto.DealBookSearchDTO">
-	
-	
-	
+		SELECT COUNT(dealings_account_book_code)
+		FROM accnut_dealings_account_book
+		<where>
+			<include refid="searchInfo"></include>
+		</where>
 	</select>
-
+	<sql id="searchInfo">
+		company_num = #{companyNum}
+		<if test="dealingsContents != null and ! dealingsContents.equals('')">
+			AND dealings_contents LIKE '%' || #{dealingsContents} || '%'
+		</if>
+		<if test="section != null and ! section.equals('')">
+			AND section = #{section}
+		</if>
+		<if test="typesOfTransaction != null and ! typesOfTransaction.equals('')">
+			AND types_of_transaction = #{typesOfTransaction}
+		</if>
+		<if test="dealDate != null and ! dealDate.equals('')">
+			AND TO_CHAR(deal_date, 'yyyy-mm-dd') = #{dealDate}
+		</if>
+	</sql>
 
 
 

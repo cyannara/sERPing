@@ -38,4 +38,19 @@ public class DebtServiceImpl implements DebtService{
 		// TODO Auto-generated method stub
 		return debtMapper.count(dto);
 	}
+	
+	//미지급금 조회
+	@Override
+	public List<DebtDTO> unpayList(DebtSearchDTO dto) {
+		// TODO Auto-generated method stub
+		return debtMapper.unpayList(dto);
+	}
+	
+	@Override
+	public int unpayCount(DebtSearchDTO dto) {
+		// TODO Auto-generated method stub
+		return debtMapper.unpayCount(dto);
+	}
+	
+	//미지급금 처리
 }

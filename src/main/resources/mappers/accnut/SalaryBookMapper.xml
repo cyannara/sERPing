@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beauty1nside.accnut.mapper.SalaryBookMapper">
+	
+	<select id="info" resultType="com.beauty1nside.accnut.dto.SalaryBookDTO">
+		SELECT salary_account_book_code, employee_code, employee_name, department, salary, excess_allowance, bonus, incidental_cost, deduction_item, payment_amount, payment_prearranged_date, payment_alternative, payer, company_num
+		FROM accnut_salary_account_book
+		WHERE salary_account_book_code = #{salaryAccountBookCode}
+	</select>
+	<select id="list" resultType="com.beauty1nside.accnut.dto.SalaryBookDTO" parameterType="com.beauty1nside.accnut.dto.SalaryBookSearchDTO">
+		SELECT salary_account_book_code, employee_code, employee_name, department, salary, excess_allowance, bonus, incidental_cost, deduction_item, payment_amount, payment_prearranged_date, payment_alternative, payer, company_num
+		FROM (SELECT /*+INDEX_DESC(accnut_salary_account_book pk_accnut_salary_account_book)*/ rownum rn, salary_account_book_code, employee_code, employee_name, fn_get_cmmn_name(department) as department, salary, excess_allowance, bonus, incidental_cost, deduction_item, payment_amount, payment_prearranged_date, payment_alternative, payer, company_num
+			  FROM accnut_salary_account_book
+		<![CDATA[
+			  WHERE rownum <= #{end}
+			  AND 
+		]]>
+		<include refid="searchInfo"></include>
+		)
+		WHERE rn >= #{start}
+		</select>
+	<select id="count" parameterType="com.beauty1nside.accnut.dto.SalaryBookSearchDTO">
+		SELECT COUNT(salary_account_book_code)
+		FROM accnut_salary_account_book
+		<where>
+			<include refid="searchInfo"></include>
+		</where>
+	</select>
+	<sql id="searchInfo">
+		company_num = #{companyNum}
+		<if test="employeeName != null and ! employeeName.equals('')">
+			employee_name LIKE '%' || #{employeeName} || '%'
+		</if>
+		<if test="department != null and ! department.equals('')">
+			department = #{department}
+		</if>	
+	</sql>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</mapper>
