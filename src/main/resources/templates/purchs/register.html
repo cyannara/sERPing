@@ -39,16 +39,18 @@
             <div class="col-md-6">
                 <label class="form-label">브랜드</label>
                 <div class="input-group">
-                    <input type="text" class="form-control" name="brandName" id="brandName" th:value="${ProductDTO.brandName}" data-bs-toggle="modal" data-bs-target="#brandModal"></input>
-        
+                    <input type="text" class="form-control" name="brandName" id="brandName" th:value="${ProductDTO.brandName}" data-bs-toggle="modal" data-bs-target="#brandModal" readonly></input>
+        			<input type="hidden" id="brandId" name="brandId" value="${ProductDTO.brandId}">
                 	<!-- 공통 모달 호출 -->
-					<div th:replace="purchs/ModalTemplate :: ModalTemplate (
+					<div 
+						th:replace="purchs/ModalTemplate :: ModalTemplate (
 					    'brandModal', 
 					    'modal-xl',
 					    '브랜드 조회',
 					    'purchs/brandTable',
 					    'purchs/brandFooter'
 					)"></div>
+					
                 </div>
             </div>
         </div>
@@ -57,7 +59,15 @@
             <div class="col-md-6">
                 <label class="form-label">공급처</label>
                 <div class="input-group">
-                    <input type="text" class="form-control" name="vendorId" th:value="${ProductDTO.vendorId}" readonly>
+                    <input type="text" class="form-control" name="vendorId" th:value="${ProductDTO.vendorId}" data-bs-toggle="modal" data-bs-target="#vendorModal"  readonly>
+                	<!-- 공통 모달 호출 -->
+					<div th:replace="purchs/ModalTemplate :: ModalTemplate (
+					    'vendorModal', 
+					    'modal-xl',
+					    '거래처 조회',
+					    'purchs/vendorTable',
+					    'purchs/brandFooter'
+					)"></div>
                 </div>
             </div>
             <div class="col-md-6">
@@ -92,8 +102,7 @@
             <div class="col-md-6">
                 <label class="form-label">대표 이미지</label>
                 <div class="input-group">
-                    <input type="text" class="form-control" name="goodsImage" th:value="${ProductDTO.goodsImage}" readonly>
-                    <button class="btn btn-secondary">📂</button>
+                    <input type="file" class="form-control" name="goodsImage" th:value="${ProductDTO.goodsImage}" readonly>
                 </div>
             </div>
             <div class="col-md-6">
@@ -113,7 +122,7 @@
             </div>
         </div>
         <div class="d-flex justify-content-between">
-            <button type="button" class="btn btn-primary mb-3" id="bttAdd">옵션 추가</button>
+            <button type="button" class="btn btn-primary" id="bttAdd">옵션 추가</button>
         </div>
         <div id="myGrid" class="tui-grid-container" style="height: 200px;"></div>
         <div id="pagination" class="tui-pagination"></div>
@@ -220,15 +229,50 @@
                 grid.appendRow({}, { at: 0 }); // 빈 행 추가
             }
         });
-        
-        //모달에 선택된 브랜드 brandName input 에 넣기 
-        if (sessionStorage.getItem("selectedBrandName")) {
-            document.getElementById("brandName").value = sessionStorage.getItem("selectedBrandName");
+       
+      //브랜드 모달 작업 
+     // 모달이 열릴 때 그리드 다시 그리기
+     document.getElementById('brandModal').addEventListener('shown.bs.modal', function () {
+	    console.log("📢 모달이 열림. 그리드 리프레시 실행!");
+	
+	    if (typeof brandGrid !== 'undefined' && brandGrid !== null) {
+	        brandGrid.refreshLayout();
+	        brandGrid.readData(); // 모달이 열리면 데이터 다시 불러오기
+	    } else {
+	        console.warn(" brandGrid가 정의되지 않았습니다.");
+	    }
+	});
 
-            // 데이터 사용 후 삭제 (필요한 경우)
-            sessionStorage.removeItem("selectedBrandId");
-            sessionStorage.removeItem("selectedBrandName");
-        }
+    document.getElementById('brandModal').addEventListener('hidden.bs.modal', function () {
+   	    console.log("📢 모달이 닫힘. 선택된 브랜드를 input에 반영.");
+
+   	    let selectedBrandName = sessionStorage.getItem("selectedBrandName");
+   	    let selectedBrandId = sessionStorage.getItem("selectedBrandId");
+
+   	    if (selectedBrandName && selectedBrandId) {
+   	        let brandInput = document.getElementById("brandName");
+   	        let brandIdInput = document.getElementById("brandId");
+
+   	        if (brandInput && brandIdInput) {
+   	            brandInput.value = selectedBrandName;
+   	            brandIdInput.value = selectedBrandId;
+   	        }
+
+   	        console.log("브랜드 선택 완료:", selectedBrandName, selectedBrandId);
+			
+	   	 
+   	     
+   	        // ✅ 값 사용 후 sessionStorage에서 삭제
+   	        sessionStorage.removeItem("selectedBrandName");
+   	        sessionStorage.removeItem("selectedBrandId");
+   	    } else {
+   	        console.warn("저장된 브랜드 정보가 없습니다.");
+   	    }
+   	});
+
+
+      
+      
         
         
         

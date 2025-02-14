@@ -10,9 +10,39 @@ order by classification_id desc
 
 <!-- brandlist 브랜드 조회 -->
 <select id="brandlist" resultType="ProductDTO">
-select *
-from stdr_brand
-order by brand_id desc
+    SELECT BRAND_ID, BRAND_CODE, BRAND_NAME, COMPANY_NUM
+    FROM (
+        SELECT /*+index_desc(STDR_BRAND PK_STDR_BRAND)*/
+               ROWNUM RN,
+               BRAND_ID,
+               BRAND_CODE,
+               BRAND_NAME,
+               COMPANY_NUM
+        FROM STDR_BRAND
+        <include refid="searchbrandInfo"/>  <!-- 검색 조건 포함 -->
+
+        
+    )
+    WHERE RN BETWEEN #{start} AND #{end}  <!--  WHERE 수정 -->
+    ORDER BY BRAND_ID DESC <!-- ORDER BY 위치  -->
 </select>
+
+
+<!-- 카운트 -->
+<select id="brandcount" resultType="int">
+	select count(*) from stdr_brand
+		<include refid="searchbrandInfo"></include>
+</select>
+
+<!--  searchbrandInfo 쿼리 -->
+<sql id="searchbrandInfo">
+    <where>
+    <!-- company_num LIKE '%' || #{companyNum} || '%' -->
+        <if test="brandName != null and brandName != ''">
+            brand_name LIKE '%' || #{brandName} || '%'
+        </if>
+    </where>
+</sql>
+
 
 </mapper>
