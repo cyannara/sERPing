@@ -26,6 +26,7 @@ public class ProductDTO {
 	private int classificationId;
 	
 	private Long brandId;
+	private String brandCode;
 	private String brandName;
 	
 	private Long employeeNum;

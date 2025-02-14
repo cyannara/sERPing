@@ -36,13 +36,7 @@ public class PurchsSampleController {
 	    model.addAttribute("catelist", productService.getCatelist()); // 빈 객체라도 전달
 	}
 	
-	//브랜드 모달 데이터 전송 
-	@GetMapping("/brandTable")
-	@ResponseBody
-	public List<ProductDTO> getBrandList() {
-		System.out.println("컨트롤"+ productService.getBrandlist());
-	    return productService.getBrandlist(); // JSON으로 반환
-	}
+	
 	
 	
 

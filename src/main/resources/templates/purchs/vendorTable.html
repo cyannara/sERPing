@@ -34,13 +34,13 @@
 			<div class="row 2row">
 				<div class="col-1"></div>
 				<div class="col-5 row ">
-					<span class="label-search col-4">브랜드명</span>
-					<input type="text" name="brandName" id="searchBrandName" class="col-8 input-box">
+					<span class="label-search col-4">거래처명</span>
+					<input type="text" name="vendorName" id="searchVendorName" class="col-8 input-box">
 				</div>
 				<div class="col-1"></div>
 				<div class="col-5 row ">
 					<span class="label-search col-4">표시수량</span>
-					<select name="display_amount" id="display_amount" class="col-8 input-box" onchange="changeDisplay()">
+					<select name="display_amount" id="vendor_display_amount" class="col-8 input-box" onchange="changeDisplay()">
 						<option value="5" selected>5</option>
 						<option value="10">10</option>
 						<option value="20">20</option>
@@ -59,21 +59,21 @@
 		</div>
 		<!-- 그리드 -->
 		<div id="table-container">
-			<div id="brandGrid"></div>
-			<div id="pagination" class="tui-pagination"></div>
+			<div id="vendorGrid"></div>
+			<div id="vendorPagination" class="tui-pagination"></div>
 		</div>
     
 </body>
 
 <script>
 
-const brandDataSource = {
+const vendorDataSource = {
 		api:{
 			readData: { url:'http://localhost:81/purchs/rest/brand/list', 
 						method: 'GET', 
 						initParams: { page: 1 ,perPage: 5},
 						   beforeRequest: function(request) {
-				                console.log("📢 서버로 요청 보내기 전 requestParams:", request.params); // ✅ 서버 요청 전 데이터 확인
+				                console.log("서버로 요청 보내기 전 requestParams:", request.params); // ✅ 서버 요청 전 데이터 확인
 				         },
 						afterResponse : function(response){
 							console.log("서버응답 결과==" , response);
@@ -82,8 +82,8 @@ const brandDataSource = {
 		},
 		contentType: 'application/json'
 }
-const brandGrid = new tui.Grid({
-	el : document.querySelector('#brandGrid'),
+const vendorGrid = new tui.Grid({
+	el : document.querySelector('#vendorGrid'),
 	pageOptions: {
 		useClient : false,
 		perPage: 5,
@@ -92,34 +92,34 @@ const brandGrid = new tui.Grid({
 		{ header : "브랜드코드", name : "brandCode",  sortable : true},
 		{ header : "브랜드명", name : "brandName" , sortable : true}
 	],
-	data : brandDataSource,
+	data : vendorDataSource,
 });
 
 function changeDisplay() {
-	let gap = parseInt(document.querySelector('#display_amount').value);
-	brandGrid.setPerPage(gap, brandDataSource)
-	brandGrid.readData(); // 데이터 다시 불러오기
+	let gap = parseInt(document.querySelector('#vendor_display_amount').value);
+	vendorGrid.setPerPage(gap, vendorDataSource)
+	vendorGrid.readData(); // 데이터 다시 불러오기
 }
 
 
 function search(){
-	let brandName = document.querySelector('#searchBrandName').value;
-	console.log("검색어==",brandName);
-	brandGrid.setRequestParams({"brandName" : brandName})
-	brandGrid.readData();
+	let brandName = document.querySelector('#searchVendorName').value;
+	console.log("검색어==",vendorName);
+	vendorGrid.setRequestParams({"vendorName" : vendorName})
+	vendorGrid.readData();
 }
 
 	//선택된 내용 을 세션에 잠시 저장 하고 다른 html 파일로 넘어갈때 정보를 저장 하고 있다 -> 그 후 다시 불러오기
-	brandGrid.on('click', (ev) => {
+	vendorGrid.on('click', (ev) => {
 	    const rowKey = ev.rowKey;
-	    const rowData = brandGrid.getRow(rowKey); 
+	    const rowData = vendorGrid.getRow(rowKey); 
 	    console.log("선택된 행 데이터:", rowData);
 	
 	    // 세션 스토리지에 데이터 저장
-	    sessionStorage.setItem("selectedBrandId", rowData.brandId);
-	    sessionStorage.setItem("selectedBrandName", rowData.brandName);
+	    sessionStorage.setItem("searchVendorId", rowData.vendorId);
+	    sessionStorage.setItem("searchVendorName", rowData.vendorName);
 	    
-	    console.log("보낼 데이터 ==",rowData.brandId,rowData.brandName);
+	    console.log("보낼 데이터 ==",rowData.vendorId,rowData.vendorName);
 	 
 	
 	});
