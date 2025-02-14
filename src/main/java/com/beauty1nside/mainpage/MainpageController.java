@@ -18,15 +18,6 @@ public class MainpageController {
   
   @GetMapping("/")
   public String main() {
-    CustomerUser userDetails = SecurityUtil.getCustomerUser(); // 공통 유틸리티 사용
-    log.info("userDetails: {}", userDetails.getUserDTO().getDepartmentNum());
-    log.info("session: {}", session.getAttribute("departmentNum"));
-    
-//    todo-dy
-    // token 없으면 login 페이지로 이동하기
-//    return "/login/login";
-    // 있으면
     return "index";
   }
-  
 }
