@@ -31,7 +31,7 @@
 	<div class="container">
 		<!-- 메뉴이름 -->
 		<div>
-			<h2>자산관리</h3>
+			<h2>채무관리</h3>
 		</div>
 
     <!-- 검색창 -->
@@ -46,7 +46,9 @@
 				<div class="col-5 row ">
 					<span class="label-search col-4">구분</span>
 					<select name="section" id="section" class="col-8 input-box">
-						<option value="" selected>대출금</option>
+						<option value="" selected>선택</option>
+						<option value="AC07">대출금</option>
+						<option value="AC08">미지급금</option>
 
 					</select>
 				</div>
@@ -73,7 +75,7 @@
 				<div class="col-4"></div>
 				<button type="button" class="btn btn-primary col-1" onclick="search()">검색</button>
 				<div class="col-1"></div>
-				<button type="button" class="btn btn-secondary col-1">초기화</button>
+				<button type="button" class="btn btn-secondary col-1" onclick="reset()">초기화</button>
 			</div>
 
 		</div>
@@ -151,13 +153,13 @@
 			perPage: 5,
 		},
 		columns: [
-			{ header : "채무코드", name : "debtCode",  },
-			{ header : "채무명", name : "debtName",  },
-			{ header : "구분", name : "section",  },
-			{ header : "채권자", name : "creditor",  },
-			{ header : "금액", name : "amount",  },
-			{ header : "이자", name : "interest",  },
-			{ header : "등록일", name : "registerDate",  },
+			{ header : "채무코드", name : "debtCode",  sortable : true},
+			{ header : "채무명", name : "debtName",  sortable : true},
+			{ header : "구분", name : "section",  sortable : true},
+			{ header : "채권자", name : "creditor",  sortable : true},
+			{ header : "금액", name : "amount",  sortable : true},
+			{ header : "이자", name : "interest",  sortable : true},
+			{ header : "등록일", name : "registerDate",  sortable : true},
 			
 		],
 		data : dataSource,
@@ -165,8 +167,9 @@
 	
 	function changeDisplay() {
 		let gap = parseInt(document.querySelector('#display_amount').value);
-		grid.setPerPage(gap,dataSource)
+		grid.setPerPage(gap, dataSource)
 	}
+	
 	function search(){
 		let debtName = document.querySelector('#debtName').value;
 		let section = document.querySelector('#section').value.toString();
@@ -176,6 +179,20 @@
 		grid.readData();
 	}
 	
+	function reset(){
+		let debtName = document.querySelector('#debtName');
+		let section = document.querySelector('#section');
+		let creditor = document.querySelector('#creditor');
+
+		debtName.value = '';
+		section.value = '';
+		creditor.value = '';
+
+
+		grid.setRequestParams({"debtName" : debtName.value, "section" : section.value, "creditor" : creditor.value })
+		grid.readData();
+
+	}
 
 </script>
 	

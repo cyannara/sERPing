@@ -12,4 +12,6 @@ public class BhfGoodsOpDTO {
 	private String optionCode;
 	private String optionName;
 	
+	private int companyNum;
+	
 }

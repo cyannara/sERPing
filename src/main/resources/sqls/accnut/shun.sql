@@ -73,4 +73,18 @@ commit;
 select fn_get_cmmn_code('°¡')
 from dual;
 
-select *
+select * from erp_company;
+select * from hr_employee;
+
+
+SELECT debt_code, debt_name, section, creditor, amount, interest, register_date
+FROM (SELECT /*+INDEX_DESC(accnut_debt pk_accnut_debt)*/ rownum rn, debt_code, debt_name, fn_get_cmmn_name(section) as section, creditor, amount, interest, register_date
+		FROM accnut_debt
+        WHERE rownum <= 40 
+        AND company_num = 0
+--        AND rownum >=1
+        )
+WHERE rn >= 21
+;
+
+select * from accnut_dealings_account_book;
