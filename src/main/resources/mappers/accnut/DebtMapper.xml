@@ -28,7 +28,7 @@
 	
 	</select>
 	<sql id="searchInfo">
-		company_num LIKE '%' || #{companyNum} || '%'
+		company_num = #{companyNum}
 		<if test="debtName != null and ! debtName.equals('')">
 			AND debt_name Like '%' || #{debtName} || '%'
 		</if>
@@ -39,6 +39,14 @@
 			AND creditor LIKE '%' || #{creditor} || '%'
 		</if>
 	</sql>
+	
+	<select id="unpayList" resultType="com.beauty1nside.accnut.dto.DebtDTO" parameterType="com.beauty1nside.accnut.dto.DebtSearchDTO">
+	
+	
+	</select>
+	<select id="unpayCount" parameterType="com.beauty1nside.accnut.dto.DebtSearchDTO">
+	
+	</select>
 	
 
 </mapper>

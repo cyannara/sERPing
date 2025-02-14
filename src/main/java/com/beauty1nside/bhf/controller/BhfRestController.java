@@ -1,12 +1,16 @@
 package com.beauty1nside.bhf.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.beauty1nside.accnut.dto.AssetSearchDTO;
+import com.beauty1nside.bhf.dto.goodsorder.BhfOrdDtlVO;
 import com.beauty1nside.bhf.dto.goodsorder.BhfOrdSearchDTO;
+import com.beauty1nside.bhf.dto.goodsorder.BhfOrdVO;
 import com.beauty1nside.bhf.service.BhfOrderService;
 import com.beauty1nside.common.GridArray;
 import com.beauty1nside.common.Paging;
@@ -72,6 +76,13 @@ public class BhfRestController {
 		GridArray grid = new GridArray();
 		Object result = grid.getArray( paging.getPage(), bhforderservice.count(dto), bhforderservice.optionList(goodsCode) );//goodsCode넣기
 		return result;
+	}
+	
+	// 발주서 등록
+	@PostMapping("/order/insert")
+	public BhfOrdVO ordinsert(@RequestBody BhfOrdDtlVO bodvo) {
+		
+		return null;
 	}
 	
 }

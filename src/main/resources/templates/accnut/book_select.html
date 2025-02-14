@@ -47,8 +47,10 @@
 					<span class="label-search col-4">구분</span>
 					<select name="section" id="section" class="col-8 input-box">
 						<option value="" selected>구분</option>
-						<option value="">수익</option>
-						<option value="">지출</option>
+						<option value="EE01">수익</option>
+						<option value="EE02">지출</option>
+						<option value="EE03">자산</option>
+						<option value="EE04">부채</option>
 
 					</select>
 				</div>
@@ -59,10 +61,15 @@
 					<span class="label-search col-4">거래방법</span>
 					<select name="typesOfTransaction" id="typesOfTransaction" class="col-8 input-box">
 						<option value="" selected>거래방법</option>
-						<option value="">현금</option>
-						<option value="">카드</option>
-						<option value="">이체</option>
-						<option value="">미지급금</option>
+						<option value="AC01">현금</option>
+						<option value="AC03">카드</option>
+						<option value="AC02">이체(통장)</option>
+						<option value="AC08">미지급금</option>
+						<option value="AC09">외상매입금</option>
+						<option value="AC13">임대보증금</option>
+						<option value="AC16">매출액</option>
+						<option value="AC19">급여</option>
+						<option value="AC23">운반비</option>
 
 					</select>
 				</div>
@@ -72,11 +79,24 @@
 					<input type="date" name="dealDate" id="dealDate" class="col-8 input-box">
 				</div>
 			</div>
+			<div class="row 4row">
+				<div class="col-1"></div>
+				<div class="col-5 row ">
+					<span class="label-search col-4">표시수량</span>
+					<select name="display_amount" id="display_amount" class="col-8 input-box" onchange="changeDisplay()">
+						<option value="5" selected>5</option>
+						<option value="10">10</option>
+						<option value="20">20</option>
+						<option value="50">50</option>
+						<option value="100">100</option>
+					</select>
+				</div>
+			</div>
 			<div class="row 3row">
 				<div class="col-4"></div>
-				<button type="button" class="btn btn-primary col-1">검색</button>
+				<button type="button" class="btn btn-primary col-1" onclick="search()">검색</button>
 				<div class="col-1"></div>
-				<button type="button" class="btn btn-secondary col-1">초기화</button>
+				<button type="button" class="btn btn-secondary col-1" onclick="reset()">초기화</button>
 			</div>
 
 		</div>
@@ -102,7 +122,7 @@
 	
 	const dataSource = {
 		api: {
-			readData: { url: 'http://localhost:81/accnut/rest/list', method: 'GET', initParams: { page: 1 } },
+			readData: { url: 'http://localhost:81/accnut/rest/book/list', method: 'GET', initParams: { page: 1 } },
 			
 		},
 		contentType: 'application/json'
@@ -127,6 +147,33 @@
 		],
 		data : dataSource,
 	});
+	
+	function changeDisplay() {
+		let gap = parseInt(document.querySelector('#display_amount').value);
+		grid.setPerPage(gap, dataSource);
+	}
+	
+	function search(){
+		let dealingsContents = document.querySelector('#dealingsContents').value;
+		let section = document.querySelector('#section').value.toString();
+		let typesOfTransaction = document.querySelector('#typesOfTransaction').value.toString();
+		let dealDate = document.querySelector('#dealDate').value;
+		if(dealDate == ''){
+			grid.setRequestParams({"dealingsContents" : dealingsContents, "section" : section, "typesOfTransaction" : typesOfTransaction });
+		} else {
+			grid.setRequestParams({"dealingsContents" : dealingsContents, "section" : section, "typesOfTransaction" : typesOfTransaction, "dealDate" : dealDate  });
+		}
+		grid.readData();
+	}
+	
+	function reset(){
+		let dealingsContents = document.querySelector('#dealingsContents').value = '';
+		let section = document.querySelector('#section').value = '';
+		let typesOfTransaction = document.querySelector('#typesOfTransaction').value = '';
+		let dealDate = document.querySelector('#dealDate').value = '';
+		grid.setRequestParams({"dealingsContents" : dealingsContents, "section" : section, "typesOfTransaction" : typesOfTransaction });
+		grid.readData();
+	}
 
 </script>
 	
