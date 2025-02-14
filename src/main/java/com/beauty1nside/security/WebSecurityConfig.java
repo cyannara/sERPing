@@ -25,7 +25,7 @@ public class WebSecurityConfig {
 
     return http.build();
   }
-  
+
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
@@ -50,7 +50,7 @@ public class WebSecurityConfig {
 //        .permitAll()
 //      )
 //      .logout((logout) -> logout.permitAll())
-//      .csrf(csrf -> csrf.disable())	// 기본적으로 사용으로 되어있음 이거 없애면 사용임
+////      .csrf(csrf -> csrf.disable())	// 기본적으로 사용으로 되어있음 이거 없애면 사용임
 //		.cors(cors -> cors
 //             .configurationSource(CorsConfig.corsConfigurationSource())
 //      );

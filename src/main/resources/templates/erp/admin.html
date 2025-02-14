@@ -92,6 +92,7 @@
 		            <!-- 폼시작 -->
 		            <div id="formSection" style="display: none;">
 			            <form action="#" id="inputComFrom" enctype="multipart/form-data">
+						<input type="hidden" id="csrfToken" name="_csrf" th:value="${_csrf.token}">
 			            <!-- EQ01=단순문의 / EQ02=상태변경 / EQ03=발행 / EQ04=신규등록 -->
 			            <input type="hidden" value="EQ04" id="customerServiceDivision" name="customerServiceDivision">
 			            <input type="hidden" value="" id="businessFullNumber" name="businessFullNumber">
