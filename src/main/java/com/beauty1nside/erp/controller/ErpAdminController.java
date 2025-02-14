@@ -63,7 +63,7 @@ public class ErpAdminController {
      */
 	@GetMapping("/admin")
 	public String layout() {
-		return "/erp/admin";
+		return "erp/admin";
 	}
 	
 	/**
@@ -73,7 +73,7 @@ public class ErpAdminController {
      */
 	@GetMapping("/main")
 	public String main() {
-		return "/erp/main";
+		return "erp/main";
 	}
 
 }

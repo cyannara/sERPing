@@ -45,7 +45,7 @@
 	<!-- 
      * ERP 사용 회사 전체 리스트를 조회한다
      *
-     * @param CompanyListSearchDTO
+     * @param ErpSearchDTO
      * @return List<CompanyListDTO>
 	-->
 	<select id="companyList" resultType="CompanyListDTO">
@@ -77,6 +77,11 @@
 				left join erp_subscription_info_list l
 				    on c.company_num = l.company_num
 				    and l.subscription_name_num in (1, 6)
+				    
+				<where>
+					<include refid="searchInfo"></include>
+				</where>    
+				    
 				order by c.COMPANY_NUM DESC
 				) A
 			<![CDATA[
@@ -91,7 +96,7 @@
 	<!-- 
      * ERP 사용 회사 전체 리스트의 갯수를 구한다
      *
-     * @param CompanyListSearchDTO
+     * @param ErpSearchDTO
      * @return int
 	-->
 	<select id="getCount" resultType="int">
@@ -103,7 +108,21 @@
 		left join erp_subscription_info_list l
 		    on c.company_num = l.company_num
 		    and l.subscription_name_num in (1, 6)
+		<where>
+			<include refid="searchInfo"></include>
+		</where>
 	</select>
+	
+	<!-- 
+     * ErpSearchDTO 가 상속하고 있는 ErpSearchListDTO의 값으로 검색을 한다
+     * companyList(전체조회) / getCount(현재갯수조회) 에 사용
+     *
+	-->
+	<sql id="searchInfo">
+		<if test="companyName != null and ! companyName.equals('')">
+			AND company_name Like '%' || #{companyName} || '%'
+		</if>
+	</sql>
 	
 	<!-- 
      * ERP 신규회사 정보를 등록한다
@@ -111,7 +130,7 @@
      * @param ComDTO
      * @return int
 	-->
-	<select id="insertCompany" resultType="int" parameterType="ComDTO">
+	<insert id="insertCompany" parameterType="ComDTO">
 	INSERT INTO erp_company VALUES 
 	(
 		erp_cmpny_seq.nextval, 
@@ -128,7 +147,7 @@
 	 	DEFAULT, 
 	 	DEFAULT
 	 )
-	</select>
+	</insert>
 	
 	<!-- 
      * ERP 신규회사 최고관리자 계정을 등록한다
@@ -136,7 +155,7 @@
      * @param ComDTO
      * @return int
 	-->
-	<select id="insertuseraccount" resultType="int" parameterType="ComDTO">
+	<insert id="insertuseraccount" parameterType="ComDTO">
 		INSERT INTO erp_user_accounts VALUES
 		( 
 			erp_account_seq.nextval, 
@@ -146,7 +165,7 @@
 			DEFAULT, 
 			DEFAULT, 
 			DEFAULT)
-	</select>
+	</insert>
 	
 	<!-- 
      * ERP 신규회사의 구독기간 서비스
@@ -154,7 +173,7 @@
      * @param int
      * @return int
 	-->
-	<select id="insertservice" resultType="int" parameterType="int">
+	<insert id="insertservice" parameterType="int">
 		INSERT INTO erp_subscription_info_list VALUES
 		( 
 			erp_subscrpt_info_seq.nextval, 
@@ -165,7 +184,7 @@
 			sysdate+10, 
 			sysdate
 		)
-	</select>
+	</insert>
 	
 	<!-- 
      * ERP 신규회사 등록에 대한 CS 내역남김
@@ -173,7 +192,7 @@
      * @param CustomerServiceDTO
      * @return int
 	-->
-	<select id="insertNewCS" resultType="int" parameterType="CustomerServiceDTO">
+	<insert id="insertNewCS" parameterType="CustomerServiceDTO">
 		INSERT INTO erp_customer_service VALUES
 		( 
 			erp_cs_seq.nextval, 
@@ -183,6 +202,6 @@
 			#{customerServiceContent}, 
 			DEFAULT 
 		)
-	</select>
+	</insert>
 	
 </mapper>

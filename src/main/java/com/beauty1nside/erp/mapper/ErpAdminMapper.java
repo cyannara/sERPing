@@ -4,8 +4,8 @@ import java.util.List;
 
 import com.beauty1nside.common.dto.ComDTO;
 import com.beauty1nside.erp.dto.CompanyListDTO;
-import com.beauty1nside.erp.dto.CompanyListSearchDTO;
 import com.beauty1nside.erp.dto.CustomerServiceDTO;
+import com.beauty1nside.erp.dto.ErpSearchDTO;
 import com.beauty1nside.erp.dto.testDTO;
 
 /**
@@ -37,18 +37,18 @@ public interface ErpAdminMapper {
 	/**
      * ERP 사용 회사 전체 리스트를 조회한다
      *
-     * @param CompanyListSearchDTO
+     * @param ErpSearchListDTO
      * @return List<CompanyListDTO>
      */
-	public List<CompanyListDTO> companyList(CompanyListSearchDTO searchDTO);
+	public List<CompanyListDTO> companyList(ErpSearchDTO searchDTO);
 	
 	/**
      * ERP 사용 회사 전체 리스트 갯수를 조회
      *
-     * @param CompanyListSearchDTO
+     * @param ErpSearchListDTO
      * @return int
      */
-	public int getCount(CompanyListSearchDTO searchDTO);
+	public int getCount(ErpSearchDTO searchDTO);
 	
 	/**
      * 신규회사 등록시 회사 코드 중복 확인
@@ -85,7 +85,7 @@ public interface ErpAdminMapper {
 	/**
      * ERP 사용 회사 전체 리스트를 조회한다
      *
-     * @param CompanyListSearchDTO
+     * @param ErpSearchListDTO
      * @return List<CompanyListDTO>
      */
 	public int insertNewCS(CustomerServiceDTO csDTO);

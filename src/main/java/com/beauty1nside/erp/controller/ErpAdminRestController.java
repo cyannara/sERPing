@@ -17,10 +17,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.beauty1nside.common.GridArray;
 import com.beauty1nside.common.Paging;
 import com.beauty1nside.common.dto.ComDTO;
 import com.beauty1nside.common.mapper.ErpComMapper;
-import com.beauty1nside.erp.dto.CompanyListSearchDTO;
+import com.beauty1nside.erp.dto.ErpSearchDTO;
 import com.beauty1nside.erp.dto.testDTO;
 import com.beauty1nside.erp.service.ErpAdminService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -43,7 +44,7 @@ import lombok.extern.log4j.Log4j2;
  *   수정일      수정자          수정내용
  *  -------    --------    ---------------------------
  *  2025.02.12  표하연          최초 생성
- *  2025.02.13  표하연          회사영문명(코드명) 중복검사, 회사등록
+ *  2025.02.13  표하연          회사영문명(코드명) 중복검사, 회사등록, 검색페이징
  *
  *  </pre>
 */
@@ -77,63 +78,41 @@ public class ErpAdminRestController {
 	
 	/**
      * ERP 사용 회사 전체 리스트 조회
+     * 2025-02-14 11:00 시훈이 페이징 모듈로 변경
      *
      * @param int
-     * @param CompanyListSearchDTO
+     * @param ErpSearchDTO
      * @param Paging
-     * @return Map<String, Object>
+     * @return Object
      * @throws JsonMappingException
      * @throws JsonProcessingException
      */
 	@GetMapping("/comlist")
-	public Map<String, Object> comlist( 
-										@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
-										CompanyListSearchDTO searchDTO,
-										Paging paging
+	public Object comlist( 
+				@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
+				@RequestParam(name = "page", defaultValue = "1", required = false) int page,
+				ErpSearchDTO dto,
+				Paging paging
 			) throws JsonMappingException, JsonProcessingException{
-		
+
 		//한페이지에 몇개 나오게 할껀지
 		paging.setPageUnit(perPage);
 		
+		// 현재 페이지 셋팅
+		paging.setPage(page);		
 		//log.info("★★★"+paging.getPage());
 
 		// 페이징 조건
-		searchDTO.setStart(paging.getFirst());
-		searchDTO.setEnd(paging.getLast());
+		dto.setStart(paging.getFirst());
+		dto.setEnd(paging.getLast());
 		
 		// 페이징처리
-		paging.setTotalRecord(erpAdminService.getCount(searchDTO));
+		paging.setTotalRecord(erpAdminService.getCount(dto));
 		
-		String str = """
-								{
-				  "result": true,
-				  "data": {
-				    "contents": [],
-				    "pagination": {
-				      "page": 1,
-				      "totalCount": 100
-				    }
-				  }
-				}
-								""";
-		ObjectMapper objectMapper = new ObjectMapper();
-		//위에 내용을 맵으로 바꾸는거
-		Map<String, Object> map = objectMapper.readValue(str, Map.class);
-		//맵으로 바꾼거에서 data 읽어내고
-		Map<String, Object> data = (Map) map.get("data");
-		//페이지 네이션 읽어내고
-		Map<String, Object> pagination = (Map) data.get("pagination");
-		
-		//거기에 전체 페이지랑 페이지번호 읽어옴
-		// 페이징처리
-		pagination.put("page", paging.getPage());
-		pagination.put("totalCount", paging.getTotalRecord());
-		//pagination.put("totalCount", erpAdminService.getCount(searchDTO));
-	
-		//log.info(searchDTO.toString());
-		data.put("contents", erpAdminService.companyList(searchDTO));
-		//log.info(map.toString());
-		return map;
+		// grid 배열 처리
+		GridArray grid = new GridArray();
+		Object result = grid.getArray( paging.getPage(), paging.getTotalRecord(), erpAdminService.companyList(dto) );
+		return result;
 	}
 	
 	
@@ -203,10 +182,13 @@ public class ErpAdminRestController {
 	    log.info("customerServiceContent: " + customerServiceContent);
 	    log.info("employeeNum: " + employeeNum);
 	    
-	    //이제 이값들로 인서트 투닥투닥 처리하면 됨
-	    //이미지파일은 어떻게 처리되는지 봐야함
-
-	    return "OK";
+	    //회사 등록
+	    Boolean isBoolean = erpAdminService.insertCompany(dto, customerServiceDivision, customerServiceContent, employeeNum);
+	    if(isBoolean) {
+	    	return "OK";
+	    }else {
+	    	return "NO";
+	    }
 	}
 	
 	/**
@@ -250,5 +232,5 @@ public class ErpAdminRestController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-
+ 
 }

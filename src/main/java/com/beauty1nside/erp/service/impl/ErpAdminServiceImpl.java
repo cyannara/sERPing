@@ -2,14 +2,15 @@ package com.beauty1nside.erp.service.impl;
 
 import java.util.List;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.beauty1nside.common.dto.ComDTO;
 import com.beauty1nside.common.mapper.ErpComMapper;
 import com.beauty1nside.erp.dto.CompanyListDTO;
-import com.beauty1nside.erp.dto.CompanyListSearchDTO;
 import com.beauty1nside.erp.dto.CustomerServiceDTO;
+import com.beauty1nside.erp.dto.ErpSearchDTO;
 import com.beauty1nside.erp.dto.testDTO;
 import com.beauty1nside.erp.mapper.ErpAdminMapper;
 import com.beauty1nside.erp.service.ErpAdminService;
@@ -50,6 +51,10 @@ public class ErpAdminServiceImpl implements ErpAdminService {
      * ErpComMapper 맵퍼를 사용하기 위한 의존성 주입 (회사코드, 회사번호 조회)
      */
 	private final ErpComMapper erpComMapper;
+	/**
+     * PasswordEncoder 비밀번호 암호화 코드 주입
+     */
+	private final PasswordEncoder passwordEncoder;
 	
 	/**
      * DB연결 확인을 위하여 샘플 데이터를 조회
@@ -66,24 +71,24 @@ public class ErpAdminServiceImpl implements ErpAdminService {
 	/**
      * ERP 사용 회사 전체 리스트를 조회한다
      * 
-     * @param CompanyListSearchDTO
+     * @param ErpSearchListDTO
      * @return List<CompanyListDTO>
      */
 	@Override
 	@Transactional	// 트랜잭션 적용: 실행 중 예외 발생 시 롤백, 정상 종료 시 커밋
-	public List<CompanyListDTO> companyList(CompanyListSearchDTO searchDTO) {
+	public List<CompanyListDTO> companyList(ErpSearchDTO searchDTO) {
 		return erpAdminMapper.companyList(searchDTO);
 	}
 
 	/**
      * ERP 사용 회사 전체 리스트 갯수를 조회
      *
-     * @param CompanyListSearchDTO
+     * @param ErpSearchListDTO
      * @return int
      */
 	@Override
 	@Transactional
-	public int getCount(CompanyListSearchDTO searchDTO) {
+	public int getCount(ErpSearchDTO searchDTO) {
 		return erpAdminMapper.getCount(searchDTO);
 	}
 
@@ -118,7 +123,7 @@ public class ErpAdminServiceImpl implements ErpAdminService {
 		//cominfo.getCompanyNum(); [회사번호]
 		
 		//회사 정보 이용 최고 관리자 계정생성
-		cominfo.setCompanyAddress(cominfo.getCompanyEngName()); //해당부분 암호화 해서 여기 넣기
+		cominfo.setCompanyAddress(passwordEncoder.encode(cominfo.getCompanyEngName())); //스프링 기본제공 함호화 이용암호화
 		erpAdminMapper.insertuseraccount(cominfo);
 		
 		//회사 구독기간 서비스

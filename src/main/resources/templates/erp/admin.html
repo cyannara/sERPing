@@ -68,6 +68,25 @@
 						id="flexCheckChecked" checked> <label
 						class="form-check-label" for="flexCheckChecked"> 기간구독 </label>
 				</div>
+				
+				<div>
+					<select name="display_amount" id="display_amount" class="col-8 input-box" onchange="changeDisplay()">
+						<option value="5" selected>5</option>
+						<option value="10">10</option>
+						<option value="20">20</option>
+						<option value="50">50</option>
+						<option value="100">100</option>
+					</select>
+				</div>
+				<div>
+					<span class="label-search col-4">회사명</span>
+					<input type="text" name="companyName2" id="companyName2" class="col-8 input-box">
+				</div>
+				<div>
+				<div class="d-flex justify-content-center align-items-center">
+				  <button type="button" class="btn btn-primary me-2" onclick="search()">검색</button>
+				  <button type="button" class="btn btn-secondary" onclick="reset()">초기화</button>
+				</div>
 			</div>
 		</div>
 		<!-- 회사 검색 영역 끝 -->
@@ -214,16 +233,60 @@
 		</div>
 		<!-- 데이터 처리 영역 끝-->
 	</div>
+	<!-- 사업자 등록증 모달 -->
+	<div class="modal fade" id="businessLicenseModal" tabindex="-1" aria-labelledby="businessLicenseModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="businessLicenseModalLabel">사업자 등록증</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<img id="businessLicenseImg" src="" class="img-fluid" alt="사업자 등록증">
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
 
-
-	<script>
+	<script th:inline="javascript">
+	
+		// 페이지 로드 후 이벤트 바인딩
 		document.addEventListener("DOMContentLoaded", function() {
+			
+			
+			// 모달 버튼 클릭 이벤트 바인딩
+		    document.body.addEventListener("click", function(event) {
+		        if (event.target.classList.contains("contract-btn")) {
+		            let value = event.target.getAttribute("data-id");
+		            openBusinessLicenseModal(value);
+		        }
+		    });
+		 
 		});
+		
+		// 모달 열기 함수
+		function openBusinessLicenseModal(value) {
+		    console.log("사업자 등록증 모달 호출됨, value:", value);
+		    // 이미지 경로 설정 (서버의 이미지 경로에 맞게 수정 필요)
+		    let imageUrl = `http://www.hanalin.net/erp/bsnlicense/${value}`; 
+		    // 이미지 설정
+		    document.getElementById("businessLicenseImg").src = imageUrl;
+		    // 모달 표시
+		    let modal = new bootstrap.Modal(document.getElementById("businessLicenseModal"));
+		    modal.show();
+		}
+		
 		//그리드 선언
 		var Grid = tui.Grid;
 		const dataSource = {
 			api : {
-				readData : { url : '/erp/rest/comlist', method : 'GET', initParams : { param : 'param' } },
+				//readData: { url: '/erp/rest/comlist', method: 'GET', initParams: { param : 'param' } },	//이거인데 공통함수를 위해 변경
+				//readData: { url: '/erp/rest/comlist', method: 'GET', initParams: { page: 1 } },
+				readData: { url: '/erp/rest/comlist', method: 'GET'},
 			//createData: { url: '/api/createData', method: 'POST' },
 			//updateData: { url: '/api/updateData', method: 'PUT' },
 			//modifyData: { url: 'http://localhost:81/api/board/modifyData', method: 'PUT' },
@@ -247,7 +310,11 @@
 				{ header: "담당자명", name: "chargerName", editor: 'text' },
 				{ header: "담당자연락처", name: "chargerPhone", editor: 'text' },
 				{ header: "이메일", name: "chargerEmail", editor: 'text' },
-				{ header: "사업자등록증", name: "businessLicense", editor: 'text' },
+				{ header: "사업자등록증", name: "businessLicense", editor: 'text',
+					formatter: function({ value }) {
+				        return `<button class="btn btn-info btn-sm contract-btn" data-id="${value}">등록증</button>`;
+				    },
+				},
 				{ header: "계약서", 
 			        name: "contractNum", 
 			        formatter: function({ value }) {
@@ -309,6 +376,32 @@
 			//초기 데이터 뭘로 할지
 			data : dataSource,
 		});
+	
+		
+		
+		//그리드 표시 수량 변경
+		function changeDisplay() {
+			let gap = parseInt(document.querySelector('#display_amount').value);
+			grid.setPerPage(gap, dataSource)
+		}
+		
+		
+		//검색 처리 이벤트
+		function search(){
+			let companyName = document.querySelector('#companyName2').value;
+			console.log(companyName);
+			grid.setRequestParams({"companyName" : companyName})
+			grid.readData();
+		}
+		//검색 초기화 이벤트
+		function reset(){
+			let companyName = document.querySelector('#companyName');
+	
+			companyName.value = '';
+			
+			grid.setRequestParams({"companyName" : companyName.value })
+			grid.readData();
+		}
 		
 		// 주소검색 api
 		document.addEventListener("DOMContentLoaded", function() {
@@ -340,6 +433,7 @@
 		});
 		// 주소검색 api 끝
 		
+		
 		//파일 업로드 버튼 클릭시 파일 선택 처리
 		// 파일 입력 필드
         const fileInput = document.getElementById("businessLicense");
@@ -361,6 +455,7 @@
         });
       	//파일 업로드 버튼 클릭시 파일 선택 처리 끝
 		
+      	
 		// 회사등록버튼
 		const inputComInserbtn = document.querySelector(".inputComInser");
 		// 닫기버튼
@@ -400,7 +495,8 @@
 			let errorMessage = "";
 			//회사명 논리 검증
 			let companyName = document.querySelector("#companyName").value;
-			companyName = "좋은회사";	//★★★★★★검증후 지우기
+			//companyName = "좋은회사";	//★★★★★★검증후 지우기
+			console.log("회사명 "+companyName);
 			if(getByteLength(companyName) < 50 && getByteLength(companyName) >= 1){
 				isOkNo = true;
 				errorMessage = "";
@@ -411,7 +507,7 @@
 			if(isOkNo){
 				//회사영문명 논리 검증
 				let companyEngName = document.querySelector("#companyEngName").value;
-				companyEngName = "oliveyoungsa";	//★★★★★★검증후 지우기
+				//companyEngName = "oliveyoungsa";	//★★★★★★검증후 지우기
 				if(getByteLength(companyEngName) <= 20 && isAllLowerCase(companyEngName) && getByteLength(companyEngName) >= 1){
 					//호출해야함 companyEngName
 					let enboolean = await iscomapnyEngName(companyEngName);
@@ -434,7 +530,7 @@
 				let businessNum2 = document.querySelector("#businessNum2").value;
 				let businessNum3 = document.querySelector("#businessNum3").value;
 				let businessNumber = businessNum1+businessNum2+businessNum3;
-				businessNumber = "6478100749";	//★★★★★★검증후 지우기
+				//businessNumber = "6478100749";	//★★★★★★검증후 지우기
 				if(getByteLength(businessNumber) == 10 && isAllNumberCase(businessNumber)){
 					document.querySelector("#businessFullNumber").value = businessNum1+"-"+businessNum2+"-"+businessNum3;
 					isOkNo = true;
@@ -448,7 +544,7 @@
 			if(isOkNo){
 				//대표자명 논리 검증
 				let representationName = document.querySelector("#representationName").value;
-				representationName = "나대표";	//★★★★★★검증후 지우기
+				//representationName = "나대표";	//★★★★★★검증후 지우기
 				if(getByteLength(representationName) <= 12 && getByteLength(representationName) >= 1 && isAllKoreanCase(representationName)){
 					isOkNo = true;
 					errorMessage = "";
@@ -460,7 +556,7 @@
 			if(isOkNo){
 				//담당자명 논리 검증
 				let chargerName = document.querySelector("#chargerName").value;
-				chargerName = "나사원";	//★★★★★★검증후 지우기
+				//chargerName = "나사원";	//★★★★★★검증후 지우기
 				if(getByteLength(chargerName) <= 12 && getByteLength(chargerName) >= 1 && isAllKoreanCase(chargerName)){
 					isOkNo = true;
 					errorMessage = "";
@@ -472,7 +568,7 @@
 			if(isOkNo){
 				//대표자 번호 논리 검증
 				let representationPhone = document.querySelector("#representationPhone").value;
-				representationPhone = "01085216704";	//★★★★★★검증후 지우기
+				//representationPhone = "01085216704";	//★★★★★★검증후 지우기
 				representationPhone = representationPhone.replaceAll("-","").trim();
 				if(isAllNumberCase(representationPhone) && getByteLength(representationPhone) == 11){
 					isOkNo = true;
@@ -486,7 +582,7 @@
 			if(isOkNo){
 				//담당자 번호 논리 검증
 				let chargerPhone = document.querySelector("#chargerPhone").value;
-				chargerPhone = "01085216704";	//★★★★★★검증후 지우기
+				//chargerPhone = "01085216704";	//★★★★★★검증후 지우기
 				chargerPhone = chargerPhone.replaceAll("-","").trim();
 				if(isAllNumberCase(chargerPhone) && getByteLength(chargerPhone) == 11){
 					isOkNo = true;
@@ -500,7 +596,7 @@
 			if(isOkNo){
 				//이메일 논리 검증
 				let chargerEmail = document.querySelector("#chargerEmail").value;
-				chargerEmail = "hayeon8521@kakao.com";	//★★★★★★검증후 지우기
+				//chargerEmail = "hayeon8521@kakao.com";	//★★★★★★검증후 지우기
 				if(isValidEmail(chargerEmail)){
 					isOkNo = true;
 					errorMessage = "";
@@ -526,8 +622,8 @@
 				//주소 논리 검증
 				let companyAddress = document.querySelector("#companyAddress").value;
 				let companyAddressMOD = document.querySelector("#companyAddressMOD").value;
-				companyAddress = "서울시 강남구 개포동";	//★★★★★★검증후 지우기
-				companyAddressMOD = "1188-2";	//★★★★★★검증후 지우기
+				//companyAddress = "서울시 강남구 개포동";	//★★★★★★검증후 지우기
+				//companyAddressMOD = "1188-2";	//★★★★★★검증후 지우기
 				if(getByteLength(companyAddress) >= 1 && getByteLength(companyAddressMOD) >= 1){
 					isOkNo = true;
 					errorMessage = "";
@@ -541,7 +637,7 @@
 			if(isOkNo){
 				//사유 기입해야 버튼 처리 가능
 				let customerServiceContent = document.querySelector("#customerServiceContent").value;
-				customerServiceContent = "서울시 강남구 개포동";	//★★★★★★검증후 지우기
+				//customerServiceContent = "서울시 강남구 개포동";	//★★★★★★검증후 지우기
 				if(customerServiceContent){
 					isOkNo = true;
 					errorMessage = "";
@@ -565,8 +661,9 @@
 				let companyAddress = document.querySelector("#fullAddress").value;
 				let customerServiceContent = document.querySelector("#customerServiceContent").value;
 				let customerServiceDivision = document.querySelector("#customerServiceDivision").value;
-				companyName = "좋은회사";	//★★★★★★검증후 지우기
-				companyEngName = "oliveyoung";	//★★★★★★검증후 지우기
+				/*
+				companyName = "좋은회사16";	//★★★★★★검증후 지우기
+				companyEngName = "olivip";	//★★★★★★검증후 지우기
 				businessNum = "647-81-00749"
 				representationName = "나대표";	//★★★★★★검증후 지우기
 				chargerName = "나사원";	//★★★★★★검증후 지우기
@@ -577,10 +674,11 @@
 				companyAddress = "서울시 좋은곳에 위치";
 				customerServiceContent = "문의내용이에요";
 				customerServiceDivision = "질의 분류";
+				*/
 				
 				//로그인 처리할때 까지 이건 계속 있어야함
 				let employeeNum = document.querySelector("#employeeNum").value;
-				employeeNum = 1;
+				employeeNum = 1;	//●●● 로그인기능 생기면 지우기 ●●●
 				
 				//이미지 먼저 저장하고
 				const uploadedFileName = await imgSave();
@@ -612,7 +710,16 @@
 					    },
 					body : JSON.stringify(requestData),
 				})
-				.then( result => result.json() )
+				.then( result => result.text() )
+				.then( result => {
+					console.log("회사등록결과" + result);
+					if(result==="OK"){
+						allCanceinbtn.click();
+						grid.readData();
+					}else{
+						alert("회사 등록중 심각한 오류 발생 관리자 문의");
+					}
+				} )
 		    }
 		});
 
