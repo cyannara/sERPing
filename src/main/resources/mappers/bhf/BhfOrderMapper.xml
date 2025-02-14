@@ -31,21 +31,7 @@
 			)
 		where rn >= #{start}
 	</select>
-	
-	<!-- 상품 선택시 옵션조회 -->
-	<select id="optionList" resultType="BhfGoodsOpDTO">
-		select g.goods_code,
-			   g.goods_name,
-			   g.goods_standard
-		       o.option_code,
-		       o.option_name
-		from   purchse_goods g join purchse_option o on g.goods_num = o.goods_num
-		<where>
-			<include refid="searchInfo"></include>
-		</where>
-		
-	</select>
-	
+
 	<!-- 페이징에 전체숫자 알려주기 위해서 -->
 	<select id="count" parameterType="BhfGoodsOpDTO">
 		SELECT COUNT(g.goods_num)
@@ -59,11 +45,22 @@
 	<sql id="searchInfo">
 			g.company_num = 1<!-- #{companyNum}  -->
 			<if test="goodsCode != null and ! goodsCode.equals('')">
-				AND g.goods_code Like '%' || #{goodsCode} || '%'
+				AND goods_code Like '%' || #{goodsCode} || '%'
 			</if>
 			<if test="goodsName != null and ! goodsName.equals('')">
 				AND g.goods_name Like '%' || #{goodsName} || '%'
 			</if>
 	</sql>
+		
+	<!-- 상품 선택시 옵션조회 -->
+	<select id="optionList" resultType="BhfGoodsOpDTO">
+		select g.goods_code,
+			   g.goods_name,
+			   g.goods_standard,
+		       o.option_code,
+		       o.option_name
+		from   purchse_goods g join purchse_option o on g.goods_num = o.goods_num
+		where g.company_num = 1 and g.goods_code = #{goodsCode} 		
+	</select>
 	
 </mapper>

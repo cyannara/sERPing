@@ -30,7 +30,7 @@ public class BhfOrderServiceImpl implements BhfOrderService {
 	}
 
 	@Override
-	public BhfGoodsOpDTO optionList(String goodsCode) {
+	public List<BhfGoodsOpDTO> optionList(String goodsCode) {
 		
 		return mapper.optionList(goodsCode);
 	}
