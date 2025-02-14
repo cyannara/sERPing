@@ -14,7 +14,7 @@
 
 </head>
 <body layout:fragment="content">
-<div class="container mt-4">
+<div class="container mt-4" id="custom-container">
     <h2 class="mb-4">상품 등록</h2>
     <form action="/purchs/register" method="get">
         <div class="row mb-3">
@@ -43,7 +43,7 @@
         
                 	<!-- 공통 모달 호출 -->
 					<div th:replace="purchs/ModalTemplate :: ModalTemplate (
-					    'brandModal',
+					    'brandModal', 
 					    'modal-xl',
 					    '브랜드 조회',
 					    'purchs/brandTable',
@@ -235,14 +235,9 @@
     });
     
     
-        
-    
-
-
-    
-
-
 </script>
 
 </body>
+
+
 </html>
