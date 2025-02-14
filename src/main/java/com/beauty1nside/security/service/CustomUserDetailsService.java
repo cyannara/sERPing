@@ -16,8 +16,6 @@ public class CustomUserDetailsService implements UserDetailsService {
   public UserDetails loadUserByUsername(String employeeId) throws UsernameNotFoundException {
     UserDTO userDTO = userMapper.getUser(employeeId);
     
-    System.out.println("CustomUserDetailsService userDTO = " + userDTO);
-    
     if(userDTO == null) {
       throw new UsernameNotFoundException("id check");
     }
