@@ -2,14 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.beauty1nside.accnut.mapper.DebtMapper">
 	<select id="info" resultType="com.beauty1nside.accnut.dto.DebtDTO">
-		SELECT debt_code, debt_name, section, creditor, amount, interest, prearrangement_due_date, register_date
+		SELECT debt_code, debt_name, section, creditor, amount, interest, time_limit, prearrangement_due_date, register_date
 		FROM accnut_debt
 		WHERE debt_code = #{debtCode}
 	
 	</select>
 	<select id="list" resultType="com.beauty1nside.accnut.dto.DebtDTO" parameterType="com.beauty1nside.accnut.dto.DebtSearchDTO">
-		SELECT debt_code, debt_name, section, creditor, amount, interest, register_date
-		FROM (SELECT /*+INDEX_DESC(accnut_debt pk_accnut_debt)*/ rownum rn, debt_code, debt_name, fn_get_cmmn_name(section) as section, creditor, amount, interest, register_date
+		SELECT debt_code, debt_name, section, creditor, amount, interest, register_date, prearrangement_due_date
+		FROM (SELECT /*+INDEX_DESC(accnut_debt pk_accnut_debt)*/ rownum rn, debt_code, debt_name, fn_get_cmmn_name(section) as section, creditor, amount, interest, time_limit, prearrangement_due_date, register_date
 		FROM accnut_debt
 		<![CDATA[
 		      WHERE rownum <= #{end} 
@@ -38,15 +38,15 @@
 		<if test="creditor != null and ! creditor.equals('')">
 			AND creditor LIKE '%' || #{creditor} || '%'
 		</if>
+		<!-- 미지급금 처리 조회 -->
+		<if test="prearrangementDueDate != null and ! prearrangementDueDate.equals('')">
+			AND TO_CHAR(prearrangement_due_date, 'yyyy-mm-dd') = #{prearrangementDueDate}
+		</if>
+		<if test="amount != null">
+			AND amount >= #{amount}
+		</if>
+		
 	</sql>
-	
-	<select id="unpayList" resultType="com.beauty1nside.accnut.dto.DebtDTO" parameterType="com.beauty1nside.accnut.dto.DebtSearchDTO">
-	
-	
-	</select>
-	<select id="unpayCount" parameterType="com.beauty1nside.accnut.dto.DebtSearchDTO">
-	
-	</select>
 	
 
 </mapper>
