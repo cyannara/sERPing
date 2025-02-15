@@ -624,33 +624,37 @@
 		
 		//비밀번호 초기화
 		document.querySelector(".pwreset").addEventListener("click", function(){
-			const requestData = {
-					companyNum: rowData.companyNum,						//회사번호
-					customerServiceDivision: "EQ02",					//문의유형
-					employeeNum: employeeNum,							//처리자번호
-					customerServiceContent: document.querySelector("#customerServiceContent").value,		//문의내용
-			};
-			const url = "/erp/rest/pwReSet";
-			//패치 시작
-			fetch(url, {
-				method:"post",
-				headers: {
-				      "Content-Type": "application/json",
-				      // 'Content-Type': 'application/x-www-form-urlencoded',
-				    },
-				body : JSON.stringify(requestData),
-			})
-			.then( result => result.text() )
-			.then( result => {
-				console.log("비밀번호 초기화결과 " + result);
-				if(result==="OK"){
-					alert('초기화 완료');
-					cslistfun();
-				}else{
-					alert("비밀번호 초기화중 심각한 오류 발생 관리자 문의");
-				}
-			} )
-			//패치 끝
+			if(document.querySelector("#customerServiceContent").value){
+				const requestData = {
+						companyNum: rowData.companyNum,						//회사번호
+						customerServiceDivision: "EQ02",					//문의유형
+						employeeNum: employeeNum,							//처리자번호
+						customerServiceContent: document.querySelector("#customerServiceContent").value,		//문의내용
+				};
+				const url = "/erp/rest/pwReSet";
+				//패치 시작
+				fetch(url, {
+					method:"post",
+					headers: {
+					      "Content-Type": "application/json",
+					      // 'Content-Type': 'application/x-www-form-urlencoded',
+					    },
+					body : JSON.stringify(requestData),
+				})
+				.then( result => result.text() )
+				.then( result => {
+					console.log("비밀번호 초기화결과 " + result);
+					if(result==="OK"){
+						alert('초기화 완료');
+						cslistfun();
+					}else{
+						alert("비밀번호 초기화중 심각한 오류 발생 관리자 문의");
+					}
+				} )
+				//패치 끝
+			}else{
+				alert('사유를 입력해주세요');
+			}
 		});
 		
 		//서비스 상태 변경
