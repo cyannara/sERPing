@@ -15,6 +15,7 @@
 	*  2025.02.12  표하연          최초생성
 	*  2025.02.13  표하연          회사영문코드 중복처리
 	*  2025.02.14  표하연          회사신규등록(회사,cs,최고관리자,구독정보목록생성)
+	*  2025.02.15  표하연          회사정보수정 및 기본cs를 등록한다
 	*
 	*  </pre>
 ======================================================== -->
@@ -187,7 +188,7 @@
 	</insert>
 	
 	<!-- 
-     * ERP 신규회사 등록에 대한 CS 내역남김
+     * ERP 사용회사의 CS내역을 남긴다
      *
      * @param CustomerServiceDTO
      * @return int
@@ -198,10 +199,159 @@
 			erp_cs_seq.nextval, 
 			#{companyNum}, 
 			#{employeeNum}, 
-			DEFAULT, 
+			#{customerServiceDivision}, 
 			#{customerServiceContent}, 
 			DEFAULT 
 		)
 	</insert>
 	
+	<!-- 
+     * ERP 사용회사의 서비스 기간을 변경한다 (특정 서비스만)
+     *
+     * @param map
+     * @return int
+	-->
+	<update id="updateServiceInfo" parameterType="map">
+		UPDATE erp_subscription_info_list
+	    <set>
+	    	subscription_update_date = sysdate,
+	        <if test="subscriptionEndDate != null and ! subscriptionEndDate.equals('')">
+	            subscription_end_date = #{subscriptionEndDate},
+	        </if>
+	    </set>
+	    WHERE subscription_num = #{subscriptionNum}
+	</update>
+	
+	<!-- 
+     * ERP 사용회사의 서비스 기간을 변경한다 (모든 서비스)
+     *
+     * @param map
+     * @return int
+	-->
+	<update id="allUpdateServiceInfo" parameterType="map">
+		UPDATE erp_subscription_info_list
+	    <set>
+	    	subscription_update_date = sysdate,
+	        <if test="subscriptionEndDate != null and ! subscriptionEndDate.equals('')">
+	            subscription_end_date = #{subscriptionEndDate},
+	        </if>
+	    </set>
+	    WHERE company_num = #{companyNum}
+	</update>
+	
+	<!-- 
+     * ERP 사용회사 성보를 변경한다
+     *
+     * @param map
+     * @return int
+	-->
+	<update id="updateCompnayInfo" parameterType="ComDTO">
+		UPDATE erp_company
+	    <set>
+	        <if test="companyName != null and ! companyName.equals('')">
+	            company_name = #{companyName},
+	        </if>
+	        <if test="companyEngName != null and ! companyEngName.equals('')">
+	            company_eng_name = #{companyEngName},
+	        </if>
+	        <if test="representationName != null and ! representationName.equals('')">
+	            representation_name = #{representationName},
+	        </if>
+	        <if test="representationPhone != null and ! representationPhone.equals('')">
+	            representation_phone = #{representationPhone},
+	        </if>
+	        <if test="chargerName != null and ! chargerName.equals('')">
+	            charger_name = #{chargerName},
+	        </if>
+	        <if test="chargerPhone != null and ! chargerPhone.equals('')">
+	            charger_phone = #{chargerPhone},
+	        </if>
+	        <if test="chargerEmail != null and ! chargerEmail.equals('')">
+	            charger_email = #{chargerEmail},
+	        </if>
+	        <if test="companyAddress != null and ! companyAddress.equals('')">
+	            company_address = #{companyAddress},
+	        </if>
+	        <if test="businessNum != null and ! businessNum.equals('')">
+	            business_num = #{businessNum},
+	        </if>
+	        <if test="businessLicense != null and ! businessLicense.equals('')">
+	            business_license = #{businessLicense},
+	        </if>
+	        <if test="serviceState != null and ! serviceState.equals('')">
+	            service_state = #{serviceState},
+	        </if>
+	    </set>
+	    WHERE company_num = #{companyNum}
+	</update>
+	
+	
+	<!-- 
+     * ERP 사용회사 정보를 상황에 맞게 등록 또는 업데이트 한다
+     *
+     * @param ComDTO
+     * @return int
+	-->
+	<update id="upsertCompanyInfo" parameterType="ComDTO">
+	    MERGE INTO erp_company target
+	    USING (SELECT #{companyNum} AS company_num FROM DUAL) source
+	    ON (target.company_num = source.company_num)
+	    WHEN MATCHED THEN
+	        UPDATE SET 
+	            company_name = #{companyName},
+	            company_eng_name = #{companyEngName},
+	            representation_name = #{representationName},
+	            representation_phone = #{representationPhone},
+	            charger_name = #{chargerName},
+	            charger_phone = #{chargerPhone},
+	            charger_email = #{chargerEmail},
+	            company_address = #{companyAddress},
+	            business_num = #{businessNum},
+	            business_license = #{businessLicense},
+	            service_state = #{serviceState}
+	    WHEN NOT MATCHED THEN
+	        INSERT (company_num, company_name, company_eng_name, representation_name,
+	                representation_phone, charger_name, charger_phone, charger_email,
+	                company_address, business_num, business_license, service_state, register_date)
+	        VALUES (#{companyNum}, #{companyName}, #{companyEngName}, #{representationName},
+	                #{representationPhone}, #{chargerName}, #{chargerPhone}, #{chargerEmail},
+	                #{companyAddress}, #{businessNum}, #{businessLicense}, #{serviceState}, SYSDATE)
+	</update>
+	
+	<!-- 
+     * ERP 사용회사의 비밀번호를 초기화 한다
+     *
+     * @param int
+     * @param String
+     * @return int
+	-->
+	<update id="pwReSet">
+		UPDATE erp_user_accounts
+	    <set>
+	    	update_date = sysdate,
+	        <if test="employeePw != null and ! employeePw.equals('')">
+	            employee_pw = #{employeePw},
+	        </if>
+	    </set>
+	    WHERE company_num = #{companyNum}
+	</update>
+
+	<!-- 
+     * ERP 사용회사의 cslist를 조회한다
+     *
+     * @param int
+     * @return CustomerServiceDTO
+	-->
+	<select id="csList" resultType="CustomerServiceDTO">
+		select customer_service_num,
+		        company_num,
+		        erp_employee_name(employee_num) as employee_name,
+		        fn_get_cmmn_name(customer_service_division) as customer_service_division,
+		        customer_service_content,
+		        customer_service_date
+		from erp_customer_service
+				where company_num = #{companyNum}
+		order by customer_service_num desc
+	</select>
+
 </mapper>

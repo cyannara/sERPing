@@ -1,6 +1,8 @@
 package com.beauty1nside.erp.service.impl;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -133,8 +135,179 @@ public class ErpAdminServiceImpl implements ErpAdminService {
 		CustomerServiceDTO csDTO = new CustomerServiceDTO();
 		csDTO.setCompanyNum(cominfo.getCompanyNum());
 		csDTO.setEmployeeNum(employeeNum);
-		csDTO.setCustomerServiceContent(customerServiceContent);		
+		csDTO.setCustomerServiceContent(customerServiceContent);
+		csDTO.setCustomerServiceDivision(customerServiceDivision);
 		
 		return erpAdminMapper.insertNewCS(csDTO) == 1 ? true : false;
+	}
+
+	/**
+     * ERP 사용 회사의 cs 내역을 남긴다
+     *
+     * @param CustomerServiceDTO
+     * @return boolean
+     */
+	@Override
+	public boolean insertNewCS(CustomerServiceDTO csDTO) {
+		return erpAdminMapper.insertNewCS(csDTO) == 1 ? true : false;
+	}
+
+	/**
+     * ERP 사용회사의 서비스 기간을 변경한다
+     *
+     * @param Map<String, Object>
+     * @return boolean
+     */
+	@Override
+	@Transactional
+	public boolean updateServiceInfo(Map<String, Object> requestData) {
+		
+		int remainingDays = ((Number) requestData.get("remainingDays")).intValue();
+		
+		//문의 내역을 남김
+	    CustomerServiceDTO customerServiceDTO = new CustomerServiceDTO();
+	    customerServiceDTO.setCompanyNum( (Integer)requestData.get("companyNum") );
+	    customerServiceDTO.setEmployeeNum( (Integer)requestData.get("employeeNum") );
+	    String servicecontent = """
+	    		[서비스기간변경]
+	    		""";
+	    servicecontent += remainingDays+"추가 \n";
+	    servicecontent += "[사유] : " + (String)requestData.get("customerServiceContent");
+	    customerServiceDTO.setCustomerServiceDivision( (String)requestData.get("customerServiceDivision") );
+	    customerServiceDTO.setCustomerServiceContent( servicecontent );
+	    log.info("Mapped DTO: " + customerServiceDTO.toString());
+	    erpAdminMapper.insertNewCS(customerServiceDTO);
+	    
+	    if(remainingDays <= -10) {
+		    //회사 서비스 상태를 변경함
+		    ComDTO comdto = new ComDTO();
+		    comdto.setCompanyNum( (Integer)requestData.get("companyNum") );
+		    comdto.setServiceState("EC03");
+		    erpAdminMapper.updateCompnayInfo(comdto);
+	    }
+	    
+	    //서비스 기간을 변경함
+		return erpAdminMapper.updateServiceInfo(requestData) == 1 ? true : false;
+	}
+	
+	/**
+     * ERP 사용회사 성보를 변경한다
+     *
+     * @param ComDTO
+     * @return boolean
+     */
+	@Override
+	public boolean updateCompnayInfo(ComDTO comDTO) {
+		return false;
+	}
+
+	/**
+     * ERP 사용회사의 서비스 기간을 변경한다 (모든 서비스)
+     *
+     * @param Map<String, Object>
+     * @return boolean
+     */
+	@Override
+	@Transactional
+	public boolean allUpdateServiceInfo(Map<String, Object> requestData) {
+		
+		//문의 내역을 남김
+	    CustomerServiceDTO customerServiceDTO = new CustomerServiceDTO();
+	    customerServiceDTO.setCompanyNum( (Integer)requestData.get("companyNum") );
+	    customerServiceDTO.setEmployeeNum( (Integer)requestData.get("employeeNum") );
+	    String servicecontent = """
+	    		[서비스상태변경]
+	    		""";
+	    servicecontent += "[변경상태] : "+(String)requestData.get("serviceState")+"\n";
+	    servicecontent += "[기존] : "+(String)requestData.get("subscriptionEndDate")+"\n";
+	    
+	    // 오늘 날짜 + 10일 계산
+	    LocalDate futureDate = LocalDate.now().plusDays(9);
+	    String updatedDate = futureDate.toString(); // "YYYY-MM-DD" 형식
+	    
+	    if ("EC03".equals(requestData.get("serviceState"))) {
+	    	servicecontent += "[변경] : 1010-10-10\n";
+	    	updatedDate = "1010-10-10";
+	    }else {
+	    	servicecontent += "[변경] : " + updatedDate + "\n";
+	    }
+	    
+	    servicecontent += "[사유] : " + (String)requestData.get("customerServiceContent");
+	    customerServiceDTO.setCustomerServiceDivision( (String)requestData.get("customerServiceDivision") );
+	    customerServiceDTO.setCustomerServiceContent( servicecontent );
+	    log.info("Mapped DTO: " + customerServiceDTO.toString());
+	    erpAdminMapper.insertNewCS(customerServiceDTO);
+	    
+	    //회사 서비스 상태를 변경함
+	    ComDTO comdto = new ComDTO();
+	    comdto.setCompanyNum( (Integer)requestData.get("companyNum") );
+	    comdto.setServiceState((String)requestData.get("serviceState"));
+	    erpAdminMapper.updateCompnayInfo(comdto);
+	    
+	    requestData.put("subscriptionEndDate", updatedDate);
+	    //구독 정보를 변경
+		return erpAdminMapper.allUpdateServiceInfo(requestData) == 1 ? true : false;
+	}
+
+	/**
+     * ERP 사용회사 정보를 상황에 맞게 등록 또는 업데이트 한다
+     *
+     * @param ComDTO
+     * @param String
+     * @param String
+     * @param int
+     * @return boolean
+     */
+	@Override
+	public boolean upsertCompanyInfo(ComDTO dto, String customerServiceDivision, String customerServiceContent,
+			int employeeNum) {
+
+		//회사 CS 내역 남기기
+		CustomerServiceDTO csDTO = new CustomerServiceDTO();
+		csDTO.setCompanyNum(dto.getCompanyNum());
+		csDTO.setEmployeeNum(employeeNum);
+		csDTO.setCustomerServiceContent(customerServiceContent);
+		csDTO.setCustomerServiceDivision(customerServiceDivision);
+		erpAdminMapper.insertNewCS(csDTO);
+		
+		//회사 정보 수정
+		return erpAdminMapper.upsertCompanyInfo(dto) == 1 ? true : false;
+	}
+
+	/**
+     * ERP 사용회사 비밀번호를 초기화 한다
+     *
+     * @param int
+     * @return boolean
+     */
+	@Override
+	public boolean pwReSet(Map<String, Object> requestData) {
+		
+		//회사 CS 내역 남기기
+		CustomerServiceDTO csDTO = new CustomerServiceDTO();
+		csDTO.setCompanyNum((int)requestData.get("companyNum"));
+		csDTO.setEmployeeNum((int)requestData.get("employeeNum"));
+		String customerServiceContent = "[비밀번호초기화] \n";
+		customerServiceContent += "[사유] " + (String)requestData.get("customerServiceContent");
+		csDTO.setCustomerServiceContent(customerServiceContent);
+		csDTO.setCustomerServiceDivision((String)requestData.get("customerServiceDivision"));
+		erpAdminMapper.insertNewCS(csDTO);
+				
+		//비밀번호 초기화 하기
+		ComDTO comdto = erpComMapper.comnum((int)requestData.get("companyNum"));
+		comdto.getCompanyEngName();
+		String employeePw = passwordEncoder.encode(comdto.getCompanyEngName()); //스프링 기본제공 함호화 이용암호화
+		return erpAdminMapper.pwReSet(employeePw, (int)requestData.get("companyNum")) == 1 ? true : false;
+	}
+
+	/**
+     * ERP 사용회사 cslist를 조회한다
+     *
+     * @param int
+     * @return List<CustomerServiceDTO>
+     */
+	@Override
+	public List<CustomerServiceDTO> csList(int companyNum) {
+		return erpAdminMapper.csList(companyNum);
 	}
 }
