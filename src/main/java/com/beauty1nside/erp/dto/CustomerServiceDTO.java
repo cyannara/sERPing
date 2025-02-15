@@ -35,5 +35,7 @@ public class CustomerServiceDTO {
 	private String customerServiceDivision;
 	private String customerServiceContent;
 	private Date customerServiceDate;
+	
+	private String employeeName;
 
 }
