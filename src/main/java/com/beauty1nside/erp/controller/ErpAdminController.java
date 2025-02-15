@@ -2,17 +2,16 @@ package com.beauty1nside.erp.controller;
 
 import java.util.List;
 
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.beauty1nside.common.dto.ComDTO;
-import com.beauty1nside.common.mapper.ErpComMapper;
-import com.beauty1nside.erp.dto.CompanyListDTO;
 import com.beauty1nside.erp.dto.testDTO;
 import com.beauty1nside.erp.service.ErpAdminService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -62,8 +61,12 @@ public class ErpAdminController {
      * @return String
      */
 	@GetMapping("/admin")
-	public String layout() {
-		return "erp/admin";
+	public String layout(Model model, HttpServletRequest request) {
+		CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
+        if (csrfToken != null) {
+            model.addAttribute("_csrf", csrfToken);
+        }
+        return "erp/admin";
 	}
 	
 	/**
