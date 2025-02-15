@@ -1,6 +1,9 @@
 package com.beauty1nside.purchs.controller;
 
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.beauty1nside.common.GridArray;
@@ -12,12 +15,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-
-import java.lang.ProcessHandle.Info;
-
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 @Log4j2	//log4j 가 안되면 버전높은 log4j2 사용
