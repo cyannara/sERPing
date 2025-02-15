@@ -4,8 +4,8 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.beauty1nside.security.mapper.UserMapper">
 
-    <resultMap type="com.beauty1nside.security.service.UserDTO" id="userMap">
-        <id column="employeeNum" property="employeeNum"/>
+    <resultMap type="UserDTO" id="userMap">
+        <id column="employee_num" property="employeeNum"/>
         <result property="employeeId" column="employee_id"/>
         <result property="employeePw" column="employee_pw"/>
         <result property="employeeName" column="employee_name"/>
@@ -20,7 +20,7 @@
                 property="roles"
                 ofType="RoleDTO"
                 select="getRole"
-                column="employeeNum"
+                column="employee_num"
         />
     </resultMap>
     <select id="getUser" resultMap="userMap">
@@ -39,19 +39,8 @@
          on   h.company_num = e.company_num
         where h.employee_id = #{employeeId}
     </select>
-
-    <!--
-    role id를 넘겨주면 롤이름 반환
-    getRole의 조회 결과가 바로 DTO로 들어가는게 아니라 resultMap을 거쳐서 감
-    -->
-<!--    <select id="getRole" resultType="com.beauty1nside.security.service.RoleDTO">-->
-<!--        select role_name-->
-<!--        from t_user_role u-->
-<!--        join t_role r on (u.role_id = r.id)-->
-<!--        where id = #{id}-->
-<!--    </select>-->
-    <select id="getRole" resultType="com.beauty1nside.security.service.RoleDTO">
-        select c.cmmn_code as role_name
+    <select id="getRole" resultType="RoleDTO">
+        select 'ROLE_'||c.cmmn_code as role_name
         from hr_employee h
                  join cmmn c on (h.authority = c.cmmn_code)
         where employee_num = #{employeeNum}

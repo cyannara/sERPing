@@ -11,18 +11,21 @@
     <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
       <span class="icon-menu"></span>
     </button>
-    <ul class="navbar-nav mr-lg-2">
-      <li class="nav-item nav-search d-none d-lg-block">
-        <div class="input-group">
-          <div class="input-group-prepend hover-cursor" id="navbar-search-icon">
-                <span class="input-group-text" id="search">
-                  <i class="icon-search"></i>
-                </span>
-          </div>
-          <input type="text" class="form-control" id="navbar-search-input" placeholder="Search now" aria-label="search" aria-describedby="search">
-        </div>
-      </li>
-    </ul>
+    <nav class="menu">
+      <a th:href="@{/(menu='standard')}" data="standard"
+         th:classappend="${#strings.equals('standard', param.menu)} ? 'selected' : ''">기준정보</a>
+      <a th:href="@{/(menu='sales')}" data="sales"
+         th:classappend="${#strings.equals('sales', param.menu)} ? 'selected' : ''">영업</a>
+      <a th:href="@{/(menu='inventory')}" data="inventory"
+         th:classappend="${#strings.equals('inventory', param.menu)} ? 'selected' : ''">재고</a>
+      <a th:href="@{/(menu='hr')}" data="hr"
+         th:classappend="${#strings.equals('hr', param.menu)} ? 'selected' : ''">인사</a>
+      <a th:href="@{/(menu='account')}" data="account"
+         th:classappend="${#strings.equals('account', param.menu)} ? 'selected' : ''">회계</a>
+      <a th:href="@{/(menu='branch')}" data="branch"
+         th:classappend="${#strings.equals('branch', param.menu)} ? 'selected' : ''">지점</a>
+    </nav>
+
     <ul class="navbar-nav navbar-nav-right">
       <li class="nav-item dropdown">
         <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-toggle="dropdown">
