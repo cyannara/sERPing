@@ -47,6 +47,8 @@
 <!-- custom CSS -->
 <link rel="stylesheet" th:href="@{/css/hr/style.css}">
 
+
+
 <title>사원 관리</title>
 </head>
 
@@ -77,56 +79,32 @@
 
 				<!-- 부서 -->
 				<div class="mb-2">
-					<label class="fw-bold d-block">부서</label> <select
-						class="form-select" style="width: 100%;" id="searchDepartment">
-						<option value="">부서 선택</option>
-						<option value="HR">인사팀</option>
-						<option value="IT">IT팀</option>
-					</select>
+				    <label class="fw-bold d-block">부서</label> 
+				    <select class="form-select" style="width: 100%;" id="searchDepartment">
+				        <option value="">부서 선택</option>
+				    </select>
 				</div>
 
 				<!-- 직급 -->
 				<div class="mb-2">
-					<label class="fw-bold d-block">직급</label> <select
-						class="form-select" style="width: 100%;" id="searchPosition">
-						<option value="">직급 선택</option>
-						<option value="P001">사원</option>
-						<option value="P002">대리</option>
-						<option value="P003">과장</option>
-					</select>
+				    <label class="fw-bold d-block">직급</label> 
+				    <select class="form-select" style="width: 100%;" id="searchPosition">
+				        <option value="">직급 선택</option>
+				    </select>
 				</div>
 
 				<!-- 재직 상태 -->
 				<div class="mb-2">
-					<label class="fw-bold d-block">재직 상태</label>
-					<div class="btn-group w-100" role="group">
-						<input type="radio" class="btn-check" name="searchStatus"
-							id="statusAll" checked> <label
-							class="btn btn-outline-primary" for="statusAll">전체</label> <input
-							type="radio" class="btn-check" name="searchStatus"
-							id="statusActive"> <label class="btn btn-outline-primary"
-							for="statusActive">재직</label> <input type="radio"
-							class="btn-check" name="searchStatus" id="statusLeave"> <label
-							class="btn btn-outline-primary" for="statusLeave">휴직</label> <input
-							type="radio" class="btn-check" name="searchStatus"
-							id="statusRetired"> <label
-							class="btn btn-outline-primary" for="statusRetired">퇴직</label>
-					</div>
+				    <label class="fw-bold d-block">재직 상태</label>
+				    <div class="btn-group w-100" role="group" id="statusGroup">
+				    </div>
 				</div>
 
 				<!-- 근무 유형 -->
 				<div class="mb-3">
-					<label class="fw-bold d-block">근무 유형</label>
-					<div class="btn-group w-100" role="group">
-						<input type="radio" class="btn-check" name="employmentType"
-							id="typeAll" checked> <label
-							class="btn btn-outline-primary" for="typeAll">전체</label> <input
-							type="radio" class="btn-check" name="employmentType"
-							id="typeRegular"> <label class="btn btn-outline-primary"
-							for="typeRegular">정규직</label> <input type="radio"
-							class="btn-check" name="employmentType" id="typeContract">
-						<label class="btn btn-outline-primary" for="typeContract">계약직</label>
-					</div>
+				    <label class="fw-bold d-block">근무 유형</label>
+				    <div class="btn-group w-100" role="group" id="employmentTypeGroup">
+				    </div>
 				</div>
 
 				<!-- 조회 및 초기화 버튼 (중앙 정렬) -->
@@ -158,129 +136,14 @@
 		</div>
 		
 
-
-		<script th:inline="javascript">
-			document.addEventListener("DOMContentLoaded", function() {
-			});
-			//그리드 선언
-			var Grid = tui.Grid;
-			const dataSource = {
-				api : {
-					readData : {
-						url : 'http://localhost:81/hr/rest/emp/list',
-						method : 'GET',
-						initParams: { page: 1 }
-					},
-				//createData: { url: '/api/createData', method: 'POST' },
-				//updateData: { url: '/api/updateData', method: 'PUT' },
-				//modifyData: { url: 'http://localhost:81/api/board/modifyData', method: 'PUT' },
-				//deleteData: { url: '/api/deleteData', method: 'DELETE' },
-				},
-				contentType : 'application/json',
-			};
-
-			Grid.applyTheme('stripe');
-			//그리드 생성
-			const grid = new Grid({
-				el : document.getElementById('grid'), // 컨테이너 엘리먼트
-				width: "100%", // 그리드 가로 크기를 자동 조정
-				autoWidth: true,  // 컬럼 크기 자동 조정
-				pageOptions : {
-					useClient : false, //페이지 네이션 할꺼면 false // 자동으로 하게할껴면 true
-					perPage : 5, //한페이지에 몇개 보여줄지
-				},
-				
-                rowHeaders: [{
-                    type: 'rowNum',
-                    header: "순번",
-                    width: 50,
-                }],
-
-				//칼럼 정하기
-				columns : [ {
-					header : "사원ID",
-					name : "employeeId",
-					align: "center",
-					width : 100,
-					
-				}, {
-					header : "사원명",
-					name : "employeeName",
-					align: "center",
-					sortable: true,
-					width : 150,
-				}, {
-					header : "부서",
-					name : "departmentName",
-					align: "center",
-					sortable: true,
-					width : 100,
-				}, {
-					header : "직급",
-					name : "position",
-					align: "center",
-					sortable: true,
-					width : 100,
-					formatter: function({value}) {
-                        const positionMap = { "PO001": "사원", "PO002": "대리", "PO003": "과장" };
-                        return positionMap[value] || value;
-                    }
-					
-				}, {
-					header : "재직 상태",
-					name : "status",
-					align: "center",
-					sortable: true,
-					width : 100,
-					formatter: function({value}) {
-                        const statusMap = { "ST001": "재직", "ST002": "휴직", "ST003": "퇴직" };
-                        return statusMap[value] || value;
-                    }
-				}, {
-					header : "근무 유형",
-					name : "employmentType",
-					align: "center",
-					sortable: true,
-					width : 100,
-					formatter: function({value}) {
-                        const employmentMap = { "ET001": "정규직", "ET002": "계약직" };
-                        return employmentMap[value] || value;
-                    }
-				}, {
-					header : "입사일",
-					name : "hireDate",
-					align: "center",
-					sortable: true,
-					width : 150,
-					formatter: function({value}) {
-                        return value ? value.split('T')[0] : '';
-                    }
-				}, {
-					header : "연락처",
-					align: "center",
-					name : "phone",
-					sortable: true,
-					width : 150
-				}, {
-					header : "이메일",
-					name : "email",
-					align: "center",
-					sortable: true,
-					width : 200
-				} ],
-
-				//초기 데이터 뭘로 할지
-				data : dataSource,
-
-				rowHeaders : [ 'checkbox' ],
-
-			});
-			
-
-			
-			
-			
-		</script>
 	</div>
+	
+	
+	<!-- 사원 관리 및 Toast Grid 설정 -->
+	<script src="/js/hr/employee.js"></script>
+	
+	<!-- 공통 코드 관리 -->
+	<script src="/js/hr/common-codes.js"></script>
+		
 </body>
 </html>

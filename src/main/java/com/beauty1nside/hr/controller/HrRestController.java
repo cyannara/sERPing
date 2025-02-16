@@ -1,5 +1,8 @@
 package com.beauty1nside.hr.controller;
 
+import java.util.Map;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -52,6 +55,12 @@ public class HrRestController {
 		Object result = grid.getArray( paging.getPage(), empService.count(dto), empService.list(dto) );
 		return result;
 	}
+	
+    @GetMapping("/emp/common-codes")
+    public ResponseEntity<Map<String, Object>> getCommonCodes() {
+        Map<String, Object> result = empService.getCommonCodes();
+        return ResponseEntity.ok(result);
+    }	
 	
 
 
