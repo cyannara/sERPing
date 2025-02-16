@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+ <!-- =======================================================
+ * 기간 구독 서비스를 결제 할 수 있다
+ * @author 개발팀 표하연
+ * @since 2025.02.17
+ * @version 1.0
+ * @see
+ *
+ * <pre>
+ * << 개정이력(Modification Information) >>
+ *
+ *   수정일      수정자          수정내용
+ *  -------    --------    ---------------------------
+ *  2025.02.17  표하연          최초 생성
+ *
+ *  </pre>
+ ======================================================== -->
+
+<html layout:decorate="~{layouts/layout}"
+      lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<body layout:fragment="content">
+	<div class="container">
+		<h3>구독 결제</h3>
+		<nav class="p-0 m-0">
+			<div class="nav nav-tabs" id="nav-tab" role="tablist">
+				<button class="nav-link border active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-fp" type="button" role="tab" aria-controls="#nav-fp" aria-selected="true">기간구독</button>
+				<button class="nav-link border" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-rg" type="button" role="tab" aria-controls="#nav-rg" aria-selected="false">정기구독</button>
+			</div>
+		</nav>
+		<div class="tab-content border" id="nav-tabContent">
+			<div class="tab-pane fade show active" id="nav-fp" role="tabpanel" aria-labelledby="nav-fp-tab" tabindex="0">
+				기간구독 내용처리 내용 처리
+			</div>
+			<div class="tab-pane fade" id="nav-rg" role="tabpanel" aria-labelledby="nav-rg-tab" tabindex="0">
+				정기구독 내용 처리
+			</div>
+		</div>
+	</div>
+</body>
