@@ -16,14 +16,13 @@
 	*
 	*  </pre>
 ======================================================== -->
-<html xmlns:th="http://www.thymeleaf.org"
-	layout:decorate="~{/erp/layouts/main}">
+<html layout:decorate="~{/erp/layouts/main}">
 
 
 <div class="container w-100 mw-1600" layout:fragment="content">
 	<div class="d-flex flex-column mb-1">
 		<div class="d-flex justify-content-start p-0 mt-2">
-			<h2>회사관리</h2>
+			<h4>회사관리</h4>
 		</div>
 		<!-- 회사 검색 영역 -->
 		<div class="p-2">
@@ -309,8 +308,8 @@
 		var rowData = false;
 		
 		//로그인 처리할때 까지 이건 계속 있어야함
-		let employeeNum = document.querySelector("#employeeNum").value;
-		employeeNum = 1;	//●●● 로그인기능 생기면 지우기 ●●●
+		let employeeNum = employeeInfo.employeeNum;
+		document.querySelector("#employeeNum").value = employeeNum;
 	
 		// 페이지 로드 후 이벤트 바인딩
 		document.addEventListener("DOMContentLoaded", function() {
