@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 /**
- * ERP 회사 관리자 관련 정보 CURD 서비스 Impl
+ * ERP 회사 관리자 관련 정보 CURD 서비스 Impl 
  * @author ERP 관리자 개발팀 표하연
  * @since 2025.02.12
  * @version 1.0
