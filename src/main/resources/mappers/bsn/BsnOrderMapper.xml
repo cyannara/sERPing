@@ -52,5 +52,42 @@ WHERE progress_status = '신청'
 </select>
 
 
+<select id="selectBhfOrderDetail"  resultType="BhfOrderDetailDTO">
+SELECT order_detail_code,
+       order_code,
+       goods_code,
+       goods_name,
+       option_code,
+       option_name,
+       goods_standard,
+       quantity
+FROM (
+SELECT /*+ INDEX_ASC(bhf_order_detail order_detail_code) */ 
+      ROWNUM RN
+      ,order_detail_code,
+       order_code,
+       goods_code,
+       goods_name,
+       option_code,
+       option_name,
+       goods_standard,
+       quantity
+FROM bhf_order_detail
+WHERE  order_code = #{orderCode}
+
+<![CDATA[
+AND ROWNUM <= #{end}
+]]>
+) WHERE RN >= #{start}
+
+ORDER BY order_detail_code
+</select>
+
+<select id="getCountOfBhfOrderDetail" parameterType="BhfOrderDTO" resultType="int">
+SELECT COUNT(*) FROM bhf_order_detail
+WHERE  order_code = #{orderCode}
+
+</select>
+
 
 </mapper>

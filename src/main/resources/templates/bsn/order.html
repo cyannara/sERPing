@@ -161,7 +161,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
                 <p class="card-description">
                   그리드 - 검색한 지점측 발주 신청 리스트 출력
                 </p>
-                
+                <!--  
                 <table class="table table-hover" style="text-align:center;">
                 <thead>
                 	<tr>
@@ -184,7 +184,9 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
                 	</tr>
                 </tbody>
                 </table>
-                
+                -->
+                <div id="orderList"></div>
+			  <div id="pagination" class="tui-pagination"></div>
                 
               </div>
             </div>
@@ -197,12 +199,13 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         	<div class="col-md-9  grid-margin stretch-card">
             <div class="card">
               <div class="card-body">
-                <h4 class="card-title">검색 조건</h4>
+                <h4 class="card-title">발주 상세</h4>
                 <p class="card-description">
                   그리드 - 선택한 발주 신청의 상세(상품) 목록 출력
                 </p>
-                <div id="orderList"></div>
-			  <div id="pagination" class="tui-pagination"></div>
+               	<div id="orderDetailList"></div>
+			    <div id="pagination" class="tui-pagination"></div>
+               
               </div>
               
             </div>
@@ -222,12 +225,15 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 
   <!-- 페이지 내용 끝 -->
 	  <script>
+	  <!--검색창 날짜 비활성 -->
 	  function toggleDateInputs(enable) {
 	      document.getElementById("startDate").disabled = !enable;
 	      document.getElementById("endDate").disabled = !enable;
 	      
 	     
 	    }
+	  <!-- 그리드 사용 -->
+	  
 	  
 	  var Grid = tui.Grid;
 		
@@ -241,11 +247,11 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		const grid = new Grid({
 				el: document.getElementById('orderList'), // 컨테이너 엘리먼트
 				pageOptions: {
-				useClient: true,
-				perPage: 5,
+				useClient: false,
+				perPage: 10,
 			},
 			columns: [ 
-				{ header : "상품코드", name : "orderCode"},
+				{ header : "주문코드", name : "orderCode"},
 				{ header : "지점코드", name : "branchOfficeId"},
 				{ header : "주문일", name : "orderDate"},
 				{ header : "납기일", name : "dueDate"},
@@ -255,6 +261,63 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 			data: dataSource
 		});
 	  
+		function changeDisplay() {
+		    let gap = parseInt(document.querySelector('#perPageSelect').value); // perPage 값을 가져옴
+		    grid.setPerPage(gap);
+		}
+
+		
+		<!-- 발주를 선택하면 선택한 주문 코드로 상세 정보 로드 -->
+		grid.on('click', (ev) => {
+			const selectedRow = grid.getRow(ev.rowKey);
+		    if (selectedRow && selectedRow.orderCode) { // orderCode가 존재하는지 확인
+		        loadOrderDetails(selectedRow.orderCode);
+		        console.log("선택된 주문 코드:", selectedRow.orderCode);
+		    } else {
+		        console.warn("선택된 주문 코드가 없습니다.");
+		    }
+		});
+		
+		function loadOrderDetails(orderCode) {
+		    if (!orderCode) {
+		        console.warn("유효하지 않은 주문 코드입니다.");
+		        return;
+		    }
+
+		    fetch(`http://localhost:81/bsn/rest/order/detail?orderCode=${orderCode}&perPage=5&page=1`)
+		        .then(response => {
+		            if (!response.ok) throw new Error(`HTTP 오류! 상태: ${response.status}`);
+		            return response.json();
+		        })
+		        .then(data => {
+		            if (data && data.data && data.data.contents) {
+		                detailGrid.resetData(data.data.contents);
+		            } else {
+		                console.warn("상세 데이터가 없습니다.");
+		                detailGrid.resetData([]); // 빈 배열로 초기화
+		            }
+		        })
+		        .catch(error => console.error('Error:', error));
+		}
+
+		
+		
+		const detailGrid = new Grid({
+		    el: document.getElementById('orderDetailList'),
+		    pageOptions: {
+		        useClient: false,
+		        perPage: 5,
+		    },
+		    columns: [
+		        { header: "발주상세코드", name: "orderDetailCode" },
+		        { header: "상품번호", name: "goodsCode" },
+		        { header: "상품이름", name: "goodsName" },
+		        { header: "옵션명", name: "optionName" },
+		        { header: "규격", name: "goodsStandard" },
+		        { header: "수량", name: "quantity" },
+		    ]
+		});
+
 	  </script>
 
 
