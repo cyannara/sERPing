@@ -39,6 +39,26 @@ public class productServiceImpl implements productService{
 	public int brandcount(ProductSearchDTO dto) {
 		return productMapper.brandcount(dto);
 	}
+
+	@Override
+	public List<ProductDTO> getVendorlist(ProductSearchDTO dto) {
+		return productMapper.vendorlist(dto);
+	}
+
+	@Override
+	public int vendorcount(ProductSearchDTO dto) {
+		return productMapper.vendorcount(dto);
+	}
+
+	@Override
+	public List<ProductDTO> getWarehouselist(ProductSearchDTO dto) {
+		return productMapper.warehouselist(dto);
+	}
+
+	@Override
+	public int warehousecount(ProductSearchDTO dto) {
+		return productMapper.warehousecount(dto);
+	}
 	
 
 }

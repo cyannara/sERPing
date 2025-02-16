@@ -35,13 +35,13 @@
 			<div class="row 2row">
 				<div class="col-1"></div>
 				<div class="col-5 row ">
-					<span class="label-search col-4">브랜드명</span>
-					<input type="text" name="brandName" id="searchBrandName" class="form-control">
+					<span class="label-search col-4">창고명</span>
+					<input type="text" name="warehouseName" id="searchWarehouseName" class="form-control">
 				</div>
 				<div class="col-1"></div>
 				<div class="col-5 row ">
 					<span class="label-search col-4">표시수량</span>
-					<select name="display_amount" id="brand_display_amount" class="form-control" onchange="changeDisplay()">
+					<select name="warehouse_display_amount" id="warehouse_display_amount" class="form-control" onchange="changeWarehouseDisplay()">
 						<option value="5" selected>5</option>
 						<option value="10">10</option>
 						<option value="20">20</option>
@@ -52,7 +52,7 @@
 			</div>
 			<div class="row 3row mt-3 mb-3">
 				<div class="col-4"></div>
-				<button type="button" class="btn btn-primary col-1" onclick="brandSearch()">검색</button>
+				<button type="button" class="btn btn-primary col-1" onclick="warehouseSearch()">검색</button>
 				<div class="col-1"></div>
 				<button type="button" class="btn btn-secondary col-1" onclick="reset()">초기화</button>
 			</div>
@@ -60,7 +60,7 @@
 		</div>
 		<!-- 그리드 -->
 		<div id="table-container">
-			<div id="brandGrid"></div>
+			<div id="warehouseGrid"></div>
 			<div id="pagination" class="tui-pagination"></div>
 		</div>
     
@@ -68,9 +68,9 @@
 
 <script>
 
-const brandDataSource = {
+const warehouseDataSource = {
 		api:{
-			readData: { url:'http://localhost:81/purchs/rest/brand/list', 
+			readData: { url:'http://localhost:81/purchs/rest/warehouse/list', 
 						method: 'GET', 
 						initParams: { page: 1 ,perPage: 5},
 						   beforeRequest: function(request) {
@@ -83,44 +83,44 @@ const brandDataSource = {
 		},
 		contentType: 'application/json'
 }
-const brandGrid = new tui.Grid({
-	el : document.querySelector('#brandGrid'),
+const warehouseGrid = new tui.Grid({
+	el : document.querySelector('#warehouseGrid'),
 	pageOptions: {
 		useClient : false,
 		perPage: 5,
 	},
 	columns: [
-		{ header : "브랜드코드", name : "brandCode",  sortable : true},
-		{ header : "브랜드명", name : "brandName" , sortable : true}
+		{ header : "창고번호", name : "warehouseId",  sortable : true},
+		{ header : "창고명", name : "warehouseName" , sortable : true}
 	],
-	data : brandDataSource,
+	data : warehouseDataSource,
 });
 
-function changeDisplay() {
-	let gap = parseInt(document.querySelector('#brand_display_amount').value);
-	brandGrid.setPerPage(gap, brandDataSource)
-	brandGrid.readData(); // 데이터 다시 불러오기
+function changeWarehouseDisplay() {
+	let gap = parseInt(document.querySelector('#warehouse_display_amount').value);
+	warehouseGrid.setPerPage(gap, brandDataSource)
+	warehouseGrid.readData(); // 데이터 다시 불러오기
 }
 
 
-function brandSearch(){
-	let brandName = document.querySelector('#searchBrandName').value;
-	console.log("검색어==",brandName);
-	brandGrid.setRequestParams({"brandName" : brandName})
-	brandGrid.readData();
+function warehouseSearch(){
+	let brawarehouseNamendName = document.querySelector('#searchwarehouseName').value;
+	console.log("검색어==",warehouseName);
+	warehouseGrid.setRequestParams({"warehouseName" : warehouseName})
+	warehouseGrid.readData();
 }
 
 	//선택된 내용 을 세션에 잠시 저장 하고 다른 html 파일로 넘어갈때 정보를 저장 하고 있다 -> 그 후 다시 불러오기
-	brandGrid.on('click', (ev) => {
+	warehouseGrid.on('click', (ev) => {
 	    const rowKey = ev.rowKey;
-	    const rowData = brandGrid.getRow(rowKey); 
+	    const rowData = warehouseGrid.getRow(rowKey); 
 	    console.log("선택된 행 데이터:", rowData);
 	
 	    // 세션 스토리지에 데이터 저장
-	    sessionStorage.setItem("selectedBrandId", rowData.brandId);
-	    sessionStorage.setItem("selectedBrandName", rowData.brandName);
+	    sessionStorage.setItem("selectedWarehouseId", rowData.warehouseId);
+	    sessionStorage.setItem("selectedWarehouseName", rowData.warehouseName);
 	    
-	    console.log("보낼 데이터 ==",rowData.brandId,rowData.brandName);
+	    console.log("보낼 데이터 ==",rowData.warehouseId,rowData.warehouseName);
 	 
 	
 	});
