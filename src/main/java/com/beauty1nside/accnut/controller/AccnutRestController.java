@@ -8,10 +8,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.beauty1nside.accnut.dto.AssetSearchDTO;
 import com.beauty1nside.accnut.dto.DealBookSearchDTO;
 import com.beauty1nside.accnut.dto.DebtSearchDTO;
+import com.beauty1nside.accnut.dto.EtcBookSearchDTO;
+import com.beauty1nside.accnut.dto.IncidentalCostSearchDTO;
 import com.beauty1nside.accnut.dto.SalaryBookSearchDTO;
 import com.beauty1nside.accnut.service.AssetService;
 import com.beauty1nside.accnut.service.DealBookService;
 import com.beauty1nside.accnut.service.DebtService;
+import com.beauty1nside.accnut.service.EtcBookService;
+import com.beauty1nside.accnut.service.IncidentalCostService;
 import com.beauty1nside.accnut.service.SalaryBookService;
 import com.beauty1nside.common.GridArray;
 import com.beauty1nside.common.Paging;
@@ -31,10 +35,12 @@ public class AccnutRestController {
 	final DebtService debtService;
 	final DealBookService dealBookService;
 	final SalaryBookService salaryBookService;
+	final EtcBookService etcBookService;
+	final IncidentalCostService incidentalCostService;
 	
 	
 	@GetMapping("/asset/list")
-	public Object assetList(@RequestParam(name = "perPage", defaultValue = "2", required = false) int perPage, 
+	public Object assetList(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage, 
 			@RequestParam(name = "page", defaultValue = "1", required = false) int page, 
 			AssetSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
 		// 페이징 유닛 수
@@ -57,7 +63,7 @@ public class AccnutRestController {
 	}
 	
 	@GetMapping("/debt/list")
-	public Object debtList(@RequestParam(name = "perPage", defaultValue = "2", required = false) int perPage, 
+	public Object debtList(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage, 
 			@RequestParam(name = "page", defaultValue = "1", required = false) int page, 
 			DebtSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
 		// 페이징 유닛 수
@@ -80,7 +86,7 @@ public class AccnutRestController {
 	}
 	
 	@GetMapping("/book/list")
-	public Object dealBookList(@RequestParam(name = "perPage", defaultValue = "2", required = false) int perPage, 
+	public Object dealBookList(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage, 
 			@RequestParam(name = "page", defaultValue = "1", required = false) int page, 
 			DealBookSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
 		// 페이징 유닛 수
@@ -103,7 +109,7 @@ public class AccnutRestController {
 	}
 	
 	@GetMapping("/salary/list")
-	public Object salaryBookList(@RequestParam(name = "perPage", defaultValue = "2", required = false) int perPage, 
+	public Object salaryBookList(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage, 
 			@RequestParam(name = "page", defaultValue = "1", required = false) int page, 
 			SalaryBookSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
 		// 페이징 유닛 수
@@ -122,6 +128,52 @@ public class AccnutRestController {
 		// grid 배열 처리
 		GridArray grid = new GridArray();
 		Object result = grid.getArray( paging.getPage(), salaryBookService.count(dto), salaryBookService.list(dto) );
+		return result;
+	}
+	
+	@GetMapping("/etc/list")
+	public Object etcBookList(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage, 
+			@RequestParam(name = "page", defaultValue = "1", required = false) int page, 
+			EtcBookSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
+		// 페이징 유닛 수
+		paging.setPageUnit(perPage);
+		paging.setPage(page);
+		
+		log.info(dto);
+		
+		// 페이징 조건
+		dto.setStart(paging.getFirst());
+		dto.setEnd(paging.getLast());
+		
+		// 페이징 처리
+		paging.setTotalRecord(etcBookService.count(dto));
+		
+		// grid 배열 처리
+		GridArray grid = new GridArray();
+		Object result = grid.getArray( paging.getPage(), etcBookService.count(dto), etcBookService.list(dto) );
+		return result;
+	}
+	
+	@GetMapping("/incidental/list")
+	public Object incidentalList(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage, 
+			@RequestParam(name = "page", defaultValue = "1", required = false) int page, 
+			IncidentalCostSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
+		// 페이징 유닛 수
+		paging.setPageUnit(perPage);
+		paging.setPage(page);
+		
+		log.info(dto);
+		
+		// 페이징 조건
+		dto.setStart(paging.getFirst());
+		dto.setEnd(paging.getLast());
+		
+		// 페이징 처리
+		paging.setTotalRecord(incidentalCostService.count(dto));
+		
+		// grid 배열 처리
+		GridArray grid = new GridArray();
+		Object result = grid.getArray( paging.getPage(), incidentalCostService.count(dto), incidentalCostService.list(dto) );
 		return result;
 	}
 	

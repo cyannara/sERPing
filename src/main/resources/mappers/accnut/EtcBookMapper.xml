@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beauty1nside.accnut.mapper.EtcBookMapper">
+	<select id="info" resultType="com.beauty1nside.accnut.dto.EtcBookDTO">
+		SELECT etc_payment_code, section, department, time_limit, amount, payment_alternative, giro_num, company_num
+		FROM accnut_etc_payment
+		WHERE etc_payment_code = #{etcPaymentCode}
+	</select>
+	
+	<select id="list" resultType="com.beauty1nside.accnut.dto.EtcBookDTO" parameterType="com.beauty1nside.accnut.dto.EtcBookSearchDTO">
+		SELECT etc_payment_code, section, department, time_limit, amount, payment_alternative, giro_num, company_num
+		FROM (SELECT /*+INDEX_DESC(accnut_etc_payment pk_accnut_etc_payment)*/ rownum rn, etc_payment_code, fn_get_cmmn_name(section) as section, department, time_limit, amount, payment_alternative, giro_num, company_num
+			  FROM accnut_etc_payment
+		<![CDATA[
+			  WHERE rownum <= #{end}
+			  AND
+		]]>
+		<include refid="searchInfo"></include>
+		)
+		WHERE rn >= #{start}
+	</select>
+
+	<select id="count" parameterType="com.beauty1nside.accnut.dto.EtcBookSearchDTO">
+		SELECT COUNT(etc_payment_code)
+		FROM accnut_etc_payment
+		<where>
+			<include refid="searchInfo"></include>
+		</where>
+	</select>
+
+	<sql id="searchInfo">
+		company_num = #{companyNum}
+		<if test="section != null and ! section.equals('') ">
+			AND section = #{section}
+		</if>
+		<if test="timeLimit != null and ! timeLimit.equals('')">
+			AND TO_CHAR(time_limit, 'yyyy-mm-dd') = #{timeLimit}
+		</if>
+	</sql>
+
+
+
+
+</mapper>

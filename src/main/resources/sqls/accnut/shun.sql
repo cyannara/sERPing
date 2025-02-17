@@ -177,3 +177,34 @@ select * from accnut_salary_account_book;
 
 select * from accnut_debt where section = 'AC08';
 commit;
+
+-- 2025-02-17
+
+create sequence accnut_salary_book_seq;
+
+SELECT * FROM accnut_salary_account_book;
+insert into accnut_salary_account_book(SALARY_ACCOUNT_BOOK_CODE, EMPLOYEE_CODE, EMPLOYEE_NAME, SALARY, PAYMENT_AMOUNT, PAYMENT_ALTERNATIVE)
+values(ACCNUT_SALARY_BOOK_SEQ.nextval, 'emp003', '홍길동',5000, 5000, 'PY02');
+
+
+SELECT lower(column_name)  as "컬럼명", data_type, nullable FROM COLS where  lower(table_name) = 'accnut_incidental_cost' order by column_id;
+
+
+select * from accnut_etc_payment;
+
+INSERT INTO accnut_etc_payment(ETC_PAYMENT_CODE, SECTION, TIME_LIMIT, AMOUNT, PAYMENT_ALTERNATIVE, COMPANY_NUM)
+VALUES (ACCNUT_ETC_PAYMENT_SEQ.nextval, 'AC20', sysdate, 5000, 'PY01', 0);
+
+CREATE SEQUENCE accnut_etc_payment_seq;
+
+select * from cmmn where upper_cmmn_code like 'CA';
+select * from cmmn where cmmn_name like '%처리%';
+
+insert into cmmn(cmmn_code , upper_cmmn_code, cmmn_name)
+values ('AC26', 'AC', '운영비');
+commit;
+
+create sequence accnut_incidental_seq;
+
+insert into accnut_incidental_cost(incidental_cost_code, section, card_num, amount, register_date, process_alternative, company_num)
+values( ACCNUT_INCIDENTAL_SEQ.nextval, 'CA02', '123456789' , 1000, sysdate, 'PC01', 0)
