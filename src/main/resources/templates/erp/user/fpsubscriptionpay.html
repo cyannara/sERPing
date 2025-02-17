@@ -96,7 +96,7 @@
 						    </tr>
 						</table>
 		
-		                <div class="section-title">▷ 추가 서비스</div>
+		                <div class="section-title addService">▷ 추가 서비스</div>
 		                <table>
 						    <tr>
 						        <th>서비스명</th>
@@ -200,14 +200,12 @@
 					                <select class="select-box" id="payment-method">
 					                    <option value="카드결제">카드결제</option>
 					                    <option value="계좌이체">계좌이체</option>
-					                    <option value="카카오페이">카카오페이</option>
-					                    <option value="네이버페이">네이버페이</option>
 					                </select>
 					            </th>
 					        </tr>
 					        <tr>
 					            <th>총 결제금액</th>
-					            <td class="total-price">9,000,000원</td>
+					            <td class="total-price">0원</td>
 					        </tr>
 					        <tr>
 					            <td colspan="2"><button class="periodpaygo">결제</button></td>
@@ -222,19 +220,13 @@
             </div>
         </div>
     </div>
-
     <!-- JavaScript -->
     <script th:inline="javascript">
         setTimeout(async () => {
             console.log("여기는 사용하는곳:", window.subscriptionState);
             
             //구독기간에 맞게 가격 다 변경시켜 주겠어
-/*             group-sub-50
-			group-sub-100
-			group-sub-limit
-			hr-sub-custom
-			branch-sub-custom
-			account-sub-custom */
+            remake_date(0);
             
             //기간 구독 결제 서비스 관련
             let tag = "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp";
@@ -264,6 +256,11 @@
             document.querySelector(".subgroup").insertAdjacentHTML("beforeend", tag);
             console.log(tag);
             
+          //인사, 지점, 회계 서비스 현황
+          tag = "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp";
+          tag += `[인사관리 : ${window.subscriptionState.hrObjdate}일 / 지점관리 : ${window.subscriptionState.pointObjdate}일 / 회계관리 : ${window.subscriptionState.accountObjdate}일] 남았습니다.`;
+          document.querySelector(".addService").insertAdjacentHTML("beforeend", tag);
+            
         }, 500);
         
         async function hr_list(data){
@@ -282,86 +279,187 @@
         	})
         }
         
-        
-        
-        
-        
-        
-        
-        document.addEventListener("DOMContentLoaded", function () {
-            // 모든 ERP 구독 라디오 버튼 가져오기
-            const erpRadios = document.querySelectorAll('input[name="erp-subscription"]');
-            // 각 라디오 버튼에 이벤트 리스너 추가
-            erpRadios.forEach(radio => {
-                radio.addEventListener("change", function () {
-                    if (this.checked) {
-                        let selectedValue = this.value;  // EC001, EC002 등
-                        let selectedPrice = this.parentElement.textContent.trim();  // 가격 텍스트 가져오기
-                        
-                        console.log("선택한 구독:", selectedValue);
-                        console.log("가격:", selectedPrice);
+     // 구독기간에 맞게 가격을 변경
+        function remake_date(redate) {
+            let newdate = window.subscriptionState.subObjdate + redate;
+            //가격 변경 대상 및 배수 설정
+            const elementsToUpdate = [
+                { selector: "#group-sub-100", multiplier: 1000 },
+                { selector: "#group-sub-limit", multiplier: 2000 },
+                { selector: "#hr-sub-custom", multiplier: 500 },
+                { selector: "#branch-sub-custom", multiplier: 500 },
+                { selector: "#account-sub-custom", multiplier: 500 }
+            ];
+
+            elementsToUpdate.forEach(({ selector, multiplier }) => {
+                let element = document.querySelector(selector);
+                if (element) {
+                    let parentLabel = element.parentElement;
+                    let labelHTML = parentLabel.innerHTML;
+
+                    // 정규식을 사용하여 모든 가격(숫자 + "원")을 찾아 새로운 가격으로 변경
+                    let updatedHTML = labelHTML.replace(/\d{1,3}(,\d{3})*원/g, (newdate * multiplier).toLocaleString() + "원");
+
+                    // 변경된 HTML을 다시 적용
+                    parentLabel.innerHTML = updatedHTML;
+                }
+            });
+            // 라디오 버튼 표시 설정 (단일 forEach 루프 사용으로 중복 제거)
+            const radioGroups = [
+                { minDays: 30, selectors: ["#hr-sub-30", "#branch-sub-30", "#account-sub-30"] },
+                { minDays: 90, selectors: ["#hr-sub-90", "#branch-sub-90", "#account-sub-90"] },
+                { minDays: 180, selectors: ["#hr-sub-180", "#branch-sub-180", "#account-sub-180"] },
+                { minDays: 360, selectors: ["#hr-sub-360", "#branch-sub-360", "#account-sub-360"] }
+            ];
+            radioGroups.forEach(({ minDays, selectors }) => {
+                selectors.forEach(selector => {
+                    let element = document.querySelector(selector);
+                    if (element) {
+                        let label = element.closest("label"); // input을 감싸는 label 요소 찾기
+                        if (label) {
+                            label.style.display = newdate < minDays ? "none" : "inline-block"; // label을 직접 숨기거나 표시
+                        }
                     }
                 });
             });
-            // 모든 ERP 구독 라디오 버튼 가져오기
-            const groupRadios = document.querySelectorAll('input[name="group-subscription"]');
-            // 각 라디오 버튼에 이벤트 리스너 추가
-            groupRadios.forEach(radio => {
-                radio.addEventListener("change", function () {
-                    if (this.checked) {
-                        let selectedValue = this.value;  // EC001, EC002 등
-                        let selectedPrice = this.parentElement.textContent.trim();  // 가격 텍스트 가져오기
-                        
-                        console.log("선택한 구독:", selectedValue);
-                        console.log("가격:", selectedPrice);
-                    }
-                });
-            });
-            // 모든 ERP 구독 라디오 버튼 가져오기
-            const hrRadios = document.querySelectorAll('input[name="hr-subscription"]');
-            // 각 라디오 버튼에 이벤트 리스너 추가
-            hrRadios.forEach(radio => {
-                radio.addEventListener("change", function () {
-                    if (this.checked) {
-                        let selectedValue = this.value;  // EC001, EC002 등
-                        let selectedPrice = this.parentElement.textContent.trim();  // 가격 텍스트 가져오기
-                        
-                        console.log("선택한 구독:", selectedValue);
-                        console.log("가격:", selectedPrice);
-                    }
-                });
-            });
-            // 모든 ERP 구독 라디오 버튼 가져오기
-            const branchRadios = document.querySelectorAll('input[name="branch-subscription"]');
-            // 각 라디오 버튼에 이벤트 리스너 추가
-            branchRadios.forEach(radio => {
-                radio.addEventListener("change", function () {
-                    if (this.checked) {
-                        let selectedValue = this.value;  // EC001, EC002 등
-                        let selectedPrice = this.parentElement.textContent.trim();  // 가격 텍스트 가져오기
-                        
-                        console.log("선택한 구독:", selectedValue);
-                        console.log("가격:", selectedPrice);
-                    }
-                });
-            });
-            // 모든 ERP 구독 라디오 버튼 가져오기
-            const accountRadios = document.querySelectorAll('input[name="account-subscription"]');
-            // 각 라디오 버튼에 이벤트 리스너 추가
-            accountRadios.forEach(radio => {
-                radio.addEventListener("change", function () {
-                    if (this.checked) {
-                        let selectedValue = this.value;  // EC001, EC002 등
-                        let selectedPrice = this.parentElement.textContent.trim();  // 가격 텍스트 가져오기
-                        
-                        console.log("선택한 구독:", selectedValue);
-                        console.log("가격:", selectedPrice);
-                    }
-                });
-            });
-        });
+        }
         
+		document.addEventListener("DOMContentLoaded", function () {
+		    document.addEventListener("change", function (event) {
+		        let target = event.target;
+	
+		        if (target.matches('input[name="erp-subscription"], input[name="group-subscription"], input[name="hr-subscription"], input[name="branch-subscription"], input[name="account-subscription"]')) {
+		        	if (target.matches('input[name="erp-subscription"]')) {
+		        	    const daysMap = { 1: 30, 2: 90, 3: 180, 4: 360 };
+		        	    const selectedDays = daysMap[target.value] || 0;
+		        	    remake_date(selectedDays);
+		        	}
+		        	if (target.checked) {
+		                let selectedValue = target.value; // 선택한 값
+		                let selectedPrice = target.parentElement.textContent.trim(); // 가격 텍스트 가져오기
+	
+		                console.log("선택한 구독:", selectedValue);
+		                console.log("가격:", selectedPrice);
+		                
+		                updateSubscriptionSummary();
+		            }
+		        }
+		    });
+		});
+		/**
+		 * 선택한 구독 옵션을 모아서 콘솔에 출력하는 함수
+		 */
+		function updateSubscriptionSummary() {
+		    let selectedValues = [];
+		    let totalPrice = 0;
+
+		    // 모든 체크된 라디오 버튼 가져오기
+		    const checkedRadios = document.querySelectorAll('input[type="radio"]:checked');
+
+		    checkedRadios.forEach(radio => {
+		        let value = radio.value; // 선택된 value 값
+		        let priceText = radio.parentElement.textContent.trim().replace(/[^0-9]/g, ""); // 가격 추출 (숫자만 남김)
+		        let price = parseInt(priceText, 10) || 0; // 숫자로 변환
+
+		        selectedValues.push(value);
+		        totalPrice += price;
+		    });
+
+		    // 3자리마다 콤마 추가하여 출력
+		    let formattedTotalPrice = totalPrice.toLocaleString() + "원";
+
+		    console.log("총 선택한 구독 value:", selectedValues.join("_"));
+		    console.log("총 결제 금액:", formattedTotalPrice);
+		    document.querySelector(".total-price").innerText = formattedTotalPrice;
+		}
+		
+		//결제처리
+		/* document.querySelector(".periodpaygo").addEventListener("click", function(){
+			console.log(document.querySelector("#payment-method").value);
+			if(document.querySelector("#payment-method").value == "카드결제"){
+				//결제모듈 활성화
+				var INIStdPay = new INIStdPay();
+			    INIStdPay.pay({
+			        mid: "INIpayTest",  // 테스트 MID
+			        oid: "TEST_ORDER_12345", // 테스트용 주문번호
+			        price: 1000, // 테스트 결제 금액
+			        goodName: "테스트 상품",
+			        buyerName: "홍길동",
+			        buyerTel: "01012345678",
+			        buyerEmail: "test@example.com",
+			        returnUrl: "https://yourdomain.com/payment/success",
+			        closeUrl: "https://yourdomain.com/payment/fail"
+			    });
+			}
+		}); */
     </script>
+    
+<!-- KG이니시스 표준 결제 JavaScript SDK -->
+<script src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
+
+<script>
+document.querySelector(".periodpaygo").addEventListener("click", async function () {
+    console.log(document.querySelector("#payment-method").value);
+
+    if (document.querySelector("#payment-method").value == "카드결제") {
+        // ✅ 현재 선택된 구독 옵션 가져오기
+        let selectedValues = [];
+        let totalPrice = 0;
+        // 모든 체크된 라디오 버튼 가져오기
+        const checkedRadios = document.querySelectorAll('input[type="radio"]:checked');
+        checkedRadios.forEach(radio => {
+            let value = radio.value; // 선택된 value 값
+            let priceText = radio.parentElement.textContent.trim().replace(/[^0-9]/g, ""); // 가격 추출 (숫자만 남김)
+            let price = parseInt(priceText, 10) || 0; // 숫자로 변환
+            selectedValues.push(value);
+            totalPrice += price;
+        });
+        // ✅ 주문번호 및 결제 금액 설정
+        let orderId = selectedValues.join("_"); // 주문번호 설정
+        let formattedTotalPrice = totalPrice.toLocaleString(); // 결제 금액 3자리마다 콤마 추가
+        console.log("🚀 주문번호:", orderId);
+        console.log("💰 결제 금액:", formattedTotalPrice);
+        
+     	// ✅ 백엔드에서 API 키 가져오기
+        let response = await fetch("/erp/rest/get-imp-key");
+        let data = await response.json();
+        if (!data || !data.impKey) {
+            console.error("API 키를 가져오지 못했습니다.");
+            return;
+        }
+
+        // ✅ 이니시스 결제 요청 실행
+        IMP.init(data.impKey); // 고객사 식별코드 사용
+        IMP.request_pay({
+            pg: "html5_inicis.INIpayTest", // KG이니시스 테스트용 PG사
+            pay_method: "card", // 결제 방식
+            merchant_uid: orderId, // 주문번호 (선택한 구독 옵션 value 조합)
+            name: "기간 구독서비스", // 결제 상품명
+            amount: 1, // 결제 금액 (formattedTotalPrice 사용하지 않고 정수로 전달)
+            buyer_email: "test@example.com",
+            buyer_name: "홍길동",
+            buyer_tel: "01012345678",
+            buyer_addr: "서울특별시 강남구",
+            buyer_postcode: "12345"
+        }, function (rsp) {
+            if (rsp.success) {
+                console.log("✅ 결제 성공:", rsp);
+                console.log("결제가 완료되었습니다! 주문번호: " + rsp.merchant_uid+" "+orderId+" "+formattedTotalPrice+"원");
+            } else {
+                console.log("❌ 결제 실패:", rsp);
+                console.log("결제가 실패했습니다. 오류 메시지: " + rsp.error_msg+" "+orderId+" "+formattedTotalPrice+"원");
+            }
+        });
+    }
+});
+
+
+</script>
+
+
+
+    
+    
 	<style>
         table {
             width: 100%;
