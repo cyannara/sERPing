@@ -13,6 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class MainpageController {
   @GetMapping("/approval")
   public String mainpage() {
-    return "mainpage";
+    return "mainpage/mainpage";
   }
 }

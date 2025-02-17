@@ -31,19 +31,19 @@
 				document_id,
 				employee_num,
 				in_approval_request_date,
-				fn_get_cmmn_name(in_approval_status) as in_approval_status,
+				in_approval_status,
 				in_approval_request_content,
 				in_approval_rejected_content,
 				in_approval_file_path,
 				company_num
 		FROM grpwr_in_approval
 		<![CDATA[
-		      WHERE rownum <= #{end} 
+		      WHERE rownum <= #{dto.end}
 		      AND 
 		]]>
 		<include refid="searchInfo"></include>
 			  ) 
-		WHERE rn >= #{start}
+		WHERE rn >= #{dto.start}
 	</select>
 	<select id="count">
 		SELECT COUNT(in_approval_id)
@@ -55,8 +55,8 @@
 	</select>
 	<sql id="searchInfo">
 		company_num LIKE '%' || #{companyNum} || '%'
-		<if test="inApprovalStatus != null and ! inApprovalStatus.equals('')">
-			AND in_approval_status Like '%' || #{inApprovalStatus} || '%'
+		<if test="dto.inApprovalStatus != null and ! dto.inApprovalStatus.equals('')">
+			AND in_approval_status Like '%' || #{dto.inApprovalStatus} || '%'
 		</if>
 	</sql>
 </mapper>
