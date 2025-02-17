@@ -41,11 +41,11 @@ public class BhfOrderTest {
 		System.out.println(list);
 	}
 	
-	@Test
-	public void optionListTest() {
-		String goodsCode = "LH001";
-		List<BhfGoodsOpDTO> list = mapper.optionList(goodsCode);
-		System.out.println(list);
-	}
+//	@Test
+//	public void optionListTest() {
+//		String goodsCode = "LH001";
+//		List<BhfGoodsOpDTO> list = mapper.optionList(goodsCode);
+//		System.out.println(list);
+//	}
 	
 }

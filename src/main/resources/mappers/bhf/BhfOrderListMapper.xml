@@ -80,4 +80,12 @@
 		where rn >= #{start}
 	</select>
 	
+	<!-- 발주서 취소 -->
+	<update id="orderCancel" parameterType="BhfOrdCancelDTO">
+		update bhf_order
+		set    progress_status = '취소', 
+			   order_cancel_reason = #{orderCancelReason}
+		where  order_code = #{orderCode}
+	</update>
+	
 </mapper>

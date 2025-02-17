@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.beauty1nside.bhf.dto.goodsorderlist.BhfOrdCancelDTO;
 import com.beauty1nside.bhf.dto.goodsorderlist.BhfOrdListDTO;
 import com.beauty1nside.bhf.dto.goodsorderlist.BhfOrdListSearchDTO;
 import com.beauty1nside.bhf.mapper.BhfOrderListMapper;
@@ -32,6 +33,12 @@ public class BhfOrderListServiceImpl implements BhfOrderListService {
 	public List<BhfOrdListDTO> orderDetailList(BhfOrdListSearchDTO dto) {
 		
 		return mapper.orderDetailList(dto);
+	}
+
+	@Override
+	public boolean orderCancel(BhfOrdCancelDTO dto) {
+		
+		return mapper.orderCancel(dto) == 1 ? true : false;
 	}
 
 }
