@@ -26,16 +26,21 @@ public class ProductDTO {
 	private int classificationId;
 	
 	private Long brandId;
+	private String brandCode;
 	private String brandName;
 	
 	private Long employeeNum;
+	
 	private Long vendorId;
+	private String vendorName;
 	
 	
 	//옵션
 	private String optionCode;
 	private String optionName;
 	private int optionSafetyInvoice;
+	
+	private Long warehouseId;
 	private String warehouseName;
 	
 

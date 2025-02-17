@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- =======================================================
+	* ERP회사 사원의 로그인을 처리한다
+	* @author ERP 관리자 개발팀 표하연
+	* @since 2025.02.16
+	* @version 1.0
+	* @see
+	*
+	* <pre>
+	* << 개정이력(Modification Information) >>
+	*
+	*   수정일      수정자          수정내용
+	*  ======    =======    ==============================
+	*  2025.02.16  표하연          최초생성
+	*
+	*  </pre>
+======================================================== -->
+<mapper namespace="com.beauty1nside.erp.mapper.ErpAdminLoginMapper">
+
+	<!-- 
+     * 신규회사 등록시 회사 코드 중복 확인
+     *
+     * @param String
+     * @return ErpEmployeeDTO
+	-->
+	<select id="loginConfig" resultType="ErpEmployeeDTO">
+		select *
+		from erp_employees
+		where employee_id = #{employeeId}
+	</select>
+	
+</mapper>

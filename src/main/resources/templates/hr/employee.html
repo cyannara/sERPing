@@ -67,8 +67,9 @@
 						<select class="form-select me-2" style="width: 120px;"
 							id="searchCategory">
 							<option value="전체">전체</option>
-							<option value="이름">이름</option>
-							<option value="부서">부서</option>
+							<option value="employeeName">사원명</option>
+							<option value="employeeId">사원ID</option>
+							<option value="phone">연락처</option>
 						</select> <input type="text" class="form-control" style="width: 250px;"
 							placeholder="검색어 입력">
 					</div>
@@ -130,9 +131,9 @@
 
 				<!-- 조회 및 초기화 버튼 (중앙 정렬) -->
 				<div class="w-100 text-center mt-3">
-					<button class="btn btn-primary me-2" onclick="searchEmployees()">🔍
+					<button class="btn btn-primary me-2" onclick="searchEmployees()">
 						조회</button>
-					<button class="btn btn-outline-success" onclick="resetFilters()">🔄
+					<button class="btn btn-outline-success" onclick="resetFilters()">
 						초기화</button>
 				</div>
 			</div>
@@ -147,10 +148,10 @@
 
 			<!-- 버튼 영역 -->
 			<div class="pt-2">
-				<button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#employeeRegisterModal" onclick="openEmployeeForm()">사원
+				<button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#empRegisterModal" onclick="openEmployeeForm()">사원
 					등록</button>
-			<!-- ✅ 모달을 다른 HTML에서 불러오기 -->
-			<div th:replace="~{hr/employee_register_modal :: employeeRegisterModal}"></div>
+			<!-- 모달을 다른 HTML에서 불러오기 -->
+			<div th:replace="~{hr/emp_register_modal :: empRegisterModal}"></div>
 
 				<button class="btn btn-danger" onclick="deleteEmployee()">삭제</button>
 			</div>
@@ -162,13 +163,13 @@
 			document.addEventListener("DOMContentLoaded", function() {
 			});
 			//그리드 선언
-			var gridData = [[${employees}]];
 			var Grid = tui.Grid;
 			const dataSource = {
 				api : {
 					readData : {
-						url : '/api/hr/employees',
-						method : 'GET'
+						url : 'http://localhost:81/hr/rest/emp/list',
+						method : 'GET',
+						initParams: { page: 1 }
 					},
 				//createData: { url: '/api/createData', method: 'POST' },
 				//updateData: { url: '/api/updateData', method: 'PUT' },
@@ -269,11 +270,13 @@
 				} ],
 
 				//초기 데이터 뭘로 할지
-				data : gridData,
+				data : dataSource,
 
 				rowHeaders : [ 'checkbox' ],
 
 			});
+			
+
 			
 			
 			

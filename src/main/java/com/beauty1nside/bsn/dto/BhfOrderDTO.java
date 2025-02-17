@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BhfOrderDTO {
+public class BhfOrderDTO extends OrderSearchDTO {
 	private String orderCode;
 	private String  branchOfficeId;
 	private Date orderDate;
