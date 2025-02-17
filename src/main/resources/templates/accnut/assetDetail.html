@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"></head>
+<body>    
+    <div class="container">
+        <div class="row">
+            <span class="col-2">자산 코드</span>
+            <input type="text" class="col-8" id="assetsCode" readonly>
+        </div>
+
+        <div class="row">
+            <span class="col-2">구분</span>
+            <input type="text" class="col-8" id="section" readonly>
+        </div>
+
+        <div class="row">
+            <span class="col-2">자산명</span>
+            <input type="text" class="col-8" id="assetsName" readonly>
+        </div>
+
+        <div class="row">
+            <span class="col-2">소유주</span>
+            <input type="text" class="col-8" id="owner" readonly>
+        </div>
+
+        <div class="row">
+            <span class="col-2">금액</span>
+            <input type="number" class="col-8" id="amount" readonly>
+        </div>
+
+        <div class="row">
+            <span class="col-2">등록일</span>
+            <input type="date" class="col-8" id="registerDate" readonly>
+        </div>
+        
+    </div>
+<script type="text/javascript">
+    // 디테일 모달이 보여질때
+	document.querySelector('#assetdetailModal').addEventListener('shown.bs.modal', (e) => {
+		console.log(e);
+        // 당겨올 데이터가 있을 때
+        if(rowData != []){
+            // 디테일 모달 태그 접근
+            let con = document.querySelector('.modal-body .container');
+
+            let assetsCode =  con.querySelector('#assetsCode');
+            let section = con.querySelector('#section');
+            let assetsName = con.querySelector('#assetsName');
+            let owner = con.querySelector('#owner');
+            let amount = con.querySelector('#amount');
+            let registerDate = con.querySelector('#registerDate');
+
+            // 디테일 모달 값 넣기
+            assetsCode.value = rowData.assetsCode;
+            section.value = rowData.section;
+            assetsName.value = rowData.assetsName;
+            owner.value = rowData.owner;
+            amount.value = rowData.amount;
+            registerDate.value = rowData.registerDate;
+
+
+            let html = "";
+            switch(rowData.section){
+                case '현금' :   console.log('현금');
+                                break;
+                case '통장' :   console.log('통장');
+                html += `<div class="row removeRow">
+                            <span class="col-2">은행</span>
+                            <input type="text" class="col-8" id="financialInstitution" class="removeRow" readonly value="${rowData.financialInstitution}">
+                         </div>
+
+                         <div class="row removeRow">
+                            <span class="col-2">계좌번호</span>
+                            <input type="text" class="col-8" id="financeInformation" readonly value="${rowData.financeInformation}">
+                         </div>
+                    `;
+                    assetsName.closest("div.row").insertAdjacentHTML("afterend", html);
+                                break;
+                case '카드' :   console.log('카드');
+                html += `<div class="row removeRow">
+                            <span class="col-2">카드사</span>
+                            <input type="text" class="col-8" id="financialInstitution" readonly value="${rowData.financialInstitution}">
+                         </div>
+
+                         <div class="row removeRow">
+                            <span class="col-2">카드번호</span>
+                            <input type="text" class="col-8" id="financeInformation" readonly value="${rowData.financeInformation}">
+                         </div>
+                    `;
+                    assetsName.closest("div.row").insertAdjacentHTML("afterend", html);
+                                break;
+                case '비품' :   console.log('비품');
+                html += `<div class="row removeRow">
+                            <span class="col-2">비품 수량</span>
+                            <input type="number" class="col-8" id="quantity" readonly value="${rowData.quantity}">
+                         </div>
+
+                         <div class="row removeRow">
+                            <span class="col-2">비품 금액</span>
+                            <input type="number" class="col-8" id="fixturesAmount" readonly value="${rowData.fixturesAmount}">
+                         </div>
+                    `;
+                    owner.closest("div.row").insertAdjacentHTML("afterend", html);
+                                break;
+                default : break;
+            } //switch
+            html = "";
+        } // if(!rowData)
+    });
+
+    // 디테일 모달이 닫힐 때
+    document.querySelector('#assetdetailModal').addEventListener('hidden.bs.modal', () => {
+        rowData = [];
+        document.querySelectorAll('.removeRow').forEach(div => {
+            div.remove();
+        })
+        //console.log(rowData);
+    });
+
+
+</script>
+</body>
+</html>

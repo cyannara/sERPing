@@ -8,8 +8,8 @@
 	</select>
 
 	<select id="list" resultType="com.beauty1nside.accnut.dto.AssetDTO" parameterType="com.beauty1nside.accnut.dto.AssetSearchDTO">
-		SELECT assets_code, assets_name, section, financial_institution, finance_information, owner, amount, register_date
-		FROM (SELECT /*+INDEX_DESC(accnut_accets pk_accnut_accets)*/ rownum rn, assets_code, assets_name, fn_get_cmmn_name(section) as section, fn_get_cmmn_name(financial_institution) as financial_institution, finance_information, owner, NVL(amount,0) as amount, register_date
+		SELECT assets_code, assets_name, section, financial_institution, finance_information, owner, amount, register_date, quantity, fixtures_amount
+		FROM (SELECT /*+INDEX_DESC(accnut_accets pk_accnut_accets)*/ rownum rn, assets_code, assets_name, fn_get_cmmn_name(section) as section, fn_get_cmmn_name(financial_institution) as financial_institution, finance_information, owner, NVL(amount,0) as amount, register_date, NVL(quantity, 0) as quantity, NVL(fixtures_amount, 0) as fixtures_amount 
 		      FROM accnut_assets
 		<![CDATA[
 		      WHERE rownum <= #{end} 

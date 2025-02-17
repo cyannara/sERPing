@@ -16,13 +16,16 @@
 
 		<!-- 검색창 -->
 		<div class="search-grid">
+			<!-- 검색창 첫줄 -->
 			<div class="row 1row">
 				<div class="col-1"></div>
+				<!-- 자산명 인풋 -->
 				<div class="col-5 row ">
 					<span class="label-search col-4">자산명</span>
 					<input type="text" name="assetsName" id="assetsName" class="col-8 input-box">
 				</div>
 				<div class="col-1"></div>
+				<!-- 구분 인풋 -->
 				<div class="col-5 row ">
 					<span class="label-search col-4">구분</span>
 					<select name="section" id="section" class="col-8 input-box">
@@ -31,13 +34,16 @@
 					</select>
 				</div>
 			</div>
+			<!-- 검색창 두번째 줄 -->
 			<div class="row 2row">
 				<div class="col-1"></div>
+				<!-- 금융기관 인풋 -->
 				<div class="col-5 row ">
 					<span class="label-search col-4">은행 및 카드사</span>
 					<input type="text" name="financialInstitution" id="financialInstitution" class="col-8 input-box">
 				</div>
 				<div class="col-1"></div>
+				<!-- 그리드 표시 수량 인풋 -->
 				<div class="col-5 row ">
 					<span class="label-search col-4">표시수량</span>
 					<select name="display_amount" id="display_amount" class="col-8 input-box" onchange="changeDisplay()">
@@ -49,6 +55,7 @@
 					</select>
 				</div>
 			</div>
+			<!-- 검색 버튼 줄 -->
 			<div class="row 3row">
 				<div class="col-4"></div>
 				<button type="button" class="btn btn-primary col-1" onclick="search()">검색</button>
@@ -62,57 +69,85 @@
 			<div id="grid"></div>
 			<div id="pagination" class="tui-pagination"></div>
 		</div>
-		<!-- 하부 버트 -->
+		<!-- 하부 버튼 -->
 		<div class="button-bar row">
 			<div class="col-1"></div>
 			<button type="button" class="btn btn-primary col-1">Excel</button>
 			<button type="button" class="btn btn-secondary col-1">PDF</button>
 			<div class="col-7"></div>
+			<!-- 등록 모달 띄울 버튼 -->
 			<div class="btn-group dropup col-2">
-				<button type="button" class="btn btn-success cash">현금 등록</button>
+				<button type="button" class="btn btn-success cash"  data-bs-toggle="modal" data-bs-target="#assetaddModal">현금 등록</button>
 				<button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split" id="dropupMenuSplitButton3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 					<span class="sr-only"></span>
 				</button>
 				<div class="dropdown-menu" aria-labelledby="dropupMenuSplitButton3">
 					<h6 class="dropdown-header">자산 등록</h6>
-					<a class="dropdown-item" href="#">통장 등록</a>
-					<a class="dropdown-item" href="#">카드 등록</a>
-					<a class="dropdown-item" href="#">비품 등록</a>
+					<a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#assetaddModal">통장 등록</a>
+					<a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#assetaddModal">카드 등록</a>
+					<a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#assetaddModal">비품 등록</a>
 					<div class="dropdown-divider"></div>
-					<a class="dropdown-item" href="#">현금 등록</a>
+					<a class="dropdown-item" href="#"  data-bs-toggle="modal" data-bs-target="#assetaddModal">현금 등록</a>
 				</div>
 			</div>
 		</div>
+		<!-- 자산 등록 -->
+		<div th:replace="purchs/ModalTemplate :: ModalTemplate (
+						    	'assetaddModal', 
+						    	'modal-xl', 
+						    	'자산 등록', 
+						    	'accnut/assetForm',
+						    	'accnut/assetFooter'
+						    )"></div>
+						    
+		<!-- 상세 보기 -->
+		<div th:replace="purchs/ModalTemplate :: ModalTemplate (
+						    	'assetdetailModal', 
+						    	'modal-xl', 
+						    	'상세 보기', 
+						    	'accnut/assetDetail', 
+						    	'accnut/assetFooter'
+						    )"></div>
+		
 	</div>
 <script>
 	document.addEventListener("DOMContentLoaded",()=>{
 		gotobtn();
 		getInfo();
 	})
+	var typeOfSection = "";
+	
 	function gotobtn(){
 		document.querySelector(".dropup").addEventListener("click", ()=>{
 			if(event.target.className.includes("cash")){
+				typeOfSection = "현금";
 				console.log("현금");
 			} else if(event.target.className.includes("dropdown-item")){
 				switch (event.target.innerHTML) {
 					case "통장 등록":
-						console.log("통장")
+						typeOfSection = "통장";
+						console.log("통장");
 						break;
 					case "카드 등록":
+						typeOfSection = "카드";
 						console.log("카드")
 						break;
 					case "비품 등록":
+						typeOfSection = "비품";
 						console.log("비품")
 						break;
 					case "현금 등록":
-						console.log("현금")
+						typeOfSection = "현금";
+						console.log("현금");
 						break;
 					default:
 						break;
-				}
-			}
+				} // switch
+				
+			} // else if
 			
-		})
+		})// addEventListener
+		
 	}
 
 	var Grid = tui.Grid;
@@ -140,7 +175,7 @@
 			{ header : "소유주", name : "owner",  sortable : true},
 			{ header : "금액", name : "amount",  sortable : true},
 			{ header : "등록일", name : "registerDate",  sortable : true},
-			{ header : "상세보기", name : "detail", formatter : () => '<button class="btn btn-warning btn-sm btnInfo">상세보기</button>', align: 'center'},
+			{ header : "상세보기", name : "detail", formatter : () => '<button class="btn btn-warning btn-sm btnInfo" data-bs-toggle="modal" data-bs-target="#assetdetailModal">상세보기</button>', align: 'center'},
 			
 		],
 		data : dataSource,
@@ -177,14 +212,19 @@
 		})
 	}
 	
+	var rowData = [];
+	
 	function clickFn() {
 		document.querySelectorAll('.btnInfo').forEach((btn, idx) => {
 			btn.addEventListener("click", () => {
-				let rowData = grid.getRow(idx);
+				rowData = grid.getRow(idx);
 				console.log(rowData);
 			})
 		})
 	}
+	
+	
+	
 
 </script>
 	

@@ -207,4 +207,9 @@ commit;
 create sequence accnut_incidental_seq;
 
 insert into accnut_incidental_cost(incidental_cost_code, section, card_num, amount, register_date, process_alternative, company_num)
-values( ACCNUT_INCIDENTAL_SEQ.nextval, 'CA02', '123456789' , 1000, sysdate, 'PC01', 0)
+values( ACCNUT_INCIDENTAL_SEQ.nextval, 'CA02', '123456789' , 1000, sysdate, 'PC01', 0);
+
+select * from accnut_assets;
+update accnut_assets set section = 'AC04' where assets_code = '3';
+
+select * from cmmn where upper_cmmn_code = 'AC';
