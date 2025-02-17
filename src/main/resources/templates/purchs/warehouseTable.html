@@ -98,13 +98,13 @@ const warehouseGrid = new tui.Grid({
 
 function changeWarehouseDisplay() {
 	let gap = parseInt(document.querySelector('#warehouse_display_amount').value);
-	warehouseGrid.setPerPage(gap, brandDataSource)
+	warehouseGrid.setPerPage(gap, warehouseDataSource)
 	warehouseGrid.readData(); // 데이터 다시 불러오기
 }
 
 
 function warehouseSearch(){
-	let brawarehouseNamendName = document.querySelector('#searchwarehouseName').value;
+	let warehouseName = document.querySelector('#searchWarehouseName').value;
 	console.log("검색어==",warehouseName);
 	warehouseGrid.setRequestParams({"warehouseName" : warehouseName})
 	warehouseGrid.readData();

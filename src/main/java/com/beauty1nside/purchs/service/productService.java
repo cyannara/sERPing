@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.beauty1nside.purchs.dto.ProductDTO;
 import com.beauty1nside.purchs.dto.ProductSearchDTO;
+import com.beauty1nside.purchs.dto.ProdInsertVO;
 
 public interface productService {
 	//카테고리 조회 
@@ -22,7 +23,8 @@ public interface productService {
 	int warehousecount(ProductSearchDTO dto);
 	
 	//상품등록 (옵션 등록)
-	public void register(ProductDTO product);
+	public void goodsinsert(ProdInsertVO vo);
+	
 	
 	
 }
