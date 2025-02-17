@@ -214,7 +214,12 @@ let grid;
                 {header : "옵션명" , name:"optionName" , editor: "text"},
                 {header : "현재재고" , name:"currentAmount",className: "tui-grid-cell-readonly"},
                 {header : "안전재고" , name:"optionSafetyInvoice" , className: "tui-grid-cell-readonly"},
-                {header : "상품위치" , name:"warehouseName" },
+                {header : "상품위치" 
+                , name:"warehouseName"
+                ,formatter: function({ value }) {
+                    return `<span data-bs-toggle="modal" data-bs-target="#warehouseModal">111</span>`;
+                },
+                },
                 {header : "창고id" , name:"warehouseId" , hidden: true},
                 {
                     header : "삭제"
@@ -468,7 +473,7 @@ document.getElementById('warehouseModal').addEventListener('shown.bs.modal', fun
 
 
 		//✅ 닫기 버튼이 존재하는지 확인 후 이벤트 추가
-		const btnClose = document.querySelector("#warehouseModal #btn-close");
+		/* const btnClose = document.querySelector("#warehouseModal #btn-close");
 		if (btnClose) {
 		    btnClose.addEventListener("click", function () {
 		        console.log("✅ 닫기 버튼 클릭됨!");
@@ -483,7 +488,7 @@ document.getElementById('warehouseModal').addEventListener('shown.bs.modal', fun
 		    });
 		} else {
 		    console.warn("❌ btn-close 버튼이 존재하지 않음!");
-		}
+		} */
 
    // 모달이 닫힐 때 선택된 값 그리드에 반영
    document.getElementById('warehouseModal').addEventListener('hidden.bs.modal', function () {
