@@ -35,7 +35,20 @@
     <span class="menu-title">account</span>
   </div>
   <div th:if="${#strings.equals('branch', param.menu) or #strings.equals('branch', menu)}">
-    <span class="menu-title">branch</span>
+    <ul class="nav">
+        <li class="nav-item">
+          <a class="nav-link" href="/bhf/order">
+            <i class="icon-grid menu-icon"></i>
+            <span class="menu-title">상품 발주 요청</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/bhf/ordList">
+            <i class="icon-grid menu-icon"></i>
+            <span class="menu-title">상품 발주 조회</span>
+          </a>
+        </li>
+      </ul>
   </div>
 
 
