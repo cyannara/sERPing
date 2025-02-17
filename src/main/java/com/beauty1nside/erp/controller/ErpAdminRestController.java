@@ -17,10 +17,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.beauty1nside.common.GridArray;
 import com.beauty1nside.common.Paging;
 import com.beauty1nside.common.dto.ComDTO;
 import com.beauty1nside.common.mapper.ErpComMapper;
-import com.beauty1nside.erp.dto.CompanyListSearchDTO;
+import com.beauty1nside.erp.dto.CustomerServiceDTO;
+import com.beauty1nside.erp.dto.ErpSearchDTO;
 import com.beauty1nside.erp.dto.testDTO;
 import com.beauty1nside.erp.service.ErpAdminService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -43,7 +45,8 @@ import lombok.extern.log4j.Log4j2;
  *   수정일      수정자          수정내용
  *  -------    --------    ---------------------------
  *  2025.02.12  표하연          최초 생성
- *  2025.02.13  표하연          회사영문명(코드명) 중복검사, 회사등록
+ *  2025.02.13  표하연          회사영문명(코드명) 중복검사, 회사등록, 검색페이징
+ *  2025.02.15  표하연          회사정보 수정 및 문의 처리
  *
  *  </pre>
 */
@@ -77,63 +80,41 @@ public class ErpAdminRestController {
 	
 	/**
      * ERP 사용 회사 전체 리스트 조회
+     * 2025-02-14 11:00 시훈이 페이징 모듈로 변경
      *
      * @param int
-     * @param CompanyListSearchDTO
+     * @param ErpSearchDTO
      * @param Paging
-     * @return Map<String, Object>
+     * @return Object
      * @throws JsonMappingException
      * @throws JsonProcessingException
      */
 	@GetMapping("/comlist")
-	public Map<String, Object> comlist( 
-										@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
-										CompanyListSearchDTO searchDTO,
-										Paging paging
+	public Object comlist( 
+				@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
+				@RequestParam(name = "page", defaultValue = "1", required = false) int page,
+				ErpSearchDTO dto,
+				Paging paging
 			) throws JsonMappingException, JsonProcessingException{
-		
+
 		//한페이지에 몇개 나오게 할껀지
 		paging.setPageUnit(perPage);
 		
+		// 현재 페이지 셋팅
+		paging.setPage(page);		
 		//log.info("★★★"+paging.getPage());
 
 		// 페이징 조건
-		searchDTO.setStart(paging.getFirst());
-		searchDTO.setEnd(paging.getLast());
+		dto.setStart(paging.getFirst());
+		dto.setEnd(paging.getLast());
 		
 		// 페이징처리
-		paging.setTotalRecord(erpAdminService.getCount(searchDTO));
+		paging.setTotalRecord(erpAdminService.getCount(dto));
 		
-		String str = """
-								{
-				  "result": true,
-				  "data": {
-				    "contents": [],
-				    "pagination": {
-				      "page": 1,
-				      "totalCount": 100
-				    }
-				  }
-				}
-								""";
-		ObjectMapper objectMapper = new ObjectMapper();
-		//위에 내용을 맵으로 바꾸는거
-		Map<String, Object> map = objectMapper.readValue(str, Map.class);
-		//맵으로 바꾼거에서 data 읽어내고
-		Map<String, Object> data = (Map) map.get("data");
-		//페이지 네이션 읽어내고
-		Map<String, Object> pagination = (Map) data.get("pagination");
-		
-		//거기에 전체 페이지랑 페이지번호 읽어옴
-		// 페이징처리
-		pagination.put("page", paging.getPage());
-		pagination.put("totalCount", paging.getTotalRecord());
-		//pagination.put("totalCount", erpAdminService.getCount(searchDTO));
-	
-		//log.info(searchDTO.toString());
-		data.put("contents", erpAdminService.companyList(searchDTO));
-		//log.info(map.toString());
-		return map;
+		// grid 배열 처리
+		GridArray grid = new GridArray();
+		Object result = grid.getArray( paging.getPage(), paging.getTotalRecord(), erpAdminService.companyList(dto) );
+		return result;
 	}
 	
 	
@@ -164,6 +145,62 @@ public class ErpAdminRestController {
 	}
 	
 	/**
+     * 회사 서비스 상태를 변경 한다
+     * @param Map<String, Object>
+     * @return String
+     */
+	@PostMapping("/serviceToggle")
+	public String serviceToggle(@RequestBody Map<String, Object> requestData) {
+		
+		log.info("requestData Map: " + requestData.toString());
+		
+		Boolean isBoolean = erpAdminService.allUpdateServiceInfo(requestData);
+	    if(isBoolean) {
+	    	return "OK";
+	    }else {
+	    	return "NO";
+	    }
+	}
+	
+	/**
+     * 회사 서비스 기간을 변경 한다
+     * @param Map<String, Object>
+     * @return String
+     */
+	@PostMapping("/serviceChange")
+	public String serviceChange(@RequestBody Map<String, Object> requestData) {
+		
+		log.info("requestData Map: " + requestData.toString());
+		
+		Boolean isBoolean = erpAdminService.updateServiceInfo(requestData);
+	    if(isBoolean) {
+	    	return "OK";
+	    }else {
+	    	return "NO";
+	    }
+	}
+	
+	/**
+     * 회사 단순문의를 처리한다
+     * @param Map<String, Object>
+     * @return String
+     */
+	@PostMapping("/cs")
+	public String cs(@RequestBody Map<String, Object> requestData) {
+		//맵객체 DTO로 자동변환
+		ObjectMapper objectMapper = new ObjectMapper();
+	    CustomerServiceDTO customerServiceDTO = objectMapper.convertValue(requestData, CustomerServiceDTO.class);
+
+	    log.info("Mapped DTO: " + customerServiceDTO.toString());
+	    Boolean isBoolean = erpAdminService.insertNewCS(customerServiceDTO);
+	    if(isBoolean) {
+	    	return "OK";
+	    }else {
+	    	return "NO";
+	    }
+	}
+	
+	/**
      * 회사를 신규등록한다
      * @param Map<String, Object>
      * @return String
@@ -189,24 +226,100 @@ public class ErpAdminRestController {
 
 	    // 추가 필드 가져오기
 	    String customerServiceDivision = (String) requestData.get("customerServiceDivision");
-	    String customerServiceContent = (String) requestData.get("customerServiceContent");
+	    String customerServiceContent = "";
 	    int employeeNum = (int) requestData.get("employeeNum");
 
-	    customerServiceContent = """
+	    customerServiceContent += """
 	    		[신규 업체 등록]
 	    		
 	    		
-	    		""" + customerServiceContent;
+	    		""" + (String) requestData.get("customerServiceContent");
 	    // 로그 출력 (정상적으로 변환되었는지 확인)
 	    log.info("DTO: " + dto.toString());
 	    log.info("customerServiceDivision: " + customerServiceDivision);
 	    log.info("customerServiceContent: " + customerServiceContent);
 	    log.info("employeeNum: " + employeeNum);
 	    
-	    //이제 이값들로 인서트 투닥투닥 처리하면 됨
-	    //이미지파일은 어떻게 처리되는지 봐야함
+	    //회사 등록
+	    Boolean isBoolean = erpAdminService.insertCompany(dto, customerServiceDivision, customerServiceContent, employeeNum);
+	    if(isBoolean) {
+	    	return "OK";
+	    }else {
+	    	return "NO";
+	    }
+	}
+	
+	/**
+     * 회사 정보 변경에 따른 알맞은 업데이트를 한다
+     * @param Map<String, Object>
+     * @return String
+     */
+	@PostMapping("/upsertcompnay")
+	public String upsertcompnay(@RequestBody Map<String, Object> requestData) {
+		
+		log.info("Received requestData: " + requestData.toString());
 
-	    return "OK";
+	    ObjectMapper objectMapper = new ObjectMapper();
+	    
+	    ComDTO dto = objectMapper.convertValue(requestData.get("dto"), ComDTO.class);
+	    ComDTO cominfo = erpComMapper.comnum(dto.getCompanyNum());
+	    if (dto.getBusinessLicense() == null || dto.getBusinessLicense().isEmpty()) {
+	    	dto.setBusinessLicense(cominfo.getBusinessLicense());
+	    }
+	    log.info("DTO: " + dto.toString());
+	    
+	    // 추가 필드 가져오기
+	    String customerServiceDivision = (String) requestData.get("customerServiceDivision");
+	    String customerServiceContent = "";
+	    int employeeNum = (int) requestData.get("employeeNum");
+	    customerServiceContent += """
+	    		[업체정보수정]
+	    		""";
+	    customerServiceContent += "[기존] " + cominfo.toString() + "\n";
+	    customerServiceContent += "[변경] " + dto.toString() + "\n";
+	    customerServiceContent += "[사유] " + (String) requestData.get("customerServiceContent");
+	    log.info("customerServiceDivision: " + customerServiceDivision);
+	    log.info("customerServiceContent: " + customerServiceContent);
+	    log.info("employeeNum: " + employeeNum);
+	    
+	    //정보수정
+	    Boolean isBoolean = erpAdminService.upsertCompanyInfo(dto, customerServiceDivision, customerServiceContent, employeeNum);
+	    if(isBoolean) {
+	    	return "OK";
+	    }else {
+	    	return "NO";
+	    }
+	}
+	
+	/**
+     * ERP사용 회사의 비밀번호를 초기화 한다
+     * @param Map<String, Object>
+     * @return String
+     */
+	@PostMapping("/pwReSet")
+	public String pwReSet(@RequestBody Map<String, Object> requestData) {
+		log.info("Received requestData: " + requestData.toString());
+		
+		//정보수정
+	    Boolean isBoolean = erpAdminService.pwReSet(requestData);
+	    if(isBoolean) {
+	    	return "OK";
+	    }else {
+	    	return "NO";
+	    }
+	}
+	
+	/**
+     * ERP사용 회사의 CS리스트를 조회한다
+     * @param Map<String, Object>
+     * @return List<CustomerServiceDTO>
+     */
+	@PostMapping("/csList")
+	public List<CustomerServiceDTO> csList(@RequestBody Map<String, Object> requestData) {
+		log.info("Received requestData: " + requestData.toString());
+		
+		List<CustomerServiceDTO> cslist =  erpAdminService.csList((int)requestData.get("companyNum"));
+		return cslist;
 	}
 	
 	/**
@@ -250,5 +363,5 @@ public class ErpAdminRestController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-
+ 
 }

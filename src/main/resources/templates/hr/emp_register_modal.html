@@ -44,7 +44,7 @@
 	integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
 	crossorigin="anonymous"></script>
 
-<!-- ✅ Custom CSS -->
+<!--  Custom CSS -->
 <style>
 /* 모달 내부 간격 */
 .modal-body {
@@ -88,9 +88,9 @@
 
 <body>
 
-	<!-- ✅ 사원 등록 모달 -->
-	<div th:fragment="employeeRegisterModal" class="modal fade"
-		id="employeeRegisterModal" tabindex="-1"
+	<!--  사원 등록 모달 -->
+	<div th:fragment="empRegisterModal" class="modal fade"
+		id="empRegisterModal" tabindex="-1"
 		aria-labelledby="employeeRegisterLabel" aria-hidden="true">
 		<div class="modal-dialog modal-lg modal-dialog-centered">
 			<div class="modal-content shadow">
@@ -111,7 +111,7 @@
 					</ul>
 
 					<div class="tab-content p-3">
-						<!-- ✅ 기본정보 -->
+						<!--  기본정보 -->
 						<div class="tab-pane fade show active" id="basic-info">
 							<div class="row">
 								<!-- 프로필 이미지 -->
@@ -194,9 +194,9 @@
 							</div>
 						</div>
 
-						<!-- ✅ 추가정보 -->
+						<!--  추가정보 -->
 						<div class="tab-pane fade" id="additional-info">
-							<!-- ✅ 추가정보 탭 -->
+							<!--  추가정보 탭 -->
 							<div class="row">
 								<!-- 급여 -->
 								<div class="col-md-6 mb-3">
@@ -251,7 +251,7 @@
 					</div>
 				</div>
 
-				<!-- ✅ 모달 푸터 -->
+				<!--  모달 푸터 -->
 				<div class="modal-footer bg-light">
 					<button class="btn btn-outline-secondary btn-icon">🔄 초기화</button>
 					<button class="btn btn-danger btn-icon" data-bs-dismiss="modal">❌

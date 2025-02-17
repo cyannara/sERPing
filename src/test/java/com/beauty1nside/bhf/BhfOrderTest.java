@@ -1,6 +1,6 @@
 package com.beauty1nside.bhf;
 
-import java.util.Date;
+import java.sql.Date;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -41,10 +41,10 @@ public class BhfOrderTest {
 		System.out.println(list);
 	}
 	
-	//@Test
+	@Test
 	public void optionListTest() {
 		String goodsCode = "LH001";
-		BhfGoodsOpDTO list = mapper.optionList(goodsCode);
+		List<BhfGoodsOpDTO> list = mapper.optionList(goodsCode);
 		System.out.println(list);
 	}
 	

@@ -1,12 +1,19 @@
 package com.beauty1nside.bhf.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.beauty1nside.accnut.dto.AssetSearchDTO;
 import com.beauty1nside.bhf.dto.goodsorder.BhfOrdSearchDTO;
+import com.beauty1nside.bhf.dto.goodsorder.BhfOrdVO;
 import com.beauty1nside.bhf.service.BhfOrderService;
 import com.beauty1nside.common.GridArray;
 import com.beauty1nside.common.Paging;
@@ -72,6 +79,25 @@ public class BhfRestController {
 		GridArray grid = new GridArray();
 		Object result = grid.getArray( paging.getPage(), bhforderservice.count(dto), bhforderservice.optionList(goodsCode) );//goodsCode넣기
 		return result;
+	}
+	
+	// 발주서 등록
+	@PostMapping("/order/insert")
+	// Map을 같이 사용해서 status,message 등을 사용 가능하다
+	// BhfOrdVO 안에 List<BhfOrdDtlVO> files 있어서 BhfOrdDtlVO를 따로 넣지 않아도 된다.
+	public ResponseEntity<Map<String, Object>> ordinsert(@RequestBody BhfOrdVO bhfOrdVO) {
+	    Map<String, Object> response = new HashMap<>();
+	    try {
+	    	bhforderservice.orderPrd(bhfOrdVO);
+	        response.put("status", "success");
+	        response.put("message", "발주 등록 성공");
+	        return ResponseEntity.ok(response); // JSON 형태 응답
+	    } catch (Exception e) {
+	        log.error("발주 등록 실패", e);
+	        response.put("status", "error");
+	        response.put("message", "발주 등록 실패");
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+	    }
 	}
 	
 }

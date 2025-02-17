@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.beauty1nside.bsn.dto.BhfOrderDTO;
+import com.beauty1nside.bsn.dto.BhfOrderDetailDTO;
 import com.beauty1nside.bsn.dto.OrderSearchDTO;
 import com.beauty1nside.bsn.mapper.BsnOrderMapper;
 import com.beauty1nside.bsn.service.BsnOrderService;
@@ -29,6 +30,8 @@ public class BsnTest {
 //		List<BhfOrderDTO> list = service.getBhfOrder();
 //		List<BhfOrderDTO> list = mapper.selectBhfOrder();
 //		list.forEach(ele -> log.info(ele.toString()));
+		
+//		List<BhfOrderDetailDTO> list = mapper.selectBhfOrderDetail(null)
 	}
 
 }

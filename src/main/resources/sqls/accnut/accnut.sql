@@ -45,6 +45,40 @@ BEGIN
 END;
 /
 
+-- 공통코드 이름으로 코드 구할 때  중복값 때문에 오류 뜰 때 사용할 함수
+CREATE OR REPLACE FUNCTION fn_get_cmmn_code_ver2(p_cmmn_name varchar2, p_section varchar2)
+RETURN varchar2
+IS
+    v_cmmn_code varchar2(20);
+    v_upper_cmmn_code varchar2(20);
+
+    CURSOR cursor_cmmn IS
+    SELECT cmmn_code, upper_cmmn_code
+    FROM cmmn
+    WHERE cmmn_name = p_cmmn_name;
+    
+    v_upper_name varchar(100);
+    v_return varchar2(20) default '00';
+BEGIN
+    OPEN cursor_cmmn;
+    LOOP
+        FETCH cursor_cmmn INTO v_cmmn_code, v_upper_cmmn_code;
+        EXIT WHEN cursor_cmmn%NOTFOUND;
+        
+        SELECT fn_get_cmmn_name(v_upper_cmmn_code)
+        INTO v_upper_name
+        FROM dual;
+        
+        IF v_upper_name LIKE '%' || p_section || '%' THEN
+            v_return := v_cmmn_code;
+        END IF;
+    END LOOP;    
+    CLOSE cursor_cmmn;
+    
+    RETURN v_return;
+END;
+/
+
 -- 회계 테이블
 
 CREATE TABLE accnut_assets (

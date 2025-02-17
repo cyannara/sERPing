@@ -2,17 +2,17 @@ package com.beauty1nside.erp.controller;
 
 import java.util.List;
 
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.beauty1nside.common.dto.ComDTO;
-import com.beauty1nside.common.mapper.ErpComMapper;
-import com.beauty1nside.erp.dto.CompanyListDTO;
 import com.beauty1nside.erp.dto.testDTO;
 import com.beauty1nside.erp.service.ErpAdminService;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -58,12 +58,28 @@ public class ErpAdminController {
 	
 	/**
      * ERP 관리자 페이지 연결
+     * csrf 토큰이 필요해서 모델과 리퀘스트가 들어감
      *
+     * @param Model
+     * @param HttpServletRequest
+     * @param HttpSession
      * @return String
      */
 	@GetMapping("/admin")
-	public String layout() {
-		return "/erp/admin";
+	public String layout(Model model, HttpServletRequest request, HttpSession session) {
+		CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
+        if (csrfToken != null) {
+            model.addAttribute("_csrf", csrfToken);
+        }
+        
+        //서버단에서 사전 차단
+        Object employeeInfo = session.getAttribute("employeeInfo");
+        // 세션이 없으면 로그인 페이지로 리다이렉트
+        if (employeeInfo == null) {
+            return "redirect:/erp/login";
+        }
+        
+        return "erp/admin";
 	}
 	
 	/**
@@ -73,7 +89,7 @@ public class ErpAdminController {
      */
 	@GetMapping("/main")
 	public String main() {
-		return "/erp/main";
+		return "erp/main";
 	}
 
 }

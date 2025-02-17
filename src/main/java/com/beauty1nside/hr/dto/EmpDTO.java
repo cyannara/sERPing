@@ -5,19 +5,17 @@ import java.util.Date;
 import org.apache.ibatis.type.Alias;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
 @Alias("EmployeeDTO")  // 별칭 추가
-public class EmployeeDTO {
+public class EmpDTO {
     private Long employeeNum; // 사원번호
     private String employeeId; // 로그인 ID
     private String employeePw; // 비밀번호
@@ -41,4 +39,5 @@ public class EmployeeDTO {
     private Date updateDate; // 수정일
     private Long companyNum; // 회사번호 (FK)
     private Long departmentNum; // 부서번호 (FK)
+    private String departmentName;
 }

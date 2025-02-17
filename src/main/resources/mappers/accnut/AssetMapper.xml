@@ -29,7 +29,7 @@
 	</select>
 
 	<sql id="searchInfo">
-		company_num LIKE '%' || #{companyNum} || '%'
+		company_num = #{companyNum}
 		<if test="assetsName != null and ! assetsName.equals('')">
 			AND assets_name Like '%' || #{assetsName} || '%'
 		</if>
