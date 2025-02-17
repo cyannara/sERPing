@@ -73,23 +73,28 @@
 							<option value="employeeId">사원ID</option>
 							<option value="phone">연락처</option>
 						</select> <input type="text" class="form-control" style="width: 250px;"
-							placeholder="검색어 입력">
+							placeholder="검색어 입력" id="searchKeyword">
 					</div>
 				</div>
 
 				<!-- 부서 -->
-				<div class="mb-2">
-				    <label class="fw-bold d-block">부서</label> 
-				    <select class="form-select" style="width: 100%;" id="searchDepartment">
-				        <option value="">부서 선택</option>
-				    </select>
-				</div>
+				<!-- 부서 선택 -->
+				<label class="fw-bold d-block">부서</label>
+				<select class="form-select" id="searchDepartment">
+				    <option value="">선택</option>
+				</select>
+				
+				<!-- 하위 부서 선택 -->
+				<label class="fw-bold d-block mt-2">하위 부서</label>
+				<select class="form-select" id="searchSubDepartment">
+				    <option value="">선택</option>
+				</select>
 
 				<!-- 직급 -->
 				<div class="mb-2">
 				    <label class="fw-bold d-block">직급</label> 
 				    <select class="form-select" style="width: 100%;" id="searchPosition">
-				        <option value="">직급 선택</option>
+				        <option value="">선택</option>
 				    </select>
 				</div>
 
@@ -109,7 +114,7 @@
 
 				<!-- 조회 및 초기화 버튼 (중앙 정렬) -->
 				<div class="w-100 text-center mt-3">
-					<button class="btn btn-primary me-2" onclick="searchEmployees()">
+					<button class="btn btn-primary me-2" onclick="searchEmployees()" id="searchBtn">
 						조회</button>
 					<button class="btn btn-outline-success" onclick="resetFilters()">
 						초기화</button>

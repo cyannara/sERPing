@@ -2,11 +2,10 @@
  * employee.js
  */
 
-
+let grid;
 
 document.addEventListener("DOMContentLoaded", function () {
     initializeGrid();
-    loadCommonCodes();
     setupEventListeners();
 });
 
@@ -26,7 +25,7 @@ function initializeGrid() {
 
     Grid.applyTheme('stripe');
 
-    const grid = new Grid({
+    grid = new Grid({
         el: document.getElementById('grid'),
         width: "100%",
         autoWidth: true,
@@ -98,17 +97,59 @@ function populateFilters() {
     });
 }
 
-// 검색 필터 적용
+// ✅ 검색 필터 적용
 function getFilterParams() {
-    return {
-        department: document.getElementById("departmentFilter").value || null,
-        position: document.getElementById("positionFilter").value || null,
-        status: document.querySelector("input[name='status']:checked")?.value || null,
-        employmentType: document.querySelector("input[name='employmentType']:checked")?.value || null,
-        searchType: document.getElementById("searchType").value || null,
-        searchKeyword: document.getElementById("searchKeyword").value || null,
+    const departmentSelect = document.getElementById("searchDepartment");
+    const subDepartmentSelect = document.getElementById("searchSubDepartment");
+
+    let selectedDeptNum = departmentSelect.value; // 상위 부서 선택 값
+    let selectedSubDeptNum = subDepartmentSelect.value; // 하위 부서 선택 값
+    let selectedPosition = document.getElementById("searchPosition")?.value || "";
+    let selectedStatus = document.querySelector("input[name='searchStatus']:checked")?.value || "";
+if (selectedStatus === "on") selectedStatus = ""; // "전체" 선택 시 공백 처리
+
+    let params = {
+        departmentNum: selectedDeptNum !== "all" ? selectedDeptNum : "",
+        subDepartmentNum: selectedSubDeptNum !== "" ? selectedSubDeptNum : "",
+        position: selectedPosition, // ✅ 직급 값 반영
+        status: selectedStatus,
+        employmentType: document.querySelector("input[name='employmentType']:checked")?.value === "on" ? "" : document.querySelector("input[name='employmentType']:checked")?.value,
+        searchType: document.getElementById("searchCategory")?.value || "",
+        searchKeyword: document.getElementById("searchKeyword")?.value || "",
     };
+
+    // ✅ 전체 부서 선택 시 모든 부서 표시
+    if (selectedDeptNum === "all" || selectedDeptNum === "") {
+        params.departmentNum = "";
+    } else {
+        params.departmentNum = selectedDeptNum;
+    }
+
+    // ✅ 하위 부서 선택 시 해당 부서만 필터링
+    if (selectedSubDeptNum !== "") {
+        params.subDepartmentNum = selectedSubDeptNum;
+    }
+
+    console.log("✅ getFilterParams() 결과:", params);
+    return params;
 }
+
+
+// ✅ Toast Grid 데이터 새로고침
+function searchEmployees(page = 1) {
+    const params = getFilterParams(); // 검색 필터 적용
+    params.page = page; // 현재 페이지 값 추가
+
+    // ✅ URLSearchParams 사용 (불필요한 중복 제거)
+    const urlParams = new URLSearchParams(params);
+    
+    console.log("🔍 API 요청 URL:", `/hr/rest/emp/list?${urlParams.toString()}`);
+
+    // ✅ Toast Grid 검색 필터 적용 후 데이터 새로 불러오기
+    grid.setRequestParams(params);
+    grid.readData(page, params, true);
+}
+
 
 // 필터 이벤트 리스너 설정
 function setupEventListeners() {
@@ -130,4 +171,30 @@ function setupEventListeners() {
             grid.refreshData();
         });
     });
+    
+    
+// 필터가 변경될 때마다 자동 검색 실행
+document.querySelectorAll("#searchDepartment, #searchPosition,#searchSubDepartment, input[name='searchStatus'], input[name='employmentType']").forEach(filter => {
+    filter.addEventListener("change", searchEmployees);
+});
 }
+
+
+document.getElementById("searchDepartment").addEventListener("change", function () {
+    let selectedDeptNum = this.value; // 선택한 부서의 `DEPARTMENT_NUM`
+    populateSubDepartments(selectedDeptNum); // 하위 부서 필터링
+    searchEmployees(); // ✅ 부서 선택 후 자동 검색 실행
+});
+
+document.getElementById("searchSubDepartment").addEventListener("change", function () {
+    searchEmployees(); // ✅ 하위 부서 선택 후 자동 검색 실행
+});
+
+// ✅ 직급 선택 시 자동 검색 실행
+document.getElementById("searchPosition").addEventListener("change", function(){
+	 searchEmployees();
+});
+
+document.getElementById("populateStatusButtons").addEventListener("change", function(){
+	searchEmployees();
+})
