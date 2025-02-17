@@ -13,4 +13,9 @@ public interface EmpMapper {
 	EmpDTO info(Long employeeNum);
 	List<EmpDTO> list(EmpSearchDTO dto);
 	int count(EmpSearchDTO dto);
+	
+    List<String> getDepartments(); // 부서 목록
+    List<String> getPositions(); // 직급 목록
+    List<String> getEmploymentTypes(); // 근무 유형 목록
+    List<String> getStatuses(); // 재직 상태 목록
 }

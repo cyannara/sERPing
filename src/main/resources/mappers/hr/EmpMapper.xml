@@ -22,33 +22,55 @@
 		ORDER BY e.employee_num DESC;
 	</select>
 	
-	<!-- 전체 사원 조회 -->
 	<select id="list" resultType="com.beauty1nside.hr.dto.EmpDTO" parameterType="com.beauty1nside.hr.dto.EmpSearchDTO">
-	    SELECT * FROM (
-	        SELECT ROWNUM rn, employeeNum, employeeId, employeeName, email, phone, hireDate, position, status, employmentType, departmentName
-	        FROM (
-	            SELECT 
-	                e.employee_num AS employeeNum,
-	                e.employee_id AS employeeId,
-	                e.employee_name AS employeeName,
-	                e.email AS email,
-	                e.phone AS phone,
-	                e.hire_date AS hireDate,
-	                fn_get_cmmn_name(e.position) AS position,
-	                fn_get_cmmn_name(e.status) AS status,
-	                fn_get_cmmn_name(e.employment_type) AS employmentType,
-	                d.department_name AS departmentName
-	            FROM hr_employee e
-	            LEFT JOIN hr_department d ON e.department_num = d.department_num
-	            <include refid="searchInfo"/> 
-	            ORDER BY e.employee_num DESC
-	        ) 
-	        <![CDATA[
-	        WHERE ROWNUM <= #{end} 
-	        ]]>
-	    ) 
-	    WHERE rn >= #{start}
-	</select>
+    SELECT * FROM (
+        SELECT ROWNUM rn, employeeNum, employeeId, employeeName, email, phone, hireDate, position, status, employmentType, departmentName
+        FROM (
+            SELECT 
+                e.employee_num AS employeeNum,
+                e.employee_id AS employeeId,
+                e.employee_name AS employeeName,
+                e.email AS email,
+                e.phone AS phone,
+                e.hire_date AS hireDate,
+                fn_get_cmmn_name(e.position) AS position,
+                fn_get_cmmn_name(e.status) AS status,
+                fn_get_cmmn_name(e.employment_type) AS employmentType,
+                d.department_name AS departmentName
+            FROM hr_employee e
+            LEFT JOIN hr_department d ON e.department_num = d.department_num
+            <if test="department != null and department != ''">
+                AND d.department_name = #{department}
+            </if>
+            <if test="position != null and position != ''">
+                AND e.position = #{position}
+            </if>
+            <if test="status != null and status != ''">
+                AND e.status = #{status}
+            </if>
+            <if test="employmentType != null and employmentType != ''">
+                AND e.employment_type = #{employmentType}
+            </if>
+            <if test="searchKeyword != null and searchKeyword != ''">
+                <choose>
+                    <when test="searchType == 'name'">
+                        AND e.employee_name LIKE '%' || #{searchKeyword} || '%'
+                    </when>
+                    <when test="searchType == 'id'">
+                        AND e.employee_id LIKE '%' || #{searchKeyword} || '%'
+                    </when>
+                    <when test="searchType == 'phone'">
+                        AND e.phone LIKE '%' || #{searchKeyword} || '%'
+                    </when>
+                </choose>
+            </if>
+        ) 
+        <![CDATA[
+        WHERE ROWNUM <= #{end} 
+         ]]>
+    ) 
+    WHERE rn >= #{start}
+</select>
 	
 	
 	<select id="count" parameterType="com.beauty1nside.accnut.dto.AssetSearchDTO">
@@ -87,6 +109,59 @@
 	        AND e.employment_type = #{employmentType}
 	    </if>
 	</sql>
+	
+	
+	<!-- 부서 목록 조회 -->
+	<select id="getDepartments" resultType="string">
+	    SELECT DISTINCT department_name 
+	    FROM hr_department 
+	    ORDER BY department_name
+	</select>
 
+    <!-- 직급 목록 조회 -->
+	<select id="getPositions" resultType="string">
+	    SELECT DISTINCT c.cmmn_name 
+	    FROM cmmn c 
+	    WHERE c.upper_cmmn_code = 'PO'
+	    
+	    UNION
+	    
+	    SELECT DISTINCT fn_get_cmmn_name(e.position) 
+	    FROM hr_employee e
+	    WHERE e.position IS NOT NULL
+	    
+	    ORDER BY 1
+	</select>
+
+
+    <!-- 근무 유형 목록 조회 -->
+	<select id="getEmploymentTypes" resultType="string">
+	    SELECT DISTINCT c.cmmn_name 
+	    FROM cmmn c 
+	    WHERE c.upper_cmmn_code = 'ET'
+	    
+	    UNION
+	    
+	    SELECT DISTINCT fn_get_cmmn_name(e.employment_type) 
+	    FROM hr_employee e
+	    WHERE e.employment_type IS NOT NULL
+	    
+	    ORDER BY 1
+	</select>
+	
+    <!-- 재직 상태 목록 조회 -->
+	<select id="getStatuses" resultType="string">
+	    SELECT DISTINCT c.cmmn_name 
+	    FROM cmmn c 
+	    WHERE c.upper_cmmn_code = 'ST'
+	    
+	    UNION
+	    
+	    SELECT DISTINCT fn_get_cmmn_name(e.status) 
+	    FROM hr_employee e
+	    WHERE e.status IS NOT NULL
+	    
+	    ORDER BY 1
+	</select>
 
 </mapper>

@@ -1,6 +1,8 @@
 package com.beauty1nside.hr.service.Impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -38,5 +40,15 @@ public class EmpServiceImpl implements EmpService {
 		// TODO Auto-generated method stub
 		return empMapper.count(dto);
 	}
+
+	@Override
+    public Map<String, Object> getCommonCodes() {
+        Map<String, Object> codes = new HashMap<>();
+        codes.put("departments", empMapper.getDepartments());
+        codes.put("positions", empMapper.getPositions());
+        codes.put("employmentTypes", empMapper.getEmploymentTypes());
+        codes.put("statuses", empMapper.getStatuses());
+        return codes;
+    }
 
 }
