@@ -13,25 +13,25 @@
     <!-- 검색창 -->
 		<div class="search-grid">
 			<div class="row 1row">
-				<div class="col-5 row ">
-					<span class="label-search col-4">상태</span>
+				<div class="col-5 row">
+					<label  class="label-search col-4" for="inApprovalStatus"></label>
 					<select name="inApprovalStatus" id="inApprovalStatus" class="col-8 input-box">
 						<option value="" selected>선택</option>
-						<option value="AC07">대기</option>
-						<option value="AC08">승인</option>
-						<option value="AC08">결재</option>
+						<option value="waiting">대기</option>
+						<option value="approved">승인</option>
+						<option value="rejected">반려</option>
 					</select>
 				</div>
 			</div>
 			<div class="row 2row">
 				<div class="col-1"></div>
 				<div class="col-5 row ">
-					<span class="label-search col-4">채권자</span>
+					<label class="label-search col-4" for="creditor">요청자</label>
 					<input type="text" name="creditor" id="creditor" class="col-8 input-box">
 				</div>
 				<div class="col-1"></div>
 				<div class="col-5 row ">
-					<span class="label-search col-4">표시수량</span>
+					<label class="label-search col-4" for="display_amount">표시수량</label>
 					<select name="display_amount" id="display_amount" class="col-8 input-box" onchange="changeDisplay()">
 						<option value="5" selected>5</option>
 						<option value="10">10</option>
@@ -55,25 +55,25 @@
 			<div id="pagination" class="tui-pagination"></div>
 		</div>
     <!-- 하부 버튼 -->
-		<div class="button-bar row">
-			<div class="col-1"></div>
-			<button type="button" class="btn btn-primary col-1">Excel</button>
-			<button type="button" class="btn btn-secondary col-1">PDF</button>
-			<div class="col-7"></div>
-			<div class="btn-group dropup col-2">
-				<button type="button" class="btn btn-success unpay">미지급금등록</button>
-				<button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split" id="dropupMenuSplitButton3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					<span class="sr-only"></span>
-				</button>
-				<div class="dropdown-menu" aria-labelledby="dropupMenuSplitButton3">
-					<h6 class="dropdown-header">채무 등록</h6>
-					<a class="dropdown-item" href="#">외상매입금 등록</a>
-					<a class="dropdown-item" href="#">대출금 등록</a>
-					<div class="dropdown-divider"></div>
-					<a class="dropdown-item" href="#">미지급금 등록</a>
-				</div>
-			</div>
-		</div>
+<!--		<div class="button-bar row">-->
+<!--			<div class="col-1"></div>-->
+<!--			<button type="button" class="btn btn-primary col-1">Excel</button>-->
+<!--			<button type="button" class="btn btn-secondary col-1">PDF</button>-->
+<!--			<div class="col-7"></div>-->
+<!--			<div class="btn-group dropup col-2">-->
+<!--				<button type="button" class="btn btn-success unpay">미지급금등록</button>-->
+<!--				<button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split" id="dropupMenuSplitButton3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
+<!--					<span class="sr-only"></span>-->
+<!--				</button>-->
+<!--				<div class="dropdown-menu" aria-labelledby="dropupMenuSplitButton3">-->
+<!--					<h6 class="dropdown-header">채무 등록</h6>-->
+<!--					<a class="dropdown-item" href="#">외상매입금 등록</a>-->
+<!--					<a class="dropdown-item" href="#">대출금 등록</a>-->
+<!--					<div class="dropdown-divider"></div>-->
+<!--					<a class="dropdown-item" href="#">미지급금 등록</a>-->
+<!--				</div>-->
+<!--			</div>-->
+<!--		</div>-->
 	</div>
 
 	<!-- 드롭다운.js -->
