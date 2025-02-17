@@ -1,5 +1,6 @@
 package com.beauty1nside.bsn.controller;
 
+import java.util.Date;
 import java.util.Map;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,7 +32,13 @@ public class BsnRestController {
 	@GetMapping("/order")
 	public Object order(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
 			@RequestParam(name ="page", defaultValue = "1", required = false) int page,
+//			@RequestParam(name ="deteOption", defaultValue = "notSelect", required = false) String deteOption,
+//			@RequestParam(name ="startDate",  required = false) Date startDate,
+//			@RequestParam(name ="endDate", required = false) Date endDate,
+//			@RequestParam(name ="selectBhf", defaultValue = "all", required = false) String selectBhf,
 			OrderSearchDTO searchDTO, Paging paging) throws JsonMappingException, JsonProcessingException  {
+		
+		
 		
 		//한 페이지에 출력할 수 : 기본값: 5
 		paging.setPageUnit(perPage);
@@ -61,6 +68,11 @@ public class BsnRestController {
 		//첫 페이지, 마지막 페이지
 		searchDTO.setStart(paging.getFirst());
 		searchDTO.setEnd(paging.getLast());
+		
+		// 날짜 값이 빈 문자열("")로 넘어오면 null로 설정
+
+
+		
 		
 		GridArray grid = new GridArray();
 		Object result = grid.getArray(paging.getPage(), bsnOrderService.getCountOfBhfOrder(searchDTO), bsnOrderService.getBhfOrder(searchDTO) );

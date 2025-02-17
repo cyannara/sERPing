@@ -5,18 +5,6 @@
 
 <!-- 발주 신청 조회 -->
 <select id="selectBhfOrder" resultType="BhfOrderDTO">
---	SELECT ORDER_CODE
---      ,branch_office_id
---      ,order_date
---      ,due_date
---      ,remark
---      ,company_num
---	FROM BHF_ORDER
---	WHERE progress_status = '신청'
--- 		AND   company_num = 14
---	ORDER BY order_date 
--- desc
-
 SELECT ORDER_CODE
       ,branch_office_id
       ,order_date
@@ -24,7 +12,7 @@ SELECT ORDER_CODE
       ,remark
       ,company_num
 FROM (
-SELECT /*+ INDEX_DESC(BHF_ORDER ORDER_CODE) */ 
+SELECT /*+ INDEX_ASC(BHF_ORDER PK_BHF_ORDER) */ 
       ROWNUM RN
       ,ORDER_CODE
       ,branch_office_id
@@ -34,11 +22,14 @@ SELECT /*+ INDEX_DESC(BHF_ORDER ORDER_CODE) */
       ,company_num
 FROM BHF_ORDER
 WHERE progress_status = '신청'
--- AND   company_num = 14
+-- AND   company_num = 1
 <![CDATA[
 AND ROWNUM <= #{end}
 ]]>
+ORDER by TO_NUMBER(REGEXP_SUBSTR(order_code, '\d+'))
 ) WHERE RN >= #{start}
+<include refid="searchInfoBhfOrder"></include>
+
 
 ORDER BY order_date, due_date
 
@@ -47,9 +38,42 @@ ORDER BY order_date, due_date
 <select id="getCountOfBhfOrder" resultType="int">
 SELECT COUNT(*) FROM BHF_ORDER
 WHERE progress_status = '신청'
--- AND   company_num = 14
-
+-- AND   company_num = 1
+<include refid="searchInfoBhfOrder"></include>
 </select>
+
+
+<sql id="searchInfoBhfOrder">
+	 
+	<if test="deteOption != null and deteOption == 'orderDate' and  startDate != null">
+		AND order_date >= #{startDate}
+	</if>
+	<if test="deteOption != null and deteOption == 'orderDate' and  endDate != null">
+		<![CDATA[
+		AND order_date < #{endDate}
+		]]>
+	</if>
+	
+	<if test="deteOption != null and deteOption =='dueDate' and  startDate != null">
+		AND due_date >= #{startDate}
+	</if>
+	<if test="deteOption != null and deteOption == 'dueDate' and  endDate != null">
+		<![CDATA[
+		AND due_date <= #{endDate}
+		]]>
+	</if>
+	
+	
+	
+	
+	<if test="branch != null and ! branch.equals('all')">
+			AND branch_office_id Like '%' || #{branch} || '%'
+	</if>
+</sql>
+
+
+
+
 
 
 <select id="selectBhfOrderDetail"  resultType="BhfOrderDetailDTO">
