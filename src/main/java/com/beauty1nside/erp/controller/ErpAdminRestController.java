@@ -103,6 +103,8 @@ public class ErpAdminRestController {
 		// 현재 페이지 셋팅
 		paging.setPage(page);		
 		//log.info("★★★"+paging.getPage());
+		
+		log.info("★★★"+dto);
 
 		// 페이징 조건
 		dto.setStart(paging.getFirst());

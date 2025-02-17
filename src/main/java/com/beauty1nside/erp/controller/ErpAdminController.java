@@ -73,9 +73,9 @@ public class ErpAdminController {
         }
         
         //서버단에서 사전 차단
-        Object employeeInfo = session.getAttribute("employeeInfo");
+        Object ErpEmployeeInfo = session.getAttribute("ErpEmployeeInfo");
         // 세션이 없으면 로그인 페이지로 리다이렉트
-        if (employeeInfo == null) {
+        if (ErpEmployeeInfo == null) {
             return "redirect:/erp/login";
         }
         

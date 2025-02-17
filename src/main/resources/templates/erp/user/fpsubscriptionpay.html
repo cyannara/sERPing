@@ -21,21 +21,400 @@
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <body layout:fragment="content">
-	<div class="container">
-		<h3>구독 결제</h3>
-		<nav class="p-0 m-0">
-			<div class="nav nav-tabs" id="nav-tab" role="tablist">
-				<button class="nav-link border active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-fp" type="button" role="tab" aria-controls="#nav-fp" aria-selected="true">기간구독</button>
-				<button class="nav-link border" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-rg" type="button" role="tab" aria-controls="#nav-rg" aria-selected="false">정기구독</button>
+    <div class="container">
+        <h3>구독 결제</h3>
+        <nav class="p-0 m-0">
+            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                <button class="nav-link border active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-fp"
+                    type="button" role="tab" aria-controls="#nav-fp" aria-selected="true">기간구독</button>
+                <button class="nav-link border" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-rg"
+                    type="button" role="tab" aria-controls="#nav-rg" aria-selected="false">정기구독</button>
+            </div>
+        </nav>
+
+        <div class="tab-content border" id="nav-tabContent" style="background-color: #ffffff;">
+            <!-- 기간 구독 -->
+            <div class="tab-pane fade show active" id="nav-fp" role="tabpanel" aria-labelledby="nav-fp-tab" tabindex="0">
+                <h3>기간 구독 결제 서비스</h3>
+                <div class="d-flex">
+					<div style="width: 900px;" class="me-5">
+		                <div class="section-title subperiod">▷ sERPing 기간구독</div>
+		                <table>
+						    <tr>
+						        <th>30일</th>
+						        <th>90일</th>
+						        <th>180일</th>
+						        <th>360일</th>
+						    </tr>
+						    <tr class="subscribe-options">
+						        <td>
+						            <label for="erp-sub-30">
+						                <input type="radio" id="erp-sub-30" name="erp-subscription" value="1"> 60,000원
+						            </label>
+						        </td>
+						        <td>
+						            <label for="erp-sub-90">
+						                <input type="radio" id="erp-sub-90" name="erp-subscription" value="2"> 174,600원
+						            </label>
+						        </td>
+						        <td>
+						            <label for="erp-sub-180">
+						                <input type="radio" id="erp-sub-180" name="erp-subscription" value="3"> 338,400원
+						            </label>
+						        </td>
+						        <td>
+						            <label for="erp-sub-360">
+						                <input type="radio" id="erp-sub-360" name="erp-subscription" value="4"> 648,000원
+						            </label>
+						        </td>
+						    </tr>
+						</table>
+		
+		                <div class="section-title subgroup">▷ 그룹웨어 인원 추가 서비스 (서비스 기간 맞춤) [필수 선택]</div>
+		                <table>
+						    <tr>
+						        <th>50명 기간맞춤</th>
+						        <th>100명 기간맞춤</th>
+						        <th>무제한 기간맞춤</th>
+						    </tr>
+						    <tr class="subscribe-options">
+						        <td>
+						            <label for="group-sub-50">
+						                <input type="radio" id="group-sub-50" name="group-subscription" value="5"> 0원
+						            </label>
+						        </td>
+						        <td>
+						            <label for="group-sub-100">
+						                <input type="radio" id="group-sub-100" name="group-subscription" value="6"> 0원
+						            </label>
+						        </td>
+						        <td>
+						            <label for="group-sub-limit">
+						                <input type="radio" id="group-sub-limit" name="group-subscription" value="7"> 0원
+						            </label>
+						        </td>
+						    </tr>
+						</table>
+		
+		                <div class="section-title">▷ 추가 서비스</div>
+		                <table>
+						    <tr>
+						        <th>서비스명</th>
+						        <th>30일</th>
+						        <th>90일</th>
+						        <th>180일</th>
+						        <th>360일</th>
+						        <th>기간맞춤</th>
+						    </tr>
+						    <tr>
+						        <td>인사관리</td>
+						        <td>
+						            <label for="hr-sub-30">
+						                <input type="radio" id="hr-sub-30" name="hr-subscription" value="8"> 15,000원
+						            </label>
+						        </td>
+						        <td>
+						            <label for="hr-sub-90">
+						                <input type="radio" id="hr-sub-90" name="hr-subscription" value="9"> 27,000원
+						            </label>
+						        </td>
+						        <td>
+						            <label for="hr-sub-180">
+						                <input type="radio" id="hr-sub-180" name="hr-subscription" value="10"> 54,000원
+						            </label>
+						        </td>
+						        <td>
+						            <label for="hr-sub-360">
+						                <input type="radio" id="hr-sub-360" name="hr-subscription" value="11"> 108,000원
+						            </label>
+						        </td>
+						        <td>
+						            <label for="hr-sub-custom">
+						                <input type="radio" id="hr-sub-custom" name="hr-subscription" value="30"> 0원
+						            </label>
+						        </td>
+						    </tr>
+						    <tr>
+						        <td>지점관리</td>
+						        <td>
+						            <label for="branch-sub-30">
+						                <input type="radio" id="branch-sub-30" name="branch-subscription" value="12"> 15,000원
+						            </label>
+						        </td>
+						        <td>
+						            <label for="branch-sub-90">
+						                <input type="radio" id="branch-sub-90" name="branch-subscription" value="13"> 27,000원
+						            </label>
+						        </td>
+						        <td>
+						            <label for="branch-sub-180">
+						                <input type="radio" id="branch-sub-180" name="branch-subscription" value="14"> 54,000원
+						            </label>
+						        </td>
+						        <td>
+						            <label for="branch-sub-360">
+						                <input type="radio" id="branch-sub-360" name="branch-subscription" value="15"> 108,000원
+						            </label>
+						        </td>
+						        <td>
+						            <label for="branch-sub-custom">
+						                <input type="radio" id="branch-sub-custom" name="branch-subscription" value="31"> 0원
+						            </label>
+						        </td>
+						    </tr>
+						    <tr>
+						        <td>회계관리</td>
+						        <td>
+						            <label for="account-sub-30">
+						                <input type="radio" id="account-sub-30" name="account-subscription" value="16"> 15,000원
+						            </label>
+						        </td>
+						        <td>
+						            <label for="account-sub-90">
+						                <input type="radio" id="account-sub-90" name="account-subscription" value="17"> 27,000원
+						            </label>
+						        </td>
+						        <td>
+						            <label for="account-sub-180">
+						                <input type="radio" id="account-sub-180" name="account-subscription" value="18"> 54,000원
+						            </label>
+						        </td>
+						        <td>
+						            <label for="account-sub-360">
+						                <input type="radio" id="account-sub-360" name="account-subscription" value="19"> 108,000원
+						            </label>
+						        </td>
+						        <td>
+						            <label for="account-sub-custom">
+						                <input type="radio" id="account-sub-custom" name="account-subscription" value="32"> 0원
+						            </label>
+						        </td>
+						    </tr>
+						</table>
+		            </div>
+		            <div class="d-flex align-items-end">
+		            	<table class="payment-table">
+					        <tr>
+					            <th>결제방식선택</th>
+					            <th>
+					                <select class="select-box" id="payment-method">
+					                    <option value="카드결제">카드결제</option>
+					                    <option value="계좌이체">계좌이체</option>
+					                    <option value="카카오페이">카카오페이</option>
+					                    <option value="네이버페이">네이버페이</option>
+					                </select>
+					            </th>
+					        </tr>
+					        <tr>
+					            <th>총 결제금액</th>
+					            <td class="total-price">9,000,000원</td>
+					        </tr>
+					        <tr>
+					            <td colspan="2"><button class="periodpaygo">결제</button></td>
+					        </tr>
+					    </table>
+		            </div>
+				</div>
 			</div>
-		</nav>
-		<div class="tab-content border" id="nav-tabContent">
-			<div class="tab-pane fade show active" id="nav-fp" role="tabpanel" aria-labelledby="nav-fp-tab" tabindex="0">
-				기간구독 내용처리 내용 처리
-			</div>
-			<div class="tab-pane fade" id="nav-rg" role="tabpanel" aria-labelledby="nav-rg-tab" tabindex="0">
-				정기구독 내용 처리
-			</div>
-		</div>
-	</div>
+            <!-- 정기 구독 -->
+            <div class="tab-pane fade" id="nav-rg" role="tabpanel" aria-labelledby="nav-rg-tab" tabindex="0">
+                <h3>정기 구독 결제 서비스</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script th:inline="javascript">
+        setTimeout(async () => {
+            console.log("여기는 사용하는곳:", window.subscriptionState);
+            
+            //구독기간에 맞게 가격 다 변경시켜 주겠어
+/*             group-sub-50
+			group-sub-100
+			group-sub-limit
+			hr-sub-custom
+			branch-sub-custom
+			account-sub-custom */
+            
+            //기간 구독 결제 서비스 관련
+            let tag = "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp";
+            if(window.subscriptionState.subObj == "date"){
+            	tag += `현재 기간제 구독중 입니다. [남은기간 : ${window.subscriptionState.subObjdate}일]`;
+            }else{
+            	tag += `현재 정기 구독중 입니다. [결제 불가 합니다]`;
+            	document.querySelector(".periodpaygo").remove();
+            }
+            document.querySelector(".subperiod").insertAdjacentHTML("beforeend", tag);
+            
+            //그룹웨어 인원 추가 서비스
+            tag = "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp";
+            if(window.subscriptionState.groupObj == "date"){
+            	let hrpersonnel = await hr_list([[${session.companyNum}]]);
+            	tag += `그룹웨어 직원 ${hrpersonnel}명 입니다.`;
+            	if(hrpersonnel > 100){
+            		document.querySelector("#group-sub-50").remove();
+            		document.querySelector("#group-sub-100").remove();
+            	}else if(hrpersonnel > 50){
+            		document.querySelector("#group-sub-50").remove();
+            	}else{
+            	}
+            }else{
+            	tag += `현재 정기 구독중 입니다. [결제 불가 합니다]`;
+            }
+            document.querySelector(".subgroup").insertAdjacentHTML("beforeend", tag);
+            console.log(tag);
+            
+        }, 500);
+        
+        async function hr_list(data){
+        	const url = "/erp/rest/hrlist/"+data;
+        	console.log(url);
+        	return fetch( url, {
+        			method:"get",
+        			headers: {
+        				"Content-Type": "application/json",
+        			},
+        			//body : JSON.stringify(requestData),
+        		})
+        	.then( result => result.text() )
+        	.then( result => {
+        		return result;
+        	})
+        }
+        
+        
+        
+        
+        
+        
+        
+        document.addEventListener("DOMContentLoaded", function () {
+            // 모든 ERP 구독 라디오 버튼 가져오기
+            const erpRadios = document.querySelectorAll('input[name="erp-subscription"]');
+            // 각 라디오 버튼에 이벤트 리스너 추가
+            erpRadios.forEach(radio => {
+                radio.addEventListener("change", function () {
+                    if (this.checked) {
+                        let selectedValue = this.value;  // EC001, EC002 등
+                        let selectedPrice = this.parentElement.textContent.trim();  // 가격 텍스트 가져오기
+                        
+                        console.log("선택한 구독:", selectedValue);
+                        console.log("가격:", selectedPrice);
+                    }
+                });
+            });
+            // 모든 ERP 구독 라디오 버튼 가져오기
+            const groupRadios = document.querySelectorAll('input[name="group-subscription"]');
+            // 각 라디오 버튼에 이벤트 리스너 추가
+            groupRadios.forEach(radio => {
+                radio.addEventListener("change", function () {
+                    if (this.checked) {
+                        let selectedValue = this.value;  // EC001, EC002 등
+                        let selectedPrice = this.parentElement.textContent.trim();  // 가격 텍스트 가져오기
+                        
+                        console.log("선택한 구독:", selectedValue);
+                        console.log("가격:", selectedPrice);
+                    }
+                });
+            });
+            // 모든 ERP 구독 라디오 버튼 가져오기
+            const hrRadios = document.querySelectorAll('input[name="hr-subscription"]');
+            // 각 라디오 버튼에 이벤트 리스너 추가
+            hrRadios.forEach(radio => {
+                radio.addEventListener("change", function () {
+                    if (this.checked) {
+                        let selectedValue = this.value;  // EC001, EC002 등
+                        let selectedPrice = this.parentElement.textContent.trim();  // 가격 텍스트 가져오기
+                        
+                        console.log("선택한 구독:", selectedValue);
+                        console.log("가격:", selectedPrice);
+                    }
+                });
+            });
+            // 모든 ERP 구독 라디오 버튼 가져오기
+            const branchRadios = document.querySelectorAll('input[name="branch-subscription"]');
+            // 각 라디오 버튼에 이벤트 리스너 추가
+            branchRadios.forEach(radio => {
+                radio.addEventListener("change", function () {
+                    if (this.checked) {
+                        let selectedValue = this.value;  // EC001, EC002 등
+                        let selectedPrice = this.parentElement.textContent.trim();  // 가격 텍스트 가져오기
+                        
+                        console.log("선택한 구독:", selectedValue);
+                        console.log("가격:", selectedPrice);
+                    }
+                });
+            });
+            // 모든 ERP 구독 라디오 버튼 가져오기
+            const accountRadios = document.querySelectorAll('input[name="account-subscription"]');
+            // 각 라디오 버튼에 이벤트 리스너 추가
+            accountRadios.forEach(radio => {
+                radio.addEventListener("change", function () {
+                    if (this.checked) {
+                        let selectedValue = this.value;  // EC001, EC002 등
+                        let selectedPrice = this.parentElement.textContent.trim();  // 가격 텍스트 가져오기
+                        
+                        console.log("선택한 구독:", selectedValue);
+                        console.log("가격:", selectedPrice);
+                    }
+                });
+            });
+        });
+        
+    </script>
+	<style>
+        table {
+            width: 100%;
+            max-width: 900px;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            padding: 10px;
+            background-color: #ddd;
+            border: 1px solid black;
+        }
+        .subscribe-options input {
+            margin-right: 10px;
+        }
+        .payment-table {
+            width: 100%;
+            max-width: 500px;
+            border-collapse: collapse;
+            margin: 20px auto;
+            font-size: 18px;
+        }
+        .payment-table th, .payment-table td {
+            border: 1px solid black;
+            padding: 15px;
+            text-align: center;
+        }
+        .payment-table th {
+            background-color: #f2f2f2;
+        }
+        .total-price {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .select-box {
+            font-size: 16px;
+            padding: 8px;
+            width: 100%;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+        label {
+        	margin-bottom: 0;
+        }
+    </style>
 </body>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- =======================================================
+	* ERP 사용 회사 CRUD 하는 맵퍼
+	* @author ERP 관리자 개발팀 표하연
+	* @since 2025.02.17
+	* @version 1.0
+	* @see
+	*
+	* <pre>
+	* << 개정이력(Modification Information) >>
+	*
+	*   수정일      수정자          수정내용
+	*  ======    =======    ==============================
+	*  2025.02.17  표하연          최초생성
+	*
+	*  </pre>
+======================================================== -->
+<mapper namespace="com.beauty1nside.erp.mapper.ErpUserMapper">
+
+	<!-- 
+     * 회사 구독 정보를 내보냄
+     *
+     * @param int
+     * @return erpSubscriptionInfoListDTO
+	-->
+	<select id="sublist" resultType="erpSubscriptionInfoListDTO">
+		select *
+		from erp_subscription_info_list
+		where company_num = #{companyNum}
+	</select>
+	
+	<!-- 
+     * 회사 회원 인원수를 내보냄
+     *
+     * @param int
+     * @return int
+	-->
+	<select id="hrlist">
+		select count(*)
+		from hr_employee
+		where company_num = ${companyNum}
+	</select>
+</mapper>
