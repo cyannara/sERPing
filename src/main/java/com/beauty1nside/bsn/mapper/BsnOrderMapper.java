@@ -3,6 +3,7 @@ package com.beauty1nside.bsn.mapper;
 import java.util.List;
 
 import com.beauty1nside.bsn.dto.BhfOrderDTO;
+import com.beauty1nside.bsn.dto.BhfOrderDetailDTO;
 import com.beauty1nside.bsn.dto.OrderSearchDTO;
 
 public interface BsnOrderMapper {
@@ -12,4 +13,10 @@ public interface BsnOrderMapper {
 	
 	//발주신청건수 확인
 	int getCountOfBhfOrder(OrderSearchDTO orderSearchDTO);
+	
+	//발주신청 상세 조회
+	List<BhfOrderDetailDTO> selectBhfOrderDetail(BhfOrderDTO bhfOrderDTO); 
+	
+	//발주신청의 상품수 확인
+	int getCountOfBhfOrderDetail(BhfOrderDTO bhfOrderDTO);
 }

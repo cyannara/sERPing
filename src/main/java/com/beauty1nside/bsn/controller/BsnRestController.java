@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.beauty1nside.bsn.dto.BhfOrderDTO;
 import com.beauty1nside.bsn.dto.OrderSearchDTO;
 import com.beauty1nside.bsn.service.BsnOrderService;
 import com.beauty1nside.common.GridArray;
@@ -73,6 +74,37 @@ public class BsnRestController {
 //		data.put("contents", bsnOrderService.getBhfOrder(searchDTO));
 //		data.put("pagination", bsnOrderService.getCountOfBhfOrder(searchDTO));
 //		return map;
+		
+		return result;		
+				
+		
+	};
+	
+	@GetMapping("/order/detail")
+	public Object orderDetail(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
+			@RequestParam(name ="page", defaultValue = "1", required = false) int page,
+			@RequestParam(name = "orderCode", defaultValue = "bhf_ord1") String orderCode,
+			BhfOrderDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException  {
+		
+		
+		//한 페이지에 출력할 수 : 기본값: 5
+		paging.setPageUnit(perPage);
+		//현재 페이지(기본값: 1)
+		paging.setPage(page);
+		
+		
+		
+		
+		
+		//첫 페이지, 마지막 페이지
+		dto.setStart(paging.getFirst());
+		dto.setEnd(paging.getLast());
+		dto.setOrderCode(orderCode);
+		
+		GridArray grid = new GridArray();
+		Object result = grid.getArray(paging.getPage(), bsnOrderService.getCountOfBhfOrderDetail(dto), bsnOrderService.getBhfOrderDetail(dto) );
+		
+
 		
 		return result;		
 				

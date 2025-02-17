@@ -12,17 +12,17 @@
 	*   수정일      수정자          수정내용
 	*  ======    =======    ==============================
 	*  2025.02.12  표하연          최초생성
+	*  2025.02.14  표하연          회사등록 및 검색기능 활성화
 	*
 	*  </pre>
 ======================================================== -->
-<html xmlns:th="http://www.thymeleaf.org"
-	layout:decorate="~{/erp/layouts/main}">
+<html layout:decorate="~{/erp/layouts/main}">
 
 
 <div class="container w-100 mw-1600" layout:fragment="content">
 	<div class="d-flex flex-column mb-1">
 		<div class="d-flex justify-content-start p-0 mt-2">
-			<h2>회사관리</h2>
+			<h4>회사관리</h4>
 		</div>
 		<!-- 회사 검색 영역 -->
 		<div class="p-2">
@@ -68,6 +68,25 @@
 						id="flexCheckChecked" checked> <label
 						class="form-check-label" for="flexCheckChecked"> 기간구독 </label>
 				</div>
+				
+				<div>
+					<select name="display_amount" id="display_amount" class="col-8 input-box" onchange="changeDisplay()">
+						<option value="5" selected>5</option>
+						<option value="10">10</option>
+						<option value="20">20</option>
+						<option value="50">50</option>
+						<option value="100">100</option>
+					</select>
+				</div>
+				<div>
+					<span class="label-search col-4">회사명</span>
+					<input type="text" name="companyName2" id="companyName2" class="col-8 input-box">
+				</div>
+				<div>
+				<div class="d-flex justify-content-center align-items-center">
+				  <button type="button" class="btn btn-primary me-2" onclick="search()">검색</button>
+				  <button type="button" class="btn btn-secondary" onclick="reset()">초기화</button>
+				</div>
 			</div>
 		</div>
 		<!-- 회사 검색 영역 끝 -->
@@ -85,13 +104,31 @@
 		    <div class="d-flex justify-content-center border border-primary-subtle rounded-3 p-0" style="height: 400px;">
 		        <!-- 왼쪽 영역 -->
 		        <div class="d-flex flex-column flex-grow-1 flex-wrap p-1 btn-list" style="max-width: 50%;">
-		            <div class="d-flex flex-wrap mb-1 justify-content-end">
-		                <div class="p-1"><button type="button" class="btn btn-success btn-sm inputComInser">회사등록</button></div>
-		                <div class="p-1"><button type="button" class="btn btn-danger btn-sm allCance" style="display: none;">닫기</button></div>
-		            </div>
+		            <div class="d-flex flex-wrap mb-1 justify-content-between align-items-center">
+					    
+					    <!-- 왼쪽 정렬 버튼 그룹 -->
+					    <div class="d-flex gap-2">
+					        <button type="button" class="btn btn-success btn-sm inputComInser">회사등록</button>
+					        <div class="csbtnlist" style="display: none;">
+							    <button type="button" class="btn btn-primary btn-sm cslist">CS내역</button>
+							    <button type="button" class="btn btn-success btn-sm reinfo">구독정보</button>
+							    <button type="button" class="btn btn-success btn-sm relist">구독내역</button>
+							    <!-- <button type="button" class="btn btn-outline-danger btn-sm getout">중도해지</button> -->
+							    <button type="button" class="btn btn-warning btn-sm pwreset">비밀번호초기화</button>
+							</div>
+					    </div>
+					
+					    <!-- 오른쪽 정렬 버튼 -->
+					    <div>
+					        <button type="button" class="btn btn-danger btn-sm allCance" style="display: none;">닫기</button>
+					    </div>
+					    
+					</div>
+
 		            <!-- 폼시작 -->
 		            <div id="formSection" style="display: none;">
 			            <form action="#" id="inputComFrom" enctype="multipart/form-data">
+						<input type="hidden" id="csrfToken" name="_csrf" th:value="${_csrf != null ? _csrf.token : ''}">
 			            <!-- EQ01=단순문의 / EQ02=상태변경 / EQ03=발행 / EQ04=신규등록 -->
 			            <input type="hidden" value="EQ04" id="customerServiceDivision" name="customerServiceDivision">
 			            <input type="hidden" value="" id="businessFullNumber" name="businessFullNumber">
@@ -182,6 +219,39 @@
 								</div>
 			                </div>
 			            </div>
+			            <div class="csinfolist" style="display: none;">
+			            	<div class="d-flex flex-wrap mb-1">
+				                <div class="p-0 me-2">
+									<div class="input-group input-group-sm mb-1 pe-1">
+										<span class="input-group-text">서비스상태</span>
+										<select class="form-select custom-select" style="width: 120px;">
+										  <option value="EC01">서비스</option>
+										  <!-- <option value="EC02">일시정지</option> -->
+										  <option value="EC03">만료</option>
+										</select>
+										<button class="btn btn-outline-secondary serviceChange" type="button">변경</button>
+									</div>
+				                </div>
+				                <div class="p-0 me-2">
+				                	<div class="input-group input-group-sm mb-1">
+										<input type="text" class="form-control" id="dateChangeInput" name="dateChangeInput" style="width: 50px;">
+										<button class="btn btn-outline-secondary dateChange" type="button">기간변경</button>
+									</div>
+				                </div>
+				                <div class="p-0 me-2">
+				                	<div class="input-group input-group-sm mb-1">
+										<span class="input-group-text">남은기간</span>
+										<input type="text" class="form-control" id="dDay" name="dDay" style="width: 100px;" readonly="readonly">
+									</div>
+				                </div>
+				                <div class="p-0">
+				                	<div class="input-group input-group-sm mb-1">
+										<span class="input-group-text">만료일</span>
+										<input type="text" class="form-control" id="subscriptionEndDate" name="subscriptionEndDate" style="width: 100px;" readonly="readonly">
+									</div>
+				                </div>
+				            </div>
+				        </div>
 			            <div class="d-flex align-items-stretch mb-1">
 						    <div class="p-0 flex-grow-1 me-2">
 						        <div class="mb-1">
@@ -191,7 +261,7 @@
 						    </div>
 						    <div class="p-0">
 						        <div class="mb-1 h-100">
-						            <button type="button" class="btn btn-success h-100" id="insertAndUpdate"><b>회 사<br><br>등 록</b></button>
+						            <button type="button" class="btn btn-success h-100" id="insertAndUpdate"><b>등 록</b></button>
 						        </div>
 						    </div>
 						</div>
@@ -208,22 +278,71 @@
 		
 		        <!-- 오른쪽 영역 -->
 		        <div class="d-flex justify-content-center flex-grow-1 p-1" style="max-width: 50%;">
-		            처리
+		            <div class="d-flex flex-column mb-3 overflow-auto appendsection">
+					</div>
 		        </div>
 		    </div>
 		</div>
 		<!-- 데이터 처리 영역 끝-->
 	</div>
-
-
-	<script>
+	<!-- 사업자 등록증 모달 -->
+	<div class="modal fade" id="businessLicenseModal" tabindex="-1" aria-labelledby="businessLicenseModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="businessLicenseModalLabel">사업자 등록증</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<img id="businessLicenseImg" src="" class="img-fluid" alt="사업자 등록증">
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script th:inline="javascript">
+		//클릭한 행의 정보를 담는 전역 변수
+		var rowData = false;
+		
+		//로그인 처리할때 까지 이건 계속 있어야함
+		let employeeNum = employeeInfo.employeeNum;
+		document.querySelector("#employeeNum").value = employeeNum;
+	
+		// 페이지 로드 후 이벤트 바인딩
 		document.addEventListener("DOMContentLoaded", function() {
+			
+			// 모달 버튼 클릭 이벤트 바인딩
+		    document.body.addEventListener("click", function(event) {
+		        if (event.target.classList.contains("contract-btn")) {
+		            let value = event.target.getAttribute("data-id");
+		            openBusinessLicenseModal(value);
+		        }
+		    });
+		 
 		});
+		
+		// 모달 열기 함수
+		function openBusinessLicenseModal(value) {
+		    console.log("사업자 등록증 모달 호출됨, value:", value);
+		    // 이미지 경로 설정 (서버의 이미지 경로에 맞게 수정 필요)
+		    let imageUrl = `http://www.hanalin.net/erp/bsnlicense/${value}`; 
+		    // 이미지 설정
+		    document.getElementById("businessLicenseImg").src = imageUrl;
+		    // 모달 표시
+		    let modal = new bootstrap.Modal(document.getElementById("businessLicenseModal"));
+		    modal.show();
+		}
+		
 		//그리드 선언
 		var Grid = tui.Grid;
 		const dataSource = {
 			api : {
-				readData : { url : '/erp/rest/comlist', method : 'GET', initParams : { param : 'param' } },
+				//readData: { url: '/erp/rest/comlist', method: 'GET', initParams: { param : 'param' } },	//이거인데 공통함수를 위해 변경
+				//readData: { url: '/erp/rest/comlist', method: 'GET', initParams: { page: 1 } },
+				readData: { url: '/erp/rest/comlist', method: 'GET'},
 			//createData: { url: '/api/createData', method: 'POST' },
 			//updateData: { url: '/api/updateData', method: 'PUT' },
 			//modifyData: { url: 'http://localhost:81/api/board/modifyData', method: 'PUT' },
@@ -247,7 +366,11 @@
 				{ header: "담당자명", name: "chargerName", editor: 'text' },
 				{ header: "담당자연락처", name: "chargerPhone", editor: 'text' },
 				{ header: "이메일", name: "chargerEmail", editor: 'text' },
-				{ header: "사업자등록증", name: "businessLicense", editor: 'text' },
+				{ header: "사업자등록증", name: "businessLicense", editor: 'text',
+					formatter: function({ value }) {
+				        return `<button class="btn btn-info btn-sm contract-btn" data-id="${value}">등록증</button>`;
+				    },
+				},
 				{ header: "계약서", 
 			        name: "contractNum", 
 			        formatter: function({ value }) {
@@ -309,6 +432,113 @@
 			//초기 데이터 뭘로 할지
 			data : dataSource,
 		});
+	
+		//현재 그리드에 강조된행을 기록할 변수
+		let selectedRowKey = null;
+		
+		grid.on('click', function (ev) {
+			//행 전체 선택하는법
+			/* var record = {
+			  start: [ev.rowKey, 0],
+			  end: [ev.rowKey, grid.getColumns().length]
+			}
+			grid.setSelectionRange(record); */
+		
+			if (ev.rowKey !== null) {
+
+				//현재 강조된 행 클래스 초기화
+				if (selectedRowKey !== null) {
+		            grid.removeRowClassName(selectedRowKey, 'tui-grid-row-highlight');
+		        }
+		     	// 클릭한 행에 강조 효과 추가
+				grid.addRowClassName(ev.rowKey, 'tui-grid-row-highlight');
+				 // 현재 강조된 행을 기록
+		        selectedRowKey = ev.rowKey;
+				
+				rowData = grid.getRow(ev.rowKey);
+				console.log(`클릭한 행 데이터:\n${JSON.stringify(rowData, null, 2)}`);
+				
+				//폼 초기화
+				document.querySelector("#inputComFrom").reset();
+				//에러 메세지 초기화
+				document.querySelector(".errMessage").innerHTML = '';
+				// 회사등록버튼 비활성화
+				inputComInserbtn.style.display="none";
+				// 등록양식 활성화
+				document.querySelector("#formSection").style.display="block";
+				// 회사일반 CS 처리 기준정보로 변경
+				document.querySelector("#customerServiceDivision").value = "EQ01";
+				// 회사 cs 처리 관련 버튼 활성화
+				document.querySelector(".csbtnlist").style.display="block";
+				// 닫기버튼 활성화
+				allCanceinbtn.style.display="block";
+				//insertAndUpdate
+				document.querySelector("#insertAndUpdate").innerTEXT = "처리반영";
+				// 회사 서비스 관련 인풋 박스 활성화
+				document.querySelector(".csinfolist").style.display="block";
+				//서비스 상태 셀렉트 박스 확인
+				document.querySelector(".custom-select").value = rowData.serviceState;
+				//cs내역 띄우기
+				cslistfun();
+				
+				
+				//각행에 값 넣기
+				document.querySelector("#companyNum").value = rowData.companyNum;	//회사번호
+				document.querySelector("#companyName").value = rowData.companyName;	//회사이름
+				document.querySelector("#companyEngName").value = rowData.companyEngName;	//회사영문명
+				document.querySelector("#companyEngName").readOnly = true;
+				document.querySelector("#businessFullNumber").value = rowData.businessNum;	//회사 사업자번호
+				let parts = rowData.businessNum.split("-");
+				document.querySelector("#businessNum1").value = parts[0];
+				document.querySelector("#businessNum2").value = parts[1];
+				document.querySelector("#businessNum3").value = parts[2];
+				document.querySelector("#representationName").value = rowData.representationName;	//대표자명
+				document.querySelector("#chargerName").value = rowData.chargerName;	//담당자명
+				document.querySelector("#representationPhone").value = rowData.representationPhone;	//대표자연락처
+				document.querySelector("#chargerPhone").value = rowData.chargerPhone;	//담당자연락처
+				document.querySelector("#chargerEmail").value = rowData.chargerEmail;	//메일
+				//document.querySelector("#businessLicense").value = rowData.businessLicense;	//파일명은 수정불가 신규등록만 됨
+				document.querySelector("#fullAddress").value = rowData.companyAddress;	//회사주소 (히든)
+				document.querySelector("#companyAddress").value = rowData.companyAddress;	//회사주소 (인풋)
+				
+				
+				document.querySelector("#subscriptionEndDate").value = rowData.subscriptionEndDate;	//만료일
+				//남은기간 구하기
+	            const endDateStr = rowData.subscriptionEndDate; 
+	            const endDate = new Date(endDateStr);	
+	            const today = new Date();
+	            const timeDiff = endDate.getTime() - today.getTime();
+	            const remainingDays = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+				document.querySelector("#dDay").value = remainingDays+"일";	//남은기간
+				
+				//CS 내용
+				//document.querySelector("#customerServiceContent").value = rowData.customerServiceContent;
+			 }
+		});
+		
+		
+		//그리드 표시 수량 변경
+		function changeDisplay() {
+			let gap = parseInt(document.querySelector('#display_amount').value);
+			grid.setPerPage(gap, dataSource)
+		}
+		//검색 처리 이벤트
+		function search(){
+			let companyName = document.querySelector('#companyName2').value;
+			console.log(companyName);
+			grid.setRequestParams({"companyName" : companyName})
+			grid.readData();
+		}
+		//검색 초기화 이벤트
+		function reset(){
+			let companyName = document.querySelector('#companyName');
+	
+			companyName.value = '';
+			
+			grid.setRequestParams({"companyName" : companyName.value })
+			grid.readData();
+		}
+		
 		
 		// 주소검색 api
 		document.addEventListener("DOMContentLoaded", function() {
@@ -340,6 +570,228 @@
 		});
 		// 주소검색 api 끝
 		
+		//cs 내역
+		document.querySelector(".cslist").addEventListener("click", function(){
+			cslistfun();
+		});
+		function cslistfun(){
+			//클릭하면 돔으로 저기 다 생성되게 해야함
+			const requestData = {
+					companyNum: rowData.companyNum,	//회사번호
+			};
+			const url = "/erp/rest/csList";
+			//패치 시작
+			fetch(url, {
+				method:"post",
+				headers: {
+				      "Content-Type": "application/json",
+				    },
+				body : JSON.stringify(requestData),
+			})
+			.then( result => result.json() )
+			.then( result => {
+				console.log("회신결과 ", result);
+				
+				document.querySelector(".appendsection").innerHTML = '';
+				
+				result.forEach(ele => {
+					let cstag = `
+		                <div class="p-2">
+		                    <table id="answerTable">
+		                        <tr>
+		                            <th>답변유형</th>
+		                            <td>${ele.customerServiceDivision || "N/A"}</td>
+		                            <th>처리담당자</th>
+		                            <td>${ele.employeeName || "N/A"}</td>
+		                            <th>처리일시</th>
+		                            <td>${ele.customerServiceDate || "N/A"}</td>
+		                        </tr>
+		                        <tr>
+		                            <th>답변내용</th>
+		                            <td colspan="5">${ele.customerServiceContent || "내용 없음"}</td>
+		                        </tr>
+		                    </table>
+		                </div>
+		            `;
+					
+					document.querySelector(".appendsection").insertAdjacentHTML("beforeend",cstag);
+					
+				});
+			} )
+			//패치 끝
+		}
+		
+		//비밀번호 초기화
+		document.querySelector(".pwreset").addEventListener("click", function(){
+			if(document.querySelector("#customerServiceContent").value){
+				const requestData = {
+						companyNum: rowData.companyNum,						//회사번호
+						customerServiceDivision: "EQ02",					//문의유형
+						employeeNum: employeeNum,							//처리자번호
+						customerServiceContent: document.querySelector("#customerServiceContent").value,		//문의내용
+				};
+				const url = "/erp/rest/pwReSet";
+				//패치 시작
+				fetch(url, {
+					method:"post",
+					headers: {
+					      "Content-Type": "application/json",
+					      // 'Content-Type': 'application/x-www-form-urlencoded',
+					    },
+					body : JSON.stringify(requestData),
+				})
+				.then( result => result.text() )
+				.then( result => {
+					console.log("비밀번호 초기화결과 " + result);
+					if(result==="OK"){
+						alert('초기화 완료');
+						cslistfun();
+					}else{
+						alert("비밀번호 초기화중 심각한 오류 발생 관리자 문의");
+					}
+				} )
+				//패치 끝
+			}else{
+				alert('사유를 입력해주세요');
+			}
+		});
+		
+		//서비스 상태 변경
+		document.querySelector(".serviceChange").addEventListener("click", function(){
+			//추후 서비스 만료시 남은 기간들에대한 해지금 출력 필요
+			if(document.querySelector("#customerServiceContent").value){
+				
+				let customSelect = document.querySelector(".custom-select").value;
+				
+				if( rowData.serviceState == customSelect ){
+					alert('동일한 상태로 변경 불가 합니다');
+				}else{
+					//회사번호에 대한 모든 구독목록을 만료시킴
+					//일시정기 기능은 제거 하였습니다
+					const requestData = {
+							companyNum: rowData.companyNum,						//회사번호
+						    customerServiceDivision: "EQ02",					//문의유형
+						    customerServiceContent: document.querySelector("#customerServiceContent").value,		//문의내용
+						    employeeNum: employeeNum,							//처리자번호
+						    subscriptionEndDate: rowData.subscriptionEndDate,	//기존 구독 만료일
+						    serviceState: customSelect,							//서비스상태
+					};
+					const url = "/erp/rest/serviceToggle";
+					//패치 시작
+					fetch(url, {
+						method:"post",
+						headers: {
+						      "Content-Type": "application/json",
+						      // 'Content-Type': 'application/x-www-form-urlencoded',
+						    },
+						body : JSON.stringify(requestData),
+					})
+					.then( result => result.text() )
+					.then( result => {
+						console.log("서비스변경결과 " + result);
+						if(result==="OK"){
+							//재선택 효과 주기위해 값을 담음
+							let selectedRowKey = rowData ? rowData.rowKey : null;
+							grid.readData();
+							document.querySelector("#customerServiceContent").value = "";
+							if(document.querySelector(".custom-select").value=="EC03"){
+								document.querySelector("#subscriptionEndDate").value = "1010-10-10";
+								document.querySelector("#dDay").value = "종료";
+							}else{
+								let today = new Date();
+								today.setDate(today.getDate() + 9);
+								let formattedDate = today.toISOString().split('T')[0];
+								document.querySelector("#subscriptionEndDate").value = formattedDate;
+								document.querySelector("#dDay").value = "10일";
+							}
+							cslistfun();
+							setTimeout(() => {
+					            grid.addRowClassName(selectedRowKey, 'tui-grid-row-highlight');
+					        }, 500);
+						}else{
+							alert("서비스상태 변경중 심각한 오류 발생 관리자 문의");
+						}
+					} )
+					//패치 끝
+				}
+			}else{
+				alert("처리 내용을 입력해주세요");
+			}
+		});
+		
+		//서비스 기간 변경
+		document.querySelector(".dateChange").addEventListener("click", function(){
+			
+			if(rowData.subscriptionForm == "EL01"){
+				if(document.querySelector("#customerServiceContent").value){
+					
+					let dateChangeInput = parseInt(document.querySelector("#dateChangeInput").value, 10);
+					let subscriptionEndDate = document.querySelector("#subscriptionEndDate").value;
+					
+					let endDate = new Date(subscriptionEndDate);
+					endDate.setDate(endDate.getDate() + dateChangeInput);
+					let updatedDate = endDate.toISOString().split('T')[0];
+					console.log("새로운 만료일:", updatedDate);
+					
+					let today = new Date();
+					let timeDiff = endDate.getTime() - today.getTime();
+					let remainingDays = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+					console.log("새로운 남은기간:", remainingDays);
+					
+					//erp_subscription_info_list 테이블 해당구독번호의 만료일(subscription_end_date) 수정 및 구독일(subscription_update_date) 수정
+					//erp_company 테이블 서비스상태(service_state) EC03으로 변경  -10일면 만료 처리
+					
+					const requestData = {
+							companyNum: rowData.companyNum,						//회사번호
+						    customerServiceDivision: "EQ02",					//문의유형
+						    customerServiceContent: document.querySelector("#customerServiceContent").value,		//문의내용
+						    employeeNum: employeeNum,							//처리자번호
+						    subscriptionEndDate: updatedDate,					//구독만료일
+						    remainingDays: remainingDays,						//남은기간
+						    subscriptionNum: rowData.subscriptionNum,			//구독번호
+					};
+					
+					const url = "/erp/rest/serviceChange";
+					//패치 시작
+					fetch(url, {
+						method:"post",
+						headers: {
+						      "Content-Type": "application/json",
+						      // 'Content-Type': 'application/x-www-form-urlencoded',
+						    },
+						body : JSON.stringify(requestData),
+					})
+					.then( result => result.text() )
+					.then( result => {
+						console.log("기간변경결과 " + result);
+						if(result==="OK"){
+							//재선택 효과 주기위해 값을 담음
+							let selectedRowKey = rowData ? rowData.rowKey : null;
+							grid.readData();
+							cslistfun();
+							document.querySelector("#customerServiceContent").value = "";
+							setTimeout(() => {
+					            grid.addRowClassName(selectedRowKey, 'tui-grid-row-highlight');
+					        }, 500);
+							document.querySelector("#subscriptionEndDate").value = updatedDate;
+							document.querySelector("#dDay").value = remainingDays+"일";	//남은기간
+							if(remainingDays <= -10){
+								document.querySelector(".custom-select").value = "EC03";
+							}
+						}else{
+							alert("기간 변경중 심각한 오류 발생 관리자 문의");
+						}
+					} )
+					//패치 끝
+				}else{
+					alert('내용을 기입해야만 합니다.');
+				}
+			}else{				
+				alert("기간제 구독일때만 서비스 가능합니다");
+			}
+		});
+		
+		
 		//파일 업로드 버튼 클릭시 파일 선택 처리
 		// 파일 입력 필드
         const fileInput = document.getElementById("businessLicense");
@@ -361,6 +813,7 @@
         });
       	//파일 업로드 버튼 클릭시 파일 선택 처리 끝
 		
+      	
 		// 회사등록버튼
 		const inputComInserbtn = document.querySelector(".inputComInser");
 		// 닫기버튼
@@ -377,6 +830,12 @@
 			document.querySelector("#customerServiceDivision").value = "EQ04";
 			// 닫기버튼 활성화
 			allCanceinbtn.style.display="block";
+			// 회사 서비스 관련 인풋 박스 비활성화
+			document.querySelector(".csinfolist").style.display="none";
+			// 회사영문명 적을수있게
+			document.querySelector("#companyEngName").readOnly = false;
+			//회사 등록버튼 누르면 선택한 행의 데이터 삭제
+			rowData = false;
 		});
 		
 		// 닫기버튼 => 폼 초기화 => 폼 영역 none
@@ -391,16 +850,33 @@
 			inputComInserbtn.style.display="block";
 			// 닫기버튼 비활성화
 			allCanceinbtn.style.display="none";
+			//cs버튼 영역 안보이게
+			document.querySelector(".csbtnlist").style.display = "none";
+			// 회사 서비스 관련 인풋 박스 비활성화
+			document.querySelector(".csinfolist").style.display="none";
+			// 회사영문명 적을수있게
+			document.querySelector("#companyEngName").readOnly = false;
+			//닫기 등록버튼 누르면 선택한 행의 데이터 삭제
+			rowData = false;
+			//현재 강조된 행 클래스 초기화
+			if (selectedRowKey !== null) {
+	            grid.removeRowClassName(selectedRowKey, 'tui-grid-row-highlight');
+	        }
+			//cs내역 영역 지우기
+			document.querySelector(".appendsection").innerHTML = '';
+			
 		});
 		
 		let isOkNo = false;
 		// 회사삽입 (실제 등록해서 유효성 검사하는 부분)
 		document.querySelector("#insertAndUpdate").addEventListener("click", async function(){
+
 			let isOkNo = false;
 			let errorMessage = "";
 			//회사명 논리 검증
 			let companyName = document.querySelector("#companyName").value;
-			companyName = "좋은회사";	//★★★★★★검증후 지우기
+			//companyName = "좋은회사";	//★★★★★★검증후 지우기
+			console.log("회사명 "+companyName);
 			if(getByteLength(companyName) < 50 && getByteLength(companyName) >= 1){
 				isOkNo = true;
 				errorMessage = "";
@@ -408,10 +884,10 @@
 				isOkNo = false;
 				errorMessage = '회사명 15자 이하 입니다';
 			}
-			if(isOkNo){
+			if(isOkNo && !rowData){
 				//회사영문명 논리 검증
 				let companyEngName = document.querySelector("#companyEngName").value;
-				companyEngName = "oliveyoungsa";	//★★★★★★검증후 지우기
+				//companyEngName = "oliveyoungsa";	//★★★★★★검증후 지우기
 				if(getByteLength(companyEngName) <= 20 && isAllLowerCase(companyEngName) && getByteLength(companyEngName) >= 1){
 					//호출해야함 companyEngName
 					let enboolean = await iscomapnyEngName(companyEngName);
@@ -434,7 +910,7 @@
 				let businessNum2 = document.querySelector("#businessNum2").value;
 				let businessNum3 = document.querySelector("#businessNum3").value;
 				let businessNumber = businessNum1+businessNum2+businessNum3;
-				businessNumber = "6478100749";	//★★★★★★검증후 지우기
+				//businessNumber = "6478100749";	//★★★★★★검증후 지우기
 				if(getByteLength(businessNumber) == 10 && isAllNumberCase(businessNumber)){
 					document.querySelector("#businessFullNumber").value = businessNum1+"-"+businessNum2+"-"+businessNum3;
 					isOkNo = true;
@@ -448,7 +924,7 @@
 			if(isOkNo){
 				//대표자명 논리 검증
 				let representationName = document.querySelector("#representationName").value;
-				representationName = "나대표";	//★★★★★★검증후 지우기
+				//representationName = "나대표";	//★★★★★★검증후 지우기
 				if(getByteLength(representationName) <= 12 && getByteLength(representationName) >= 1 && isAllKoreanCase(representationName)){
 					isOkNo = true;
 					errorMessage = "";
@@ -460,7 +936,7 @@
 			if(isOkNo){
 				//담당자명 논리 검증
 				let chargerName = document.querySelector("#chargerName").value;
-				chargerName = "나사원";	//★★★★★★검증후 지우기
+				//chargerName = "나사원";	//★★★★★★검증후 지우기
 				if(getByteLength(chargerName) <= 12 && getByteLength(chargerName) >= 1 && isAllKoreanCase(chargerName)){
 					isOkNo = true;
 					errorMessage = "";
@@ -472,7 +948,7 @@
 			if(isOkNo){
 				//대표자 번호 논리 검증
 				let representationPhone = document.querySelector("#representationPhone").value;
-				representationPhone = "01085216704";	//★★★★★★검증후 지우기
+				//representationPhone = "01085216704";	//★★★★★★검증후 지우기
 				representationPhone = representationPhone.replaceAll("-","").trim();
 				if(isAllNumberCase(representationPhone) && getByteLength(representationPhone) == 11){
 					isOkNo = true;
@@ -486,7 +962,7 @@
 			if(isOkNo){
 				//담당자 번호 논리 검증
 				let chargerPhone = document.querySelector("#chargerPhone").value;
-				chargerPhone = "01085216704";	//★★★★★★검증후 지우기
+				//chargerPhone = "01085216704";	//★★★★★★검증후 지우기
 				chargerPhone = chargerPhone.replaceAll("-","").trim();
 				if(isAllNumberCase(chargerPhone) && getByteLength(chargerPhone) == 11){
 					isOkNo = true;
@@ -500,7 +976,7 @@
 			if(isOkNo){
 				//이메일 논리 검증
 				let chargerEmail = document.querySelector("#chargerEmail").value;
-				chargerEmail = "hayeon8521@kakao.com";	//★★★★★★검증후 지우기
+				//chargerEmail = "hayeon8521@kakao.com";	//★★★★★★검증후 지우기
 				if(isValidEmail(chargerEmail)){
 					isOkNo = true;
 					errorMessage = "";
@@ -509,7 +985,7 @@
 					errorMessage = '이메일 형식이 맞지 않습니다.';
 				}
 			}
-			if(isOkNo){
+			if(isOkNo && !rowData){
 				//파일명 확인
 				let businessLicense = document.querySelector("#businessLicense").value;
 				//businessLicense = "abad.png";	//★★★★★★검증후 지우기
@@ -520,14 +996,27 @@
 					isOkNo = false;
 					errorMessage = '이미지 또는 PDF 파일이 아닙니다.';
 				}
-				
+			}else if(isOkNo && rowData){
+				let businessLicense = document.querySelector("#businessLicense").value;
+				if(businessLicense){
+					if(isValidFileExtension(businessLicense)){
+						isOkNo = true;
+						errorMessage = "";
+					}else{
+						isOkNo = false;
+						errorMessage = '이미지 또는 PDF 파일이 아닙니다.';
+					}
+				}else{
+					isOkNo = true;
+					errorMessage = "";
+				}
 			}
-			if(isOkNo){
+			if(isOkNo && !rowData){
 				//주소 논리 검증
 				let companyAddress = document.querySelector("#companyAddress").value;
 				let companyAddressMOD = document.querySelector("#companyAddressMOD").value;
-				companyAddress = "서울시 강남구 개포동";	//★★★★★★검증후 지우기
-				companyAddressMOD = "1188-2";	//★★★★★★검증후 지우기
+				//companyAddress = "서울시 강남구 개포동";	//★★★★★★검증후 지우기
+				//companyAddressMOD = "1188-2";	//★★★★★★검증후 지우기
 				if(getByteLength(companyAddress) >= 1 && getByteLength(companyAddressMOD) >= 1){
 					isOkNo = true;
 					errorMessage = "";
@@ -536,12 +1025,19 @@
 					isOkNo = false;
 					errorMessage = '주소를 입력 해주세요.';
 				}
-				
+			}else{
+				let companyAddress = document.querySelector("#companyAddress").value;
+				let companyAddressMOD = document.querySelector("#companyAddressMOD").value;
+				if(companyAddressMOD){
+					document.querySelector("#fullAddress").value = companyAddress+" "+companyAddressMOD;				
+				}else{
+					document.querySelector("#fullAddress").value = companyAddress+companyAddressMOD;
+				}
 			}
 			if(isOkNo){
 				//사유 기입해야 버튼 처리 가능
 				let customerServiceContent = document.querySelector("#customerServiceContent").value;
-				customerServiceContent = "서울시 강남구 개포동";	//★★★★★★검증후 지우기
+				//customerServiceContent = "서울시 강남구 개포동";	//★★★★★★검증후 지우기
 				if(customerServiceContent){
 					isOkNo = true;
 					errorMessage = "";
@@ -553,6 +1049,7 @@
 			}
 			document.querySelector(".errMessage").innerHTML = errorMessage;
 			if (isOkNo) {
+				let companyNum = document.querySelector("#companyNum").value;
 				let companyName = document.querySelector("#companyName").value;
 				let companyEngName = document.querySelector("#companyEngName").value;
 				let businessNum = document.querySelector("#businessFullNumber").value;
@@ -564,9 +1061,30 @@
 				//let businessLicense = document.querySelector("#businessLicense").value;
 				let companyAddress = document.querySelector("#fullAddress").value;
 				let customerServiceContent = document.querySelector("#customerServiceContent").value;
+				//let customerServiceDivision = document.querySelector("#customerServiceDivision").value;	//이건 아랫쪽에서 받음
+				
+				if(rowData){
+					if(rowData.companyName != companyName
+							|| rowData.businessNum != businessNum
+							|| rowData.representationName != representationName
+							|| rowData.chargerName != chargerName
+							|| rowData.representationPhone != representationPhone
+							|| rowData.chargerPhone != chargerPhone
+							|| rowData.chargerEmail != chargerEmail
+							|| rowData.companyAddress != companyAddress
+							|| document.getElementById("businessLicense").value
+					){
+						document.querySelector("#customerServiceDivision").value = "EQ02";	//상태변경
+					}else{
+						document.querySelector("#customerServiceDivision").value = "EQ01";	//단순 CS
+					}			
+				}
+				
 				let customerServiceDivision = document.querySelector("#customerServiceDivision").value;
-				companyName = "좋은회사";	//★★★★★★검증후 지우기
-				companyEngName = "oliveyoung";	//★★★★★★검증후 지우기
+				
+				/*
+				companyName = "좋은회사16";	//★★★★★★검증후 지우기
+				companyEngName = "olivip";	//★★★★★★검증후 지우기
 				businessNum = "647-81-00749"
 				representationName = "나대표";	//★★★★★★검증후 지우기
 				chargerName = "나사원";	//★★★★★★검증후 지우기
@@ -577,42 +1095,133 @@
 				companyAddress = "서울시 좋은곳에 위치";
 				customerServiceContent = "문의내용이에요";
 				customerServiceDivision = "질의 분류";
+				*/
 				
-				//로그인 처리할때 까지 이건 계속 있어야함
-				let employeeNum = document.querySelector("#employeeNum").value;
-				employeeNum = 1;
-				
-				//이미지 먼저 저장하고
-				const uploadedFileName = await imgSave();
-				if (uploadedFileName === "FAIL") {
-					alert('치명적 이미지 오류발생 관리자 문의');
-			        return;
-			    }
-				let businessLicense = uploadedFileName;
-    		    
-				
-				const url = "/erp/rest/newcomapny";
-				const param = {
-								companyName, companyEngName,
-								representationName, chargerName, representationPhone,
-								chargerPhone, chargerEmail, businessLicense,
-								companyAddress, businessNum
-				};
-				const requestData = {
-										dto: param,
-									    customerServiceDivision: customerServiceDivision,
-									    customerServiceContent: customerServiceContent,
-									    employeeNum: employeeNum
-				};
-				fetch(url, {
-					method:"post",
-					headers: {
-					      "Content-Type": "application/json",
-					      // 'Content-Type': 'application/x-www-form-urlencoded',
-					    },
-					body : JSON.stringify(requestData),
-				})
-				.then( result => result.json() )
+				if( customerServiceDivision == "EQ01" ){	//단순문의
+					const requestData = {
+							companyNum: companyNum,								//회사번호
+						    customerServiceDivision: customerServiceDivision,	//문의유형
+						    customerServiceContent: customerServiceContent,		//문의내용
+						    employeeNum: employeeNum							//처리자번호
+					};
+					const url = "/erp/rest/cs";
+					//패치 시작
+					fetch(url, {
+						method:"post",
+						headers: {
+						      "Content-Type": "application/json",
+						      // 'Content-Type': 'application/x-www-form-urlencoded',
+						    },
+						body : JSON.stringify(requestData),
+					})
+					.then( result => result.text() )
+					.then( result => {
+						console.log("회사등록결과" + result);
+						if(result==="OK"){
+							//재선택 효과 주기위해 값을 담음
+							let selectedRowKey = rowData ? rowData.rowKey : null;
+							grid.readData();
+							document.querySelector("#customerServiceContent").value = "";
+							cslistfun();
+							setTimeout(() => {
+					            grid.addRowClassName(selectedRowKey, 'tui-grid-row-highlight');
+					        }, 500);
+						}else{
+							alert("회사 등록중 심각한 오류 발생 관리자 문의");
+						}
+					} )
+					//패치 끝
+				}else if( customerServiceDivision == "EQ03" ){	//발행
+					
+				}else if( customerServiceDivision == "EQ02" ){	//정보수정
+					//이 항목 개발 다되면 없어질꺼임
+					let uploadedFileName = "";
+					let businessLicense = "";
+					if(document.getElementById("businessLicense").value){
+						uploadedFileName = await imgSave();
+						if (uploadedFileName === "FAIL") {
+							alert('치명적 이미지 오류발생 관리자 문의');
+					        return;
+					    }
+						businessLicense = uploadedFileName;
+					}
+					const url = "/erp/rest/upsertcompnay";
+					let serviceState = rowData.serviceState;
+					const param = {
+							companyNum, companyName, companyEngName,
+							representationName, chargerName, representationPhone,
+							chargerPhone, chargerEmail, businessLicense,
+							companyAddress, businessNum, serviceState
+					};
+					const requestData = {
+							dto: param,
+						    customerServiceDivision: customerServiceDivision,
+						    customerServiceContent: customerServiceContent,
+						    employeeNum: employeeNum
+					};
+					// 패치 시작
+					fetch(url, {
+						method:"post",
+						headers: {
+						      "Content-Type": "application/json",
+						      // 'Content-Type': 'application/x-www-form-urlencoded',
+						    },
+						body : JSON.stringify(requestData),
+					})
+					.then( result => result.text() )
+					.then( result => {
+						console.log("회사 수정 결과" + result);
+						if(result==="OK"){
+							allCanceinbtn.click();
+							grid.readData();
+						}else{
+							alert("회사 등록중 심각한 오류 발생 관리자 문의");
+						}
+					} )
+					// 패치 끝
+					
+				}else{
+					//이미지 먼저 저장하고
+					const uploadedFileName = await imgSave();
+					if (uploadedFileName === "FAIL") {
+						alert('치명적 이미지 오류발생 관리자 문의');
+				        return;
+				    }
+					let businessLicense = uploadedFileName;
+	    		    
+					
+					const url = "/erp/rest/newcomapny";
+					const param = {
+									companyName, companyEngName,
+									representationName, chargerName, representationPhone,
+									chargerPhone, chargerEmail, businessLicense,
+									companyAddress, businessNum
+					};
+					const requestData = {
+											dto: param,
+										    customerServiceDivision: customerServiceDivision,
+										    customerServiceContent: customerServiceContent,
+										    employeeNum: employeeNum
+					};
+					fetch(url, {
+						method:"post",
+						headers: {
+						      "Content-Type": "application/json",
+						      // 'Content-Type': 'application/x-www-form-urlencoded',
+						    },
+						body : JSON.stringify(requestData),
+					})
+					.then( result => result.text() )
+					.then( result => {
+						console.log("회사등록결과" + result);
+						if(result==="OK"){
+							allCanceinbtn.click();
+							grid.readData();
+						}else{
+							alert("회사 등록중 심각한 오류 발생 관리자 문의");
+						}
+					} )
+				}
 		    }
 		});
 

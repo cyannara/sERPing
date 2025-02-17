@@ -7,15 +7,6 @@ import java.util.List;
 
 @Data
 public class UserDTO  {
-//  private Long id;
-//  private String loginId;
-//  private String password;
-//  private String fullName;
-//  private String deptName;
-//
-//  private List<RoleDTO> roles;
-  
-  
   private Long employeeNum;
   private String employeeId;
   private String employeePw;
@@ -28,11 +19,4 @@ public class UserDTO  {
   private Long companyNum;
   private String companyEngName;
   private Long departmentNum;
-  
-  public List<RoleDTO> getRoles() {
-    if (roles == null) {
-      roles = new ArrayList<>();
-    }
-    return roles;
-  }
 }

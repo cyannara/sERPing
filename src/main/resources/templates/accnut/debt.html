@@ -139,7 +139,7 @@
 	
 	const dataSource = {
 		api: {
-			readData: { url: 'http://localhost:81/accnut/rest/debt/list', method: 'GET', initParams: { page: 1 } },
+			readData: { url: 'http://localhost:81/accnut/rest/debt/list', method: 'GET', initParams: { page: 1 , amount: 0 } },
 			
 		},
 		contentType: 'application/json'
@@ -167,29 +167,22 @@
 	
 	function changeDisplay() {
 		let gap = parseInt(document.querySelector('#display_amount').value);
-		grid.setPerPage(gap, dataSource)
+		grid.setPerPage(gap, dataSource);
 	}
 	
 	function search(){
 		let debtName = document.querySelector('#debtName').value;
 		let section = document.querySelector('#section').value.toString();
 		let creditor = document.querySelector('#creditor').value.toString();
-		console.log(creditor.toString());
-		grid.setRequestParams({"debtName" : debtName, "section" : section, "creditor" : creditor })
+		grid.setRequestParams({"debtName" : debtName, "section" : section, "creditor" : creditor });
 		grid.readData();
 	}
 	
 	function reset(){
-		let debtName = document.querySelector('#debtName');
-		let section = document.querySelector('#section');
-		let creditor = document.querySelector('#creditor');
-
-		debtName.value = '';
-		section.value = '';
-		creditor.value = '';
-
-
-		grid.setRequestParams({"debtName" : debtName.value, "section" : section.value, "creditor" : creditor.value })
+		let debtName = document.querySelector('#debtName').value = '';
+		let section = document.querySelector('#section').value = '';
+		let creditor = document.querySelector('#creditor').value = '';
+		grid.setRequestParams({"debtName" : debtName, "section" : section, "creditor" : creditor });
 		grid.readData();
 
 	}

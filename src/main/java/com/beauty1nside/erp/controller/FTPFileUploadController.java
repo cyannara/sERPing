@@ -72,6 +72,9 @@ public class FTPFileUploadController {
             ftpClient.login(ftpUser, ftpPass);
             ftpClient.enterLocalPassiveMode();
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+            
+            // **💡 FTPClient 인코딩 UTF-8 설정**
+            ftpClient.setControlEncoding("UTF-8");
 
             // 2. 파일명 뒤에 현재 시간 추가 (yyyyMMdd_HHmmss)
             String originalFileName = file.getOriginalFilename();
@@ -90,12 +93,18 @@ public class FTPFileUploadController {
             // 현재 날짜 및 시간 추가
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
             String newFileName = originalFileName + "_" + timestamp + extension;
+            
+            // **💡 한글 파일명 깨짐 방지 처리**
+            newFileName = new String(newFileName.getBytes("UTF-8"), "ISO-8859-1");
 
             // 3. 파일 업로드
             String remoteFilePath = ftpUploadDir + newFileName;
             try (InputStream inputStream = file.getInputStream()) {
                 boolean uploaded = ftpClient.storeFile(remoteFilePath, inputStream);
-                return uploaded ? newFileName : "FAIL";
+                
+                String utf8FileName = new String(newFileName.getBytes("ISO-8859-1"), "UTF-8");
+                
+                return uploaded ? utf8FileName : "FAIL";
             }
         } catch (IOException e) {
             e.printStackTrace();

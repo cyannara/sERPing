@@ -169,22 +169,22 @@
 
 	function changeDisplay() {
 		let gap = parseInt(document.querySelector('#display_amount').value);
-		grid.setPerPage(gap,dataSource)
+		grid.setPerPage(gap,dataSource);
 	}
+
 	function search(){
 		let assetName = document.querySelector('#assetsName').value;
 		let section = document.querySelector('#section').value.toString();
 		let institution = document.querySelector('#financialInstitution').value.toString();
-		console.log(institution.toString());
-		grid.setRequestParams({"assetsName" : assetName, "section" : section, "financialInstitution" : institution })
+		grid.setRequestParams({"assetsName" : assetName, "section" : section, "financialInstitution" : institution });
 		grid.readData();
 	}
+	
 	function reset(){
 		let assetName = document.querySelector('#assetsName').value = '';
 		let section = document.querySelector('#section').value = '';
 		let institution = document.querySelector('#financialInstitution').value = '';
-		console.log(institution.toString());
-		grid.setRequestParams({"assetsName" : assetName, "section" : section, "financialInstitution" : institution })
+		grid.setRequestParams({"assetsName" : assetName, "section" : section, "financialInstitution" : institution });
 		grid.readData();
 	}
 

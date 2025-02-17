@@ -88,3 +88,92 @@ WHERE rn >= 21
 ;
 
 select * from accnut_dealings_account_book;
+
+
+-- 2025-02-14
+SELECT dealings_account_book_code, section, types_of_transaction, amount, vat_alternative, dealings_contents, deal_date, department, company_num
+FROM accnut_dealings_account_book
+--;
+WHERE to_char(deal_date, 'yyyy-mm-dd') = '2025-02-14'
+;
+--WHERE dealings_account_book_code = #{dealingsAccountBookCode}
+--;
+select to_char(to_timestamp('02/14/2025 00:00:00.000', 'mm/dd/yyyy hh24:mi:ss.ff3'), 'yyyy-mm-dd') from dual;
+create sequence accnut_dealings_book_seq;
+commit;
+
+insert into accnut_dealings_account_book values (ACCNUT_DEALINGS_BOOK_SEQ.nextval, fn_get_cmmn_code('부채'), fn_get_cmmn_code('통장'), 100000, 'Y', 'A회사 미지급금1', sysdate, fn_get_cmmn_code('본사'), 0);
+
+insert into accnut_dealings_account_book
+select ACCNUT_DEALINGS_BOOK_SEQ.nextval, section, types_of_transaction, amount, vat_alternative, dealings_contents, deal_date, department, company_num
+from accnut_dealings_account_book;
+
+select fn_get_cmmn_code('지점') from dual;
+select * from cmmn;
+select * from cmmn where cmmn_code like upper('%dt%');
+select * from cmmn where cmmn_code like upper('%ee%');
+select * from cmmn where cmmn_code like upper('%py%');
+select * from cmmn where cmmn_code like upper('%pc%');
+select * from cmmn where cmmn_code like upper('%ac%');
+select * from cmmn where cmmn_code like upper('%ca%');
+
+insert into cmmn(cmmn_code, cmmn_name, description) values ('FI','금융기관구분','은행 및 카드사');
+insert into cmmn(cmmn_code, cmmn_name, description) values ('EE','수익여부구분','수익인지 지출인지 자산인지 부채인지');
+insert into cmmn(cmmn_code, cmmn_name, description) values ('PY','지급여부구분','지급 미지급');
+insert into cmmn(cmmn_code, cmmn_name, description) values ('PC','처리여부구분','처리 반려 미처리');
+insert into cmmn(cmmn_code, cmmn_name, description) values ('AC','계정과목구분','어떤 계정과목인지');
+insert into cmmn(cmmn_code, cmmn_name, description) values ('CA','카드구분','개인인지 법인인지');
+
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('FI01','FI','농협');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('FI02','FI','국민');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('FI03','FI','기업');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('FI04','FI','신한');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('FI05','FI','IM(대구)');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('FI06','FI','하나');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('FI07','FI','우리');
+
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('EE01','EE','수익');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('EE02','EE','지출');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('EE03','EE','자산');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('EE04','EE','부채');
+
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('PY01','PY','미지급');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('PY02','PY','지급');
+
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('PC01','PC','미처리');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('PC02','PC','처리');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('PC03','PC','반려');
+
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('CA01','CA','개인');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('CA02','CA','법인');
+
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('AC01','AC','현금');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('AC02','AC','통장');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('AC03','AC','카드');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('AC04','AC','비품');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('AC05','AC','토지');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('AC06','AC','건물');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('AC07','AC','대출금');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('AC08','AC','미지급금');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('AC09','AC','외상매입금');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('AC10','AC','예수금');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('AC11','AC','선수금');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('AC12','AC','사채');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('AC13','AC','임대보증금');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('AC14','AC','자본금');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('AC15','AC','이익잉여금');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('AC16','AC','매출액');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('AC17','AC','용역수익');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('AC18','AC','이자수익');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('AC19','AC','급여');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('AC20','AC','임차료');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('AC21','AC','판매비');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('AC22','AC','광고비');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('AC23','AC','운반비');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('AC24','AC','감가상각비');
+insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('AC25','AC','법인세비');
+
+select * from accnut_salary_account_book;
+
+select * from accnut_debt where section = 'AC08';
+commit;

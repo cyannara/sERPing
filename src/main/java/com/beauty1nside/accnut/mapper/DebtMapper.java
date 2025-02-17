@@ -9,4 +9,5 @@ public interface DebtMapper {
 	DebtDTO info(String debtCode);
 	List<DebtDTO> list(DebtSearchDTO dto);
 	int count(DebtSearchDTO dto);
+	
 }

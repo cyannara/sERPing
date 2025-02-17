@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" >
+<html layout:decorate="~{layouts/layout}"
+      lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
 <meta charset="UTF-8">
 <!-- timePicker -->
@@ -27,7 +30,7 @@
 
 <title>급여 처리</title>
 </head>
-<body>
+<body layout:fragment="content">
 	<div class="container">
 		<!-- 메뉴이름 -->
 		<div>
@@ -39,14 +42,20 @@
 			<div class="row 1row">
 				<div class="col-1"></div>
 				<div class="col-5 row ">
-					<span class="label-search col-4">채무명</span>
-					<input type="text" name="assetsName" id="assetsName" class="col-8 input-box">
+					<span class="label-search col-4">직원</span>
+					<input type="text" name="employeeName" id="employeeName" class="col-8 input-box">
 				</div>
 				<div class="col-1"></div>
 				<div class="col-5 row ">
-					<span class="label-search col-4">구분</span>
-					<select name="section" id="section" class="col-8 input-box">
-						<option value="" selected>대출금</option>
+					<span class="label-search col-4">부서</span>
+					<select name="department" id="department" class="col-8 input-box">
+						<option value="" selected>부서</option>
+						<option value="">회사</option>
+						<option value="">별로</option>
+						<option value="">부서</option>
+						<option value="">달라</option>
+						<option value="">추후</option>
+						<option value="">출력</option>
 
 					</select>
 				</div>
@@ -54,15 +63,21 @@
 			<div class="row 2row">
 				<div class="col-1"></div>
 				<div class="col-5 row ">
-					<span class="label-search col-4">채권자</span>
-					<input type="text" name="financialInstitution" id="financialInstitution" class="col-8 input-box">
+					<span class="label-search col-4">표시수량</span>
+					<select name="display_amount" id="display_amount" class="col-8 input-box" onchange="changeDisplay()">
+						<option value="5" selected>5</option>
+						<option value="10">10</option>
+						<option value="20">20</option>
+						<option value="50">50</option>
+						<option value="100">100</option>
+					</select>
 				</div>
 			</div>
 			<div class="row 3row">
 				<div class="col-4"></div>
-				<button type="button" class="btn btn-primary col-1">검색</button>
+				<button type="button" class="btn btn-primary col-1" onclick="search()">검색</button>
 				<div class="col-1"></div>
-				<button type="button" class="btn btn-secondary col-1">초기화</button>
+				<button type="button" class="btn btn-secondary col-1" onclick="reset()">초기화</button>
 			</div>
 
 		</div>
@@ -74,34 +89,21 @@
     <!-- 하부 버튼 -->
 		<div class="button-bar row">
 			<div class="col-1"></div>
-			<button type="button" class="btn btn-primary col-1">Excel</button>
-			<button type="button" class="btn btn-secondary col-1">PDF</button>
+			<button type="button" class="btn btn-secondary col-2">일괄처리</button>
 			<div class="col-7"></div>
-			<div class="btn-group dropup col-2">
-				<button type="button" class="btn btn-success cash">미지급금등록</button>
-				<button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split" id="dropupMenuSplitButton3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					<span class="sr-only"></span>
-				</button>
-				<div class="dropdown-menu" aria-labelledby="dropupMenuSplitButton3">
-					<h6 class="dropdown-header">대출금 등록</h6>
-					<a class="dropdown-item" href="#">외상매입금</a>
-					<div class="dropdown-divider"></div>
-					<a class="dropdown-item" href="#">미지급금 등록</a>
-				</div>
-			</div>
 		</div>
 	</div>
 
 <script>
 	document.addEventListener("DOMContentLoaded",()=>{
-	
+		
 	})
 	
 	var Grid = tui.Grid;
 	
 	const dataSource = {
 		api: {
-			readData: { url: 'http://localhost:81/accnut/rest/list', method: 'GET', initParams: { page: 1 } },
+			readData: { url: 'http://localhost:81/accnut/rest/salary/list', method: 'GET', initParams: { page: 1 } },
 			
 		},
 		contentType: 'application/json'
@@ -115,18 +117,37 @@
 			perPage: 5,
 		},
 		columns: [
-			{ header : "자산코드", name : "assetsCode",  },
-			{ header : "자산명", name : "assetsName",  },
-			{ header : "구분", name : "section",  },
-			{ header : "금융기관", name : "financialInstitution",  },
-			{ header : "결제정보", name : "financeInformation",  },
-			{ header : "소유주", name : "owner",  },
-			{ header : "금액", name : "amount",  },
-			{ header : "등록일", name : "registerDate",  },
-			
+			{ header : "직원", name : "employeeName",  },
+      { header : "부서", name : "department",  },
+      { header : "급여", name : "salary",  },
+      { header : "초과수당", name : "excessAllowance",  },
+      { header : "보너스", name : "bonus",  },
+      { header : "부대비용", name : "incidentailCost",  },
+      { header : "공제항목", name : "deductionItem",  },
+      { header : "지급금액", name : "paymentAmount",  },
 		],
 		data : dataSource,
 	});
+	
+	function changeDisplay() {
+		let gap = parseInt(document.querySelector('#display_amount').value);
+		grid.setPerPage(gap, dataSource);
+	}
+	
+	function search(){
+		let employeeName = document.querySelector('#employeeName').value;
+		let department = document.querySelector('#department').value.toString();
+		grid.setRequestParams({"employeeName" : employeeName, "department" : department });
+		grid.readData();
+	}
+	
+	function reset(){
+		let employeeName = document.querySelector('#employeeName').value = '';
+		let department = document.querySelector('#department').value = '';
+		grid.setRequestParams({"employeeName" : employeeName, "department" : department });
+		grid.readData();
+
+	}
 
 </script>
 	
