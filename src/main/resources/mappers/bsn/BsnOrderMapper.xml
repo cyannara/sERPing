@@ -114,4 +114,20 @@ WHERE  order_code = #{orderCode}
 </select>
 
 
+<!-- 주문과 발주 상세 정보를 삽입하는 프로시저 호출 -->
+<insert id="insertBsnOrder" statementType="CALLABLE">
+call insert_Bsn_Order( 
+              #{orderCode}, 
+              #{branchOfficeId}, 
+              #{orderDate}, 
+              #{dueDate}, 
+              #{employeeNum}, 
+              #{companyNum}, 
+              #{orderDetails, typeHandler=com.beauty1nside.bsn.OrdDtlArrayTypeHandler}
+) 
+</insert>
+
+
+
+
 </mapper>

@@ -46,7 +46,16 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 
   
   
-  
+  <style>
+  	#custom-container{
+        background-color: #f8f9fa; /* 연한 회색 배경 /
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); / 박스 그림자 */
+        margin-bottom: 20px;
+
+    } 
+  </style>
   
 
 </head>
@@ -164,7 +173,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
     <!-- ✅ 승인 / 🚫 거부 버튼 -->
     <div class="row mt-3">
         <div class="col-12 text-center">
-            <button class="btn btn-success">✅ 승인 (등록)</button>
+            <button class="btn btn-success" id="registerButton">✅ 승인 (등록)</button>
             <button class="btn btn-danger">🚫 거부 (취소)</button>
         </div>
     </div>
@@ -184,11 +193,14 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	 
 	  
 	  
-	  var Grid = tui.Grid;
+	    var Grid = tui.Grid;
+	    var selectedRow = null; // 선택된 주문 정보
+	    var detailData = [];    // 상세 데이터 정보
+
 		
 		const dataSource = {
 				api: {
-					readData: { url: 'http://localhost:81/bsn/rest/order', method: 'GET', 
+					readData: { url: 'http://localhost:81/bsn/rest/bhforder', method: 'GET', 
 						initParams: { page: 1 }},
 				},
 				contentType: 'application/json'
@@ -232,13 +244,13 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		<!-- 발주를 선택하면 선택한 주문 코드로 상세 정보 로드 -->
 		grid.on('click', (ev) => {
 			const rowKey = ev.rowKey;
-			const selectedRow = grid.getRow(rowKey);
+			selectedRow = grid.getRow(rowKey);
 			
 			
 			if (selectedRow) {
 		        document.querySelector('#selectedOrder').innerHTML = `
 		            <p><strong>주문 코드:</strong> ${selectedRow.orderCode}</p>
-		            <p><strong>지점 코드:</strong> ${selectedRow.branchOfficeId}</p>
+		            <p><strong>지점ID:</strong> ${selectedRow.branchOfficeId}</p>
 		            <p><strong>주문일:</strong> ${formatDate(selectedRow.orderDate, 'order')}</p>
 		            <p><strong>납기일:</strong> ${formatDate(selectedRow.dueDate, 'due')}</p>
 		            ${selectedRow.remark ? `<p><strong>비고:</strong> ${selectedRow.remark}</p>` : ''}
@@ -249,6 +261,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		    if (selectedRow && selectedRow.orderCode) { // orderCode가 존재하는지 확인
 		        loadOrderDetails(selectedRow.orderCode);
 		        console.log("선택된 주문 코드:", selectedRow.orderCode);
+		        
 		    } else {
 		        console.warn("선택된 주문 코드가 없습니다.");
 		    }
@@ -260,17 +273,21 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		        return;
 		    }
 
-		    fetch(`http://localhost:81/bsn/rest/order/detail?orderCode=${orderCode}&perPage=5&page=1`)
+		    fetch(`http://localhost:81/bsn/rest/bhforder/detail?orderCode=${orderCode}&perPage=5&page=1`)
 		        .then(response => {
 		            if (!response.ok) throw new Error(`HTTP 오류! 상태: ${response.status}`);
 		            return response.json();
 		        })
 		        .then(data => {
 		            if (data && data.data && data.data.contents) {
+		            	detailData = data.data.contents; // 상세 데이터 저장
+		            	//
 		                detailGrid.resetData(data.data.contents);
 		            } else {
 		                console.warn("상세 데이터가 없습니다.");
 		                detailGrid.resetData([]); // 빈 배열로 초기화
+		                //
+		                detailGrid.resetData(detailData);
 		            }
 		        })
 		        .catch(error => console.error('Error:', error));
@@ -343,6 +360,95 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 
 
 		}
+		
+		
+		
+		// 주문 등록 버튼 클릭 이벤트
+		
+		
+		
+		// 모든 페이지에서 데이터를 불러오는 함수
+		function loadAllOrderDetails(orderCode) {
+		    if (!orderCode) {
+		        console.warn("유효하지 않은 주문 코드입니다.");
+		        return;
+		    }
+		
+		    let allDetails = [];
+		    let page = 1;
+		    let isLastPage = false;  // 마지막 페이지 확인 변수
+		
+		    // 모든 페이지의 데이터를 순차적으로 가져오는 함수
+		    function fetchPageData() {
+		        fetch(`http://localhost:81/bsn/rest/bhforder/detail?orderCode=${orderCode}&perPage=5&page=${page}`)
+		            .then(response => {
+		                if (!response.ok) throw new Error(`HTTP 오류! 상태: ${response.status}`);
+		                return response.json();
+		            })
+		            .then(data => {
+		                if (data && data.data && data.data.contents) {
+		                    allDetails = allDetails.concat(data.data.contents);  // 데이터를 누적
+		                    if (data.data.contents.length < 5) {
+		                        isLastPage = true;  // 마지막 페이지인지 확인
+		                    } else {
+		                        page++;  // 페이지 증가
+		                        fetchPageData();  // 다음 페이지 데이터를 요청
+		                    }
+		                } else {
+		                    console.warn("상세 데이터가 없습니다.");
+		                    isLastPage = true;  // 데이터가 없으면 마지막 페이지로 간주
+		                }
+		            })
+		            .catch(error => {
+		                console.error('Error:', error);
+		                isLastPage = true;  // 에러 발생 시 마지막 페이지로 간주
+		            });
+		    }
+		
+		    fetchPageData();  // 첫 번째 페이지 데이터 요청
+		
+		    // 페이지 로딩이 완료되면, 모든 데이터를 등록할 수 있음
+		    const waitForData = setInterval(() => {
+		        if (isLastPage) {
+		            clearInterval(waitForData);
+		            // 이제 allDetails 배열에 모든 상세 데이터가 들어있으므로 등록 작업을 진행
+		            console.log("선택된 주문:", selectedRow);
+		            console.log("모든 상세 데이터:", allDetails);
+		            // 여기서 등록 버튼 이벤트를 트리거하거나 필요한 작업을 처리
+		            
+		            
+		            
+		        }
+		    }, 100);  // 100ms 간격으로 데이터 로드 완료 여부 체크
+		}
+
+		// 등록 버튼 클릭 시 호출
+		document.getElementById('registerButton').addEventListener('click', () => {
+		    if (selectedRow && selectedRow.orderCode) {
+		        loadAllOrderDetails(selectedRow.orderCode);  // 모든 상세 데이터를 가져와서 등록
+		    }
+		});
+		
+		
+		
+		
+		
+//		document.getElementById('registerButton').addEventListener('click', () => {
+//			if (!selectedRow) {
+//		          alert("주문을 선택해주세요.");
+//		          return;
+//		      }
+//		      
+//		      if (detailData.length === 0) {
+//		          alert("상세 정보를 로드해주세요.");
+//		          return;
+//		      }
+//
+		      // 선택된 주문 정보와 상세 정보 활용
+//		      console.log("선택된 주문:", selectedRow);
+//		      console.log("상세 정보:", detailData);
+//		});
+
 	  </script>
 
 
