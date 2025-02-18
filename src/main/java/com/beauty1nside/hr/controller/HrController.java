@@ -30,6 +30,11 @@ public class HrController {
 	
 //	----------------------------------------------------------------------------	
 	
+	  @ModelAttribute
+	  public void setAttributes(Model model) {
+	    model.addAttribute("menu", "hr");
+	  }
+	
 	//인사관리-사원정보관리
 	@GetMapping("/employee")
 	public String employee(@ModelAttribute EmpSearchDTO searchDTO, Model model) {

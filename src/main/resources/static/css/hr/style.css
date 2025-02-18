@@ -1,90 +1,57 @@
 @charset "UTF-8";
 
-    /* 전체 컨테이너 크기 조정 */
-    .container {
-      max-width: 1400px;
-    }
+/* 전체 컨테이너 크기 조정 */
+.container {
+    max-width: 1400px;
+}
 
-    /* 검색 필터 영역 */
-    .search-box {
-      background-color: #E8F0FE;
-      padding: 20px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 40px;
-    }
+/* 검색 필터 영역 */
+.search-box {
+    background-color: #E8F0FE;
+    padding: 20px;
+    border-radius: 10px;
+}
 
-    .search-box .form-group {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
+/* 검색 필터 내부 요소 */
+.search-box .row {
+    margin-bottom: 8px; /* ✅ 각 행 간격 최소한 조정 */
+}
 
-    .search-box label {
-      font-weight: bold;
-      white-space: nowrap;
-      min-width: 80px;
-      text-align: right;
-    }
+/* 검색 라벨 스타일 */
+.search-box label {
+    font-weight: bold;
+    white-space: nowrap;
+    text-align: right;
+}
 
-    /* 버튼 스타일 */
-    .btn-search {
-      background-color: #3b82f6;
-      color: white;
-      border-radius: 5px;
-      padding: 8px 16px;
-    }
+/* 버튼 스타일 */
+.btn-search {
+    background-color: #3b82f6;
+    color: white;
+    border-radius: 5px;
+    padding: 8px 16px;
+}
 
-    .btn-reset {
-      border-radius: 5px;
-      padding: 8px 16px;
-    }
+.btn-reset {
+    border-radius: 5px;
+    padding: 8px 16px;
+}
 
-    /* 사원 등록, 삭제 버튼 배치 */
-    .top-btn-group {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 30px;
-      margin-bottom: 10px;
-    }
+/* Toast UI Grid */
+.tui-grid-container {
+    margin-top: 10px;
+    background-color: white !important;
+}
 
-    /* Toast UI Grid */
-    .tui-grid-container {
-      margin-top: 10px;
-    }
-    
-    /* Toast Grid 기본 배경색 제거 (흰색 적용) */
-	.tui-grid-container {
-	    background-color: white !important;  /* 🔹 강제적으로 흰색 적용 */
-	}
-	
-	.tui-grid-header-area {
-	    background-color: white !important;  /* 🔹 헤더 영역 */
-	}
-	
-	.tui-grid-body-area {
-	    background-color: white !important;  /* 🔹 바디 영역 */
-	}
-	
-	.tui-grid-cell {
-	    background-color: white !important;  /* 🔹 셀 배경 */
-	}
+.tui-grid-header-area,
+.tui-grid-body-area,
+.tui-grid-cell {
+    background-color: white !important;
+}
 
-	
-	.tui-grid-container {
-    width: 100% !important;
-    max-width: none !important;
-	}
-
-	#grid {
-	    width: 100% !important;
-	}
-
-    /* 페이지네이션 */
-    .pagination-box {
-      display: flex;
-      justify-content: center;
-      margin-top: 20px;
-    }
+/* 페이지네이션 */
+.pagination-box {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}

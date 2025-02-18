@@ -22,15 +22,40 @@
         </li>
       </ul>
   </div>
+  
   <div th:if="${#strings.equals('sales', param.menu) or #strings.equals('sales', menu)}">
       <span class="menu-title">inventory</span>
   </div>
   <div th:if="${#strings.equals('inventory', param.menu) or #strings.equals('inventory', menu)}">
     <span class="menu-title">inventory</span>
   </div>
-  <div th:if="${#strings.equals('hr', param.menu) or #strings.equals('hr', menu)}">
-    <span class="menu-title">hr</span>
-  </div>
+  
+	<div th:if="${#strings.equals('hr', param.menu) or #strings.equals('hr', menu)}">
+	    <li class="nav-item">
+	        <a class="nav-link" data-bs-toggle="collapse" href="/hr/employee" aria-expanded="false" aria-controls="hrMenu">
+	            <i class="icon-grid menu-icon"></i>
+	            <span class="menu-title">인사관리</span>
+	            <i class="menu-arrow"></i>
+	        </a>
+	        <div class="collapse" id="hrMenu">
+	            <ul class="nav flex-column sub-menu">
+	                <li class="nav-item">
+	                    <a class="nav-link" href="/hr/employee">사원정보관리</a>
+	                </li>
+	                <li class="nav-item">
+	                    <a class="nav-link" href="/hr/organization">조직도관리</a>
+	                </li>
+	                <li class="nav-item">
+	                    <a class="nav-link" href="/hr/emp_change">인사발령관리</a>
+	                </li>
+	                <li class="nav-item">
+	                    <a class="nav-link" href="/hr/emp_contract">근로계약관리</a>
+	                </li>
+	            </ul>
+	        </div>
+	    </li>
+	</div>
+
   <div th:if="${#strings.equals('account', param.menu) or #strings.equals('account', menu)}">
     <span class="menu-title">account</span>
   </div>
