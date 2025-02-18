@@ -1,6 +1,6 @@
 package com.beauty1nside.bhf;
 
-import java.util.Date;
+import java.sql.Date;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;

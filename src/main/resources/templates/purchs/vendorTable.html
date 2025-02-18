@@ -30,7 +30,7 @@
 </head>
 <body>
 	<!-- 검색창 -->
-	<div class="search-grid">
+	<div class="search-grid" id="custom-container" >
 			<div class="row 2row">
 				<div class="col-1"></div>
 				<div class="col-5 row ">
@@ -51,9 +51,9 @@
 			</div>
 			<div class="row 3row mt-3 mb-3">
 				<div class="col-4"></div>
-				<button type="button" class="btn btn-primary col-1" onclick="search()">검색</button>
+				<button type="button" class="btn btn-primary col-1" onclick=" searchVendor()">검색</button>
 				<div class="col-1"></div>
-				<button type="button" class="btn btn-secondary col-1" onclick="reset()">초기화</button>
+				<button type="button" class="btn btn-secondary col-1" onclick="vendorReset()">초기화</button>
 			</div>
 
 		</div>
@@ -69,7 +69,7 @@
 
 const vendorDataSource = {
 		api:{
-			readData: { url:'http://localhost:81/purchs/rest/brand/list', 
+			readData: { url:'http://localhost:81/purchs/rest/vendor/list', 
 						method: 'GET', 
 						initParams: { page: 1 ,perPage: 5},
 						   beforeRequest: function(request) {
@@ -89,8 +89,8 @@ const vendorGrid = new tui.Grid({
 		perPage: 5,
 	},
 	columns: [
-		{ header : "브랜드코드", name : "brandCode",  sortable : true},
-		{ header : "브랜드명", name : "brandName" , sortable : true}
+		{ header : "거래처번호", name : "vendorId",  sortable : true},
+		{ header : "거래처명", name : "vendorName" , sortable : true}
 	],
 	data : vendorDataSource,
 });
@@ -102,12 +102,12 @@ function changeDisplay() {
 }
 
 
-function search(){
-	let brandName = document.querySelector('#searchVendorName').value;
+ function  searchVendor(){
+	let vendorName = document.querySelector('#searchVendorName').value;
 	console.log("검색어==",vendorName);
 	vendorGrid.setRequestParams({"vendorName" : vendorName})
 	vendorGrid.readData();
-}
+} 
 
 	//선택된 내용 을 세션에 잠시 저장 하고 다른 html 파일로 넘어갈때 정보를 저장 하고 있다 -> 그 후 다시 불러오기
 	vendorGrid.on('click', (ev) => {
@@ -116,8 +116,8 @@ function search(){
 	    console.log("선택된 행 데이터:", rowData);
 	
 	    // 세션 스토리지에 데이터 저장
-	    sessionStorage.setItem("searchVendorId", rowData.vendorId);
-	    sessionStorage.setItem("searchVendorName", rowData.vendorName);
+	    sessionStorage.setItem("selectedVendorId", rowData.vendorId);
+	    sessionStorage.setItem("selectedVendorName", rowData.vendorName);
 	    
 	    console.log("보낼 데이터 ==",rowData.vendorId,rowData.vendorName);
 	 

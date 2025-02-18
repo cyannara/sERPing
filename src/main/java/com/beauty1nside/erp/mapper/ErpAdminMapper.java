@@ -1,6 +1,9 @@
 package com.beauty1nside.erp.mapper;
 
 import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.annotations.Param;
 
 import com.beauty1nside.common.dto.ComDTO;
 import com.beauty1nside.erp.dto.CompanyListDTO;
@@ -83,11 +86,60 @@ public interface ErpAdminMapper {
 	public int insertservice(int companyNum);
 	
 	/**
-     * ERP 사용 회사 전체 리스트를 조회한다
+     * ERP 사용 회사 cs를 남긴다
      *
      * @param ErpSearchListDTO
      * @return List<CompanyListDTO>
      */
 	public int insertNewCS(CustomerServiceDTO csDTO);
+	
+	/**
+     * ERP 사용회사의 서비스 기간을 변경한다 (특정 서비스만)
+     *
+     * @param Map<String, Object>
+     * @return int
+     */
+	public int updateServiceInfo(Map<String, Object> requestData);
+		
+	/**
+     * ERP 사용회사의 서비스 기간을 변경한다 (모든 서비스)
+     *
+     * @param Map<String, Object>
+     * @return int
+     */
+	public int allUpdateServiceInfo(Map<String, Object> requestData);
+	
+	/**
+     * ERP 사용회사 성보를 변경한다
+     *
+     * @param ComDTO
+     * @return int
+     */
+	public int updateCompnayInfo(ComDTO comDTO);
+	
+	/**
+     * ERP 사용회사 정보를 상황에 맞게 등록 또는 업데이트 한다
+     *
+     * @param ComDTO
+     * @return int
+     */
+	public int upsertCompanyInfo(ComDTO dto);
+	
+	/**
+     * ERP 사용회사 비밀번호를 초기화 한다
+     *
+     * @param String
+     * @param int
+     * @return int
+     */
+	public int pwReSet(@Param("employeePw") String employeePw, @Param("companyNum") int companyNum);
+	
+	/**
+     * ERP 사용회사 cslist를 조회한다
+     *
+     * @param int
+     * @return List<CustomerServiceDTO>
+     */
+	public List<CustomerServiceDTO> csList(int companyNum);
 	
 }

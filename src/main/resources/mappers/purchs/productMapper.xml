@@ -45,4 +45,74 @@ order by classification_id desc
 </sql>
 
 
+<!-- vendorlist 브랜드 조회 -->
+<select id="vendorlist" resultType="ProductDTO">
+    SELECT VENDOR_ID, VENDOR_NAME
+    FROM (
+        SELECT /*+index_desc(STDR_BRAND PK_GRPWR_VENDOR)*/
+               ROWNUM RN,
+               VENDOR_ID,
+               VENDOR_NAME             
+        FROM GRPWR_VENDOR
+        <include refid="searchVendorInfo"/>  <!-- 검색 조건 포함 -->
+
+        
+    )
+    WHERE RN BETWEEN #{start} AND #{end}  <!--  WHERE 수정 -->
+    ORDER BY VENDOR_ID DESC <!-- ORDER BY 위치  -->
+</select>
+
+
+<!-- 카운트 -->
+<select id="vendorcount" resultType="int">
+	select count(*) from GRPWR_VENDOR
+		<include refid="searchVendorInfo"></include>
+</select>
+
+<!--  searchbrandInfo 쿼리 -->
+<sql id="searchVendorInfo">
+    <where>
+    <!-- company_num LIKE '%' || #{companyNum} || '%' -->
+        <if test="vendorName != null and vendorName != ''">
+            VENDOR_NAME LIKE '%' || #{vendorName} || '%'
+        </if>
+    </where>
+</sql>
+
+<!-- warehouselist  창고 조회 -->
+<select id="warehouselist" resultType="ProductDTO">
+    SELECT WAREHOUSE_ID, WAREHOUSE_NAME,COMPANY_NUM
+    FROM (
+        SELECT /*+index_desc(STDR_BRAND PK_STDR_WAREHOUSE)*/
+               ROWNUM RN,
+               WAREHOUSE_ID,
+               WAREHOUSE_NAME,
+               COMPANY_NUM
+        FROM STDR_WAREHOUSE
+        <include refid="searchwarehouseInfo"/>  <!-- 검색 조건 포함 -->
+
+        
+    )
+    WHERE RN BETWEEN #{start} AND #{end}  <!--  WHERE 수정 -->
+    ORDER BY WAREHOUSE_ID DESC <!-- ORDER BY 위치  -->
+</select>
+
+
+<!-- 카운트 -->
+<select id="warehousecount" resultType="int">
+	select count(*) from STDR_WAREHOUSE
+		<include refid="searchwarehouseInfo"></include>
+</select>
+
+<!--  searchwarehouseInfo 쿼리 -->
+<sql id="searchwarehouseInfo">
+    <where>
+    <!-- company_num LIKE '%' || #{companyNum} || '%' -->
+        <if test="warehouseName != null and warehouseName != ''">
+            warehouse_name LIKE '%' || #{warehouse_name} || '%'
+        </if>
+    </where>
+</sql>
+
+
 </mapper>

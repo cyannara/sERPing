@@ -1,0 +1,39 @@
+.menu {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    margin-right: 20px;
+    > span {
+        margin: 0 10px;
+    }
+}
+
+nav {
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
+nav a {
+    margin: 0 20px;
+    text-decoration: none;
+    color: #4a4a4a;
+    font-size: 16px;
+    font-weight: 500;
+    transition: color 0.3s, transform 0.2s;
+}
+nav a:hover {
+    font-weight: 800;
+    color: #3f3e91;
+    transform: scale(1.1);
+    text-decoration: auto !important;
+}
+
+ .selected {
+     font-weight: bold;
+     background-color: #3f3e91;
+     color: white !important;
+     padding: 8px 20px;
+     border-radius: 8px;
+ }
+

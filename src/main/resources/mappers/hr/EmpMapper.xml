@@ -75,7 +75,7 @@
 	        </choose>
 	    </if>
 	    <if test="department != null and department != ''">
-	        AND d.department_name = #{department}
+	        AND d.department_name = #{departmentName}
 	    </if>
 	    <if test="position != null and position != ''">
 	        AND e.position = #{position}

@@ -175,3 +175,5 @@ insert into cmmn(cmmn_code, upper_cmmn_code, cmmn_name) values ('AC25','AC','¹ýÀ
 
 select * from accnut_salary_account_book;
 
+select * from accnut_debt where section = 'AC08';
+commit;

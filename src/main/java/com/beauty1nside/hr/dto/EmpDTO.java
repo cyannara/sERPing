@@ -39,4 +39,5 @@ public class EmpDTO {
     private Date updateDate; // 수정일
     private Long companyNum; // 회사번호 (FK)
     private Long departmentNum; // 부서번호 (FK)
+    private String departmentName;
 }

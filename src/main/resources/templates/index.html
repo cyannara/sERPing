@@ -12,18 +12,15 @@
   <div class="col-md-12 grid-margin">
     <div class="row">
       <div class="col-12 col-xl-8 mb-4 mb-xl-0">
-        <h3 class="font-weight-bold">메인페이지</h3>
-        <div sec:authorize="isAnonymous()">
-          로그인 전
-        </div>
+        <h3 class="font-weight-bold">결재문서</h3>
+<!--        <div sec:authorize="isAnonymous()">-->
+<!--          로그인 전-->
+<!--        </div>-->
         <div sec:authorize="isAuthenticated()">
           환영합니다. <span sec:authentication="name" class="h4"></span>님!
 <!--          <p sec:authentication="principal.username"></p>-->
 <!--          <p sec:authentication="principal.userDTO.deptName"></p>-->
 <!--          <p th:text="${session.deptName}"></p>-->
-        </div>
-        <div sec:authorize="hasRole('ROLE_ADMIN')">
-          어드민 권한이 있으면
         </div>
       </div>
       <div class="col-12 col-xl-4">
@@ -45,48 +42,7 @@
   </div>
 </div>
 <div class="row">
-  <table border="1">
-    <tr>
-      <th>항목</th>
-      <th>값</th>
-    </tr>
-    <tr>
-      <td>Employee ID</td>
-      <td th:text="${session.employeeId}"></td>
-    </tr>
-    <tr>
-      <td>Employee Name</td>
-      <td th:text="${session.employeeName}"></td>
-    </tr>
-    <tr>
-      <td>Email</td>
-      <td th:text="${session.email}"></td>
-    </tr>
-    <tr>
-      <td>Phone</td>
-      <td th:text="${session.phone}"></td>
-    </tr>
-    <tr>
-      <td>Position</td>
-      <td th:text="${session.position}"></td>
-    </tr>
-    <tr>
-      <td>Authority</td>
-      <td th:text="${session.authority}"></td>
-    </tr>
-    <tr>
-      <td>Company Number</td>
-      <td th:text="${session.companyNum}"></td>
-    </tr>
-    <tr>
-      <td>Company English Name</td>
-      <td th:text="${session.companyEngName}"></td>
-    </tr>
-    <tr>
-      <td>Department Number</td>
-      <td th:text="${session.departmentNum}"></td>
-    </tr>
-  </table>
+
 </div>
 </body>
 

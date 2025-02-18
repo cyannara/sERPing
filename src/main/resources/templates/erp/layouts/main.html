@@ -1,10 +1,17 @@
 <!DOCTYPE html>
-<html lang="utf-8">
+<html lang="utf-8" xmlns:th="http://www.thymeleaf.org">
 
 <head>
   <meta charset="UTF-8">
   <title>sERPing - beauty1ndide</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+	<!-- ERP제공자 어드민 사원 세션 정보 확인 -->
+	<script th:inline="javascript">
+		let employeeInfo = /*[[${session.employeeInfo}]]*/ null;
+	</script>
+	<script src="/js/erp/erpEmpSession.js"></script>
+
 
   <!-- bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -86,24 +93,72 @@
 		padding-top: 0 !important;
 		padding-bottom: 0 !important;
 	}
+	/* 그리드 선택하면 생기는 색상 */
+	.tui-grid-row-highlight {
+	    background-color: #f0f8ff !important; /* 연한 하늘색 */
+	}
+	/* cslist 스타일 */
+	#answerTable {
+	    width: 750px;
+	    border-collapse: separate;
+	    border-spacing: 0;
+	    border-radius: 10px;
+	    overflow: hidden; /* 둥근 테두리가 잘리지 않도록 */
+	    text-align: left;
+	    font-size: 12px;
+	}
+	/* 내부 셀 스타일 */
+	#answerTable th, #answerTable td {
+	    border: 0.5px solid #6c757d; /* 부트스트랩 세컨더리 색상 */
+	    padding: 5px;
+	}
+	/* 바깥쪽 둥근 테두리 적용 */
+	#answerTable tr:first-child th:first-child {
+	    border-top-left-radius: 10px;
+	}
+	#answerTable tr:first-child th:last-child,
+	#answerTable tr:first-child td:last-child {
+	    border-top-right-radius: 10px;
+	}
+	#answerTable tr:last-child th:first-child,
+	#answerTable tr:last-child td:first-child {
+	    border-bottom-left-radius: 10px;
+	}
+	#answerTable tr:last-child th:last-child,
+	#answerTable tr:last-child td:last-child {
+	    border-bottom-right-radius: 10px;
+	}
+	#answerTable th {
+	    background-color: #dee2e633;
+	    text-align: center;
+	}
+	#answerTable td[colspan] {
+	    font-weight: bold;
+	}
+	@media (min-width: 1400px) {
+	    .container, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl {
+	        max-width: 1600px;
+	    }
+	}
 </style>
 
 </head>
 
 <body class="index-page">
 
-  <header id="header" class="header d-flex align-items-center sticky-top">
-    <div class="container position-relative d-flex align-items-center">
+  <header id="header" class="header d-flex align-items-center sticky-top" style="height: 50px;">
+    <div class="container position-relative d-flex align-items-center" style="height: 50px;">
 
       <a href="main" class="logo d-flex align-items-center me-auto">
         <img src="/file/image/erp/serpinglogo.png"/><h1>sERPing</h1>
       </a>
-
+		<div class="erpemployeeinfo" style="font-size: 12px;">
+		</div>
       <nav id="navmenu" class="navmenu">
         <ul>
 		  <li><a href="main">HOME</a></li>        	
           <li><a href="team.html">CS문의</a></li>
-          <li><a href="contact.html">회사관리</a></li>
+          <li><a href="admin">회사관리</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>

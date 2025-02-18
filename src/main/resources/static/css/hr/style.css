@@ -61,16 +61,17 @@
 	}
 	
 	.tui-grid-header-area {
-	    background-color: white !important;  /* 🔹 헤더 영역도 흰색 적용 */
+	    background-color: white !important;  /* 🔹 헤더 영역 */
 	}
 	
 	.tui-grid-body-area {
-	    background-color: white !important;  /* 🔹 바디 영역도 흰색 적용 */
+	    background-color: white !important;  /* 🔹 바디 영역 */
 	}
 	
 	.tui-grid-cell {
-	    background-color: white !important;  /* 🔹 셀 배경도 흰색 적용 */
+	    background-color: white !important;  /* 🔹 셀 배경 */
 	}
+
 	
 	.tui-grid-container {
     width: 100% !important;

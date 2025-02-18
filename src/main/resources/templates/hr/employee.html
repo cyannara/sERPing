@@ -67,8 +67,9 @@
 						<select class="form-select me-2" style="width: 120px;"
 							id="searchCategory">
 							<option value="전체">전체</option>
-							<option value="이름">이름</option>
-							<option value="부서">부서</option>
+							<option value="employeeName">사원명</option>
+							<option value="employeeId">사원ID</option>
+							<option value="phone">연락처</option>
 						</select> <input type="text" class="form-control" style="width: 250px;"
 							placeholder="검색어 입력">
 					</div>
@@ -162,7 +163,6 @@
 			document.addEventListener("DOMContentLoaded", function() {
 			});
 			//그리드 선언
-			var gridData = [[${employees}]];
 			var Grid = tui.Grid;
 			const dataSource = {
 				api : {

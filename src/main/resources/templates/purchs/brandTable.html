@@ -27,20 +27,21 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
 
+
 </head>
 <body>
 	<!-- 검색창 -->
-	<div class="search-grid">
+	<div class="search-grid" id="custom-container">
 			<div class="row 2row">
 				<div class="col-1"></div>
 				<div class="col-5 row ">
 					<span class="label-search col-4">브랜드명</span>
-					<input type="text" name="brandName" id="searchBrandName" class="col-8 input-box">
+					<input type="text" name="brandName" id="searchBrandName" class="form-control">
 				</div>
 				<div class="col-1"></div>
 				<div class="col-5 row ">
 					<span class="label-search col-4">표시수량</span>
-					<select name="display_amount" id="display_amount" class="col-8 input-box" onchange="changeDisplay()">
+					<select name="display_amount" id="brand_display_amount" class="form-control" onchange="changeDisplay()">
 						<option value="5" selected>5</option>
 						<option value="10">10</option>
 						<option value="20">20</option>
@@ -51,7 +52,7 @@
 			</div>
 			<div class="row 3row mt-3 mb-3">
 				<div class="col-4"></div>
-				<button type="button" class="btn btn-primary col-1" onclick="search()">검색</button>
+				<button type="button" class="btn btn-primary col-1" onclick="brandSearch()">검색</button>
 				<div class="col-1"></div>
 				<button type="button" class="btn btn-secondary col-1" onclick="reset()">초기화</button>
 			</div>
@@ -96,13 +97,13 @@ const brandGrid = new tui.Grid({
 });
 
 function changeDisplay() {
-	let gap = parseInt(document.querySelector('#display_amount').value);
+	let gap = parseInt(document.querySelector('#brand_display_amount').value);
 	brandGrid.setPerPage(gap, brandDataSource)
 	brandGrid.readData(); // 데이터 다시 불러오기
 }
 
 
-function search(){
+function brandSearch(){
 	let brandName = document.querySelector('#searchBrandName').value;
 	console.log("검색어==",brandName);
 	brandGrid.setRequestParams({"brandName" : brandName})

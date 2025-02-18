@@ -21,6 +21,7 @@ import com.beauty1nside.common.GridArray;
 import com.beauty1nside.common.Paging;
 import com.beauty1nside.common.dto.ComDTO;
 import com.beauty1nside.common.mapper.ErpComMapper;
+import com.beauty1nside.erp.dto.CustomerServiceDTO;
 import com.beauty1nside.erp.dto.ErpSearchDTO;
 import com.beauty1nside.erp.dto.testDTO;
 import com.beauty1nside.erp.service.ErpAdminService;
@@ -45,6 +46,7 @@ import lombok.extern.log4j.Log4j2;
  *  -------    --------    ---------------------------
  *  2025.02.12  표하연          최초 생성
  *  2025.02.13  표하연          회사영문명(코드명) 중복검사, 회사등록, 검색페이징
+ *  2025.02.15  표하연          회사정보 수정 및 문의 처리
  *
  *  </pre>
 */
@@ -143,6 +145,62 @@ public class ErpAdminRestController {
 	}
 	
 	/**
+     * 회사 서비스 상태를 변경 한다
+     * @param Map<String, Object>
+     * @return String
+     */
+	@PostMapping("/serviceToggle")
+	public String serviceToggle(@RequestBody Map<String, Object> requestData) {
+		
+		log.info("requestData Map: " + requestData.toString());
+		
+		Boolean isBoolean = erpAdminService.allUpdateServiceInfo(requestData);
+	    if(isBoolean) {
+	    	return "OK";
+	    }else {
+	    	return "NO";
+	    }
+	}
+	
+	/**
+     * 회사 서비스 기간을 변경 한다
+     * @param Map<String, Object>
+     * @return String
+     */
+	@PostMapping("/serviceChange")
+	public String serviceChange(@RequestBody Map<String, Object> requestData) {
+		
+		log.info("requestData Map: " + requestData.toString());
+		
+		Boolean isBoolean = erpAdminService.updateServiceInfo(requestData);
+	    if(isBoolean) {
+	    	return "OK";
+	    }else {
+	    	return "NO";
+	    }
+	}
+	
+	/**
+     * 회사 단순문의를 처리한다
+     * @param Map<String, Object>
+     * @return String
+     */
+	@PostMapping("/cs")
+	public String cs(@RequestBody Map<String, Object> requestData) {
+		//맵객체 DTO로 자동변환
+		ObjectMapper objectMapper = new ObjectMapper();
+	    CustomerServiceDTO customerServiceDTO = objectMapper.convertValue(requestData, CustomerServiceDTO.class);
+
+	    log.info("Mapped DTO: " + customerServiceDTO.toString());
+	    Boolean isBoolean = erpAdminService.insertNewCS(customerServiceDTO);
+	    if(isBoolean) {
+	    	return "OK";
+	    }else {
+	    	return "NO";
+	    }
+	}
+	
+	/**
      * 회사를 신규등록한다
      * @param Map<String, Object>
      * @return String
@@ -168,14 +226,14 @@ public class ErpAdminRestController {
 
 	    // 추가 필드 가져오기
 	    String customerServiceDivision = (String) requestData.get("customerServiceDivision");
-	    String customerServiceContent = (String) requestData.get("customerServiceContent");
+	    String customerServiceContent = "";
 	    int employeeNum = (int) requestData.get("employeeNum");
 
-	    customerServiceContent = """
+	    customerServiceContent += """
 	    		[신규 업체 등록]
 	    		
 	    		
-	    		""" + customerServiceContent;
+	    		""" + (String) requestData.get("customerServiceContent");
 	    // 로그 출력 (정상적으로 변환되었는지 확인)
 	    log.info("DTO: " + dto.toString());
 	    log.info("customerServiceDivision: " + customerServiceDivision);
@@ -189,6 +247,79 @@ public class ErpAdminRestController {
 	    }else {
 	    	return "NO";
 	    }
+	}
+	
+	/**
+     * 회사 정보 변경에 따른 알맞은 업데이트를 한다
+     * @param Map<String, Object>
+     * @return String
+     */
+	@PostMapping("/upsertcompnay")
+	public String upsertcompnay(@RequestBody Map<String, Object> requestData) {
+		
+		log.info("Received requestData: " + requestData.toString());
+
+	    ObjectMapper objectMapper = new ObjectMapper();
+	    
+	    ComDTO dto = objectMapper.convertValue(requestData.get("dto"), ComDTO.class);
+	    ComDTO cominfo = erpComMapper.comnum(dto.getCompanyNum());
+	    if (dto.getBusinessLicense() == null || dto.getBusinessLicense().isEmpty()) {
+	    	dto.setBusinessLicense(cominfo.getBusinessLicense());
+	    }
+	    log.info("DTO: " + dto.toString());
+	    
+	    // 추가 필드 가져오기
+	    String customerServiceDivision = (String) requestData.get("customerServiceDivision");
+	    String customerServiceContent = "";
+	    int employeeNum = (int) requestData.get("employeeNum");
+	    customerServiceContent += """
+	    		[업체정보수정]
+	    		""";
+	    customerServiceContent += "[기존] " + cominfo.toString() + "\n";
+	    customerServiceContent += "[변경] " + dto.toString() + "\n";
+	    customerServiceContent += "[사유] " + (String) requestData.get("customerServiceContent");
+	    log.info("customerServiceDivision: " + customerServiceDivision);
+	    log.info("customerServiceContent: " + customerServiceContent);
+	    log.info("employeeNum: " + employeeNum);
+	    
+	    //정보수정
+	    Boolean isBoolean = erpAdminService.upsertCompanyInfo(dto, customerServiceDivision, customerServiceContent, employeeNum);
+	    if(isBoolean) {
+	    	return "OK";
+	    }else {
+	    	return "NO";
+	    }
+	}
+	
+	/**
+     * ERP사용 회사의 비밀번호를 초기화 한다
+     * @param Map<String, Object>
+     * @return String
+     */
+	@PostMapping("/pwReSet")
+	public String pwReSet(@RequestBody Map<String, Object> requestData) {
+		log.info("Received requestData: " + requestData.toString());
+		
+		//정보수정
+	    Boolean isBoolean = erpAdminService.pwReSet(requestData);
+	    if(isBoolean) {
+	    	return "OK";
+	    }else {
+	    	return "NO";
+	    }
+	}
+	
+	/**
+     * ERP사용 회사의 CS리스트를 조회한다
+     * @param Map<String, Object>
+     * @return List<CustomerServiceDTO>
+     */
+	@PostMapping("/csList")
+	public List<CustomerServiceDTO> csList(@RequestBody Map<String, Object> requestData) {
+		log.info("Received requestData: " + requestData.toString());
+		
+		List<CustomerServiceDTO> cslist =  erpAdminService.csList((int)requestData.get("companyNum"));
+		return cslist;
 	}
 	
 	/**

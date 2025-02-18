@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beauty1nside.mainpage.mapper.ApprovalMapper">
+	<select id="info" resultType="com.beauty1nside.mainpage.dto.ApprovalDTO">
+		SELECT in_approval_id,
+			   document_id,
+				employee_num,
+				in_approval_request_date,
+				in_approval_status,
+				in_approval_request_content,
+				in_approval_rejected_content,
+				in_approval_file_path,
+				company_num
+		FROM grpwr_in_approval
+		WHERE in_approval_id = #{inApprovalId}
+	
+	</select>
+	<select id="list" resultType="com.beauty1nside.mainpage.dto.ApprovalDTO" parameterType="com.beauty1nside.mainpage.dto.ApprovalSearchDTO">
+		SELECT in_approval_id,
+				document_id,
+				employee_num,
+				in_approval_request_date,
+				in_approval_status,
+				in_approval_request_content,
+				in_approval_rejected_content,
+				in_approval_file_path,
+				company_num
+		FROM (SELECT /*+INDEX_DESC(grpwr_in_approval pk_grpwr_in_approval)*/
+				rownum rn,
+				in_approval_id,
+				document_id,
+				employee_num,
+				in_approval_request_date,
+				fn_get_cmmn_name(in_approval_status) as in_approval_status,
+				in_approval_request_content,
+				in_approval_rejected_content,
+				in_approval_file_path,
+				company_num
+		FROM grpwr_in_approval
+		<![CDATA[
+		      WHERE rownum <= #{end} 
+		      AND 
+		]]>
+		<include refid="searchInfo"></include>
+			  ) 
+		WHERE rn >= #{start}
+	</select>
+	<select id="count">
+		SELECT COUNT(in_approval_id)
+		FROM grpwr_in_approval
+		<where>
+			<include refid="searchInfo"></include>
+		</where>
+	
+	</select>
+	<sql id="searchInfo">
+		company_num LIKE '%' || #{companyNum} || '%'
+		<if test="inApprovalStatus != null and ! inApprovalStatus.equals('')">
+			AND in_approval_status Like '%' || #{inApprovalStatus} || '%'
+		</if>
+	</sql>
+</mapper>
