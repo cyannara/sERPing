@@ -125,7 +125,8 @@ if (selectedStatus === "on") selectedStatus = ""; // "전체" 선택 시 공백 
     // 🔹 "검색 기준" 선택 값 가져오기
     let searchType = document.getElementById("searchCategory")?.value || "전체";
 	let searchKeyword = document.getElementById("searchKeyword")?.value || "";
-	searchKeyword = searchKeyword.replace(/\D/g, ""); // 🔹 숫자 이외 문자 제거
+	searchKeyword = searchKeyword.trim(); // 앞뒤 공백 제거
+
 
     if (selectedStatus === "on") selectedStatus = ""; // "전체" 선택 시 공백 처리
 
