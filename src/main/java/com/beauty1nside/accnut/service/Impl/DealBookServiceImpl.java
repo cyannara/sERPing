@@ -39,4 +39,10 @@ public class DealBookServiceImpl implements DealBookService{
 		// TODO Auto-generated method stub
 		return dealBookMapper.count(dto);
 	}
+	
+	@Override
+	public int insert(DealBookDTO dto) {
+		// TODO Auto-generated method stub
+		return dealBookMapper.insert(dto);
+	}
 }

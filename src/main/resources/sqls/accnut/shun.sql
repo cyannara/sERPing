@@ -225,3 +225,5 @@ SELECT /*+INDEX_DESC(ACCNUT_ASSETS PK_ACCNUT_ASSETS)*/ rownum rn, assets_code, a
               
 UPDATE ACCNUT_ASSETS SET assets_code = '0' + assets_code where TO_NUMBER(assets_code, '999999') < 10;
 Commit;
+select * from accnut_dealings_account_book;
+INSERT INTO accnut_dealings_account_book(dealings_account_book_code,  section, types_of_transaction, amount, vat_alternative, dealings_contents, deal_date,company_num)
