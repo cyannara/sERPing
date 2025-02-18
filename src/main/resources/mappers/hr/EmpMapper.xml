@@ -127,6 +127,7 @@
 		ORDER BY parent_department_num, department_name
 	</select>
 
+
 	<!-- 직급 목록 조회 -->
 	<select id="getPositions" resultType="map">
 		SELECT DISTINCT c.cmmn_code AS cmmnCode, c.cmmn_name AS cmmnName

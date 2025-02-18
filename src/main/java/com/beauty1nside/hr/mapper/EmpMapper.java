@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
 
+import com.beauty1nside.hr.dto.DepartmentDTO;
 import com.beauty1nside.hr.dto.EmpDTO;
 import com.beauty1nside.hr.dto.EmpSearchDTO;
 
@@ -26,4 +26,6 @@ public interface EmpMapper {
     
     // 🔹 사원 등록
     void insertEmployee(EmpDTO empDTO);
+    
+
 }

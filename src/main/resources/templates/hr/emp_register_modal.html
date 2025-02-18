@@ -94,6 +94,7 @@
 		aria-labelledby="employeeRegisterLabel" aria-hidden="true">
 		<div class="modal-dialog modal-lg modal-dialog-centered">
 			<div class="modal-content shadow">
+			
 				<!-- 모달 헤더 -->
 				<div class="modal-header bg-light">
 					<h5 class="modal-title fw-bold text-primary">사원 등록</h5>
@@ -144,6 +145,7 @@
 											<input type="text" class="form-control"> <span
 												class="input-group-text">@</span> <select
 												class="form-select">
+												<option>직접 입력</option>
 												<option>naver.com</option>
 												<option>gmail.com</option>
 												<option>daum.net</option>
@@ -164,12 +166,22 @@
 											class="form-control">
 									</div>
 									
-									<div class="mb-2">
-										<label class="fw-bold">부서</label> <select class="form-select">
-											<option>없음</option>
-											<option>인사</option>
-											<option>영업</option>
-										</select>
+									<div class="row mb-2 align-items-center">
+									    <!-- 부서 -->
+									    <div class="col-md-6">
+									        <label class="fw-bold">부서</label>
+											<select class="form-select" id="modalDepartment"></select>
+									    </div>
+									
+									    <!-- 하위 부서 -->
+									    <div class="col-md-6">
+									        <label class="fw-bold">하위 부서</label>
+									        <select class="form-select">
+									            <option>없음</option>
+									            <option>총무</option>
+									            <option>개발</option>
+									        </select>
+									    </div>
 									</div>
 									
 									<div class="mb-2">

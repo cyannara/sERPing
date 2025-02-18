@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.beauty1nside.hr.dto.DepartmentDTO;
 import com.beauty1nside.hr.dto.EmpDTO;
 import com.beauty1nside.hr.dto.EmpSearchDTO;
 import com.beauty1nside.hr.mapper.EmpMapper;
@@ -96,6 +97,9 @@ public class EmpServiceImpl implements EmpService {
         // 사원 등록
         empMapper.insertEmployee(empDTO);
     }
+    
+
+
 
 
 

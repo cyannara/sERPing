@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.beauty1nside.common.GridArray;
 import com.beauty1nside.common.Paging;
+import com.beauty1nside.hr.dto.DepartmentDTO;
 import com.beauty1nside.hr.dto.EmpDTO;
 import com.beauty1nside.hr.dto.EmpSearchDTO;
 import com.beauty1nside.hr.service.EmpService;
@@ -91,7 +92,8 @@ public class HrRestController {
         String newEmployeeId = empService.getNewEmployeeId(); // 새 사원번호 가져오기
         return ResponseEntity.ok(newEmployeeId);
     }
-	
+
+
 
 
 }
