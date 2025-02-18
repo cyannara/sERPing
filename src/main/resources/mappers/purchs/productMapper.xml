@@ -118,9 +118,11 @@ order by classification_id desc
 <insert id="goodsinsert" statementType="CALLABLE">
 	call purchs_product_register(
 		#{goodsName},
+		#{goodsCost}
 	    #{goodsPrice},
-	    #{supplyPrice},
+	    #{goodsSupplyPrice},
 	    #{goodsStandard},
+	    #{goodsDescription},
 	    #{goodsImage},
 	    #{classificationId},  
 	    #{brandId},

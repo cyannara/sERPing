@@ -6,9 +6,8 @@
 <head>
     <meta charset="UTF-8">
     <title>상품 등록</title>
-    <!-- ✅ Bootstrap 5 CDN 추가 -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+ 
     
     <!-- toast grid -->
     <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
@@ -29,6 +28,9 @@
 	    min-width: 120px; /* 최소 너비 설정 */
 	    padding: 10px 20px; /* 패딩 조정 */
 	}
+
+
+
     
 </style>
 </head>
@@ -36,24 +38,24 @@
 <div class="container mt-4" >
 	<h2 class="mb-4">상품 등록</h2>
 	
-    <form action="/purchs/register" method="post" enctype="multipart/form-data">
+    <!-- <form action="/purchs/register" method="post" enctype="multipart/form-data"> -->
     	<!-- <input type="hidden" id="csrfToken" name="_csrf" th:value="${_csrf.token}"> -->
     	<div id="custom-container">
 	    	<div class="row mb-3">
 	            <div class="col-md-6">
 	                <label class="form-label">상품명</label>
-	                <input type="text" class="form-control" name="goodsName" th:value="${ProductDTO.goodsName}">
+	                <input type="text" class="form-control" name="goodsName" id="goodsName" th:value="${ProductDTO.goodsName}">
 	            </div>
 	            <div class="col-md-6">
 	                <label class="form-label">상품번호</label>
-	                <input type="text" class="form-control" name="goodsCode" th:value="${ProductDTO.goodsCode}" readonly>
+	                <input type="text" class="form-control" name="goodsCode"  id="goodsCode" th:value="${ProductDTO.goodsCode}" readonly>
 	            </div>
 	        </div>
 	
 	        <div class="row mb-3">
 	            <div class="col-md-6">
 	                <label class="form-label">상품분류</label>
-	                <select class="form-select" name="classificationId" >
+	                <select class="form-select" name="classificationId" id="classificationId">
 	                    <option value="" selected>선택</option>
 	                    <option th:each="cate:${catelist}" th:value="${cate.classificationId}" th:text="${cate.classificationName}"></option>
 	                </select>
@@ -62,12 +64,12 @@
 	                <label class="form-label">브랜드</label>
 	                <div class="input-group">
 	                    <input type="text" class="form-control" name="brandName" id="brandName" th:value="${ProductDTO.brandName}" data-bs-toggle="modal" data-bs-target="#brandModal" readonly></input>
-	        			<input type="hidden" id="brandId" name="brandId" value="${ProductDTO.brandId}">
+	        			<input type="hidden" id="brandId" name="brandId"  value="${ProductDTO.brandId}">
 	                	<!-- 공통 모달 호출 -->
 						
 						<!-- 브랜드 모달 -->
 						
-						    <div th:replace="purchs/ModalTemplate :: ModalTemplate (
+						    <div th:include="purchs/ModalTemplate :: ModalTemplate (
 						    	'brandModal', 
 						    	'modal-xl', 
 						    	'브랜드 조회', 
@@ -85,9 +87,9 @@
 	                <label class="form-label">공급처</label>
 	                <div class="input-group">
 	                    <input type="text" class="form-control" name="vendorName" id="vendorName" th:value="${ProductDTO.vendorName}" data-bs-toggle="modal" data-bs-target="#vendorModal"  readonly>
-	                	<input type="hidden" id="vendorId" name="vendorId" value="${ProductDTO.vendorId}">
+	                	<input type="hidden" id="vendorId" name="vendorId"  value="${ProductDTO.vendorId}">
 	                	<!-- 거래처 모달 -->
-						    <div th:replace="purchs/ModalTemplate :: ModalTemplate (
+						    <div th:include="purchs/ModalTemplate :: ModalTemplate (
 						    'vendorModal', 
 						    'modal-xl', 
 						    '거래처 조회', 
@@ -99,49 +101,54 @@
 	            </div>
 	            <div class="col-md-6">
 	                <label class="form-label">원가</label>
-	                <input type="text" class="form-control" name="goodsCost" th:value="${ProductDTO.goodsCost}">
+	                <input type="text" class="form-control" name="goodsCost" id="goodsCost" th:value="${ProductDTO.goodsCost}">
 	            </div>
 	        </div>
 	
 	        <div class="row mb-3">
 	            <div class="col-md-6">
 	                <label class="form-label">판매가</label>
-	                <input type="text" class="form-control" name="goodsPrice" th:value="${ProductDTO.goodsPrice}">
+	                <input type="text" class="form-control" name="goodsPrice" id="goodsPrice" th:value="${ProductDTO.goodsPrice}">
 	            </div>
 	            <div class="col-md-6">
 	                <label class="form-label">공급가액</label>
-	                <input type="text" class="form-control" name="goodsSupplyPrice" th:value="${ProductDTO.goodsSupplyPrice}">
+	                <input type="text" class="form-control" name="goodsSupplyPrice" id="goodsSupplyPrice" th:value="${ProductDTO.goodsSupplyPrice}">
 	            </div>
 	        </div>
 	
 	        <div class="row mb-3">
 	            <div class="col-md-6">
 	                <label class="form-label">규격</label>
-	                <input type="text" class="form-control" name="goodsStandard" th:value="${ProductDTO.goodsStandard}">
+	                <input type="text" class="form-control" name="goodsStandard" id="goodsStandard" th:value="${ProductDTO.goodsStandard}">
 	            </div>
 	            <div class="col-md-6">
 	                <label class="form-label">담당자</label>
-	                <input type="text" class="form-control" name="employeeNum" th:value="${ProductDTO.employeeNum}" readonly>
+	                <input type="text" class="form-control" name="emloyeeName"  id="emloyeeName" th:value="${session.employeeName}" readonly>
+	                <input type="hidden" class="form-control" name="employeeNum"  id="employeeNum" th:value="${session.employeeNum}" readonly>
+	            	<input type="hidden" class="form-control" name="companyNum"  id="companyNum" th:value="${session.companyNum}" readonly>
 	            </div>
 	        </div>
+	        
+	      
 	
 	        <div class="row mb-3">
 	            <div class="col-md-6">
 	                <label class="form-label">대표 이미지</label>
-	                <div class="input-group">
-	                    <input type="file" class="form-control" id="goodsImage" name="goodsImage" th:value="${ProductDTO.goodsImage}" accept=".jpg, .jpeg, .png, .pdf"  placeholder="png, jpg, pdf 가능"   style="width: 400px;">
-        				<button class="btn btn-outline-secondary" type="button" id="uploadImageBtn">업로드</button>
-	                </div>
+	                  <div class="input-group">
+						    <input type="file" class="form-control" id="goodsImage" name="goodsImage" accept=".jpg, .jpeg, .png, .pdf" style="width: 400px;">
+						    <button class="btn btn-outline-secondary" type="button" id="uploadImageBtn">업로드</button>
+						</div>
+						
+						<!-- ✅ 업로드된 이미지 파일명을 저장할 hidden input -->
+						<input type="hidden" id="uploadedImageName" name="goodsImage" th:value="${ProductDTO.goodsImage}">
+	        
 	                 	
-	            		   	<!-- 업로드된 이미지 미리보기 -->
-				        <div id="imagePreview" class="mt-3">
-				            <img id="uploadedImage" src="" alt="업로드된 이미지" style="max-width: 300px; display: none;">
-				        </div>
+	            		
 	            </div>
 	            <div class="col-md-6">
 	                <label class="form-label">상품설명</label>
 	                <div class="input-group">
-	                    <textarea class="form-control" name="goodsDescription" rows="2" th:text="${ProductDTO.goodsDescription}"></textarea>
+	                    <textarea class="form-control" name="goodsDescription" id="goodsDescription" rows="2" th:text="${ProductDTO.goodsDescription}"></textarea>
 	                </div>
 	            </div>
 	        </div>
@@ -163,7 +170,7 @@
         <div id="myGrid" class="tui-grid-container" style="height: 200px;"></div>
         <div id="pagination" class="tui-pagination"></div>
           <!--  창고 모달 -->
-		    <div th:replace="purchs/ModalTemplate :: ModalTemplate (
+		    <div th:include="purchs/ModalTemplate :: ModalTemplate (
 		    'warehouseModal', 
 		    'modal-xl', 
 		    '창고 조회', 
@@ -171,12 +178,12 @@
 		    'purchs/warehouseFooter'
 		    )"></div>
         <div class=" d-flex justify-content-center mt-4">
-            <button type="submit" class="btn btn-primary mx-2">등록</button>
-            <button type="reset" class="btn btn-secondary mx-2">초기화</button>
+            <button class="btn btn-primary mx-2" id="registerBtn">등록</button>
+            <button class="btn btn-secondary mx-2">초기화</button>
         </div>
         
       
-    </form>
+    <!--</form>-->
 </div>
 
 <script>
@@ -214,12 +221,7 @@ let grid;
                 {header : "옵션명" , name:"optionName" , editor: "text"},
                 {header : "현재재고" , name:"currentAmount",className: "tui-grid-cell-readonly"},
                 {header : "안전재고" , name:"optionSafetyInvoice" , className: "tui-grid-cell-readonly"},
-                {header : "상품위치" 
-                , name:"warehouseName"
-                ,formatter: function({ value }) {
-                    return `<span data-bs-toggle="modal" data-bs-target="#warehouseModal">111</span>`;
-                },
-                },
+                {header : "상품위치" , name:"warehouseName",editor: "text"},
                 {header : "창고id" , name:"warehouseId" , hidden: true},
                 {
                     header : "삭제"
@@ -233,6 +235,9 @@ let grid;
             ],
             data: dataSource
         });
+        	 
+     	;
+
         
         
         const singleRegister = document.getElementById("singleRegister");
@@ -295,6 +300,7 @@ let grid;
         bttAdd.addEventListener("click", function () {
             if (!singleRegister.checked && optionRegister.checked) {
                 grid.appendRow({}, { at: 0 }); // 빈 행 추가
+                
             }
         });
         
@@ -356,6 +362,7 @@ let grid;
 
    document.getElementById('vendorModal').addEventListener('hidden.bs.modal', function () {
   	    console.log("📢 모달이 닫힘. 선택된 브랜드를 input에 반영.");
+  	  
 
   	    let selectedVendorName = sessionStorage.getItem("selectedVendorName");
   	    let selectedVendorId = sessionStorage.getItem("selectedVendorId");
@@ -380,19 +387,14 @@ let grid;
   	        console.warn("저장된 브랜드 정보가 없습니다.");
   	    }
   	});
-   
-   
+ 
 // ✅ 이미지 업로드 버튼 클릭 시 imgSave() 실행
-    document.getElementById("uploadImageBtn").addEventListener("click", imgSave);
-   //이미지 저장 함수 
+
    async function imgSave(){
-	   console.log("실행!!")
        const fileInput = document.getElementById("goodsImage");
        const file = fileInput.files[0];
-       
        const formData = new FormData();
        formData.append("file", file);
-       
        return fetch("/purchs/rest/product/uploadGoodsImages", {
            method: "POST",
            body: formData
@@ -400,16 +402,87 @@ let grid;
        .then(response => response.text())
        .then(data => {
            return data;
+           console.log("업로드 데이터",data)
        })
        .catch(error => {
            console.error("파일 업로드 중 오류 발생:", error);
        });
    }
    
+   
+   
+   
+// ✅ 이미지 업로드 버튼 클릭 시 imgSave() 실행
+  /*  document.getElementById("uploadImageBtn").addEventListener("click", async function () {
+       try {
+           const uploadedFileName = await imgSave(); // ✅ 이미지 업로드 후 파일명 반환
+           if (uploadedFileName) {
+               console.log("✅ 이미지 파일명 저장됨:", uploadedFileName);
+
+               // ✅ 업로드된 파일명을 <input>에 반영
+               //document.getElementById("uploadedImageName").value = uploadedFileName;
+               console.log("✅ Hidden Input 값 업데이트됨: ", document.getElementById("uploadedImageName").value);
+           } else {
+               console.warn("⚠️ 서버에서 파일명을 반환하지 않았습니다.");
+           }
+       } catch (error) {
+           console.error("❌ 이미지 업로드 중 오류 발생:", error);
+       }
+   }); */
+
+   
+   // ✅ 이미지 저장 함수 (파일명 반환)
+/* async function imgSave() {
+    console.log("📢 이미지 업로드 실행!");
+    const fileInput = document.getElementById("goodsImage");
+    const file = fileInput.files[0];
+
+    if (!file) {
+        console.warn("⚠️ 업로드할 파일이 선택되지 않았습니다.");
+        return null;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+        const response = await fetch("/purchs/rest/product/uploadGoodsImages", {
+            method: "POST",
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error("❌ 서버 응답 오류: " + response.statusText);
+        }
+
+        // ✅ JSON 응답을 올바르게 처리
+        const data = await response.json();
+
+        if (data.success) {
+            console.log("✅ 업로드된 파일명:", data.fileName);
+            return data.fileName; // ✅ 파일명 반환
+        } else {
+            console.warn("❌ 파일 업로드 실패:", data.message);
+            return null;
+        }
+    } catch (error) {
+        console.error("❌ 파일 업로드 중 오류 발생:", error);
+        return null;
+    }
+} */
+
+   
+  
+
+ 
+   
  //창고 모달 작업
 
 function openWarehouseModal(rowKey) {
    	    sessionStorage.setItem("selectedRowKey", rowKey); // 클릭한 행(rowKey) 저장
+   	    
+   	 	let selectedRowKey = parseInt(sessionStorage.getItem("selectedRowKey"), 10);
+
    	
    	    // 모달 요소 가져오기
    	    const modalElement = document.getElementById('warehouseModal');
@@ -436,10 +509,7 @@ function openWarehouseModal(rowKey) {
    		        warehouseGrid.refreshLayout();  // 기존 데이터 초기화
    	        	
    			}, 500);
-   	        
-
-   	  
-      
+  
 
    	        // 데이터를 다 불러온 후 모달 열기 (onGridUpdated 이벤트 활용)
    	         warehouseGrid.on("onGridUpdated", function () {
@@ -470,54 +540,136 @@ document.getElementById('warehouseModal').addEventListener('shown.bs.modal', fun
 	    }
 	}); 
 	
-
-
-		//✅ 닫기 버튼이 존재하는지 확인 후 이벤트 추가
-		/* const btnClose = document.querySelector("#warehouseModal #btn-close");
-		if (btnClose) {
-		    btnClose.addEventListener("click", function () {
-		        console.log("✅ 닫기 버튼 클릭됨!");
-		
-		        // Bootstrap Modal 인스턴스 가져오기 또는 생성
-		        const modalInstance = new bootstrap.Modal(warehouseModal);
-		        
-		        console.log("모달인스턴스",modalInstance)
-		        modalElement.classList.remove("show");
-		        modalInstance.hide();
-		        
+	
+  
+	
+		//모달 검은 화면 모두 제거 
+	   document.querySelectorAll('[data-bs-toggle="modal"]').forEach(function (modalTrigger) {
+		    modalTrigger.addEventListener("click", function () {
+		        document.querySelectorAll('.modal-backdrop').forEach(function (element) {
+		            element.remove(); // 중복 생성 방지
+		        });
 		    });
-		} else {
-		    console.warn("❌ btn-close 버튼이 존재하지 않음!");
-		} */
+		});
+   
+	    const modalElement = document.getElementById("warehouseModal");
+	    const closeButton = modalElement.querySelector('[data-bs-dismiss="modal"]');
+	    
+	    
+	    console.log()
+	    if (closeButton) {
+	        closeButton.addEventListener("click", function () {
+	            console.log("✅ 창고 모달 닫기 버튼 클릭됨!");
 
-   // 모달이 닫힐 때 선택된 값 그리드에 반영
-   document.getElementById('warehouseModal').addEventListener('hidden.bs.modal', function () {
-       console.log("📢 상품 위치 모달 닫힘. 선택된 위치를 그리드에 반영.");
- 
+	            try {
+	            	let modalInstance = bootstrap.Modal.getInstance("#warehouseModal") || new bootstrap.Modal("#warehouseModal");
+	                modalInstance.hide(); // ✅ Bootstrap 방식으로 모달 닫기
+	                
+	            } catch (error) {
+	                console.warn("❌ Bootstrap 5가 로드되지 않았음. 대체 방식 사용");
+	                modalElement.classList.remove("show");
+	                modalElement.style.display = "none";
+	                document.body.classList.remove("modal-open");
 
-       let selectedWarehouseId = sessionStorage.getItem("selectedWarehouseId"); // 창고 ID 가져오기
-       let selectedWarehouseName = sessionStorage.getItem("selectedWarehouseName"); // 창고명 가져오기
-       let selectedRowKey = sessionStorage.getItem("selectedRowKey"); // 클릭한 행 정보 가져오기
-       
-       console.log("넘어온 데이터",selectedWarehouseId,selectedWarehouseName,selectedRowKey)
+	                setTimeout(() => {
+	                    document.querySelectorAll(".modal-backdrop").forEach((element) => element.remove()); // 백그라운드 제거
+	                }, 300);
+	                
+	                hiddenwmodal();
+	            }
+	        });
+	    } else {
+	        console.warn("❌ 창고 모달 닫기 버튼을 찾을 수 없습니다.");
+	    } 
+	  
+	
 
-       if (selectedWarehouseId && selectedWarehouseName && selectedRowKey) {
-           grid.setValue(selectedRowKey, "warehouseId", selectedWarehouseId);
-           grid.setValue(selectedRowKey, "warehouseName", selectedWarehouseName);
-       } else {
-           console.warn("📢 저장된 상품 위치 정보가 없습니다.");
-       }
+	    function hiddenwmodal() {
+	        let selectedWarehouseId = sessionStorage.getItem("selectedWarehouseId");
+	        let selectedWarehouseName = sessionStorage.getItem("selectedWarehouseName");
+	        let selectedRowKey = parseInt(sessionStorage.getItem("selectedRowKey"), 10); // ✅ 숫자로 변환
 
-       sessionStorage.removeItem("selectedWarehouseId");
-       sessionStorage.removeItem("selectedWarehouseName");
-       sessionStorage.removeItem("selectedRowKey");
-   });
+	        console.log("📢 저장된 데이터 확인:", selectedWarehouseId, selectedWarehouseName, selectedRowKey);
+
+	        if (selectedWarehouseId && selectedWarehouseName && !isNaN(selectedRowKey)) {
+	            setTimeout(() => {
+	                grid.setValue(selectedRowKey, "warehouseId", selectedWarehouseId, false);
+	                grid.setValue(selectedRowKey, "warehouseName", selectedWarehouseName, false);
+
+	                console.log(`✅ 그리드에 값 설정 완료: ${selectedRowKey} => ${selectedWarehouseName} + ${selectedWarehouseId}`);
+
+	                let currentData = grid.getData();
+	                console.log("📢 현재 그리드 데이터:", currentData);
+
+	                // ✅ UI 업데이트 보장
+	                setTimeout(() => {
+	                    grid.refreshLayout();
+	                }, 50);
+
+	                // ✅ sessionStorage 데이터 삭제
+	                sessionStorage.removeItem("selectedWarehouseId");
+	                sessionStorage.removeItem("selectedWarehouseName");
+	                sessionStorage.removeItem("selectedRowKey");
+	            }, 100);
+	        } else {
+	            console.warn("📢 저장된 상품 위치 정보가 없습니다.");
+	        }
+	    }
+
+
+	    // ✅ 모달 클릭 시 중복 백그라운드 제거
+	    document.querySelectorAll('[data-bs-toggle="modal"]').forEach(function (modalTrigger) {
+	        modalTrigger.addEventListener("click", function () {
+	            document.querySelectorAll('.modal-backdrop').forEach(function (element) {
+	                element.remove(); // 중복 생성 방지
+	            });
+	        });
+	    });
+	    
+	    //제품 정보 등록 기능
+	    
+	    document.getElementById("registerBtn").addEventListener("click", productInsert);
+	
+
+	    function productInsert(event){
+	    	event.preventDefault();
+	    	
+	    	//상품 데이터 불러오기 
+	    	
+	    	let prodInfo = {
+	    		    goodsName: document.querySelector('#goodsName').value, //유효성 체크 
+	    		    goodsCost: parseInt(document.querySelector('#goodsCost')?.value, 10) || 0,
+	    		    goodsPrice: parseInt(document.querySelector('#goodsPrice')?.value, 10) || 0,
+	    		    goodsSupplyPrice: parseInt(document.querySelector('#goodsSupplyPrice')?.value, 10) || 0,
+	    		    goodsGoodsStandard: document.querySelector('#goodsStandard').value, //유효성 체크 
+	    		    goodsdescription : document.querySelector('#goodsdescription')?.value || "",
+	    		    goodsImage : document.querySelector('#uploadedImageName')?.value || "",
+	    		    classificationId: parseInt(document.querySelector('#classificationId').value, 10),//유효성체크
+	    		    brandId: parseInt(document.querySelector('#brandId').value, 10), //유효성체크
+	    		    employeeNum: parseInt(document.querySelector('#employeeNum').value, 10), //유효성체크
+	    		    vendorId: parseInt(document.querySelector('#vendorId')?.value, 10) || 0,
+	    		    companyNum: parseInt(document.querySelector('#companyNum')?.value, 10) || 0
+	    		};
+	    	
+	    	console.log("데이터",prodInfo)
+	    	
+	    	//토스트 그리드 데이터 불러오기 
+	    	const gridData = grid.getData();
+	    	console.log("그리드데이터=",gridData);
+	    	
+	    }
+
         
     });
+ 
+ 
+
     
+ 
     
 </script>
-
+<!-- ✅ Bootstrap 5 CDN 추가 -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 
