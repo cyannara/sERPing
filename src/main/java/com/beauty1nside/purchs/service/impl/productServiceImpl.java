@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.beauty1nside.purchs.dto.ProductDTO;
 import com.beauty1nside.purchs.dto.ProductSearchDTO;
+import com.beauty1nside.purchs.dto.ProdInsertVO;
 import com.beauty1nside.purchs.mapper.productMapper;
 import com.beauty1nside.purchs.service.productService;
 
@@ -19,11 +20,6 @@ public class productServiceImpl implements productService{
 	
 	private final productMapper productMapper;
 	
-	@Override
-	public void register(ProductDTO product) {
-		productMapper.insert(product);
-		
-	}
 
 	@Override
 	public List<ProductDTO> getCatelist() {
@@ -58,6 +54,12 @@ public class productServiceImpl implements productService{
 	@Override
 	public int warehousecount(ProductSearchDTO dto) {
 		return productMapper.warehousecount(dto);
+	}
+
+	@Override
+	public void goodsinsert(ProdInsertVO vo) {
+		productMapper.goodsinsert(vo);
+		
 	}
 	
 
