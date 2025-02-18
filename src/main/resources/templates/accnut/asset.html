@@ -121,24 +121,19 @@
 		document.querySelector(".dropup").addEventListener("click", ()=>{
 			if(event.target.className.includes("cash")){
 				typeOfSection = "현금";
-				console.log("현금");
 			} else if(event.target.className.includes("dropdown-item")){
 				switch (event.target.innerHTML) {
 					case "통장 등록":
 						typeOfSection = "통장";
-						console.log("통장");
 						break;
 					case "카드 등록":
 						typeOfSection = "카드";
-						console.log("카드")
 						break;
 					case "비품 등록":
 						typeOfSection = "비품";
-						console.log("비품")
 						break;
 					case "현금 등록":
 						typeOfSection = "현금";
-						console.log("현금");
 						break;
 					default:
 						break;
@@ -218,7 +213,6 @@
 		document.querySelectorAll('.btnInfo').forEach((btn, idx) => {
 			btn.addEventListener("click", () => {
 				rowData = grid.getRow(idx);
-				console.log(rowData);
 			})
 		})
 	}

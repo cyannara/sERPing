@@ -6,12 +6,13 @@
 <head>
 <meta charset="UTF-8">
 <title>거래대장 등록</title>
+<link rel="stylesheet" href="/vendors/mdi/css/materialdesignicons.min.css">
 </head>
 <body layout:fragment="content">
   <div class="container">
     <!-- 메뉴이름 -->
 		<div>
-			<h2>거래대장 등록</h3>
+			<h2>거래대장 등록</h2>
 		</div>
 
     <!-- 등록 grid -->
@@ -28,7 +29,7 @@
         <div class="col-4"></div>
         <div class="col-4 row">
           <div class="col-1"></div>
-          <button type="button" class="btn btn-secondary col-4">초기화</button>
+          <button type="button" class="btn btn-secondary col-4" onclick="resetBtn()">초기화</button>
           <div class="col-2"></div>
           <button type="button" class="btn btn-success col-4">등록</button>
           <div class="col-1"></div>
@@ -40,14 +41,14 @@
 
   <script>
     document.addEventListener("DOMContentLoaded",()=>{
-  
+      addRow();
+      delRow();
     })
     var Grid = tui.Grid;
     
     const dataSource = {
       api: {
-        
-        
+          createData: { url: '/api/createData', method: 'POST' },
       },
       contentType: 'application/json'
         
@@ -55,20 +56,53 @@
     
     const grid = new Grid({
       el : document.querySelector('#grid'),
-      pageOptions: {
+      /*pageOptions: {
         useClient : true,
-        perPage: 10,
-      },
+        perPage: 20,
+      },*/
       columns: [
-        { header : "구분", name : "section",  editor: "text"},
-        { header : "거래방법", name : "typesOfTransaction",  editor: "text"},
-        { header : "금액", name : "amount",  editor: "text"},
-        { header : "부가세여부", name : "vatAlternative",  editor: "text"},
-        { header : "거래내용", name : "dealingsContents",  editor: "text"},
-        { header : "거래일", name : "dealDate",  editor: "text"},
-        
+        { header : "구분", name : "section", formatter: 'listItemText', align: 'center', editor: { type : "select",
+        											   options : { listItems : [ 
+        												   				   	{ text : "구분", value : "" },
+        												   					{ text : "수익", value : "EE01" },
+        												   				   	{ text : "지출", value : "EE02" },
+        												   				   	{ text : "자산", value : "EE03" },
+        												   				   	{ text : "부채", value : "EE04" }
+        												   
+        												   
+	   	] }}},
+        { header : "거래방법", name : "typesOfTransaction", formatter: 'listItemText', align: 'center', editor: { type : "select",
+			   											   			 options : 	{ listItems : [ 	
+			   											   				 					{ text : "거래방법", value : "" },
+			   											   				 					{ text : "현금", value : "AC01" },
+   				   															  				{ text : "이체", value : "AC02" },
+   				   																			{ text : "카드", value : "AC03" },
+   				  																			{ text : "미지급", value : "AC08" }
+   
+   
+   		] }}},
+        { header : "금액", name : "amount", align: 'center', editor: "text", onAfterChange: (ev)=> {
+        																							let newValue = ev.value.replace(/[^0-9]/g, "");
+        																							if(ev.value != newValue){
+        																								grid.setValue(ev.rowKey, "amount", newValue, false);
+        																							}
+        	}},
+        { header : "부가세여부", name : "vatAlternative", align: 'center',  editor: { type : "radio",
+	   			 												   options : 	{ listItems : [ 	
+		 																						{ text : "없음", value : "N" },
+																			 					{ text : "있음", value : "Y" },
+		] }}},
+        { header : "거래내용", name : "dealingsContents", align: 'center',  editor: "text"},
+        { header : "거래일", name : "dealDate", align: 'center',  editor: { type : "datePicker",
+        												  options : { format : "yyyy-MM-dd",
+        													  		  type : "date",
+        													  		  timepicker : false
+  		}}},
+  		{ header : "삭제", name : "del", formatter : () => '<button class="btn btn-danger btn-sm btnDel"><i class="mdi mdi-delete" style="line-height: 15px;"></i></button>', align: 'center', width: '40'},
       ],
       data : [
+			{},{},{},{},{}        
+        /*
         {"section" : "", "typesOfTransaction" : "", "amount" : "", "vatAlternative" : "", "dealingsContents" : "", "dealDate" : "", "amount" : "" },
         {"section" : "", "typesOfTransaction" : "", "amount" : "", "vatAlternative" : "", "dealingsContents" : "", "dealDate" : "", "amount" : "" },
         {"section" : "", "typesOfTransaction" : "", "amount" : "", "vatAlternative" : "", "dealingsContents" : "", "dealDate" : "", "amount" : "" },
@@ -79,9 +113,32 @@
         {"section" : "", "typesOfTransaction" : "", "amount" : "", "vatAlternative" : "", "dealingsContents" : "", "dealDate" : "", "amount" : "" },
         {"section" : "", "typesOfTransaction" : "", "amount" : "", "vatAlternative" : "", "dealingsContents" : "", "dealDate" : "", "amount" : "" },
         {"section" : "", "typesOfTransaction" : "", "amount" : "", "vatAlternative" : "", "dealingsContents" : "", "dealDate" : "", "amount" : "" },
+        */
       ],
     });
-  
+  	
+    function addRow() {
+      document.querySelector('#addBtn').addEventListener('click', ()=> {
+        grid.appendRow({})
+        delRow();
+      })
+
+    }
+    
+    function delRow() {
+      grid.on("click", (ev)=>{
+        if(ev.columnName == 'del'){
+        	grid.removeRow(ev.rowKey);
+        }
+      })
+    }
+    
+    function resetBtn() {
+    	grid.resetData([{},{},{},{},{}]);
+    }
+    
+    
+    
   </script>
 </body>
 </html>

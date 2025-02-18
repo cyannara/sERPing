@@ -2,17 +2,150 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head><meta charset="UTF-8"></head>
 <body>
-    <h1>내용 들어갈거</h1>
-    <input type="text" id="asd">
+    <div class="container">
+        <div class="row">
+            <span class="col-2">자산 코드</span>
+            <input type="text" class="col-8" id="assetsCode" disabled>
+        </div>
+
+        <div class="row">
+            <span class="col-2">구분</span>
+            <select type="text" class="col-8" id="section" disabled>
+                <option value="">구분</option>
+                <option value="AC01">현금</option>
+                <option value="AC02">통장</option>
+                <option value="AC03">카드</option>
+                <option value="AC04">비품</option>
+            </select>
+        </div>
+
+        <div class="row">
+            <span class="col-2">자산명</span>
+            <input type="text" class="col-8" id="assetsName">
+        </div>
+
+        <div class="row">
+            <span class="col-2">소유주</span>
+            <input type="text" class="col-8" id="owner">
+        </div>
+
+        <div class="row">
+            <span class="col-2">금액</span>
+            <input type="number" class="col-8" id="amount">
+        </div>
+
+        <div class="row">
+            <span class="col-2">등록일</span>
+            <input type="date" class="col-8" id="registerDate" >
+        </div>
+        
+    </div>
 <script type="text/javascript">
-	/* 
-	var asd = document.querySelector('#asd');
-	asd.addEventListener("change", ()=>{
-		console.log(asd.value);
-		
+        
+	//등록 모달이 보여질때
+	document.querySelector('#assetaddModal').addEventListener('shown.bs.modal', (e) => {
+		// 모달 접근
+		let con = document.querySelector('#assetaddModal').querySelector('.modal-body .container');
+
+        let assetsCode =  con.querySelector('#assetsCode');
+        let section = con.querySelector('#section');
+        let assetsName = con.querySelector('#assetsName');
+        let owner = con.querySelector('#owner');
+        let amount = con.querySelector('#amount');
+        let registerDate = con.querySelector('#registerDate');
+
+        assetsName.value = '';
+        owner.value = '';
+        
+        // 금액 0으로 기본 설정
+        amount.value = 0;
+
+        // 날짜 오늘 날짜로 기본 설정
+        let today = `${new Date().getFullYear()}-${('0'+(new Date().getMonth()+1)).slice(-2)}-${('0'+(new Date().getDate())).slice(-2)}`;
+        registerDate.value = today;
+
+        // 모달 추가할 인풋
+        let html = "";
+        switch(typeOfSection){
+            case '현금' :   section.value = "AC01";
+                            break;
+            case '통장' :   
+                            html += `<div class="row removeRow">
+                                            <span class="col-2">은행</span>
+                                            <input type="text" class="col-8" id="financialInstitution">
+                                        </div>
+
+                                        <div class="row removeRow">
+                                            <span class="col-2">계좌번호</span>
+                                            <input type="text" class="col-8" id="financeInformation">
+                                        </div>
+                                    `;
+                            assetsName.closest("div.row").insertAdjacentHTML("afterend", html);
+                            amount.setAttribute("disabled", "true");
+                            section.value = "AC02";
+                            break;
+            case '카드' :   
+                            html += `<div class="row removeRow">
+                                            <span class="col-2">카드사</span>
+                                            <input type="text" class="col-8" id="financialInstitution">
+                                        </div>
+
+                                        <div class="row removeRow">
+                                            <span class="col-2">카드번호</span>
+                                            <input type="text" class="col-8" id="financeInformation">
+                                        </div>
+                                    `;
+                            assetsName.closest("div.row").insertAdjacentHTML("afterend", html);
+                            amount.setAttribute("disabled", "true");
+                            section.value = "AC03";
+                            break;
+
+            case '비품' :   
+                            html += `<div class="row removeRow">
+                                		    <span class="col-2">비품 금액</span>
+                                	 	    <input type="number" class="col-8" id="fixturesAmount">
+                            		    </div>
+
+                            		    <div class="row removeRow">
+                                            <span class="col-2">비품 수량</span>
+                                            <input type="number" class="col-8" id="quantity">
+                                        </div>
+
+                                        
+                                    `;
+                            owner.closest("div.row").insertAdjacentHTML("afterend", html);
+                            amount.setAttribute("disabled", "true");
+                            section.value = "AC04";
+                            break;
+            default     :   break;
+            
+
+        } // switch(typeOfSection)
+
+        if(con.querySelector('#quantity') && con.querySelector('#fixturesAmount')){
+            let quantity = con.querySelector('#quantity');
+            let fixturesAmount = con.querySelector('#fixturesAmount');
+            quantity.addEventListener('keyup', (e) => {
+                amount.value = quantity.value * fixturesAmount.value;
+            })
+            fixturesAmount.addEventListener('keyup', (e) => {
+                amount.value = quantity.value * fixturesAmount.value;
+            })
+        }
+
+
 	})
-	*/
+
+    // 디테일 모달이 닫힐 때
+    document.querySelector('#assetaddModal').addEventListener('hidden.bs.modal', () => {
+        document.querySelectorAll('.removeRow').forEach(div => {
+            div.remove();
+        })
+    });
 	
+	
+	
+		
 
 </script>
 </body>

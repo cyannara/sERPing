@@ -1,10 +1,18 @@
 package com.beauty1nside.accnut.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.beauty1nside.accnut.dto.AssetDTO;
 import com.beauty1nside.accnut.dto.AssetSearchDTO;
 import com.beauty1nside.accnut.dto.DealBookSearchDTO;
 import com.beauty1nside.accnut.dto.DebtSearchDTO;
@@ -175,6 +183,24 @@ public class AccnutRestController {
 		GridArray grid = new GridArray();
 		Object result = grid.getArray( paging.getPage(), incidentalCostService.count(dto), incidentalCostService.list(dto) );
 		return result;
+	}
+	
+	// 삽입
+	
+	@PostMapping("/asset/insert")
+	public ResponseEntity<Map<String, Object>> assetsInsert(@RequestBody AssetDTO dto) {
+	    Map<String, Object> response = new HashMap<>();
+	    try {
+	    	assetService.insert(dto);
+	        response.put("status", "success");
+	        response.put("message", "등록 성공");
+	        return ResponseEntity.ok(response); // JSON 형태 응답
+	    } catch (Exception e) {
+	        log.error("등록 실패", e);
+	        response.put("status", "error");
+	        response.put("message", "등록 실패");
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+	    }
 	}
 	
 	

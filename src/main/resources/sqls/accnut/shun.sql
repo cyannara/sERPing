@@ -213,3 +213,15 @@ select * from accnut_assets;
 update accnut_assets set section = 'AC04' where assets_code = '3';
 
 select * from cmmn where upper_cmmn_code = 'AC';
+select * from cmmn where upper_cmmn_code = 'EE';
+
+
+-- 2025-02-18
+
+select * from accnut_assets;
+
+SELECT /*+INDEX_DESC(ACCNUT_ASSETS PK_ACCNUT_ASSETS)*/ rownum rn, assets_code, assets_name, fn_get_cmmn_name(section) as section, fn_get_cmmn_name(financial_institution) as financial_institution, finance_information, owner, NVL(amount,0) as amount, register_date, NVL(quantity, 0) as quantity, NVL(fixtures_amount, 0) as fixtures_amount 
+		      FROM accnut_assets;
+              
+UPDATE ACCNUT_ASSETS SET assets_code = '0' + assets_code where TO_NUMBER(assets_code, '999999') < 10;
+Commit;
