@@ -313,4 +313,53 @@ function registerEmployee() {
         location.reload();
     })
     .catch(error => console.error("❌ 등록 실패:", error));
+    
+    
+    
+document.getElementById("checkAccountOwnerBtn").addEventListener("click", function () {
+    let bankCode = document.getElementById("bankSelect").value;
+    let accountNumber = document.getElementById("accountNumber").value;
+    let birthDate = document.getElementById("birthDate").value; // 생년월일 (YYYYMMDD)
+
+    if (!bankCode || !accountNumber || !birthDate) {
+        alert("은행, 계좌번호, 생년월일을 입력하세요!");
+        return;
+    }
+
+    // 현재 시간 (yyyyMMddHHmmss)
+    let now = new Date();
+    let tran_dtime = now.getFullYear() +
+        String(now.getMonth() + 1).padStart(2, '0') +
+        String(now.getDate()).padStart(2, '0') +
+        String(now.getHours()).padStart(2, '0') +
+        String(now.getMinutes()).padStart(2, '0') +
+        String(now.getSeconds()).padStart(2, '0');
+
+    let requestData = {
+        bank_code_std: bankCode,
+        account_num: accountNumber,
+        account_holder_info_type: " ",
+        account_holder_info: birthDate,
+        tran_dtime: tran_dtime
+    };
+
+    fetch("https://testapi.openbanking.or.kr/v2.0/inquiry/real_name", {
+        method: "POST",
+        headers: {
+            "Authorization": "Bearer YOUR_ACCESS_TOKEN",
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(requestData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.rsp_code === "A0000") {
+            document.getElementById("accountHolderName").value = data.account_holder_name;
+            alert("예금주: " + data.account_holder_name);
+        } else {
+            alert("예금주 확인 실패: " + data.rsp_message);
+        }
+    })
+    .catch(error => console.error("API 요청 실패:", error));
+});
 }
