@@ -18,6 +18,12 @@
 	</div>
 	<div
 		th:if="${#strings.equals('sales', param.menu) or #strings.equals('sales', menu)}">
+		<ul class="nav">
+			<li class="nav-item"><a class="nav-link"
+				href="/bsn/order"> <i class="icon-grid menu-icon"></i> <span
+					class="menu-title">주문등록</span>
+			</a></li>
+		</ul>
 		<span class="menu-title">inventory</span>
 	</div>
 	<div

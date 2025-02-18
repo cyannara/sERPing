@@ -196,6 +196,8 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	    var Grid = tui.Grid;
 	    var selectedRow = null; // 선택된 주문 정보
 	    var detailData = [];    // 상세 데이터 정보
+	    
+	    
 
 		
 		const dataSource = {
@@ -363,7 +365,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		
 		
 		
-		// 주문 등록 버튼 클릭 이벤트
+		
 		
 		
 		
@@ -415,14 +417,52 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		            console.log("선택된 주문:", selectedRow);
 		            console.log("모든 상세 데이터:", allDetails);
 		            // 여기서 등록 버튼 이벤트를 트리거하거나 필요한 작업을 처리
-		            
+		            let orderDTO = {
+		            		orderCode:      selectedRow.orderCode,
+		                    branchOfficeId: selectedRow.branchOfficeId,
+		                    orderDate:      selectedRow.orderDate,
+		                    dueDate:        selectedRow.dueDate,
+		                    remark:         selectedRow.remark,
+		                    companyNum:     selectedRow.companyNum,
+		            		employeeNum: 1234,
+		            		orderDetails:   allDetails
+		            }
+		            console.log(orderDTO);
+		            // 등록 함수 호출
+		            //registerOrder(orderDTO);
 		            
 		            
 		        }
 		    }, 100);  // 100ms 간격으로 데이터 로드 완료 여부 체크
 		}
+		
+		
+		// 주문 등록 함수
+		function registerOrder(orderDTO) {
+		    fetch('http://localhost:81/bsn/rest/order/insert', {
+		        method: 'POST',
+		        headers: {
+		            'Content-Type': 'application/json'  // JSON 형식으로 보내기
+		        },
+		        body: JSON.stringify(orderDTO)  // 객체를 JSON으로 변환하여 전송
+		    })
+		    .then(response => response.json())
+		    .then(data => {
+		        if (data.status === "success") {
+		            alert("주문 등록 성공");
+		         	// 값 초기화
+		            selectedRow = null; // 선택된 주문 정보
+	    			detailData = [];    // 상세 데이터 정보 
+		           
+		        } else {
+		            alert("발주 등록 실패: " + data.message);
+		        }
+		        //테이블 초기화?
 
-		// 등록 버튼 클릭 시 호출
+		    }) 
+		}
+
+		// 주문 등록 버튼 클릭 이벤트
 		document.getElementById('registerButton').addEventListener('click', () => {
 		    if (selectedRow && selectedRow.orderCode) {
 		        loadAllOrderDetails(selectedRow.orderCode);  // 모든 상세 데이터를 가져와서 등록
