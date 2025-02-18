@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -21,6 +22,8 @@ import lombok.extern.log4j.Log4j2;
 public class PurchsSampleController {
 	
 	private final productService productService;
+	
+	@ModelAttribute public void setAttributes(Model model) { model.addAttribute("menu", "inventory");}
 
 	//샘플 페이지
 	@GetMapping("/")
@@ -30,7 +33,7 @@ public class PurchsSampleController {
 	
 
 	//등록 페이지 이동
-	@GetMapping("/register")
+	@GetMapping("/goodsRegister")
 	public void showRegister(Model model) {
 		model.addAttribute("ProductDTO", new ProductDTO());
 	    model.addAttribute("catelist", productService.getCatelist()); // 빈 객체라도 전달

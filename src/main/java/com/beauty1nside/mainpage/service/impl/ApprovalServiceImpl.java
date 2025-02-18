@@ -18,17 +18,22 @@ public class ApprovalServiceImpl implements ApprovalService{
 	private final ApprovalMapper approvalMapper;
 	
 	@Override
-	public ApprovalDTO info(Long inApprovalId) {
-		return approvalMapper.info(inApprovalId);
+	public ApprovalDTO info(Long inApprovalId, Long companyNum) {
+		return approvalMapper.info(inApprovalId, companyNum);
 	}
 	
 	@Override
-	public List<ApprovalDTO> list(ApprovalSearchDTO dto) {
-		return approvalMapper.list(dto);
+	public List<ApprovalDTO> waitingList(ApprovalSearchDTO dto, Long companyNum) {
+		return approvalMapper.waitingList(dto, companyNum);
 	}
 	
 	@Override
-	public int count(ApprovalSearchDTO dto) {
-		return approvalMapper.count(dto);
+	public int count(ApprovalSearchDTO dto, Long companyNum) {
+		return approvalMapper.count(dto, companyNum);
+	}
+	
+	@Override
+	public int update(Long inApprovalId, String processStr, Long companyNum) {
+		return approvalMapper.update(inApprovalId, processStr, companyNum);
 	}
 }

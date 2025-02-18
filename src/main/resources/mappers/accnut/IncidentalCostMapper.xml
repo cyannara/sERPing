@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beauty1nside.accnut.mapper.IncidentalCostMapper">
+	<select id="info">
+		SELECT incidental_cost_code, department, section, card_num, amount, contents, register_date, pay_date, image, process_alternative, employee_num, employee_name, account_category, confirmer, company_num
+		FROM accnut_incidental_cost
+		WHERE incidental_cost_code = #{incidentalCostCode}
+	
+	</select>
+	
+	<select id="list">
+		SELECT incidental_cost_code, department, section, card_num, amount, contents, register_date, pay_date, image, process_alternative, employee_num, employee_name, account_category, confirmer, company_num
+		FROM (SELECT /*+INDEX_DESC(accnut_incidental_cost pk_accnut_incidental_cost)*/ rownum rn, incidental_cost_code, department, fn_get_cmmn_name(section) section, card_num, amount, contents, register_date, pay_date, image, process_alternative, employee_num, employee_name, account_category, confirmer, company_num
+			  FROM accnut_incidental_cost	
+		<![CDATA[
+			  WHERE rownum <= #{end}
+			  AND
+		]]>
+		<include refid="searchInfo"></include>
+		)
+		WHERE rn >= #{start}
+	
+	</select>
+	
+	<select id="count">
+		SELECT COUNT(incidental_cost_code)
+		FROM accnut_incidental_cost
+		<where>
+			<include refid="searchInfo"></include>
+		</where>
+
+	
+	</select>
+	
+	<sql id="searchInfo">
+		company_num = #{companyNum}
+		<if test="department != null and ! department.equals('')">
+			AND department = #{department}
+		</if>
+		<if test="registerDate != null and ! registerDate.equals('')">
+			AND TO_CHAR(register_date, 'yyyy-mm-dd') = #{registerDate}
+		</if>
+	</sql>
+
+
+
+
+
+
+
+</mapper>

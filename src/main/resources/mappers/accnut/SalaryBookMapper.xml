@@ -29,10 +29,10 @@
 	<sql id="searchInfo">
 		company_num = #{companyNum}
 		<if test="employeeName != null and ! employeeName.equals('')">
-			employee_name LIKE '%' || #{employeeName} || '%'
+			AND employee_name LIKE '%' || #{employeeName} || '%'
 		</if>
 		<if test="department != null and ! department.equals('')">
-			department = #{department}
+			AND department = #{department}
 		</if>	
 	</sql>
 

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.beauty1nside.purchs.dto.ProductDTO;
 import com.beauty1nside.purchs.dto.ProductSearchDTO;
+import com.beauty1nside.purchs.dto.ProdInsertVO;
 
 public interface productMapper {
 	//카테고리 조회 (드롭박스)
@@ -22,5 +23,5 @@ public interface productMapper {
 	int warehousecount(ProductSearchDTO dto);
 	
 	//상품,옵션 등록 
-	int insert(ProductDTO productDTO);
+	public void goodsinsert(ProdInsertVO vo);
 }
