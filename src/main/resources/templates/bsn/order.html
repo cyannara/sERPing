@@ -46,200 +46,162 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 
   
   
-  
-  
+  <style>
+  	#custom-container{
+        background-color: #f8f9fa; /* 연한 회색 배경 /
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); / 박스 그림자 */
+        margin-bottom: 20px;
+
+    } 
+  </style>
   
 
 </head>
 
 <body layout:fragment="content">
   <!-- 페이지 내용 시작 -->
-  <div class="container" >
+  <div class="container">
 	
-	<h3>주문 등록</h3>
+    <h3>주문 등록</h3>
 
-        <div class="row">
-
-          <div class="col-md-9  grid-margin stretch-card">
+    <!-- 🔍 검색 조건 -->
+    <div class="row mb-3">
+        <div class="col-12">
             <div class="card">
-              <div class="card-body">
-                <h4 class="card-title">검색 조건</h4>
-                <p class="card-description">
-                  검색 조건을 선택하세요.
-                </p>
-                <form name='searchForm' action="/bsn/order"  class="forms-sample">
+                <div class="card-body">
+                    <h4 class="card-title">검색 조건</h4>
+                    <p class="card-description">검색 조건을 선택하세요.</p>
+                    <!--  <form name='searchForm' action="/bsn/order" class="forms-sample"> -->
+                        <div class="d-flex align-items-center gap-3">
+                            <!-- 라디오 버튼 -->
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input type="radio" class="form-check-input" name="optionsRadios" value="notSelect" checked onclick="toggleDateInputs(false)">
+                                        사용안함
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input type="radio" class="form-check-input" name="optionsRadios" value="orderDate" onclick="toggleDateInputs(true)">
+                                        주문일자
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input type="radio" class="form-check-input" name="optionsRadios" value="dueDate" onclick="toggleDateInputs(true)">
+                                        납기일자
+                                    </label>
+                                </div>
+                            </div>
 
-                  <div class="d-flex align-items-center gap-3">
-                    <!-- 라디오 버튼 -->
-                    <div class="d-flex gap-3">
-                      <div class="form-check">
-                        <label class="form-check-label">
-                          <input type="radio" class="form-check-input" name="optionsRadios" id="optionNone" value=""
-                            checked onclick="toggleDateInputs(false)">
-                          사용안함
-                        </label>
-                      </div>
-                      <div class="form-check">
-                        <label class="form-check-label">
-                          <input type="radio" class="form-check-input" name="optionsRadios" id="optionOrderDate"
-                            value="order" onclick="toggleDateInputs(true)">
-                          주문일자
-                        </label>
-                      </div>
-                      <div class="form-check">
-                        <label class="form-check-label">
-                          <input type="radio" class="form-check-input" name="optionsRadios" id="optionDueDate"
-                            value="due" onclick="toggleDateInputs(true)">
-                          납기일자
-                        </label>
-                      </div>
-                    </div>
+                            <!-- 날짜 입력 -->
+                            <div class="d-flex gap-3">
+                                <div>
+                                    <label for="startDate">시작 날짜</label>
+                                    <input type="date" class="form-control" id="startDate" name="startDate" disabled>
+                                </div>
+                                <div>
+                                    <label for="endDate">끝 날짜</label>
+                                    <input type="date" class="form-control" id="endDate" name="endDate" disabled>
+                                </div>
+                            </div>
+                        </div>
 
-                    <!-- 날짜 입력 -->
-                    <div class="d-flex gap-3">
-                      <div>
-                        <label for="startDate">시작 날짜</label>
-                        <input type="date" class="form-control" id="startDate" name="startDate" disabled>
-                      </div>
-                      <div>
-                        <label for="endDate">끝 날짜</label>
-                        <input type="date" class="form-control" id="endDate" name="endDate" disabled>
-                      </div>
-                    </div>
-                  </div>
-
-
-                  <div class="form-group m-3">
-                    <label for="exampleSelectKeyword">검색어</label>
-                    <select class="form-control" id="exampleSelectKeyword">
-                      <option>발주지점</option>
-                      <option>주문서명</option>
-                      <option>담당자명</option>
-                    </select>
-                  </div>
-
-                  <div class="form-group">
-                    <label for="exampleInputCity1">City</label>
-                    <input type="text" class="form-control" id="exampleInputCity1" placeholder="Location">
-                  </div>
-
-                  <button type="submit" class="btn btn-primary mr-2">검색</button>
-                  <button class="btn btn-light">Cancel</button>
-                </form>
-              </div>
+                        <div class="form-group m-3">
+                            <label for="selectBhf">발주지점</label>
+                            <select class="form-control" id="selectBhf">
+                            	<option>all</option>
+                                <option>발주지점1</option>
+                                <option>발주지점2</option>
+                                <option>발주지점3</option>
+                                <option>yedam</option>
+                            </select>
+                        </div>
+						<div class="col-12 text-center">
+                        	<button class="btn btn-primary mr-2" onclick="search()">검색</button>
+                        	<button class="btn btn-light"        onclick="reset()">초기화</button>
+                        </div>
+                    <!-- </form> -->
+                </div>
             </div>
-          </div>
-          
-          
-          
-          <div class="col-md-3 col-12 grid-margin stretch-card ">
-            <div class="card">
-              <div class="card-body">
-                <h4 class="card-title">Checkbox Controls</h4>
-                <p class="card-description">Checkbox and radio controls (default appearance is in primary color)</p>
-                
-              </div>
-
-            </div>
-          </div>
-
-
-
-          
-
-
-
-
         </div>
-        
-        
-        <div class="row">
-        	<div class="col-md-9  grid-margin stretch-card">
+    </div>
+
+    <!-- 📋 발주 요청 리스트 & 선택한 발주 요청 정보 -->
+    <div class="row">
+        <!-- 발주 요청 리스트 -->
+        <div class="col-md-9 grid-margin stretch-card">
             <div class="card">
-              <div class="card-body">
-                <h4 class="card-title">검색 조건</h4>
-                <p class="card-description">
-                  그리드 - 검색한 지점측 발주 신청 리스트 출력
-                </p>
-                <!--  
-                <table class="table table-hover" style="text-align:center;">
-                <thead>
-                	<tr>
-						<td>주문번호</td>
-						<td>지점번호</td>
-						<td>주문일</td>
-						<td>납기일자</td>
-						<td>비고</td>
-                	</tr>
-                </thead>
-                <tbody>  
-                	<tr th:each="order : ${bhfOrder}">
-                		<td th:text="${order.orderCode}">주문번호</td>
-                		<td th:text="${order.branchOfficeId}">지점번호</td>
-                		
-                		<td th:text="${#dates.format(order.orderDate, 'yyyy/MM/dd')}">주문일</td>
-                		<td th:text="${#dates.format(order.dueDate, 'yyyy/MM/dd')}">납기일자</td>
-                		<td th:text="${order.remark}">비고</td>
-                		
-                	</tr>
-                </tbody>
-                </table>
-                -->
-                <div id="orderList"></div>
-			  <div id="pagination" class="tui-pagination"></div>
-                
-              </div>
+                <div class="card-body">
+                    <h4 class="card-title">📋 검색 결과 (발주 요청 리스트)</h4>
+                    <p class="card-description">그리드 - 검색한 지점측 발주 신청 리스트 출력</p>
+                    <div id="orderList"></div>
+                    <div id="pagination" class="tui-pagination"></div>
+                </div>
             </div>
-          </div>
         </div>
-        
-        
-        
-        <div class="row">
-        	<div class="col-md-9  grid-margin stretch-card">
+
+        <!-- 선택한 발주 요청 정보 -->
+        <div class="col-md-3 col-12 grid-margin stretch-card">
             <div class="card">
-              <div class="card-body">
-                <h4 class="card-title">발주 상세</h4>
-                <p class="card-description">
-                  그리드 - 선택한 발주 신청의 상세(상품) 목록 출력
-                </p>
-               	<div id="orderDetailList"></div>
-			    <div id="pagination" class="tui-pagination"></div>
-               
-              </div>
-              
+                <div class="card-body">
+                    <h4 class="card-title">📝 선택한 발주 요청 정보</h4>
+                    <p class="card-description">선택한 발주 정보를 표시합니다.</p>
+                    <div id="selectedOrder"></div>
+                </div>
             </div>
-            
-          </div>
-          
         </div>
-        
-        	
-			 
-        
-        
-        
-        
-      </div>
+    </div>
+
+    <!-- 📦 선택한 발주 상세 정보 -->
+    <div class="row">
+        <div class="col-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">📦 선택한 발주 상세 (상품 리스트)</h4>
+                    <p class="card-description">그리드 - 선택한 발주 신청의 상세(상품) 목록 출력</p>
+                    <div id="orderDetailList"></div>
+                    <div id="pagination" class="tui-pagination"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ 승인 / 🚫 거부 버튼 -->
+    <div class="row mt-3">
+        <div class="col-12 text-center">
+            <button class="btn btn-success" id="registerButton">✅ 승인 (등록)</button>
+            <button class="btn btn-danger">🚫 거부 (취소)</button>
+        </div>
+    </div>
+</div>
+
       <!-- container 끝 -->
 
   <!-- 페이지 내용 끝 -->
 	  <script>
-	  <!--검색창 날짜 비활성 -->
+	  <!-- 검색창 날짜 비활성 -->
 	  function toggleDateInputs(enable) {
 	      document.getElementById("startDate").disabled = !enable;
 	      document.getElementById("endDate").disabled = !enable;
 	      
 	     
 	    }
-	  <!-- 그리드 사용 -->
+	 
 	  
 	  
-	  var Grid = tui.Grid;
+	    var Grid = tui.Grid;
+	    var selectedRow = null; // 선택된 주문 정보
+	    var detailData = [];    // 상세 데이터 정보
+
 		
 		const dataSource = {
 				api: {
-					readData: { url: 'http://localhost:81/bsn/rest/order', method: 'GET', initParams: { page: 1 }},
+					readData: { url: 'http://localhost:81/bsn/rest/bhforder', method: 'GET', 
+						initParams: { page: 1 }},
 				},
 				contentType: 'application/json'
 			};
@@ -253,13 +215,25 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 			columns: [ 
 				{ header : "주문코드", name : "orderCode"},
 				{ header : "지점코드", name : "branchOfficeId"},
-				{ header : "주문일", name : "orderDate"},
-				{ header : "납기일", name : "dueDate"},
+				{ header : "주문일", name : "orderDate", formatter: ({ value }) => formatDate(value, 'order'), sortable : true},
+				{ header : "납기일", name : "dueDate", formatter: ({ value }) => formatDate(value, 'due'), sortable : true},
 				{ header : "비고", name : "remark"},
 				{ header : "회사번호", name : "companyNum"},
 			],
 			data: dataSource
 		});
+		
+		//그리드 날짜 형식 변경(데이터 수정X, 표기만)
+		function formatDate(dateString, type) {
+		    if (!dateString) return ''; // 데이터가 없으면 빈 문자열 반환
+		    const date = new Date(dateString);
+		    if (isNaN(date)) return dateString; // 날짜 변환이 실패하면 원본 유지
+
+		    return type === 'order' 
+		        ? date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }) // "2025년 2월 17일"
+		        : date.toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit', weekday: 'short' }); // "02/17 (월)"
+		}
+		
 	  
 		function changeDisplay() {
 		    let gap = parseInt(document.querySelector('#perPageSelect').value); // perPage 값을 가져옴
@@ -269,10 +243,25 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		
 		<!-- 발주를 선택하면 선택한 주문 코드로 상세 정보 로드 -->
 		grid.on('click', (ev) => {
-			const selectedRow = grid.getRow(ev.rowKey);
+			const rowKey = ev.rowKey;
+			selectedRow = grid.getRow(rowKey);
+			
+			
+			if (selectedRow) {
+		        document.querySelector('#selectedOrder').innerHTML = `
+		            <p><strong>주문 코드:</strong> ${selectedRow.orderCode}</p>
+		            <p><strong>지점ID:</strong> ${selectedRow.branchOfficeId}</p>
+		            <p><strong>주문일:</strong> ${formatDate(selectedRow.orderDate, 'order')}</p>
+		            <p><strong>납기일:</strong> ${formatDate(selectedRow.dueDate, 'due')}</p>
+		            ${selectedRow.remark ? `<p><strong>비고:</strong> ${selectedRow.remark}</p>` : ''}
+		        `;
+		    }
+			
+			
 		    if (selectedRow && selectedRow.orderCode) { // orderCode가 존재하는지 확인
 		        loadOrderDetails(selectedRow.orderCode);
 		        console.log("선택된 주문 코드:", selectedRow.orderCode);
+		        
 		    } else {
 		        console.warn("선택된 주문 코드가 없습니다.");
 		    }
@@ -284,17 +273,21 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		        return;
 		    }
 
-		    fetch(`http://localhost:81/bsn/rest/order/detail?orderCode=${orderCode}&perPage=5&page=1`)
+		    fetch(`http://localhost:81/bsn/rest/bhforder/detail?orderCode=${orderCode}&perPage=5&page=1`)
 		        .then(response => {
 		            if (!response.ok) throw new Error(`HTTP 오류! 상태: ${response.status}`);
 		            return response.json();
 		        })
 		        .then(data => {
 		            if (data && data.data && data.data.contents) {
+		            	detailData = data.data.contents; // 상세 데이터 저장
+		            	//
 		                detailGrid.resetData(data.data.contents);
 		            } else {
 		                console.warn("상세 데이터가 없습니다.");
 		                detailGrid.resetData([]); // 빈 배열로 초기화
+		                //
+		                detailGrid.resetData(detailData);
 		            }
 		        })
 		        .catch(error => console.error('Error:', error));
@@ -317,6 +310,144 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		        { header: "수량", name: "quantity" },
 		    ]
 		});
+
+		
+		function search(){
+			let selectedOption = document.querySelector('input[name="optionsRadios"]:checked').value; // 라디오 버튼 선택 값
+		    let startDate = document.getElementById("startDate").value; // 시작 날짜
+		    let endDate = document.getElementById("endDate").value; // 끝 날짜
+		    let selectedBhf = document.getElementById("selectBhf").value; // 발주지점 선택 값
+		    
+		    console.log(selectedOption, startDate, endDate, selectedBhf);
+		    
+		    let params = {
+		    		"deteOption": selectedOption,
+		            "startDate": startDate,
+		            "endDate": endDate,
+		            "branch": selectedBhf
+		    };
+		    
+		    console.log("검색 조건:", params);
+		    
+		 	// grid(발주요청)에 파라미터 설정
+//		    grid.setRequestParams({
+//	      		"deteOption": selectedOption,
+//	            "startDate": startDate,
+//	            "endDate": endDate,
+//	            "branch": selectedBhf
+//	    });
+		 	grid.readData(1, params, true);
+		   
+
+		    // 데이터 갱신
+		    //grid.readData();
+		}
+		
+		function reset(){
+			// 라디오 버튼 선택 값 초기화
+		    // "사용안함" 라디오 버튼을 체크하도록 설정
+		    let notSelectRadio = document.querySelector('input[name="optionsRadios"][value="notSelect"]');
+		    if (notSelectRadio) {
+		        notSelectRadio.checked = true;  // "사용안함" 라디오 버튼을 선택 상태로
+		        toggleDateInputs(false);  // 날짜 입력 비활성화
+		    }
+
+			// 시작 날짜와 끝 날짜 초기화
+	    	document.getElementById("startDate").value = "";
+	    	document.getElementById("endDate").value = "";
+	    	// 발주지점 선택 값 초기화
+	        document.getElementById("selectBhf").value = "all";
+
+
+		}
+		
+		
+		
+		// 주문 등록 버튼 클릭 이벤트
+		
+		
+		
+		// 모든 페이지에서 데이터를 불러오는 함수
+		function loadAllOrderDetails(orderCode) {
+		    if (!orderCode) {
+		        console.warn("유효하지 않은 주문 코드입니다.");
+		        return;
+		    }
+		
+		    let allDetails = [];
+		    let page = 1;
+		    let isLastPage = false;  // 마지막 페이지 확인 변수
+		
+		    // 모든 페이지의 데이터를 순차적으로 가져오는 함수
+		    function fetchPageData() {
+		        fetch(`http://localhost:81/bsn/rest/bhforder/detail?orderCode=${orderCode}&perPage=5&page=${page}`)
+		            .then(response => {
+		                if (!response.ok) throw new Error(`HTTP 오류! 상태: ${response.status}`);
+		                return response.json();
+		            })
+		            .then(data => {
+		                if (data && data.data && data.data.contents) {
+		                    allDetails = allDetails.concat(data.data.contents);  // 데이터를 누적
+		                    if (data.data.contents.length < 5) {
+		                        isLastPage = true;  // 마지막 페이지인지 확인
+		                    } else {
+		                        page++;  // 페이지 증가
+		                        fetchPageData();  // 다음 페이지 데이터를 요청
+		                    }
+		                } else {
+		                    console.warn("상세 데이터가 없습니다.");
+		                    isLastPage = true;  // 데이터가 없으면 마지막 페이지로 간주
+		                }
+		            })
+		            .catch(error => {
+		                console.error('Error:', error);
+		                isLastPage = true;  // 에러 발생 시 마지막 페이지로 간주
+		            });
+		    }
+		
+		    fetchPageData();  // 첫 번째 페이지 데이터 요청
+		
+		    // 페이지 로딩이 완료되면, 모든 데이터를 등록할 수 있음
+		    const waitForData = setInterval(() => {
+		        if (isLastPage) {
+		            clearInterval(waitForData);
+		            // 이제 allDetails 배열에 모든 상세 데이터가 들어있으므로 등록 작업을 진행
+		            console.log("선택된 주문:", selectedRow);
+		            console.log("모든 상세 데이터:", allDetails);
+		            // 여기서 등록 버튼 이벤트를 트리거하거나 필요한 작업을 처리
+		            
+		            
+		            
+		        }
+		    }, 100);  // 100ms 간격으로 데이터 로드 완료 여부 체크
+		}
+
+		// 등록 버튼 클릭 시 호출
+		document.getElementById('registerButton').addEventListener('click', () => {
+		    if (selectedRow && selectedRow.orderCode) {
+		        loadAllOrderDetails(selectedRow.orderCode);  // 모든 상세 데이터를 가져와서 등록
+		    }
+		});
+		
+		
+		
+		
+		
+//		document.getElementById('registerButton').addEventListener('click', () => {
+//			if (!selectedRow) {
+//		          alert("주문을 선택해주세요.");
+//		          return;
+//		      }
+//		      
+//		      if (detailData.length === 0) {
+//		          alert("상세 정보를 로드해주세요.");
+//		          return;
+//		      }
+//
+		      // 선택된 주문 정보와 상세 정보 활용
+//		      console.log("선택된 주문:", selectedRow);
+//		      console.log("상세 정보:", detailData);
+//		});
 
 	  </script>
 

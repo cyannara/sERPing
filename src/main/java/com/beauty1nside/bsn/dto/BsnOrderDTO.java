@@ -1,6 +1,5 @@
 package com.beauty1nside.bsn.dto;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -14,8 +13,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BsnOrderDTO {
-	private String orderId;
-	private String orderCode;
+	private String orderId;			//bsnOrder의 PK
+	private String orderCode;		//bhfOrder의 PK
 	private String branchOfficeId;
 	private String orderName;
 	private Long total_amount;
@@ -30,32 +29,7 @@ public class BsnOrderDTO {
 	private String remark;
 	private int companyNum;
 	
-	private List<BsnOrderDetailDTO> details;
+	private List<BsnOrderDetailDTO> orderDetails;
 
-	public BsnOrderDTO(String orderId, String orderCode, String branchOfficeId, String orderName,
-			Long total_amount, Long purchaseVat, Date orderDate, Date registerDate, Date cancleDate,
-			Date dueDate, Date sendingDate, String orderStatus, int employeeNum, String remark, int companyNum) {
-		super();
-		this.orderId = orderId;
-		this.orderCode = orderCode;
-		this.branchOfficeId = branchOfficeId;
-		this.orderName = orderName;
-		this.total_amount = total_amount;
-		this.purchaseVat = purchaseVat;
-		this.orderDate = orderDate;
-		this.registerDate = registerDate;
-		this.cancleDate = cancleDate;
-		this.dueDate = dueDate;
-		this.sendingDate = sendingDate;
-		this.orderStatus = orderStatus;
-		this.employeeNum = employeeNum;
-		this.remark = remark;
-		this.companyNum = companyNum;
-	}
-	
-	
-	
-	
-	
 	
 }

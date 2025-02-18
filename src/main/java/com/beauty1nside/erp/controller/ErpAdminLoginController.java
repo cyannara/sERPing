@@ -68,7 +68,7 @@ public class ErpAdminLoginController {
         }
         
         //로그인 하면 세션 받아옴
-        ErpEmployeeDTO employee = (ErpEmployeeDTO) session.getAttribute("employeeInfo");
+        ErpEmployeeDTO employee = (ErpEmployeeDTO) session.getAttribute("ErpEmployeeInfo");
         
         //세션 있으면 로그인페이지
         if (employee != null) {
@@ -101,7 +101,7 @@ public class ErpAdminLoginController {
 		
 		if (passwordEncoder.matches(employeePw, dto.getEmployeePw())) {
 			log.info("로그인 성공: {}", employeeId);
-			session.setAttribute("employeeInfo", dto);
+			session.setAttribute("ErpEmployeeInfo", dto);
 	        return "/erp/admin"; // 로그인 성공 시 DTO 반환
 	    } else {
 	        log.warn("비밀번호 불일치: {}", employeeId);

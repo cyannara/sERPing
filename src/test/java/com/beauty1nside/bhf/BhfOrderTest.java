@@ -1,6 +1,5 @@
 package com.beauty1nside.bhf;
 
-
 import java.sql.Date;
 import java.util.List;
 

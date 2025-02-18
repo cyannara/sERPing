@@ -15,13 +15,13 @@ import lombok.NoArgsConstructor;
 public class BsnOrderDetailDTO {
 	
 	private int orderDetailId;
-	private String orederId;
-	private int goodsNum;
-	private int optionNum;
+	private String orderId;
+	private String goodsCode;
+	private String optionCode;
 	private int quantity;
 	private String goodsStandard;
-	private BigDecimal unitPrice;
-	private BigDecimal summationAmt;
+	private Double unitPrice;
+	private Double summationAmt;
 	
 	
 

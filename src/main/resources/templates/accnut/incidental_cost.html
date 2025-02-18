@@ -1,10 +1,160 @@
 <!DOCTYPE html>
-<html>
+<html layout:decorate="~{layouts/layout}"
+      lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
 <meta charset="UTF-8">
 <title>부대비용 처리</title>
 </head>
-<body>
+<body layout:fragment="content">
+	<div class="container">
+		<!-- 메뉴이름 -->
+		<div>
+			<h2>부대비용 처리</h3>
+		</div>
 
+    <!-- 검색창 -->
+		<div class="search-grid" id="custom-container">
+			<div class="row 1row">
+				<div class="col-1"></div>
+				<div class="col-5 row ">
+					<span class="label-search col-4">부서</span>
+					<select name="display_amount" id="department" class="col-8 input-box">
+						<option value="" selected>구분</option>
+						<option value="1">회사별로</option>
+						<option value="2">부서가 다름</option>		
+					</select>
+				</div>
+				<div class="col-1"></div>
+				<div class="col-5 row ">
+					<span class="label-search col-4">등록일</span>
+					<input type="date" name="registerDate" id="registerDate" class="col-8 input-box">
+				</div>
+			</div>
+			<div class="row 2row">
+				<div class="col-1"></div>
+				<div class="col-5 row ">
+					<span class="label-search col-4">표시수량</span>
+					<select name="display_amount" id="display_amount" class="col-8 input-box" onchange="changeDisplay()">
+						<option value="5" selected>5</option>
+						<option value="10">10</option>
+						<option value="20">20</option>
+						<option value="50">50</option>
+						<option value="100">100</option>
+					</select>
+				</div>
+			</div>
+			<div class="row 3row">
+				<div class="col-4"></div>
+				<button type="button" class="btn btn-primary col-1" onclick="search()">검색</button>
+				<div class="col-1"></div>
+				<button type="button" class="btn btn-secondary col-1" onclick="reset()">초기화</button>
+			</div>
+
+		</div>
+		<!-- 그리드 -->
+		<div id="table-container">
+			<div id="grid"></div>
+			<div id="pagination" class="tui-pagination"></div>
+		</div>
+    <!-- 하부 버튼 -->
+		<div class="button-bar row">
+			<div class="col-1"></div>
+			<button type="button" class="btn btn-secondary col-2">일괄처리</button>
+			<div class="col-7"></div>
+		</div>
+	</div>
+
+<script>
+	document.addEventListener("DOMContentLoaded",()=>{
+		
+	})
+	
+	var Grid = tui.Grid;
+	
+	const dataSource = {
+		api: {
+			readData: { url: 'http://localhost:81/accnut/rest/incidental/list', method: 'GET', initParams: { page: 1 } },
+			
+		},
+		contentType: 'application/json'
+			
+	};
+	
+	const grid = new Grid({
+		el : document.querySelector('#grid'),
+		pageOptions: {
+			useClient : false,
+			perPage: 5,
+		},
+		rowHeaders: ['checkbox'],
+		columns: [	
+			{ header : "부서", name : "department",  },
+	  { header : "카드 구분", name : "section",  },
+      { header : "카드 번호", name : "cardNum",  },
+      { header : "금액", name : "amount",  },
+      { header : "내용", name : "contents",  },
+      { header : "등록일", name : "registerDate",  },
+      { header : "사진", name : "image",  },
+    ],
+		data : dataSource,
+	});
+	
+	function changeDisplay() {
+		let gap = parseInt(document.querySelector('#display_amount').value);
+		grid.setPerPage(gap, dataSource);
+	}
+	
+	function search(){
+		let department = document.querySelector('#department').value;
+		let registerDate = document.querySelector('#registerDate').value.toString();
+		if(registerDate == ''){
+			grid.setRequestParams({"department" : department, });
+		}else{
+			grid.setRequestParams({"department" : department, "registerDate" : registerDate });		
+		}
+		grid.readData();
+	}
+	
+	function reset(){
+		let department = document.querySelector('#department').value = '';
+		let registerDate = document.querySelector('#registerDate').value = '';
+		grid.setRequestParams({"department" : department });
+		grid.readData();
+
+	}
+	
+// grid 체크 박스 함수로 데이터 제어
+	
+	let checkArray = [];
+	
+	grid.on('check', (ev)=> {
+		checkArray.push(grid.getRow(ev.rowKey));
+		console.log(checkArray);
+	})
+	
+	grid.on('uncheck', (ev)=>{
+		for(let i = 0; i < checkArray.length; i++){
+			if(checkArray[i].rowKey == ev.rowKey){
+				checkArray.splice(i, 1);
+			}
+		}
+		console.log(checkArray);
+	})
+	
+	grid.on('checkAll', (ev) => {
+		checkArray = grid.getData();
+		console.log(checkArray);
+	})
+	
+	grid.on('uncheckAll', (ev) => {
+		checkArray = [];
+		console.log(checkArray);
+	})
+
+</script>
+	
 </body>
+
 </html>
