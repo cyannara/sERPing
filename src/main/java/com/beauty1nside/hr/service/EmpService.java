@@ -20,4 +20,9 @@ public interface EmpService {
 	
 	//공통코드 가져오기
 	Map<String, Object> getCommonCodes();
+	
+    // 사원 등록 (사번 자동 생성)
+    void registerEmployee(EmpDTO empDTO);
+    
+    String getNewEmployeeId();  // 최신 사번 조회
 }

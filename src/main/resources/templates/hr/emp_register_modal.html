@@ -129,9 +129,9 @@
 									<div class="mb-2">
 										<label class="fw-bold">사원번호</label>
 										<div class="d-flex align-items-center">
-											<input type="text" class="form-control me-2" disabled>
-											<input type="checkbox" id="autoGenerate"> <label
-												for="autoGenerate" class="ms-1">자동</label>
+											<input type="text" class="form-control me-2"
+												id="employeeIdInput" disabled>
+
 										</div>
 									</div>
 									<div class="mb-2">
@@ -163,6 +163,7 @@
 										<label class="fw-bold">입사일</label> <input type="date"
 											class="form-control">
 									</div>
+									
 									<div class="mb-2">
 										<label class="fw-bold">부서</label> <select class="form-select">
 											<option>없음</option>
@@ -170,6 +171,7 @@
 											<option>영업</option>
 										</select>
 									</div>
+									
 									<div class="mb-2">
 										<label class="fw-bold">직급</label> <select class="form-select">
 											<option>없음</option>
@@ -177,6 +179,7 @@
 											<option>대리</option>
 										</select>
 									</div>
+									
 									<div class="mb-2">
 										<label class="fw-bold">근무유형</label>
 										<div class="form-check form-check-inline">
@@ -199,22 +202,22 @@
 							<!--  추가정보 탭 -->
 							<div class="row">
 								<!-- 급여 -->
-								<div class="col-md-6 mb-3">
+								<div class="col-md-12 mb-3">
 									<label class="fw-bold">급여</label>
 									<div class="input-group">
-										<select class="form-select">
+										<select class="form-select" style="max-width: 120px;">
 											<option>월급</option>
-											<option>연봉</option>
-											<option>시급</option>
 										</select> <input type="text" class="form-control" placeholder="0">
 									</div>
 								</div>
+							</div>
 
+							<div class="row">
 								<!-- 급여계좌 -->
-								<div class="col-md-6 mb-3">
+								<div class="col-md-12 mb-3">
 									<label class="fw-bold">급여계좌</label>
 									<div class="input-group">
-										<select class="form-select">
+										<select class="form-select" style="max-width: 150px;">
 											<option>선택</option>
 											<option>국민은행</option>
 											<option>신한은행</option>
@@ -225,26 +228,26 @@
 										<button class="btn btn-outline-primary">🔍 예금주 조회</button>
 									</div>
 								</div>
+							</div>
 
-								<!-- 주소 -->
-								<div class="col-md-12 mb-3">
-									<label class="fw-bold">주소</label>
-									<div class="input-group">
-										<button class="btn btn-outline-secondary">📌 우편번호 검색</button>
-										<input type="text" class="form-control" placeholder="기본 주소">
-									</div>
-									<input type="text" class="form-control mt-2"
-										placeholder="상세주소 입력">
+							<!-- 주소 -->
+							<div class="col-md-12 mb-3">
+								<label class="fw-bold">주소</label>
+								<div class="input-group">
+									<button class="btn btn-outline-secondary">📌 우편번호 검색</button>
+									<input type="text" class="form-control" placeholder="기본 주소">
 								</div>
+								<input type="text" class="form-control mt-2"
+									placeholder="상세주소 입력">
+							</div>
 
-								<!-- 메모 -->
-								<div class="col-md-12 mb-3">
-									<label class="fw-bold">메모</label>
-									<textarea class="form-control" rows="4"
-										placeholder="필요시 메모하세요." maxlength="100"></textarea>
-									<div class="text-end text-muted">
-										<small>0/100자</small>
-									</div>
+							<!-- 메모 -->
+							<div class="col-md-12 mb-3">
+								<label class="fw-bold">메모</label>
+								<textarea class="form-control" rows="4" placeholder="필요시 메모하세요."
+									maxlength="100"></textarea>
+								<div class="text-end text-muted">
+									<small>0/100자</small>
 								</div>
 							</div>
 						</div>

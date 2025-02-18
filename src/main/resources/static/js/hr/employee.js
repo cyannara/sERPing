@@ -7,6 +7,7 @@ let grid;
 document.addEventListener("DOMContentLoaded", function () {
     initializeGrid();
     setupEventListeners();
+    fetchNewEmployeeId(); // 모달 열릴 때 사원번호 자동 입력
 });
 
 // 전화번호 포맷 함수 (01012345678 → 010-1234-5678)
@@ -171,6 +172,7 @@ if (selectedStatus === "on") selectedStatus = ""; // "전체" 선택 시 공백 
 
     console.log("getFilterParams() 결과:", params);
     return params;
+
 }
 
 
@@ -270,3 +272,45 @@ document.querySelectorAll("input[name='searchStatus']").forEach(btn => {
         searchEmployees();
     });
 });
+
+// 🔹 새 사원번호 가져오기
+function fetchNewEmployeeId() {
+    fetch("/hr/rest/emp/new-employee-id")
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById("employeeIdInput").value = data; // 사원번호 입력칸에 자동 반영
+        })
+        .catch(error => console.error("❌ 사원번호 생성 오류:", error));
+}
+
+
+function registerEmployee() {
+    let empData = {
+        employeeName: document.getElementById("employeeName").value,
+        email: document.getElementById("email").value,
+        phone: document.getElementById("phone").value,
+        hireDate: document.getElementById("hireDate").value,
+        position: document.getElementById("position").value,
+        status: document.querySelector("input[name='status']:checked").value,
+        employmentType: document.querySelector("input[name='employmentType']:checked").value,
+        departmentNum: document.getElementById("department").value,
+        salary: document.getElementById("salary").value,
+        bankName: document.getElementById("bankName").value,
+        accountNum: document.getElementById("accountNum").value,
+        zipcode: document.getElementById("zipcode").value,
+        address: document.getElementById("address").value,
+        memo: document.getElementById("memo").value
+    };
+
+    fetch("/hr/rest/emp/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(empData)
+    })
+    .then(response => response.text())
+    .then(message => {
+        alert(message);
+        location.reload();
+    })
+    .catch(error => console.error("❌ 등록 실패:", error));
+}

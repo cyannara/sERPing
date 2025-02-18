@@ -48,44 +48,7 @@
 		</if>
 		JOIN hr_department d ON e.department_num = d.department_num
 		<where>
-			<if test="departmentNum != null and departmentNum != ''">
-				AND e.department_num in (select department_num
-				from hr_department
-				where department_num = #{departmentNum}
-				or parent_department_num = #{departmentNum})
-			</if>
-
-			<!-- ✅ 하위 부서가 선택되었을 경우, 하위 부서만 조회 -->
-			<if test="subDepartmentNum != null and subDepartmentNum != ''">
-				AND e.department_num = #{subDepartmentNum}
-			</if>
-
-			<if test="departmentNum == null or departmentNum == ''">
-				<if test="departmentName != null and departmentName != ''">
-					AND d.department_name = #{departmentName, jdbcType=VARCHAR}
-				</if>
-			</if>
-			<if test="position != null and position != ''">
-				AND e.position = #{position}
-			</if>
-			<if test="status != null and status != ''">
-			    AND e.status = fn_get_cmmn_code_ver2(#{status}, '재직 상태')
-			</if>
-			<if test="employmentType != null and employmentType != ''">
-			    AND e.employment_type = #{employmentType}
-			</if>
-
-			<if test="searchType == '전체' and searchKeyword != null and searchKeyword != ''">
-			    AND (
-			        e.employee_name LIKE '%' || #{searchKeyword} || '%' 
-			        OR e.employee_id LIKE '%' || #{searchKeyword} || '%'
-			        OR e.phone LIKE '%' || #{searchKeyword} || '%'
-			    )
-			</if>
-			<if test="searchType != '전체' and searchKeyword != null and searchKeyword != ''">
-			    AND ${searchType} LIKE '%' || #{searchKeyword} || '%'
-			</if>
-
+			<include refid="searchInfo"></include>
 		</where>
 		) 
         <![CDATA[
@@ -110,42 +73,47 @@
 
 
 	<sql id="searchInfo">
-		<if test="searchType != null and searchKeyword != null">
-			<choose>
-				<when test="searchType == 'name'">
-					AND e.employee_name LIKE '%' || #{searchKeyword} || '%'
-				</when>
-				<when test="searchType == 'id'">
-					AND e.employee_id LIKE '%' || #{searchKeyword} || '%'
-				</when>
-				<when test="searchType == 'phone'">
-					AND e.phone LIKE '%' || #{searchKeyword} || '%'
-				</when>
-			</choose>
-		</if>
-
-		<!-- 부서 선택 조건 추가 -->
-		<if test="departmentNum != null and departmentNum != ''">
-			AND (d.department_num = #{departmentNum}
-			OR d.parent_department_num = #{departmentNum})
-		</if>
-
-		<!-- 하위 부서 선택 조건 추가 -->
-		<if test="subDepartmentNum != null and subDepartmentNum != ''">
-			AND d.department_num = #{subDepartmentNum}
-		</if>
-
-		<if test="position != null and position != ''">
-			AND e.position = #{position}
-		</if>
-
-<if test="status != null and status != ''">
-    AND e.status = #{status}
-</if>
-		<if test="employmentType != null and employmentType != ''">
-			AND e.employment_type = fn_get_cmmn_code_ver2(#{employmentType}, '근무
-			유형')
-		</if>
+	    <if test="searchKeyword != null and searchKeyword != ''">
+	        <choose>
+	            <when test="searchType == '전체'">
+	                AND (
+	                    e.employee_name LIKE '%' || #{searchKeyword} || '%' 
+	                    OR e.employee_id LIKE '%' || #{searchKeyword} || '%'
+	                    OR e.phone LIKE '%' || #{searchKeyword} || '%'
+	                )
+	            </when>
+	            <when test="searchType == 'employeeName'">
+	                AND e.employee_name LIKE '%' || #{searchKeyword} || '%'
+	            </when>
+	            <when test="searchType == 'employeeId'">
+	                AND e.employee_id LIKE '%' || #{searchKeyword} || '%'
+	            </when>
+	            <when test="searchType == 'phone'">
+	                AND e.phone LIKE '%' || #{searchKeyword} || '%'
+	            </when>
+	        </choose>
+	    </if>
+	
+	    <if test="departmentNum != null and departmentNum != ''">
+	        AND (d.department_num = #{departmentNum}
+	        OR d.parent_department_num = #{departmentNum})
+	    </if>
+	
+	    <if test="subDepartmentNum != null and subDepartmentNum != ''">
+	        AND d.department_num = #{subDepartmentNum}
+	    </if>
+	
+	    <if test="position != null and position != ''">
+	        AND e.position = #{position}
+	    </if>
+	
+	    <if test="status != null and status != ''">
+	        AND e.status = fn_get_cmmn_code_ver2(#{status}, '재직 상태')
+	    </if>
+	
+	    <if test="employmentType != null and employmentType != ''">
+	        AND e.employment_type = #{employmentType}
+	    </if>
 	</sql>
 
 
@@ -187,8 +155,6 @@
 	</select>
 
 
-
-
 	<!-- 재직 상태 목록 조회 (재직,퇴직,휴직)-->
 	<select id="getStatuses" resultType="string">
 		SELECT DISTINCT c.cmmn_name
@@ -203,5 +169,27 @@
 
 		ORDER BY 1
 	</select>
+	
+	<insert id="insertEmployee" parameterType="com.beauty1nside.hr.dto.EmpDTO">
+	    INSERT INTO hr_employee (
+	        employee_num, employee_id, employee_name, email, phone, hire_date, 
+	        position, status, employment_type, department_num, salary, bank_name, 
+	        account_num, zipcode, address, memo
+	    ) VALUES (
+	        HR_EMPLOYEE_SEQ.NEXTVAL, #{employeeId}, #{employeeName}, #{email}, #{phone}, #{hireDate},
+	        #{position}, #{status}, #{employmentType}, #{departmentNum}, #{salary}, #{bankName},
+	        #{accountNum}, #{zipcode}, #{address}, #{memo}
+	    )
+	</insert>
+
+	
+	<select id="getMaxEmployeeId" resultType="string">
+	    SELECT COALESCE(MAX(TO_NUMBER(SUBSTR(employee_id, 7, 3))), 0) 
+	    FROM hr_employee 
+	    WHERE REGEXP_LIKE(employee_id, '^[0-9]{6}[0-9]{3}$') -- 숫자로 된 9자리 employee_id만 선택
+	</select>
+
+	
+
 
 </mapper>

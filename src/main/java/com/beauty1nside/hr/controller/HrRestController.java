@@ -6,6 +6,8 @@ import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,7 +26,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @RestController
 @AllArgsConstructor
-@RequestMapping("/hr/rest/*")
+@RequestMapping("/hr/rest")
 public class HrRestController {
 	final EmpService empService;
 	
@@ -37,6 +39,10 @@ public class HrRestController {
 		
 		log.info("📥 empList 호출됨");
 	    log.info("🔍 검색 DTO 값: {}", dto);
+	    
+	    // ✅ 검색 조건이 올바르게 전달되는지 확인
+	    log.info("🔎 searchType: {}", dto.getSearchType());
+	    log.info("🔎 searchKeyword: {}", dto.getSearchKeyword());
 		
 		
 		// 페이징 유닛 수
@@ -66,6 +72,25 @@ public class HrRestController {
         Map<String, Object> result = empService.getCommonCodes();
         return ResponseEntity.ok(result);
     }	
+    
+    
+    // 🔹 사원 등록 API
+    @PostMapping("/emp/register")
+    public ResponseEntity<String> registerEmployee(@RequestBody EmpDTO empDTO) {
+        try {
+            empService.registerEmployee(empDTO);
+            return ResponseEntity.ok("사원 등록 성공! 사번: " + empDTO.getEmployeeId());
+        } catch (Exception e) {
+            log.error("❌ 사원 등록 실패: ", e);
+            return ResponseEntity.status(500).body("사원 등록 실패");
+        }
+    }
+    
+    @GetMapping("/emp/new-employee-id")
+    public ResponseEntity<String> getNewEmployeeId() {
+        String newEmployeeId = empService.getNewEmployeeId(); // 새 사원번호 가져오기
+        return ResponseEntity.ok(newEmployeeId);
+    }
 	
 
 
