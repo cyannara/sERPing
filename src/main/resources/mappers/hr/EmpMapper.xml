@@ -72,22 +72,20 @@
 			    AND e.status = fn_get_cmmn_code_ver2(#{status}, '재직 상태')
 			</if>
 			<if test="employmentType != null and employmentType != ''">
-				AND e.employment_type = fn_get_cmmn_code_ver2(#{employmentType},'근무
-				유형')
+			    AND e.employment_type = #{employmentType}
 			</if>
-			<if test="searchKeyword != null and searchKeyword != ''">
-				<choose>
-					<when test="searchType == 'name'">
-						AND e.employee_name LIKE '%' || #{searchKeyword} || '%'
-					</when>
-					<when test="searchType == 'id'">
-						AND e.employee_id LIKE '%' || #{searchKeyword} || '%'
-					</when>
-					<when test="searchType == 'phone'">
-						AND e.phone LIKE '%' || #{searchKeyword} || '%'
-					</when>
-				</choose>
+
+			<if test="searchType == '전체' and searchKeyword != null and searchKeyword != ''">
+			    AND (
+			        e.employee_name LIKE '%' || #{searchKeyword} || '%' 
+			        OR e.employee_id LIKE '%' || #{searchKeyword} || '%'
+			        OR e.phone LIKE '%' || #{searchKeyword} || '%'
+			    )
 			</if>
+			<if test="searchType != '전체' and searchKeyword != null and searchKeyword != ''">
+			    AND ${searchType} LIKE '%' || #{searchKeyword} || '%'
+			</if>
+
 		</where>
 		) 
         <![CDATA[
@@ -169,22 +167,29 @@
 		ORDER BY c.cmmn_code
 	</select>
 
-	<!-- 근무 유형 목록 조회 -->
-	<select id="getEmploymentTypes" resultType="string">
-		SELECT DISTINCT c.cmmn_name
-		FROM cmmn c
-		WHERE c.upper_cmmn_code = 'ET'
-
-		UNION
-
-		SELECT DISTINCT fn_get_cmmn_name(e.employment_type)
-		FROM hr_employee e
-		WHERE e.employment_type IS NOT NULL
-
-		ORDER BY 1
+	<!-- 근무 유형 목록 조회 (정규직,계약직)-->
+	<select id="getEmploymentTypes" resultType="map">
+	    SELECT DISTINCT 
+	        c.cmmn_code AS cmmnCode, 
+	        c.cmmn_name AS cmmnName
+	    FROM cmmn c
+	    WHERE c.upper_cmmn_code = 'ET'
+	
+	    UNION
+	
+	    SELECT DISTINCT 
+	        e.employment_type AS cmmnCode, 
+	        fn_get_cmmn_name(e.employment_type) AS cmmnName
+	    FROM hr_employee e
+	    WHERE e.employment_type IS NOT NULL
+	
+	    ORDER BY 1
 	</select>
 
-	<!-- 재직 상태 목록 조회 -->
+
+
+
+	<!-- 재직 상태 목록 조회 (재직,퇴직,휴직)-->
 	<select id="getStatuses" resultType="string">
 		SELECT DISTINCT c.cmmn_name
 		FROM cmmn c

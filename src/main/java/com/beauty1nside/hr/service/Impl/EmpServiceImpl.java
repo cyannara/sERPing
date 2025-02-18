@@ -1,5 +1,6 @@
 package com.beauty1nside.hr.service.Impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,13 +43,22 @@ public class EmpServiceImpl implements EmpService {
 	}
 
 	@Override
-    public Map<String, Object> getCommonCodes() {
-        Map<String, Object> codes = new HashMap<>();
-        codes.put("departments", empMapper.getDepartments());
-        codes.put("positions", empMapper.getPositions());
-        codes.put("employmentTypes", empMapper.getEmploymentTypes());
-        codes.put("statuses", empMapper.getStatuses());
-        return codes;
-    }
+	public Map<String, Object> getCommonCodes() {
+	    Map<String, Object> codes = new HashMap<>();
+	    codes.put("departments", empMapper.getDepartments());
+	    codes.put("positions", empMapper.getPositions());
+
+	    // ✅ 근무 유형을 리스트로 변환하여 반환
+	    List<Map<String, String>> employmentTypeList = empMapper.getEmploymentTypes();
+	    if (employmentTypeList == null || employmentTypeList.isEmpty()) {
+	        employmentTypeList = new ArrayList<>(); // 빈 리스트 반환하여 `null` 방지
+	    }
+	    codes.put("employmentTypes", employmentTypeList);
+
+	    codes.put("statuses", empMapper.getStatuses());
+	    return codes;
+	}
+
+
 
 }

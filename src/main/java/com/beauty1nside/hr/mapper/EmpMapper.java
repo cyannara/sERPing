@@ -1,6 +1,7 @@
 package com.beauty1nside.hr.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
@@ -16,6 +17,6 @@ public interface EmpMapper {
 	
     List<String> getDepartments(); // 부서 목록
     List<String> getPositions(); // 직급 목록
-    List<String> getEmploymentTypes(); // 근무 유형 목록
+    List<Map<String, String>> getEmploymentTypes(); // 근무 유형 목록
     List<String> getStatuses(); // 재직 상태 목록
 }

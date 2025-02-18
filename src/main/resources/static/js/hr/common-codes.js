@@ -52,7 +52,7 @@ function populateDepartmentSelect(departments) {
 // 하위 부서 필터링 함수
 function populateSubDepartments(parentCode) {
     const subDepartmentSelect = document.getElementById("searchSubDepartment");
-    subDepartmentSelect.innerHTML = '<option value="">하위 부서 선택</option>'; // 🔥 초기화
+    subDepartmentSelect.innerHTML = '<option value="">선택</option>'; // 🔥 초기화
 
     if (!parentCode) return; // 상위 부서 선택 안 한 경우
 
@@ -69,7 +69,7 @@ function populateSubDepartments(parentCode) {
 // 직급 목록 동적으로 추가
 function populatePositionSelect(positions) {
     const positionSelect = document.getElementById('searchPosition');
-    positionSelect.innerHTML = '<option value="">직급 선택</option>';
+    positionSelect.innerHTML = '<option value="">선택</option>';
 
     if (!positions) {
         console.error("⚠ positions 데이터가 없습니다.");
@@ -86,43 +86,79 @@ function populatePositionSelect(positions) {
 // 재직 상태 버튼 동적으로 추가
 function populateStatusButtons(statuses) {
     const statusGroup = document.getElementById('statusGroup');
-    statusGroup.innerHTML = '';
+    statusGroup.innerHTML = ''; // 기존 버튼 초기화
 
+    // ✅ "전체" 버튼 추가
     statusGroup.innerHTML += `
-        <input type="radio" class="btn-check" name="searchStatus" id="statusAll" checked>
+        <input type="radio" class="btn-check" name="searchStatus" id="statusAll" checked value="">
         <label class="btn btn-outline-primary" for="statusAll">전체</label>
     `;
-    statuses.forEach((status, index) => {
-        const statusId = `status${index}`;
-        statusGroup.innerHTML += `
-            <input type="radio" class="btn-check" name="searchStatus" id="${statusId}" value="${status}">
-            <label class="btn btn-outline-primary" for="${statusId}">${status}</label>
-        `;
-    });
+    
+    // ✅ 상태 버튼 추가 (예상 데이터: ["재직", "퇴직", "휴직"])
+    if (statuses && Array.isArray(statuses)) {
+        statuses.forEach((status, index) => {
+            const statusId = `status${index}`;
+            statusGroup.innerHTML += `
+                <input type="radio" class="btn-check" name="searchStatus" id="${statusId}" value="${status}">
+                <label class="btn btn-outline-primary" for="${statusId}">${status}</label>
+            `;
+        });
+    } else {
+        console.error("⚠ 상태 목록 데이터가 비어있음:", statuses);
+    }
 
-    document.querySelectorAll('input[name="searchStatus"]').forEach(btn => {
-        btn.addEventListener("click", searchEmployees);
+    // ✅ 상태 필터 버튼 변경 시 자동 검색 실행
+    document.querySelectorAll("input[name='searchStatus']").forEach(btn => {
+        btn.addEventListener("change", function () {
+            searchEmployees();
+        });
     });
 }
 
 // 근무 유형 버튼 동적으로 추가
 function populateEmploymentButtons(employmentTypes) {
     const employmentGroup = document.getElementById('employmentTypeGroup');
-    employmentGroup.innerHTML = '';
+    employmentGroup.innerHTML = ''; // 초기화
 
+    console.log("✅ 근무 유형 데이터 확인:", employmentTypes);
+
+    // ✅ 데이터가 undefined이거나 비어있는 경우 처리
+    if (!employmentTypes || employmentTypes.length === 0) {
+        console.error("❌ 근무 유형 데이터가 비어있음!");
+        return;
+    }
+
+    // ✅ "전체" 버튼 추가
     employmentGroup.innerHTML += `
-        <input type="radio" class="btn-check" name="employmentType" id="typeAll" checked>
-        <label class="btn btn-outline-primary" for="typeAll">전체</label>
+        <input type="radio" class="btn-check" name="employmentType" id="employmentTypeAll" checked value="">
+        <label class="btn btn-outline-primary" for="employmentTypeAll">전체</label>
     `;
-    employmentTypes.forEach((type, index) => {
-        const typeId = `type${index}`;
-        employmentGroup.innerHTML += `
-            <input type="radio" class="btn-check" name="employmentType" id="${typeId}" value="${type}">
-            <label class="btn btn-outline-primary" for="${typeId}">${type}</label>
-        `;
-    });
 
-    document.querySelectorAll('input[name="employmentType"]').forEach(btn => {
-        btn.addEventListener("click", searchEmployees);
+    // ✅ `employmentTypes`가 배열이 아닐 경우 단일 값 처리
+    if (!Array.isArray(employmentTypes)) {
+        const typeId = `employmentType_${employmentTypes.CMMNCODE}`;
+        employmentGroup.innerHTML += `
+            <input type="radio" class="btn-check" name="employmentType" id="${typeId}" value="${employmentTypes.CMMNCODE}">
+            <label class="btn btn-outline-primary" for="${typeId}">${employmentTypes.CMMNNAME}</label>
+        `;
+    } else {
+        // ✅ `employmentTypes`가 배열인 경우 forEach 사용
+        employmentTypes.forEach(type => {
+            const typeId = `employmentType_${type.CMMNCODE}`;
+            employmentGroup.innerHTML += `
+                <input type="radio" class="btn-check" name="employmentType" id="${typeId}" value="${type.CMMNCODE}">
+                <label class="btn btn-outline-primary" for="${typeId}">${type.CMMNNAME}</label>
+            `;
+        });
+    }
+    
+
+    // ✅ 근무 유형 선택 시 자동 검색 실행
+    document.querySelectorAll("input[name='employmentType']").forEach(btn => {
+        btn.addEventListener("change", function () {
+            searchEmployees();
+        });
     });
 }
+
+
