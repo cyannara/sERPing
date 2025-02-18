@@ -429,7 +429,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		            }
 		            console.log(orderDTO);
 		            // 등록 함수 호출
-		            //registerOrder(orderDTO);
+		            registerOrder(orderDTO);
 		            
 		            
 		        }
@@ -437,11 +437,17 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		}
 		
 		
+	    
 		// 주문 등록 함수
 		function registerOrder(orderDTO) {
+			const header = document.querySelector('meta[name="_csrf_header"]').content;
+		    const token = document.querySelector('meta[name="_csrf"]').content;
+			
 		    fetch('http://localhost:81/bsn/rest/order/insert', {
 		        method: 'POST',
 		        headers: {
+		        	'header': header,
+		        	'X-CSRF-Token': token,
 		            'Content-Type': 'application/json'  // JSON 형식으로 보내기
 		        },
 		        body: JSON.stringify(orderDTO)  // 객체를 JSON으로 변환하여 전송
