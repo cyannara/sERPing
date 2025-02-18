@@ -105,18 +105,9 @@
         </li>
       </ul>
   </div>
-
-	<div
-		th:if="${#strings.equals('hr', param.menu) or #strings.equals('hr', menu)}">
-		<span class="menu-title">hr</span>
-	</div>
 	<div
 		th:if="${#strings.equals('account', param.menu) or #strings.equals('account', menu)}">
 		<span class="menu-title">account</span>
-	</div>
-	<div
-		th:if="${#strings.equals('branch', param.menu) or #strings.equals('branch', menu)}">
-		<span class="menu-title">branch</span>
 	</div>
 
 

@@ -113,7 +113,7 @@
 		select *
 		from erp_subscription_info_list
 		where company_num = #{companyNum}
-		and subscription_name_num in ( #{subnamenum1}, #{subnamenum2} );
+		and subscription_name_num in ( #{subnamenum1}, #{subnamenum2} )
 	</select>
 
 </mapper>

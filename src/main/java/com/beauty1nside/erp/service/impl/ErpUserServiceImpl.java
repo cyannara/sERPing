@@ -99,34 +99,27 @@ public class ErpUserServiceImpl implements ErpUserService {
 		    log.info("dto정보 : "+dto);
 		    log.info("dto정보 : "+dto.getSubscriptionNameNum());
 		    // 옵션번호로 구독정보 조회해서 서 해당 구독정보에 맞는 구독 상품 업데이트 하기
-//		    erpSubscriptionInfoListDTO subDTO = new erpSubscriptionInfoListDTO();
+		    erpSubscriptionInfoListDTO subDTO = new erpSubscriptionInfoListDTO();
 		    if(dto.getSubscriptionNameNum() == 1 || dto.getSubscriptionNameNum() == 6) {
-		    	//subDTO = erpUserMapper.subinfo(companyNum, 1, 6);
-		    	log.info("11111111111");
+		    	subDTO = erpUserMapper.subinfo(companyNum, 1, 6);
 		    }else if(dto.getSubscriptionNameNum() == 2 || dto.getSubscriptionNameNum() == 7) {
-		    	//subDTO = erpUserMapper.subinfo(companyNum, 2, 7);
-		    	log.info("22222222222");
+		    	subDTO = erpUserMapper.subinfo(companyNum, 2, 7);
 		    }else if(dto.getSubscriptionNameNum() == 3 || dto.getSubscriptionNameNum() == 8) {
-		    	//subDTO = erpUserMapper.subinfo(companyNum, 3, 8);
-		    	log.info("3333333");
+		    	subDTO = erpUserMapper.subinfo(companyNum, 3, 8);
 		    }else if(dto.getSubscriptionNameNum() == 4 || dto.getSubscriptionNameNum() == 9) {
-		    	//subDTO = erpUserMapper.subinfo(companyNum, 4, 9);
-		    	log.info("4444444");
+		    	subDTO = erpUserMapper.subinfo(companyNum, 4, 9);
 		    }else if(dto.getSubscriptionNameNum() == 5 || dto.getSubscriptionNameNum() == 10) {
-		    	//subDTO = erpUserMapper.subinfo(companyNum, 5, 10);
-		    	log.info("555555555");
+		    	subDTO = erpUserMapper.subinfo(companyNum, 5, 10);
 		    }
-//		    log.info("현재 구독 정보 리스트 : "+subDTO);
+		    log.info("현재 구독 정보 리스트 : "+subDTO);
+		    //null이면 생성시켜주고 [ dto.getSubscriptionNameNum() ] 값에 맞는걸로 인서트
+		    
+		    //값이 있으면 기본키로 업데이트 시키고
+		    //내용은 만료일 가져와서 계산해서 만료일 증가시키고, 
+		    //정기결제인경우 만료일이 지났으면 기간결제로 바꾸고 만료일 증가시키기
 		}
-//		Insert into erp_subscription_tail values
-//		( erp_subscrpt_tail_seq.nextval, #{lastKey}, #{optionKey} )
-		
-		
-		// 결제 테이블 없으면 인서트 있으면 업데이트
-		
 		
 		log.info("결제정보 : "+requestData);
-		
 
 		return 1;
 	}
