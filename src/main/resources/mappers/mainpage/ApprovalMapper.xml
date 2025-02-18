@@ -54,14 +54,24 @@
 		g.company_num
 		FROM grpwr_in_approval g
 		<![CDATA[
-            WHERE rownum <= #{dto.end}
+            WHERE rownum <= #{dto.end} and g.in_approval_status = 'WAITING'
             AND
         ]]>
-		<include refid="searchInfo"></include>
+<!--		<include refid="searchInfo"></include>-->
+		company_num LIKE '%' || #{companyNum} || '%'
+
+
 		) g
 		JOIN hr_employee h ON g.employee_num = h.employee_num
 		join stdr_document s on g.document_id = s.document_id
-		WHERE rn >= #{dto.start} and g.in_approval_status = 'WAITING'
+		WHERE rn >= #{dto.start}
+		<if test="dto.documentType != null and ! dto.documentType.equals('')">
+			AND s.document_type Like '%' || #{dto.documentType} || '%'
+		</if>
+	</select>
+
+	<select id="documentList" resultType="com.beauty1nside.mainpage.dto.DocumentDTO">
+		select * from stdr_document
 	</select>
 
 
@@ -69,14 +79,15 @@
 		SELECT COUNT(in_approval_id)
 		FROM grpwr_in_approval
 		<where>
-			<include refid="searchInfo"></include>
+			company_num LIKE '%' || #{companyNum} || '%'
+				AND in_approval_status = 'WAITING'
 		</where>
 	</select>
 
 	<sql id="searchInfo">
 		company_num LIKE '%' || #{companyNum} || '%'
-		<if test="dto.inApprovalStatus != null and ! dto.inApprovalStatus.equals('')">
-			AND in_approval_status Like '%' || #{dto.inApprovalStatus} || '%'
+		<if test="dto.documentType != null and ! dto.documentType.equals('')">
+			AND document_type Like '%' || #{dto.documentType} || '%'
 		</if>
 	</sql>
 </mapper>

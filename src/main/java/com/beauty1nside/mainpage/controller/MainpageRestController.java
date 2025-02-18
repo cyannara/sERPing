@@ -4,6 +4,7 @@ import com.beauty1nside.common.GridArray;
 import com.beauty1nside.common.Paging;
 import com.beauty1nside.mainpage.dto.ApprovalDTO;
 import com.beauty1nside.mainpage.dto.ApprovalSearchDTO;
+import com.beauty1nside.mainpage.dto.DocumentDTO;
 import com.beauty1nside.mainpage.service.ApprovalService;
 import com.beauty1nside.security.service.CustomerUser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -11,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @Log4j2
 @RestController
@@ -20,7 +22,7 @@ public class MainpageRestController {
   final ApprovalService approvalService;
   
   @GetMapping("/approval/list")
-  public Object approvalList(@RequestParam(name = "perPage", defaultValue = "10", required = false) int perPage,
+  public Object approvalList(@RequestParam(name = "perPage", defaultValue = "20", required = false) int perPage,
                              @RequestParam(name = "page", defaultValue = "1", required = false) int page,
                              ApprovalSearchDTO dto,
                              Paging paging,
@@ -52,8 +54,13 @@ public class MainpageRestController {
                                      @PathVariable("processStr") String processStr,
                                         @AuthenticationPrincipal CustomerUser user) {
     Long companyNum = user.getUserDTO().getCompanyNum();
-    log.info("approvalService.update(approvalId, processStr, companyNum): {}", approvalService.update(approvalId, processStr, companyNum));
     return approvalService.update(approvalId, processStr, companyNum);
+  }
+  
+  @GetMapping("/approval/type")
+  public List<DocumentDTO> getApprovalType(@AuthenticationPrincipal CustomerUser user) {
+    Long companyNum = user.getUserDTO().getCompanyNum();
+    return approvalService.documentList(companyNum);
   }
   
 }
