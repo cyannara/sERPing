@@ -225,5 +225,20 @@ SELECT /*+INDEX_DESC(ACCNUT_ASSETS PK_ACCNUT_ASSETS)*/ rownum rn, assets_code, a
               
 UPDATE ACCNUT_ASSETS SET assets_code = '0' + assets_code where TO_NUMBER(assets_code, '999999') < 10;
 Commit;
-select * from accnut_dealings_account_book;
-INSERT INTO accnut_dealings_account_book(dealings_account_book_code,  section, types_of_transaction, amount, vat_alternative, dealings_contents, deal_date,company_num)
+select * from accnut_dealings_account_book order by 1 desc;
+select accnut_dealings_book_seq.nextval from dual;
+
+update (select a.quantity as asd, b.quantity as def
+        from bhf_warehouse a, bhf_returning_detail b
+        where a.option_code = b.option_code) c
+set c.asd = (c.asd - c.def);
+
+UPDATE (SELECT e.salary AS emp_salary, d.bonus AS dept_bonus
+        FROM employees e
+        JOIN departments d ON e.dept_id = d.dept_id)
+SET emp_salary = emp_salary + dept_bonus;
+
+UPDATE (SELECT a.quantity as asd, b.quantity as def, a.warehouse_code, b.returning_detail_code
+        FROM bhf_warehouse a
+        JOIN bhf_returning_detail b ON a.option_code = b.option_code)
+SET asd = (asd - def);
