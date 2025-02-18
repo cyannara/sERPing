@@ -1,13 +1,16 @@
 package com.beauty1nside.erp.service.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.beauty1nside.erp.dto.ErpSubOptionDTO;
 import com.beauty1nside.erp.dto.erpSubscriptionInfoListDTO;
 import com.beauty1nside.erp.mapper.ErpUserMapper;
 import com.beauty1nside.erp.service.ErpUserService;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -59,6 +62,73 @@ public class ErpUserServiceImpl implements ErpUserService {
 	@Override
 	public int hrlist(int companyNum) {
 		return erpUserMapper.hrlist(companyNum);
+	}
+
+	/**
+     * 기간 구독 서비스를 등록한다
+     *
+     * @param Map<String, Object>
+     * @return int
+     */
+	@Override
+	@Transactional
+	public int periodservicepay(Map<String, Object> requestData) {
+		
+		log.info("결제정보 : "+requestData);
+		
+	    int companyNum = (int) requestData.get("companyNum");
+		
+		//결제 헤더 등록하기 erp_subscription_list [1개]
+		String price = requestData.get("price").toString().replace(",", "");
+		requestData.put("price", price);
+	
+		//결제 바디 등록하기 erp_subscription_tail [여러개]
+		erpUserMapper.prosubscriptionlist(requestData);
+		
+		int lastKey = erpUserMapper.lastpaykey(requestData);
+		log.info("마지막기본키 : "+lastKey);
+		
+		//결제 정보로 구독목록 업뎃하기 erp_subscription_info_list [여러개] 바디 포문안에서 해야함
+		String[] optionNum = ((String) requestData.get("orderId")).split("_");
+		for (String ele : optionNum) {
+		    //ele => 옵션번호 // 이거랑 lastKey 이용해서 인서트
+		    //구독 결제 디테일 저장
+		    erpUserMapper.prosubscriptiontail(lastKey, Integer.parseInt(ele));
+		    
+		    ErpSubOptionDTO dto = erpUserMapper.lastoptionlist(Integer.parseInt(ele));
+		    log.info("dto정보 : "+dto);
+		    log.info("dto정보 : "+dto.getSubscriptionNameNum());
+		    // 옵션번호로 구독정보 조회해서 서 해당 구독정보에 맞는 구독 상품 업데이트 하기
+//		    erpSubscriptionInfoListDTO subDTO = new erpSubscriptionInfoListDTO();
+		    if(dto.getSubscriptionNameNum() == 1 || dto.getSubscriptionNameNum() == 6) {
+		    	//subDTO = erpUserMapper.subinfo(companyNum, 1, 6);
+		    	log.info("11111111111");
+		    }else if(dto.getSubscriptionNameNum() == 2 || dto.getSubscriptionNameNum() == 7) {
+		    	//subDTO = erpUserMapper.subinfo(companyNum, 2, 7);
+		    	log.info("22222222222");
+		    }else if(dto.getSubscriptionNameNum() == 3 || dto.getSubscriptionNameNum() == 8) {
+		    	//subDTO = erpUserMapper.subinfo(companyNum, 3, 8);
+		    	log.info("3333333");
+		    }else if(dto.getSubscriptionNameNum() == 4 || dto.getSubscriptionNameNum() == 9) {
+		    	//subDTO = erpUserMapper.subinfo(companyNum, 4, 9);
+		    	log.info("4444444");
+		    }else if(dto.getSubscriptionNameNum() == 5 || dto.getSubscriptionNameNum() == 10) {
+		    	//subDTO = erpUserMapper.subinfo(companyNum, 5, 10);
+		    	log.info("555555555");
+		    }
+//		    log.info("현재 구독 정보 리스트 : "+subDTO);
+		}
+//		Insert into erp_subscription_tail values
+//		( erp_subscrpt_tail_seq.nextval, #{lastKey}, #{optionKey} )
+		
+		
+		// 결제 테이블 없으면 인서트 있으면 업데이트
+		
+		
+		log.info("결제정보 : "+requestData);
+		
+
+		return 1;
 	}
 
 }

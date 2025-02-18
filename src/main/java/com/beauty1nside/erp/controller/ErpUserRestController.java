@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,7 +39,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2	//log4j 가 안되면 버전높은 log4j2 사용
 @RestController
 //@AllArgsConstructor
-@RequestMapping("/erp/rest/*")
+@RequestMapping("/erp/rest")
 public class ErpUserRestController {
 	
 	/**
@@ -92,5 +94,16 @@ public class ErpUserRestController {
         response.put("impKey", impKey);
         return response;
     }
+	/**
+     * 기간 구독 결제를 처리한다
+     *
+     * @return Map<String, String>
+     */
+	@PostMapping("/periodservicepay")
+	public String periodservicepay(@RequestBody Map<String, Object> requestData) {
+			//log.info("결제정보 : "+requestData);
+			erpUserService.periodservicepay(requestData);
+			return null;
+	}
 	
 }

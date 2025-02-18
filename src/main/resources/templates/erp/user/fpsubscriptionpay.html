@@ -402,7 +402,7 @@ document.querySelector(".periodpaygo").addEventListener("click", async function 
     console.log(document.querySelector("#payment-method").value);
 
     if (document.querySelector("#payment-method").value == "카드결제") {
-        // ✅ 현재 선택된 구독 옵션 가져오기
+        // 현재 선택된 구독 옵션 가져오기
         let selectedValues = [];
         let totalPrice = 0;
         // 모든 체크된 라디오 버튼 가져오기
@@ -414,46 +414,86 @@ document.querySelector(".periodpaygo").addEventListener("click", async function 
             selectedValues.push(value);
             totalPrice += price;
         });
-        // ✅ 주문번호 및 결제 금액 설정
+        // 주문번호 및 결제 금액 설정
         let orderId = selectedValues.join("_"); // 주문번호 설정
         let formattedTotalPrice = totalPrice.toLocaleString(); // 결제 금액 3자리마다 콤마 추가
         console.log("🚀 주문번호:", orderId);
         console.log("💰 결제 금액:", formattedTotalPrice);
         
-     	// ✅ 백엔드에서 API 키 가져오기
+     	// 백엔드에서 API 키 가져오기
         let response = await fetch("/erp/rest/get-imp-key");
         let data = await response.json();
         if (!data || !data.impKey) {
             console.error("API 키를 가져오지 못했습니다.");
             return;
         }
-
-        // ✅ 이니시스 결제 요청 실행
-        IMP.init(data.impKey); // 고객사 식별코드 사용
-        IMP.request_pay({
-            pg: "html5_inicis.INIpayTest", // KG이니시스 테스트용 PG사
-            pay_method: "card", // 결제 방식
-            merchant_uid: orderId, // 주문번호 (선택한 구독 옵션 value 조합)
-            name: "기간 구독서비스", // 결제 상품명
-            amount: 1, // 결제 금액 (formattedTotalPrice 사용하지 않고 정수로 전달)
-            buyer_email: "test@example.com",
-            buyer_name: "홍길동",
-            buyer_tel: "01012345678",
-            buyer_addr: "서울특별시 강남구",
-            buyer_postcode: "12345"
-        }, function (rsp) {
-            if (rsp.success) {
-                console.log("✅ 결제 성공:", rsp);
-                console.log("결제가 완료되었습니다! 주문번호: " + rsp.merchant_uid+" "+orderId+" "+formattedTotalPrice+"원");
-            } else {
-                console.log("❌ 결제 실패:", rsp);
-                console.log("결제가 실패했습니다. 오류 메시지: " + rsp.error_msg+" "+orderId+" "+formattedTotalPrice+"원");
-            }
-        });
+		if(formattedTotalPrice != "0"){
+	        // 이니시스 결제 요청 실행
+	        IMP.init(data.impKey); // 고객사 식별코드 사용
+	        IMP.request_pay({
+	            pg: "html5_inicis.INIpayTest", // KG이니시스 테스트용 PG사
+	            pay_method: "card", // 결제 방식
+	            merchant_uid: orderId, // 주문번호 (선택한 구독 옵션 value 조합)
+	            name: "기간 구독서비스", // 결제 상품명
+	            amount: 1, // 결제 금액 (formattedTotalPrice 사용하지 않고 정수로 전달)
+	            buyer_email: "test@example.com",
+	            buyer_name: "홍길동",
+	            buyer_tel: "01012345678",
+	            buyer_addr: "서울특별시 강남구",
+	            buyer_postcode: "12345"
+	        }, function (rsp) {
+	            if (rsp.success) {
+	                console.log("✅ 결제 성공:", rsp);
+	                console.log("결제가 완료되었습니다! 주문번호: " + rsp.merchant_uid+" "+orderId+" "+formattedTotalPrice+"원",window.subscriptionState);
+	                payGO(orderId, formattedTotalPrice, window.subscriptionState);
+	            } else {
+	            	//alert("결제가 실패했습니다. 오류 메시지: " + rsp.error_msg);
+	                console.log("❌ 결제 실패:", rsp);
+	                console.log("결제가 실패했습니다. 오류 메시지: " + rsp.error_msg+" "+orderId+" "+formattedTotalPrice+"원",window.subscriptionState);
+	                //결제 실패여도 결제로 넘길 예정 (테스트니까)
+	                payGO(orderId, formattedTotalPrice, window.subscriptionState);
+	            }
+	        });
+		}else{
+			alert('구독 서비스를 선택해주세요');
+		}
     }
 });
-
-
+</script>
+<script th:inline="javascript">
+	function payGO(orderId, price, subscriptionState){
+		//console.log("함수호출 " +orderId+" "+price+"원", subscriptionState, [[${session.companyNum}]]);
+		let companyNum = [[${session.companyNum}]];
+		let employeeNum = [[${session.employeeNum}]];
+		console.log(employeeNum);
+		const requestData = {
+				companyNum: companyNum,		//회사번호
+				orderId: orderId,			//주문내역(분할해서 써야함 1_24_53_32)
+				price: price,				//최종결제 금액
+				paymethod : "EP02",						//결제방식
+				employeeNum : employeeNum,				//결제자(사원ID)
+				subscriptionState: subscriptionState,	//현재 사용중인 서비스내역 (객체)
+				subscriptionNum: 0						//기본키 결과 반환 하는 공간
+		};
+		console.log("보내는 값", requestData);
+		const url = "/erp/rest/periodservicepay";
+		fetch ( url, {
+			method : "POST",
+			headers : {
+				"Content-Type": "application/json",
+			},
+			body : JSON.stringify(requestData),
+		})
+		.then( result => result.text() )
+		.then( result => {
+			console.log("결제 결과" + result);
+			if(result==="OK"){
+				alert("기간 구독에 성공 했습니다");
+			}else{
+				alert("기간 구독에 실패 했습니다");
+			}
+		})
+	}
 </script>
 
 

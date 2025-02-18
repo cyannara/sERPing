@@ -1,6 +1,7 @@
 package com.beauty1nside.erp.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.beauty1nside.erp.dto.erpSubscriptionInfoListDTO;
 
@@ -17,6 +18,7 @@ import com.beauty1nside.erp.dto.erpSubscriptionInfoListDTO;
  *   수정일      수정자          수정내용
  *  -------    --------    ---------------------------
  *  2025.02.17  표하연          최초 생성
+ *  2025.02.18  표하연          기간 구독 결제 서비스 생성
  *
  *  </pre>
 */
@@ -37,5 +39,13 @@ public interface ErpUserService {
      * @return int
      */
 	public int hrlist(int companyNum);
+	
+	/**
+     * 기간 구독 서비스를 등록한다
+     *
+     * @param Map<String, Object>
+     * @return int
+     */
+	public int periodservicepay(Map<String, Object> requestData);
 
 }

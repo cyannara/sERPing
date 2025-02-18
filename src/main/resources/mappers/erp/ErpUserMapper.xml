@@ -13,6 +13,7 @@
 	*   수정일      수정자          수정내용
 	*  ======    =======    ==============================
 	*  2025.02.17  표하연          최초생성
+	*  2025.02.18  표하연          기간결제에 따른 추가처리
 	*
 	*  </pre>
 ======================================================== -->
@@ -41,4 +42,78 @@
 		from hr_employee
 		where company_num = ${companyNum}
 	</select>
+	
+	<!-- 
+     * 구독목록(결제헤더)를 등록한다
+     *
+     * @param map
+     * @return int
+	-->
+	<insert id="prosubscriptionlist" parameterType="map">
+		INSERT INTO erp_subscription_list VALUES
+		(erp_subscrpt_seq.nextval, #{companyNum}, #{employeeNum}, DEFAULT, #{paymethod}, null, #{price}, 'ES04', sysdate)
+	</insert>
+	
+	<!-- 
+     * 구독목록(결제헤더)의 마지막 결제 기본키를 가져온다
+     *
+     * @param map
+     * @return int
+	-->
+	<select id="lastpaykey" resultType="int" parameterType="map">
+		SELECT subscription_num 
+		FROM (
+		    select subscription_num
+		    from erp_subscription_list
+		    where state = 'ES04'
+		    and company_num = #{companyNum}
+		    and employee_num = #{employeeNum}
+		    and subscription_mean = #{paymethod}
+		    and subscription_amount = #{price}
+		    order by subscription_num desc
+		) 
+		WHERE ROWNUM = 1
+	</select>
+	
+	<!-- 
+     * 구독목록 결제 옵션 정보를 저장한다
+     *
+     * @param int
+     * @param int
+     * @return int
+	-->
+	<insert id="prosubscriptiontail">
+		INSERT INTO erp_subscription_tail VALUES
+		(erp_subscrpt_tail_seq.nextval, #{subscriptionNum}, #{subscriptionOptionNum})
+	</insert>
+	
+	<!-- 
+     * 구독 옵션 정보를 가져온다 단일 레코드
+     *
+     * @param int
+     * @return ErpSubOptionDTO
+	-->
+	<select id="lastoptionlist" resultType="ErpSubOptionDTO" >
+		select *
+		from erp_subscription_option
+		where subscription_option_num = ${subscriptionOptionNum}
+	</select>
+	
+	<!-- 
+     * 회사가 현재 구독중인 정보 확인
+     * 위에 동일한거 있는데 쿼리랑 파라미터 수정할 시간에 한페이지라도 더나가려고
+     * 졸업후 작업으로 놔둠
+     *
+     * @param int
+     * @param int
+     * @param int
+     * @return erpSubscriptionInfoListDTO
+	-->
+	<select id="subinfo" resultType="erpSubscriptionInfoListDTO">
+		select *
+		from erp_subscription_info_list
+		where company_num = #{companyNum}
+		and subscription_name_num in ( #{subnamenum1}, #{subnamenum2} );
+	</select>
+
 </mapper>

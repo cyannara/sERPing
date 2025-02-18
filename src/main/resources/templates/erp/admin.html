@@ -585,6 +585,7 @@
 				method:"post",
 				headers: {
 				      "Content-Type": "application/json",
+				      'X-CSRF-TOKEN': document.querySelector('#csrfToken').value,
 				    },
 				body : JSON.stringify(requestData),
 			})
@@ -637,6 +638,7 @@
 					headers: {
 					      "Content-Type": "application/json",
 					      // 'Content-Type': 'application/x-www-form-urlencoded',
+					      'X-CSRF-TOKEN': document.querySelector('#csrfToken').value,
 					    },
 					body : JSON.stringify(requestData),
 				})
@@ -683,6 +685,7 @@
 						headers: {
 						      "Content-Type": "application/json",
 						      // 'Content-Type': 'application/x-www-form-urlencoded',
+						      'X-CSRF-TOKEN': document.querySelector('#csrfToken').value,
 						    },
 						body : JSON.stringify(requestData),
 					})
@@ -758,6 +761,7 @@
 						headers: {
 						      "Content-Type": "application/json",
 						      // 'Content-Type': 'application/x-www-form-urlencoded',
+						      'X-CSRF-TOKEN': document.querySelector('#csrfToken').value,
 						    },
 						body : JSON.stringify(requestData),
 					})
@@ -1111,6 +1115,7 @@
 						headers: {
 						      "Content-Type": "application/json",
 						      // 'Content-Type': 'application/x-www-form-urlencoded',
+						      'X-CSRF-TOKEN': document.querySelector('#csrfToken').value,
 						    },
 						body : JSON.stringify(requestData),
 					})
@@ -1165,6 +1170,7 @@
 						headers: {
 						      "Content-Type": "application/json",
 						      // 'Content-Type': 'application/x-www-form-urlencoded',
+						      'X-CSRF-TOKEN': document.querySelector('#csrfToken').value,
 						    },
 						body : JSON.stringify(requestData),
 					})
@@ -1208,6 +1214,7 @@
 						headers: {
 						      "Content-Type": "application/json",
 						      // 'Content-Type': 'application/x-www-form-urlencoded',
+						      'X-CSRF-TOKEN': document.querySelector('#csrfToken').value,
 						    },
 						body : JSON.stringify(requestData),
 					})
@@ -1265,7 +1272,12 @@
 		// 회사영문명 중복코드 확인
 		async function iscomapnyEngName(str){
 			const url = `/erp/rest/comenname/${str}`;
-			return fetch ( url )
+			return fetch ( url, {
+				method: "GET",
+		        headers: {
+			      'X-CSRF-TOKEN': document.querySelector('#csrfToken').value,
+			    },
+			} )
 			.then ( result => result.json() )
 			.then ( result => {
 				//alert(result);
@@ -1280,6 +1292,9 @@
 		    formData.append("file", file);
 		    return fetch("/erp/rest/uploadBusinessLicense", {
 		        method: "POST",
+		        headers: {
+			      //'X-CSRF-TOKEN': document.querySelector('#csrfToken').value,
+			    },
 		        body: formData
 		    })
 		    .then(response => response.text())
