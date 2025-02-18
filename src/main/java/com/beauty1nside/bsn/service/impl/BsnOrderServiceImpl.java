@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.beauty1nside.bsn.dto.BhfOrderDTO;
 import com.beauty1nside.bsn.dto.BhfOrderDetailDTO;
+import com.beauty1nside.bsn.dto.BsnOrderDTO;
 import com.beauty1nside.bsn.dto.OrderSearchDTO;
 import com.beauty1nside.bsn.mapper.BsnOrderMapper;
 import com.beauty1nside.bsn.service.BsnOrderService;
@@ -36,6 +37,12 @@ public class BsnOrderServiceImpl implements BsnOrderService {
 	@Override
 	public int getCountOfBhfOrderDetail(BhfOrderDTO bhfOrderDTO) {
 		return bsnOrderMapper.getCountOfBhfOrderDetail(bhfOrderDTO);
+	}
+
+	@Override
+	public void registerOrder(BsnOrderDTO bsnOrederDTO) {
+		bsnOrderMapper.insertBsnOrder(bsnOrederDTO);
+		
 	}
 
 }
