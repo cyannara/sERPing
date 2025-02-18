@@ -96,6 +96,10 @@
 	</div>
 	
 	<script>
+		// layout.html <meta>태그에 있는 값 불러오기
+		const header = document.querySelector('meta[name="_csrf_header"]').content; //서버에서 요구하는 CSRF 헤더이름
+	    const token = document.querySelector('meta[name="_csrf"]').content; //서버에서 생성한 CSRF 토큰 값
+		
 		var Grid = tui.Grid;
 		
 		//페이지가 로드되면 테이블에 데이터가 없을때 뜨는 문구 함수 실행
@@ -242,7 +246,10 @@
 	 	    fetch("http://localhost:81/bhf/rest/order/insert", {
 		        method: "POST",
 		        headers: {
-		            "Content-Type": "application/json"
+		            "Content-Type": "application/json",
+		            //위에 변수로 저장한 헤더이름,토큰값 넣어주기
+		        	'header': header, 
+		            'X-CSRF-Token': token
 		        },
 		        body: JSON.stringify(orderInfo) // orderInfo 객체를 JSON 형식으로 변환(JSON.parse는 JSON을 객체로 변환)
 		    })

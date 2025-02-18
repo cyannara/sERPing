@@ -2,6 +2,16 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.beauty1nside.bhf.mapper.BhfReturnMapper">
 
+	<!-- 반품 요청 프로시져 호출 -->
+	<insert id="returnGoods" statementType="CALLABLE">
+		call bhf_return_goods(
+		  #{branchOfficeId},
+		  #{remark},
+		  #{companyNum},
+		  #{files, typeHandler=com.beauty1nside.bhf.ReturningArrayStructHandler} 
+		)
+	</insert>
+
 	<!-- 창고에 있는 상품 조회 -->
 	<select id="goodsList" resultType="BhfGdsOptDTO" parameterType="BhfGdsOptSearchDTO">
 		SELECT DISTINCT 
