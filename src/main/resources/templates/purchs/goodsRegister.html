@@ -135,7 +135,7 @@
 	            <div class="col-md-6">
 	                <label class="form-label">대표 이미지</label>
 	                  <div class="input-group">
-						    <input type="file" class="form-control" id="goodsImage" name="goodsImage" accept=".jpg, .jpeg, .png, .pdf" style="width: 400px;">
+						    <input type="file" class="form-control" id="goodsImage" accept=".jpg, .jpeg, .png, .pdf" style="width: 400px;">
 						    <button class="btn btn-outline-secondary" type="button" id="uploadImageBtn">업로드</button>
 						</div>
 						
@@ -390,7 +390,7 @@ let grid;
  
 // ✅ 이미지 업로드 버튼 클릭 시 imgSave() 실행
 
-   async function imgSave(){
+  /*  async function imgSave(){
        const fileInput = document.getElementById("goodsImage");
        const file = fileInput.files[0];
        const formData = new FormData();
@@ -408,27 +408,67 @@ let grid;
            console.error("파일 업로드 중 오류 발생:", error);
        });
    }
-   
-   
-   
-   
-// ✅ 이미지 업로드 버튼 클릭 시 imgSave() 실행
-  /*  document.getElementById("uploadImageBtn").addEventListener("click", async function () {
-       try {
-           const uploadedFileName = await imgSave(); // ✅ 이미지 업로드 후 파일명 반환
-           if (uploadedFileName) {
-               console.log("✅ 이미지 파일명 저장됨:", uploadedFileName);
+    */
+    async function imgSave() {
+        const fileInput = document.getElementById("goodsImage");
+        const file = fileInput.files[0];
 
-               // ✅ 업로드된 파일명을 <input>에 반영
-               //document.getElementById("uploadedImageName").value = uploadedFileName;
-               console.log("✅ Hidden Input 값 업데이트됨: ", document.getElementById("uploadedImageName").value);
-           } else {
-               console.warn("⚠️ 서버에서 파일명을 반환하지 않았습니다.");
-           }
-       } catch (error) {
-           console.error("❌ 이미지 업로드 중 오류 발생:", error);
-       }
-   }); */
+        if (!file) {
+            console.warn("⚠️ 업로드할 파일이 선택되지 않았습니다.");
+            return null;
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const response = await fetch("/purchs/rest/product/uploadGoodsImages", {
+                method: "POST",
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error("❌ 서버 응답 오류: " + response.statusText);
+            }
+
+            // ✅ JSON 응답 처리
+            const data = await response.json();
+
+            if (data.success) {
+                console.log("✅ 업로드된 파일명:", data.fileName);
+                return data.fileName; // ✅ 파일명 반환
+            } else {
+                console.warn("❌ 파일 업로드 실패:", data.message);
+                return null;
+            }
+        } catch (error) {
+            console.error("❌ 파일 업로드 중 오류 발생:", error);
+            return null;
+        }
+    }
+    
+ // ✅ 이미지 업로드 버튼 클릭 시 imgSave() 실행
+    document.getElementById("uploadImageBtn").addEventListener("click", async function () {
+        try {
+            const uploadedFileName = await imgSave(); // ✅ 이미지 업로드 후 파일명 반환
+            if (uploadedFileName) {
+                console.log("✅ 이미지 파일명 저장됨:", uploadedFileName);
+
+                // ✅ 업로드된 파일명을 <input>에 반영
+                document.getElementById("uploadedImageName").value = uploadedFileName;
+                console.log("✅ Hidden Input 값 업데이트됨: ", document.getElementById("uploadedImageName").value);
+            } else {
+                console.warn("⚠️ 서버에서 파일명을 반환하지 않았습니다.");
+            }
+        } catch (error) {
+            console.error("❌ 이미지 업로드 중 오류 발생:", error);
+        }
+    });
+
+
+   
+   
+
 
    
    // ✅ 이미지 저장 함수 (파일명 반환)
