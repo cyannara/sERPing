@@ -18,7 +18,7 @@ public class BhfOrderTest {
 	@Autowired 
 	BhfOrderMapper mapper;
 	
-	//@Test
+	@Test
 	public void testStruct() {
 		BhfOrdVO vo = new BhfOrdVO();
 		vo.setBranchOfficeId("Yedam");

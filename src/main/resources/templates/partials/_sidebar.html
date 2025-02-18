@@ -1,63 +1,3 @@
-<<<<<<< HEAD
-<nav th:fragment="sidebar" class="sidebar sidebar-offcanvas" id="sidebar">
-<!--==[[${param.menu}]]==-->
-  <div th:if="${#strings.equals('standard', param.menu) or #strings.equals('standard', menu)}">
-      <ul class="nav">
-        <li class="nav-item">
-          <a class="nav-link" href="/standard/product">
-            <i class="icon-grid menu-icon"></i>
-            <span class="menu-title">상품</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/standard/store">
-            <i class="icon-grid menu-icon"></i>
-            <span class="menu-title">창고</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/standard/doc">
-            <i class="icon-grid menu-icon"></i>
-            <span class="menu-title">결재문서</span>
-          </a>
-        </li>
-      </ul>
-  </div>
-  <div th:if="${#strings.equals('sales', param.menu) or #strings.equals('sales', menu)}">
-      <span class="menu-title">inventory</span>
-  </div>
-  <div th:if="${#strings.equals('inventory', param.menu) or #strings.equals('inventory', menu)}">
-    <span class="menu-title">inventory</span>
-  </div>
-  <div th:if="${#strings.equals('hr', param.menu) or #strings.equals('hr', menu)}">
-    <span class="menu-title">hr</span>
-  </div>
-  <div th:if="${#strings.equals('account', param.menu) or #strings.equals('account', menu)}">
-    <span class="menu-title">account</span>
-  </div>
-  <div th:if="${#strings.equals('branch', param.menu) or #strings.equals('branch', menu)}">
-    <ul class="nav">
-        <li class="nav-item">
-          <a class="nav-link" href="/bhf/order">
-            <i class="icon-grid menu-icon"></i>
-            <span class="menu-title">상품 발주 요청</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/bhf/ordList">
-            <i class="icon-grid menu-icon"></i>
-            <span class="menu-title">상품 발주 조회</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/bhf/return">
-            <i class="icon-grid menu-icon"></i>
-            <span class="menu-title">교환 및 반품 요청</span>
-          </a>
-        </li>
-      </ul>
-  </div>
-=======
 <nav th:fragment="sidebar" class="sidebar sidebar-offcanvas"
 	id="sidebar">
 	<!--==[[${param.menu}]]==-->
@@ -166,19 +106,8 @@
       </ul>
   </div>
 
-	<div
-		th:if="${#strings.equals('hr', param.menu) or #strings.equals('hr', menu)}">
-		<span class="menu-title">hr</span>
-	</div>
-	<div
-		th:if="${#strings.equals('account', param.menu) or #strings.equals('account', menu)}">
-		<span class="menu-title">account</span>
-	</div>
-	<div
-		th:if="${#strings.equals('branch', param.menu) or #strings.equals('branch', menu)}">
-		<span class="menu-title">branch</span>
-	</div>
->>>>>>> refs/heads/test
+
+
 
 
 
