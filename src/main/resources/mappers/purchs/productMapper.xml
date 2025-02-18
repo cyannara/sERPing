@@ -109,10 +109,30 @@ order by classification_id desc
     <where>
     <!-- company_num LIKE '%' || #{companyNum} || '%' -->
         <if test="warehouseName != null and warehouseName != ''">
-            warehouse_name LIKE '%' || #{warehouse_name} || '%'
+            warehouse_name LIKE '%' || #{warehouseName} || '%'
         </if>
     </where>
 </sql>
+
+<!-- 상품 등록 프로시저 호출  -->
+<insert id="goodsinsert" statementType="CALLABLE">
+	call purchs_product_register(
+		#{goodsName},
+		#{goodsCost}
+	    #{goodsPrice},
+	    #{goodsSupplyPrice},
+	    #{goodsStandard},
+	    #{goodsDescription},
+	    #{goodsImage},
+	    #{classificationId},  
+	    #{brandId},
+	    #{employeeNum},
+	    #{vendorId},
+	    #{companyNum},
+	    #{files,typeHandler=com.beauty1nside.purchs.OracleArrayProductHandler}  
+	)
+	
+</insert>
 
 
 </mapper>

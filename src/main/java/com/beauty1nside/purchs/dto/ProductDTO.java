@@ -30,6 +30,7 @@ public class ProductDTO {
 	private String brandName;
 	
 	private Long employeeNum;
+	private String emloyeeName;
 	
 	private Long vendorId;
 	private String vendorName;
