@@ -1,171 +1,29 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" >
+<!doctype html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>결재</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Document</title>
 </head>
 <body>
-	<div class="container">
-		<!-- 메뉴이름 -->
-		<div>
-			<h3>채무관리</h3>
-		</div>
-    <!-- 검색창 -->
-		<div class="search-grid">
-			<div class="row 1row">
-				<div class="col-5 row ">
-					<span class="label-search col-4">상태</span>
-					<select name="inApprovalStatus" id="inApprovalStatus" class="col-8 input-box">
-						<option value="" selected>선택</option>
-						<option value="AC07">대기</option>
-						<option value="AC08">승인</option>
-						<option value="AC08">결재</option>
-					</select>
-				</div>
-			</div>
-			<div class="row 2row">
-				<div class="col-1"></div>
-				<div class="col-5 row ">
-					<span class="label-search col-4">채권자</span>
-					<input type="text" name="creditor" id="creditor" class="col-8 input-box">
-				</div>
-				<div class="col-1"></div>
-				<div class="col-5 row ">
-					<span class="label-search col-4">표시수량</span>
-					<select name="display_amount" id="display_amount" class="col-8 input-box" onchange="changeDisplay()">
-						<option value="5" selected>5</option>
-						<option value="10">10</option>
-						<option value="20">20</option>
-						<option value="50">50</option>
-						<option value="100">100</option>
-					</select>
-				</div>
-			</div>
-			<div class="row 3row">
-				<div class="col-4"></div>
-				<button type="button" class="btn btn-primary col-1" onclick="search()">검색</button>
-				<div class="col-1"></div>
-				<button type="button" class="btn btn-secondary col-1" onclick="reset()">초기화</button>
-			</div>
-
-		</div>
-		<!-- 그리드 -->
-		<div id="table-container">
-			<div id="grid"></div>
-			<div id="pagination" class="tui-pagination"></div>
-		</div>
-    <!-- 하부 버튼 -->
-		<div class="button-bar row">
-			<div class="col-1"></div>
-			<button type="button" class="btn btn-primary col-1">Excel</button>
-			<button type="button" class="btn btn-secondary col-1">PDF</button>
-			<div class="col-7"></div>
-			<div class="btn-group dropup col-2">
-				<button type="button" class="btn btn-success unpay">미지급금등록</button>
-				<button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split" id="dropupMenuSplitButton3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					<span class="sr-only"></span>
-				</button>
-				<div class="dropdown-menu" aria-labelledby="dropupMenuSplitButton3">
-					<h6 class="dropdown-header">채무 등록</h6>
-					<a class="dropdown-item" href="#">외상매입금 등록</a>
-					<a class="dropdown-item" href="#">대출금 등록</a>
-					<div class="dropdown-divider"></div>
-					<a class="dropdown-item" href="#">미지급금 등록</a>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<!-- 드롭다운.js -->
-	<script src="/vendors/js/vendor.bundle.base.js"></script>
+<h3>결제 요청 문서</h3>
+<span id="approvalId" th:data-approval-id="${inApprovalId}"></span>
+</body>
 <script>
-	document.addEventListener("DOMContentLoaded",()=>{
-		gotobtn();
-	})
-	function gotobtn(){
-		document.querySelector(".dropup").addEventListener("click", ()=>{
-			if(event.target.className.includes("unpay")){
-				console.log("미지급금");
-			} else if(event.target.className.includes("dropdown-item")){
-				switch (event.target.innerHTML) {
-					case "외상매입금 등록":
-						console.log("외상매입금")
-						break;
-					case "대출금 등록":
-						console.log("대출금")
-						break;
-					case "미지급금 등록":
-						console.log("미지급금")
-						break;
-					default:
-						break;
-				}
-			}
-			
-		})
-	}
-
-	var Grid = tui.Grid;
-	
-	const dataSource = {
-		api: {
-			readData: { url: 'http://localhost:81/accnut/rest/debt/list', method: 'GET', initParams: { page: 1 } },
-			
-		},
-		contentType: 'application/json'
-			
-	};
-	
-	const grid = new Grid({
-		el : document.querySelector('#grid'),
-		pageOptions: {
-			useClient : false,
-			perPage: 5,
-		},
-		columns: [
-			{ header : "채무코드", name : "debtCode",  sortable : true},
-			{ header : "채무명", name : "debtName",  sortable : true},
-			{ header : "구분", name : "section",  sortable : true},
-			{ header : "채권자", name : "creditor",  sortable : true},
-			{ header : "금액", name : "amount",  sortable : true},
-			{ header : "이자", name : "interest",  sortable : true},
-			{ header : "등록일", name : "registerDate",  sortable : true},
-			
-		],
-		data : dataSource,
-	});
-	
-	function changeDisplay() {
-		let gap = parseInt(document.querySelector('#display_amount').value);
-		grid.setPerPage(gap, dataSource)
-	}
-	
-	function search(){
-		let debtName = document.querySelector('#debtName').value;
-		let section = document.querySelector('#section').value.toString();
-		let creditor = document.querySelector('#creditor').value.toString();
-		console.log(creditor.toString());
-		grid.setRequestParams({"debtName" : debtName, "section" : section, "creditor" : creditor })
-		grid.readData();
-	}
-	
-	function reset(){
-		let debtName = document.querySelector('#debtName');
-		let section = document.querySelector('#section');
-		let creditor = document.querySelector('#creditor');
-
-		debtName.value = '';
-		section.value = '';
-		creditor.value = '';
-
-
-		grid.setRequestParams({"debtName" : debtName.value, "section" : section.value, "creditor" : creditor.value })
-		grid.readData();
-
-	}
+    const approvalId = document.getElementById("approvalId").dataset.approvalId
+    const url = `/mainpage/rest/approval/${approvalId}`;
+    fetch(url, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+        }
+    })
+        .then(result => result.json())
+        .then(data => {
+            document.body.innerHTML += data.inApprovalRequestContent;
+        })
+        .catch(error => console.error("Error fetching data:", error));
 
 </script>
-	
-</body>
-
 </html>
+
