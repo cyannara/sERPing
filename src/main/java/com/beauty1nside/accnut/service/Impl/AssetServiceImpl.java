@@ -38,5 +38,11 @@ public class AssetServiceImpl implements AssetService{
 		// TODO Auto-generated method stub
 		return assetMapper.count(dto);
 		}
+		
+		@Override
+		public int insert(AssetDTO dto) {
+		// TODO Auto-generated method stub
+		return assetMapper.insert(dto);
+		}
 }		
 

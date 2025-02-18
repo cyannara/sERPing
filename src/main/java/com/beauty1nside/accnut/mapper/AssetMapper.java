@@ -10,4 +10,5 @@ public interface AssetMapper {
 	AssetDTO info(String assetsCode);
 	List<AssetDTO> list(AssetSearchDTO dto);
 	int count(AssetSearchDTO dto);
+	int insert(AssetDTO dto);
 }
