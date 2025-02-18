@@ -8,7 +8,9 @@ import java.util.Date;
 public class ApprovalDTO {
   private Long inApprovalId;
   private Long documentId;
+  private String documentType;
   private Long employeeNum;
+  private String employeeName;
   private Date inApprovalRequestDate;
   private String inApprovalStatus;
   private String inApprovalRequestContent;

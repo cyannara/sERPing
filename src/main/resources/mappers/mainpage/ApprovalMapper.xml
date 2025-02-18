@@ -12,47 +12,67 @@
 				in_approval_file_path,
 				company_num
 		FROM grpwr_in_approval
-		WHERE in_approval_id = #{inApprovalId}
+		WHERE in_approval_id = #{inApprovalId} and company_num = #{companyNum}
 	
 	</select>
-	<select id="list" resultType="com.beauty1nside.mainpage.dto.ApprovalDTO" parameterType="com.beauty1nside.mainpage.dto.ApprovalSearchDTO">
-		SELECT in_approval_id,
-				document_id,
-				employee_num,
-				in_approval_request_date,
-				in_approval_status,
-				in_approval_request_content,
-				in_approval_rejected_content,
-				in_approval_file_path,
-				company_num
-		FROM (SELECT /*+INDEX_DESC(grpwr_in_approval pk_grpwr_in_approval)*/
-				rownum rn,
-				in_approval_id,
-				document_id,
-				employee_num,
-				in_approval_request_date,
-				in_approval_status,
-				in_approval_request_content,
-				in_approval_rejected_content,
-				in_approval_file_path,
-				company_num
-		FROM grpwr_in_approval
+
+	<update id="update">
+		update grpwr_in_approval
+		<if test="processStr == 'approve'">
+			set in_approval_status = 'APPROVED'
+		</if>
+		<if test="processStr == 'reject'">
+			set in_approval_status = 'REJECTED'
+		</if>
+		where company_num = #{companyNum}
+			and in_approval_id = #{inApprovalId}
+	</update>
+
+	<select id="waitingList" resultType="com.beauty1nside.mainpage.dto.ApprovalDTO" parameterType="com.beauty1nside.mainpage.dto.ApprovalSearchDTO">
+		SELECT g.in_approval_id,
+		g.document_id,
+		g.employee_num,
+		h.employee_name, -- 바깥 쿼리에서 employee_name을 가져오기
+		g.in_approval_request_date,
+		g.in_approval_status,
+		g.in_approval_request_content,
+		g.in_approval_rejected_content,
+		g.in_approval_file_path,
+		g.company_num,
+		s.document_type
+		FROM (
+		SELECT /*+ INDEX_DESC(grpwr_in_approval pk_grpwr_in_approval) */
+		rownum rn,
+		g.in_approval_id,
+		g.document_id,
+		g.employee_num,
+		g.in_approval_request_date,
+		g.in_approval_status,
+		g.in_approval_request_content,
+		g.in_approval_rejected_content,
+		g.in_approval_file_path,
+		g.company_num
+		FROM grpwr_in_approval g
 		<![CDATA[
-		      WHERE rownum <= #{dto.end}
-		      AND 
-		]]>
+            WHERE rownum <= #{dto.end}
+            AND
+        ]]>
 		<include refid="searchInfo"></include>
-			  ) 
-		WHERE rn >= #{dto.start}
+		) g
+		JOIN hr_employee h ON g.employee_num = h.employee_num
+		join stdr_document s on g.document_id = s.document_id
+		WHERE rn >= #{dto.start} and g.in_approval_status = 'WAITING'
 	</select>
+
+
 	<select id="count">
 		SELECT COUNT(in_approval_id)
 		FROM grpwr_in_approval
 		<where>
 			<include refid="searchInfo"></include>
 		</where>
-	
 	</select>
+
 	<sql id="searchInfo">
 		company_num LIKE '%' || #{companyNum} || '%'
 		<if test="dto.inApprovalStatus != null and ! dto.inApprovalStatus.equals('')">

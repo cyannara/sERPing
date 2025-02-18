@@ -8,7 +8,7 @@
         xmlns:sec=""
 >
 <body layout:fragment="content">
-<div class="row" >
+<div class="row">
   <div class="col-md-12 grid-margin">
     <div class="row">
       <div class="col-12 col-xl-8 mb-4 mb-xl-0">
@@ -41,15 +41,15 @@
     </div>
   </div>
 </div>
-<div class="row">
+<div class="row approval">
 <!--  <div th:replace="~{mainpage/mainpage :: approval}"></div>-->
 <!--  <body>-->
   <div class="container">
     <div class="search-grid">
       <div class="row 1row">
         <div class="col-5 row">
-          <label  class="label-search col-4" for="inApprovalStatus">상태</label>
-          <select name="inApprovalStatus" id="inApprovalStatus" class="col-8 input-box">
+          <label class="label-search col-4" for="inApprovalType">요청 구분</label>
+          <select name="inApprovalType" id="inApprovalType" class="col-8 input-box">
             <option value="" selected>선택</option>
             <option value="WAITING">대기</option>
             <option value="APPROVED">승인</option>
@@ -149,57 +149,115 @@
       readData: { url: 'http://localhost:81/mainpage/rest/approval/list', method: 'GET', initParams: { page: 1 } },
       contentType: 'application/json'
     },
-
-
   };
 
   const grid = new Grid({
-    el : document.querySelector('#grid'),
-    pageOptions: {
-      useClient : false,
-      perPage: 5,
-    },
-    columns: [
-      { header : "결재번호", name : "inApprovalId",  sortable : true},
-      { header : "문서번호", name : "documentId",  sortable : true},
-      { header : "요청자번호", name : "employeeNum",  sortable : true},
-      { header : "결재요청 날짜", name : "inApprovalRequestDate",  sortable : true},
-      { header : "상태", name : "inApprovalStatus",  sortable : true},
-      { header : "요청 내용", name : "inApprovalRequestContent",  sortable : true},
-      { header : "반려 내용", name : "inApprovalRejectedContent",  sortable : true},
-      { header : "승인 파일 주소", name : "inApprovalFilePath",  sortable : true}
+            el: document.querySelector('#grid'),
+            scrollX: false,
+            scrollY: false,
+            pageOptions: {
+              useClient: false,
+              perPage: 5,
+            },
+            columns: [
+              {header: "번호", name: "inApprovalId", sortable: true},
+              {header: "요청 구분", name: "documentType", sortable: true},
+              {header: "요청자", name: "employeeName", sortable: true},
+              {
+                header: "결재요청 날짜",
+                name: "inApprovalRequestDate",
+                sortable: true,
+                width: 150,
+                formatter: ({value}) => {
+                  return formatDateTime(value)
+                }
+              },
+              {
+                header: "처리",
+                name: "process",
+                formatter: ({row}) => {
+                  return `
+                    <button class="btn btn-approve" data-in-approval-id="${row.inApprovalId}">승인</button>
+                    <button class="btn btn-reject" data-in-approval-id="${row.inApprovalId}">반려</button>`
+                }
+              },
+              {
+                header: "상태",
+                name: "inApprovalStatus",
+                sortable: true,
+                rowClassName: 'center',
+                width: 80,
+                hidden: true,
+                formatter: ({value}) => {
+                  const statusMap = {
+                    WAITING: {text: "대기중", color: "gray"},
+                    APPROVED: {text: "승인", color: "green"},
+                    REJECTED: {text: "거절", color: "red"}
+                  };
+                  const status = statusMap[value] || {text: "알 수 없음", color: "black"};
+                  return `<span class="status-label"
+                                style="background-color: ${status.color};
+                            ">${status.text}</span>`;
+                }
+              },
+              {header: "요청 내용", name: "inApprovalRequestContent", sortable: true, hidden: true},
+              {header: "요청 내용 확인", name: "moveToPage", sortable: true,
+              formatter: ({ row }) => {
+                return `<button class="move-btn" data-id="${row.inApprovalId}">
+                          <i class="mdi mdi-arrow-right-bold"></i>
+                        </button>`;
+              }
+          },
+          {
+            header: "다운로드",
+            name: "download",
+        sortable: true,
+        formatter: ({ row }) => {
+          return `<button class="download-btn" data-content="${row.inApprovalRequestContent}">
+              <i class="mdi mdi-folder-download"></i>
+            </button>`;
+        }
+      }
+
+      // { header : "반려 내용", name : "inApprovalRejectedContent",  sortable : true},
+      // { header : "승인 파일 주소", name : "inApprovalFilePath",  sortable : true}
     ],
     data : dataSource,
   });
 
+  document.addEventListener("click", function (event) {
+    const buttonApprove = event.target.closest(".btn-approve");
+    const buttonReject = event.target.closest(".btn-reject");
 
+    if (buttonApprove) {
+      const inApprovalId = buttonApprove.dataset.inApprovalId;
+      processApproval(inApprovalId, 'approve')
+    } else if(buttonReject) {
+      const inApprovalId = buttonReject.dataset.inApprovalId;
+      processApproval(inApprovalId, 'reject')
+    }
+  });
 
-  function changeDisplay() {
-    let gap = parseInt(document.querySelector('#display_amount').value);
-    grid.setPerPage(gap, dataSource)
-  }
+  document.addEventListener("click", function (event) {
+    const button = event.target.closest(".move-btn");
+    if (button) {
+      const dataset = button.dataset; // 버튼에서 data-id 값 가져오기
+      window.location.href = `/mainpage/approval?inApprovalId=${dataset.id}`;
 
-  function search(){
-    let inApprovalStatus = document.querySelector('#inApprovalStatus').value.toString();
-    let requester = document.querySelector('#requester').value.toString();
-    grid.setRequestParams({"inApprovalStatus" : inApprovalStatus, "requester" : requester })
-    grid.readData();
-  }
+    }
+  });
 
-  function reset(){
-    let inApprovalStatus = document.querySelector('#inApprovalStatus');
-    let requester = document.querySelector('#requester');
-
-    inApprovalStatus.value = '';
-    requester.value = '';
-
-
-    grid.setRequestParams({ "inApprovalStatus" : inApprovalStatus.value, "requester" : requester.value })
-    grid.readData();
-
-  }
+  document.addEventListener("click", function (event) {
+    const button = event.target.closest(".download-btn");
+    if (button) {
+      const dataset = button.dataset;
+      downloadPDF(dataset);
+    }
+  });
 
 </script>
+<script src="/js/mainpage/mainpage.js"></script>
+
 </body>
 
 </html>
