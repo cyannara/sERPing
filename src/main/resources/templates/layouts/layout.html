@@ -8,8 +8,24 @@
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>Skydash Admin</title>
 
-    <link rel="stylesheet" href="/vendors/mdi/css/materialdesignicons.min.css">
+	<!-- ERP 구독 권한 관리 스크립트 시작 [하연 2025-02-17] -->
+    <script th:inline="javascript">
+		const sessionData = /*[[${session}]]*/ {};
+		document.addEventListener("DOMContentLoaded", function () {
+	        let checkInterval = setInterval(() => {
+	            if (window.subscriptionState) {
+	                //console.log("여기는 외부:", window.subscriptionState);
+	                clearInterval(checkInterval);  // 확인 후 인터벌 제거
+	            }
+	        }, 100);
+	    });
+	</script>
+	<script src="/js/erp/erpsubscription.js"></script>
+    <!-- ERP 구독 권한 관리 스크립트 끝 [하연 2025-02-17] -->
 
+    <link rel="stylesheet" href="/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="/common/_navbar.css">
+    
     <!-- plugins:css -->
     <link rel="stylesheet" href="/vendors/feather/feather.css">
     <link rel="stylesheet" href="/vendors/ti-icons/css/themify-icons.css">

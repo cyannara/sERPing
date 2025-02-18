@@ -39,6 +39,7 @@ public class WebSecurityConfig {
 //        .requestMatchers("/erp/**").hasRole("AU001")
         .anyRequest().authenticated()
       )
+      .csrf(csrf -> csrf.ignoringRequestMatchers("/erp/rest/**"))  // /erp/rest/**` 경로의 CSRF 보호 해제 표하연 202502181029 추가
       .formLogin((form) -> form
         .loginPage("/login")
         .usernameParameter("employeeId")
