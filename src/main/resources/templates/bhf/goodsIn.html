@@ -8,6 +8,153 @@
 <title>상품 입고</title>
 </head>
 <body layout:fragment="content">
-
+	<div class="container">
+		<div class="row">
+			<h3 class="mt-2 mb-2">상품 입고</h3>
+			<hr>
+			<div class="col-md-6 mt-2 mb-5">
+				<div class="row">
+					<label class="col-sm-4">발주 일자</label> 
+					<input type="date"class="col-sm-5" id="orderDate"> 
+					<button type="button" class="col-sm-2" onclick="search()">검색</button>
+				</div>
+			</div>
+			<div class="col-md-6 mt-2 mb-5">
+				<div class="row">
+					<label class="col-sm-4">주문 지점</label> 
+					<input type="text"class="col-sm-7" id="branchOfficeId">
+				</div>
+			</div>
+			<div class="col-md-6 stretch-card mt-2 mb-2">
+				<div class="card">
+					<div class="card-body">
+						<h6 class="mb-4">주문서</h6>
+						<div id="order"></div>
+						<div id="pagination" class="tui-pagination"></div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6 stretch-card mt-2 mb-2">
+				<div class="card">
+					<div class="card-body">
+						<h6 class="mb-4">주문 상세</h6>
+						<div id="orderDtl"></div>
+						<div id="pagination" class="tui-pagination"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script>
+	var Grid = tui.Grid;
+	
+	//페이지가 로드되면 테이블에 데이터가 없을때 뜨는 문구 함수 실행
+	document.addEventListener("DOMContentLoaded",()=>{
+		ORDnodata();
+	})
+	
+	// 주문 조회 쿼리 호출
+	const dataSource = {
+		api: {
+			readData: { url: 'http://localhost:81/bhf/rest/', method: 'GET', initParams: { page: 1 }},
+		},
+		contentType: 'application/json'
+		
+	};
+	// 주문 테이블
+	const grid = new Grid({
+		el: document.getElementById('order'), 
+		pageOptions: {
+			useClient: false,
+			perPage: 5,
+		},
+		columns: [ 
+			{ header : "주문번호", name : "returningCode"},
+			{ header : "발주서코드", name : "requestDate"},
+			{ header : "발주일자", name : "progressStatus"},
+			{ header : "납기일자", name : "progressStatus"},
+			{ header : "비고", name : "remark"}
+		],
+		data: dataSource
+	});
+	// 주문 테이블 행 선택
+	grid.on('click', (ev) => {
+		const rowKey = ev.rowKey;  	// 클릭된 행의 키값
+		if(rowKey != undefined){ 	// 행 말고 다른데 클릭해도 이 함수가 실행되서 행의 키값이 있을때만 실행되게 함
+			
+			const rowData = grid.getRow(rowKey); //해당 행의 데이터 가져오기
+			const returningCode = rowData.returningCode; // 교환및반품 코드
+			
+			// 교환및반품 상세 조회 쿼리호출(orderCode)
+		    fetch('http://localhost:81/bhf/rest/return/detail?returningCode=' + returningCode, {
+		        method: 'GET',
+		        headers: {
+		            'Content-Type': 'application/json'
+		        }
+		    })
+		    .then(response => response.json())
+		    .then(data => {
+		        grid2.resetData(data.data.contents);  // 교환및반품 상세 테이블 데이터 업데이트
+		    })
+		    .catch(error => console.error("데이터 요청 실패:", error));
+		}
+	});
+	
+	// 주문 상세 테이블
+	const grid2 = new Grid({
+		el: document.getElementById('orderDtl'), 
+		pageOptions: {
+			useClient: false,
+			perPage: 5,
+		},
+		columns: [ 
+			{ header : "상품명", name : "goodsName"},
+			{ header : "옵션명", name : "optionName"},
+			{ header : "옵션코드", name : "optionCode", hidden : 1},
+			{ header : "규격", name : "optionName"},
+			{ header : "발주수량", name : "quantity"},
+			{ header : "낱개수량", name : "exchangeReturningChoice"},
+			{ header : "입고수량", name : "returningReason"}
+		],
+		data: ""
+	});
+	
+	// 검색 함수
+	function search(){
+		// 값 가져와서 변수선언
+		let orderDate = document.querySelector('#orderDate').value;
+		// 객체로 담을 변수선언
+		let parameter = {};
+		// 객체 담기
+		parameter.progressStatus = progressStatus;
+		// sql로 선언한 Date는 null값이 들어가면 오류가 나서 null이 아닐때 넣는거로 선언
+		if(orderDate != ''){
+			parameter.requestDate = requestDate;
+		}
+		// 검색 조건들 보내기
+		grid.setRequestParams(parameter);
+		grid.readData();
+		//데이터가 없으면 뜨는 문구
+		ORnodata();
+	}
+	
+	// 주문 테이블 데이터 없을때 나오는 문구
+	function ORnodata(){
+		console.log("nodata실행")
+		setTimeout( () => {
+			let nodata = document.querySelectorAll('.tui-grid-layer-state-content p')[0];
+			nodata.innerHTML = '해당하는 데이터가 없습니다.';
+		}, 100)
+	}
+	// 주문 상세 테이블 데이터 없을때 나오는 문구
+	function ORDnodata(){
+		setTimeout( () => {
+			let nodata = document.querySelectorAll('.tui-grid-layer-state-content p')[1];
+			nodata.innerHTML = '주문서를 선택 해주세요';
+		}, 100)
+	}
+	</script>
+	
 </body>
 </html>

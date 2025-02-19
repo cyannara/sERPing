@@ -6,8 +6,8 @@
 	<insert id="goodsIn" parameterType="java.util.List">
 		MERGE  INTO bhf_warehouse b
 		USING(
-			<!-- collection="list" item="item" 이거는 디폴트 -->
-			<foreach collection="list" item="item" open="" close="" index="idx" separator="">
+			<!-- collection="list" item="item" 이거는 디폴트, dual을 여러개 반복할때는 separator="UNION" 넣기 -->
+			<foreach collection="list" item="item" open="" close="" index="idx" separator="UNION">
 				select 
 					 #{item.branchOfficeId} as branchOfficeId,
 		             #{item.goodsCode} as goodsCode,
