@@ -8,12 +8,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.beauty1nside.purchs.dto.ProdInsertDtlVO;
 import com.beauty1nside.purchs.dto.ProdInsertVO;
 import com.beauty1nside.purchs.mapper.productMapper;
+import com.beauty1nside.purchs.service.productService;
 
 @SpringBootTest
 public class insertTest {
 
     @Autowired 
     private productMapper mapper;
+    
+    @Autowired
+    private productService service;
 
     @Test
     public void productInsertTest() {
@@ -25,8 +29,8 @@ public class insertTest {
         vo.setGoodsStandard("sdfsfsd");
         vo.setGoodsDescription("sdffsfdsfsd");
         vo.setGoodsImage("sfdsdfsd");
-        vo.setClassificationId(0);
-        vo.setBrandId(0);
+        vo.setClassificationId(1);
+        vo.setBrandId(1);
         vo.setEmployeeNum(1);
         vo.setVendorId(1);
         vo.setCompanyNum(1);
@@ -38,6 +42,6 @@ public class insertTest {
         ));
 
         // ✅ 상품 등록 실행
-        mapper.goodsinsert(vo);
+        service.goodsinsert(vo);
     }
 }

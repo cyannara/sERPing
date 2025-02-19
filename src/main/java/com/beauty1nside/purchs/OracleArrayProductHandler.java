@@ -1,13 +1,12 @@
 package com.beauty1nside.purchs;
 
+import java.math.BigDecimal;
 import java.sql.Array;
 import java.sql.CallableStatement;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Struct;
-import java.sql.Types;
 import java.util.List;
 
 import org.apache.ibatis.type.JdbcType;
@@ -16,7 +15,7 @@ import org.springframework.util.StringUtils;
 
 import com.beauty1nside.purchs.dto.ProdInsertDtlVO;
 
-import oracle.jdbc.driver.OracleConnection;
+import oracle.jdbc.OracleConnection;
 
 public class OracleArrayProductHandler implements TypeHandler<Object> {
 	@Override
@@ -34,41 +33,29 @@ public class OracleArrayProductHandler implements TypeHandler<Object> {
 	public void setParameter(PreparedStatement ps, int i, Object parameter, JdbcType jdbcType) throws SQLException {
 	    if (parameter == null) return;
 
-	    Connection connection = ps.getConnection();
-	    OracleConnection conn;
-	    if (connection.isWrapperFor(OracleConnection.class)) {
-	        conn = connection.unwrap(OracleConnection.class);
-	    } else {
-	        throw new SQLException("OracleConnection으로 unwrap 할 수 없습니다.");
-	    }
-
-	    List<ProdInsertDtlVO> files = (List<ProdInsertDtlVO>) parameter;
-
 	   
+	   
+	    OracleConnection conn = ps.getConnection().unwrap(OracleConnection.class); 	
+
+	    System.out.println("=====>>>>>"+parameter);
+	    List<ProdInsertDtlVO> files = (List<ProdInsertDtlVO>) parameter;	   
 	    Struct[] array = new Struct[files.size()];
-	    Object[] filetype = new Object[2];
 	    
 	    int arrayIndex = 0;
-	    for (ProdInsertDtlVO file : files) {
-	    	
-	        filetype[0] = file.getOptionName();
-	        filetype[1] = file.getWarehouseId();
-
-	        try {
-	            array[arrayIndex++] = conn.createStruct("PURCHSFILETYPE", filetype);
-	        } catch (SQLException e) {
-	            e.printStackTrace(); // 🔥 오류 로그 출력
-	            throw new SQLException("PURCHSFILETYPE 변환 오류 발생", e);
-	        }
-	    }
-
 	    try {
-	        Array filearray = conn.createOracleArray("PURCHSFILEARRAY", array);
-	        ps.setArray(i, filearray);
+	    	for (ProdInsertDtlVO file : files) {
+		    	Object[] filetype = new Object[2];		    	
+		        filetype[0] = file.getOptionName();
+		        filetype[1] = new BigDecimal(file.getWarehouseId());
+	            array[arrayIndex++] = conn.createStruct("PURCHSFILETYPE", filetype);
+		    }
+		    Array filearray = conn.createOracleArray("PURCHSFILEARRAY", (Struct[])array);
+		    ps.setArray(i, filearray);
 	    } catch (SQLException e) {
-	        e.printStackTrace(); // 🔥 오류 로그 출력
-	        throw new SQLException("PURCHSFILEARRAY 변환 오류 발생", e);
+	    	e.printStackTrace(); // 🔥 오류 로그 출력
+	    	throw new SQLException("PURCHSFILETYPE 변환 오류 발생", e);
 	    }
+
 	}
 	
 	
