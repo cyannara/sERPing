@@ -27,5 +27,10 @@ public interface EmpService {
     
     String getNewEmployeeId();  // 최신 사번 조회
     
+    
+    List<String> getDepartments(); // ✅ 기존 방식 유지
+    List<Map<String, Object>> getDepartmentList(); // ✅ 새로운 방식 추가
+    List<Map<String, Object>> getSubDepartments(String departmentNum); // ✅ 하위 부서 조회
+    
 
 }

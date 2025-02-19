@@ -8,6 +8,26 @@ document.addEventListener("DOMContentLoaded", function () {
     initializeGrid();
     setupEventListeners();
     fetchNewEmployeeId(); // 모달 열릴 때 사원번호 자동 입력
+    initializeEmailInput(); // ✅ 이메일 입력 필드 초기화
+    
+        // ✅ 초기화 버튼 이벤트 리스너 연결 (id 일치 확인)
+    let resetBtn = document.getElementById("resetBtn");
+    if (resetBtn) {
+        resetBtn.addEventListener("click", resetEmployeeForm);
+        console.log("✅ 초기화 버튼 이벤트 연결 완료");
+    } else {
+        console.error("❌ resetBtn을 찾을 수 없습니다.");
+    }
+
+    // ✅ 모달이 열릴 때마다 초기화
+    let empRegisterModal = document.getElementById("empRegisterModal");
+    if (empRegisterModal) {
+        empRegisterModal.addEventListener("shown.bs.modal", resetEmployeeForm);
+        console.log("✅ 모달 이벤트 리스너 연결 완료");
+    } else {
+        console.error("❌ empRegisterModal을 찾을 수 없습니다.");
+    }
+    
 });
 
 // 전화번호 포맷 함수 (01012345678 → 010-1234-5678)
@@ -70,13 +90,14 @@ function initializeGrid() {
 }
 
 // 공통 코드 목록 불러오기 (동적 적용)
-let commonCodes = {};
+let commonCodes = {}; // 🔹 공통 코드 저장 변수
 function loadCommonCodes() {
     fetch("http://localhost:81/hr/rest/emp/common-codes")
         .then(response => response.json())
         .then(data => {
             commonCodes = data;
             populateFilters(); // 필터 UI 업데이트
+            populateModals(); // 모달 UI 업데이트
         })
         .catch(error => console.error("공통 코드 로딩 실패:", error));
 }
@@ -204,14 +225,6 @@ function setupEventListeners() {
         });
     } else {
         console.error("❌ searchBtn 요소를 찾을 수 없음!");
-    }
-
-    if (resetBtn) {
-        resetBtn.addEventListener("click", function () {
-            resetFilters();
-        });
-    } else {
-        console.error("❌ resetBtn 요소를 찾을 수 없음!");
     }
 
     if (searchKeywordInput) {
@@ -363,3 +376,81 @@ document.getElementById("checkAccountOwnerBtn").addEventListener("click", functi
     .catch(error => console.error("API 요청 실패:", error));
 });
 }
+
+// ✅ 예금주 조회 기능
+function checkAccountOwner() {
+    const bankCode = document.getElementById("bankSelect").value;
+    const accountNumber = document.getElementById("accountNumber").value;
+
+    if (!bankCode || !accountNumber) {
+        alert("⚠️ 은행 및 계좌번호를 입력하세요.");
+        return;
+    }
+
+    fetch(`/api/iamport/account-holder?bankCode=${bankCode}&accountNumber=${accountNumber}`)
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById("accountHolderName").value = data;
+        })
+        .catch(error => console.error("❌ 예금주 조회 실패:", error));
+}
+
+document.getElementById("empRegisterModal").addEventListener("show.bs.modal", function () {
+    populateModalData();  // 모달 공통 코드 데이터 로드
+});
+
+
+// ✅ 모달 공통 코드 데이터 불러와서 채우는 함수
+function populateModalData() {
+    console.log("🔹 모달 공통 코드 데이터 불러오는 중...");
+
+    fetch("/hr/rest/emp/common-codes")
+        .then(response => response.json())
+        .then(data => {
+            if (!data) {
+                console.error("❌ 공통 코드 데이터를 불러오지 못함.");
+                return;
+            }
+
+            console.log("📥 불러온 공통 코드 데이터:", data);
+
+            // ✅ 부서 (Department) 데이터 채우기
+            const departmentSelect = document.getElementById("modalDepartment");
+            departmentSelect.innerHTML = '<option value="">선택</option>';
+            data.departments.forEach(dept => {
+                departmentSelect.innerHTML += `<option value="${dept.DEPARTMENT_NUM}">${dept.DEPARTMENT_NAME}</option>`;
+            });
+
+            // ✅ 하위 부서 (Sub-Department) 데이터 채우기
+            const subDepartmentSelect = document.getElementById("modalSubDepartment");
+            subDepartmentSelect.innerHTML = '<option value="">선택</option>';
+            data.subDepartments.forEach(subDept => {
+                subDepartmentSelect.innerHTML += `<option value="${subDept.SUB_DEPT_NUM}">${subDept.SUB_DEPT_NAME}</option>`;
+            });
+
+            // ✅ 직급 (Position) 데이터 채우기
+            const positionSelect = document.getElementById("modalPosition");
+            positionSelect.innerHTML = '<option value="">선택</option>';
+            data.positions.forEach(pos => {
+                positionSelect.innerHTML += `<option value="${pos.CMMNCODE}">${pos.CMMNNAME}</option>`;
+            });
+
+            // ✅ 근무 유형 (Employment Type) 라디오 버튼 채우기
+            const employmentTypeContainer = document.getElementById("employmentTypeContainer");
+            employmentTypeContainer.innerHTML = '';
+            data.employmentTypes.forEach((type, index) => {
+                const typeId = `employmentType_${index}`;
+                employmentTypeContainer.innerHTML += `
+                    <div class="form-check form-check-inline">
+                        <input type="radio" class="form-check-input" id="${typeId}" name="employmentType" value="${type.CMMNCODE}">
+                        <label class="form-check-label" for="${typeId}">${type.CMMNNAME}</label>
+                    </div>
+                `;
+            });
+
+            console.log("✅ 모달 공통 코드 데이터 적용 완료!");
+        })
+        .catch(error => console.error("❌ 모달 공통 코드 데이터 불러오기 실패:", error));
+}
+
+

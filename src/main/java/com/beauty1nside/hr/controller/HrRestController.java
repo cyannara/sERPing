@@ -30,7 +30,6 @@ import lombok.extern.log4j.Log4j2;
 public class HrRestController {
 	final EmpService empService;
 	
-	
 	@GetMapping("/emp/list")
 	public Object empList(@RequestParam(name = "perPage", defaultValue = "2", required = false) int perPage, 
 			@RequestParam(name = "page", defaultValue = "1", required = false) int page, 
@@ -91,8 +90,24 @@ public class HrRestController {
         String newEmployeeId = empService.getNewEmployeeId(); // 새 사원번호 가져오기
         return ResponseEntity.ok(newEmployeeId);
     }
+    
+//    @GetMapping("/emp/departments")
+//    public ResponseEntity<List<Map<String, Object>>> getDepartments() {
+//        return ResponseEntity.ok(empService.getDepartmentList());
+//    }
 
 
+    // ✅ 새로운 전체 부서 목록 조회 (부서번호 + 부서이름 반환)
+    @GetMapping("/emp/department-list")
+    public ResponseEntity<List<Map<String, Object>>> getDepartmentList() {
+        return ResponseEntity.ok(empService.getDepartmentList());
+    }
+
+    // ✅ 하위 부서 목록 조회
+    @GetMapping("/emp/sub-departments")
+    public ResponseEntity<List<Map<String, Object>>> getSubDepartments(@RequestParam("departmentNum") String departmentNum) {
+        return ResponseEntity.ok(empService.getSubDepartments(departmentNum));
+    }
 
 
 }
