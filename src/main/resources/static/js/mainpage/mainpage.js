@@ -33,19 +33,19 @@ getApprovalType()
 
 function reset(){
     let documentType = document.querySelector('#documentType');
-    let requester = document.querySelector('#requester');
+    let employeeName = document.querySelector('#employeeName');
 
     documentType.value = '';
-    requester.value = '';
+    employeeName.value = '';
 
-    grid.setRequestParams({ "documentType" : documentType.value, "requester" : requester.value })
+    grid.setRequestParams({ "documentType" : documentType.value, "employeeName" : employeeName.value })
     grid.readData();
 }
 
 function search(){
     let documentType = document.querySelector('#documentType').value.toString();
-    let requester = document.querySelector('#requester').value.toString();
-    grid.setRequestParams({"documentType" : documentType, "requester" : requester })
+    let employeeName = document.querySelector('#employeeName').value.toString();
+    grid.setRequestParams({"documentType" : documentType, "employeeName" : employeeName })
     grid.readData();
 }
 
