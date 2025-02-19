@@ -8,8 +8,6 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.web.csrf.CsrfToken;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,7 +29,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -177,7 +174,7 @@ public class ErpAdminRestController {
 		
 		log.info("requestData Map: " + requestData.toString());
 		
-		Boolean isBoolean = erpAdminService.updateServiceInfo(requestData);
+		boolean isBoolean = erpAdminService.updateServiceInfo(requestData);
 	    if(isBoolean) {
 	    	return "OK";
 	    }else {

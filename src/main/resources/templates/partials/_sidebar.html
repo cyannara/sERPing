@@ -123,9 +123,10 @@
         </li>
       </ul>
   </div>
-
-
-
+	<div
+		th:if="${#strings.equals('account', param.menu) or #strings.equals('account', menu)}">
+		<span class="menu-title">account</span>
+	</div>
 
 
 
