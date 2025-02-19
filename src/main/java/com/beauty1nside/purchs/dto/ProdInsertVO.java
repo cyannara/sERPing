@@ -2,6 +2,9 @@ package com.beauty1nside.purchs.dto;
 
 import java.util.List;
 
+import lombok.Data;
+
+@Data
 public class ProdInsertVO {
 
 	//프로시저 보낼 값들 순서대로 정렬해서 지정 

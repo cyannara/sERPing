@@ -61,6 +61,17 @@ public class ErpUserRestController {
 	}
 	
 	/**
+     * 회사 계약 상태 여부를 내보냄
+     *
+     * @param int
+     * @return int
+     */
+	@GetMapping("/subcontact/{compnayNum}")
+	public int subcontact(@PathVariable(name="compnayNum") int compnayNum){
+		return erpUserService.subcontact(compnayNum);
+	}
+	
+	/**
      * 회사 인사인원 확인
      *
      * @param int
@@ -95,15 +106,28 @@ public class ErpUserRestController {
         return response;
     }
 	/**
-     * 기간 구독 결제를 처리한다
+     * 기간구독 결제를 처리한다
      *
      * @return Map<String, String>
      */
 	@PostMapping("/periodservicepay")
 	public String periodservicepay(@RequestBody Map<String, Object> requestData) {
-			//log.info("결제정보 : "+requestData);
-			erpUserService.periodservicepay(requestData);
-			return null;
+		//log.info("결제정보 : "+requestData);
+		int num = erpUserService.periodservicepay(requestData);
+		if(num == 1) {
+			return "OK";
+		}
+		return "NO";
 	}
 	
+	/**
+     * 그룹웨어 옵션 정보를 불러온다
+     *
+     * @param int
+     * @return int
+     */
+	@GetMapping("/subgp/{compnayNum}")
+	public int subgp(@PathVariable(name="compnayNum") int compnayNum){
+		return erpUserService.gpoptioninfo(compnayNum);
+	}
 }

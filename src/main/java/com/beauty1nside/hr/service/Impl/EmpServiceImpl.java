@@ -93,9 +93,43 @@ public class EmpServiceImpl implements EmpService {
         String newEmployeeId = today + String.format("%03d", newSeq);
         empDTO.setEmployeeId(newEmployeeId);
 
-        // 사원 등록
+        // ✅ 비밀번호 암호화 (예제: "beauty1nside"를 기본 비밀번호로 설정)
+        if (empDTO.getPosition() == null) empDTO.setEmployeePw("0000");  // 기본 비밀번호
+
+        // ✅ 기본값 설정 (공통 코드 적용)
+        if (empDTO.getPosition() == null) empDTO.setPosition("PO001");  // 기본 직급
+        if (empDTO.getAuthority() == null) empDTO.setAuthority("AU004"); // 기본 권한
+        if (empDTO.getStatus() == null) empDTO.setStatus("ST001");       // 재직 상태
+        if (empDTO.getEmploymentType() == null) empDTO.setEmploymentType("ET001");
+
+        // ✅ 데이터 저장
         empMapper.insertEmployee(empDTO);
+        
+        
     }
+
+	@Override
+	public List<String> getDepartments() {
+		// TODO Auto-generated method stub
+		return empMapper.getDepartments(); // ✅ 기존 방식 유지
+	}
+
+	@Override
+	public List<Map<String, Object>> getDepartmentList() {
+		// TODO Auto-generated method stub
+		return empMapper.getDepartmentList(); // ✅ 새로운 방식 추가
+	}
+
+	@Override
+	public List<Map<String, Object>> getSubDepartments(String departmentNum) {
+		// TODO Auto-generated method stub
+		return empMapper.getSubDepartments(departmentNum); // ✅ 하위 부서 조회 추가
+	}
+    
+    
+    
+
+
 
 
 

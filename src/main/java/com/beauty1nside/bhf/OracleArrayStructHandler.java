@@ -29,12 +29,13 @@ public class OracleArrayStructHandler implements TypeHandler<Object> {
 
 	@Override
 	public void setParameter(PreparedStatement ps, int i, Object parameter,	JdbcType jdbcType) throws SQLException {
-		if (parameter == null)
-			return;
-		OracleConnection conn = ps.getConnection().unwrap(OracleConnection.class); 	
+		if (parameter == null) return;
+		
+		OracleConnection conn = ps.getConnection().unwrap(OracleConnection.class); 
+		
 		List<BhfOrdDtlVO> files = (List<BhfOrdDtlVO>)parameter;
-		//배열의 크기를 6으로 지정
-	    Object[] filetype = new Object[6]; 
+		
+	    Object[] filetype = new Object[6]; //필드의 크기가 6, 배열의 크기를 6으로 지정
 	    Struct[] array = new Struct[files.size()];
 
 	    int arrayIndex = 0;

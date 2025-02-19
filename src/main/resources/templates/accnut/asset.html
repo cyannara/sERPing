@@ -5,7 +5,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
 <meta charset="UTF-8">
-<title>자산관리</title>
+<title>자산관리</title>    
 </head>
 <body layout:fragment="content">
 	<div class="container">
@@ -72,7 +72,7 @@
 		<!-- 하부 버튼 -->
 		<div class="button-bar row">
 			<div class="col-1"></div>
-			<button type="button" class="btn btn-primary col-1">Excel</button>
+			<button type="button" class="btn btn-primary col-1 btnExcel">Excel</button>
 			<button type="button" class="btn btn-secondary col-1">PDF</button>
 			<div class="col-7"></div>
 			<!-- 등록 모달 띄울 버튼 -->
@@ -114,6 +114,9 @@
 	document.addEventListener("DOMContentLoaded",()=>{
 		gotobtn();
 		getInfo();
+		downExcel();
+		
+		
 	})
 	var typeOfSection = "";
 	
@@ -215,6 +218,18 @@
 				rowData = grid.getRow(idx);
 			})
 		})
+	}
+	
+	function downExcel(){
+		let btnExcel = document.querySelector('.btnExcel');
+		btnExcel.addEventListener("click", function () {
+		       const options = {
+		         				includeHiddenColumns: true,
+		         				//onlySelected: true,
+		         				fileName: 'asset',
+		       					};
+		       grid.export('xlsx', options);
+	     })
 	}
 	
 	

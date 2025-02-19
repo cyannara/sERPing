@@ -114,17 +114,19 @@
     <!-- 버튼 영역 -->
     <div class="row mt-3">
         <div class="col text-start">
-            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#empRegisterModal" onclick="openEmployeeForm()">사원 등록</button>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#empRegisterModal">사원 등록</button>
             <button class="btn btn-danger" onclick="deleteEmployee()">삭제</button>
         </div>
     </div>
 </div>
 
 <!-- 사원 관리 및 Toast Grid 설정 -->
+<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script src="/js/hr/employee.js"></script>
 <script src="/js/hr/common-codes.js"></script>
+<script src="/js/hr/emp_register_modal.js"></script>
 
-<div th:insert="~{hr/emp_register_modal :: empRegisterModal}"></div>
+<div th:replace="~{hr/emp_register_modal :: empRegisterModal}"></div>
 
 </body>
 </html>

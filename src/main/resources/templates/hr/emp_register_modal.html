@@ -87,181 +87,212 @@
 </head>
 
 <body>
-
-	<!--  사원 등록 모달 -->
-	<div th:fragment="empRegisterModal" class="modal fade"
-		id="empRegisterModal" tabindex="-1"
-		aria-labelledby="employeeRegisterLabel" aria-hidden="true">
-		<div class="modal-dialog modal-lg modal-dialog-centered">
-			<div class="modal-content shadow">
-				<!-- 모달 헤더 -->
-				<div class="modal-header bg-light">
-					<h5 class="modal-title fw-bold text-primary">사원 등록</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-				</div>
-
-				<!-- 모달 바디 -->
-				<div class="modal-body">
-					<!-- 기본정보 & 추가정보 탭 -->
-					<ul class="nav nav-tabs">
-						<li class="nav-item"><a class="nav-link active"
-							id="basic-tab" data-bs-toggle="tab" href="#basic-info">기본정보</a></li>
-						<li class="nav-item"><a class="nav-link" id="additional-tab"
-							data-bs-toggle="tab" href="#additional-info">추가정보</a></li>
-					</ul>
-
-					<div class="tab-content p-3">
-						<!--  기본정보 -->
-						<div class="tab-pane fade show active" id="basic-info">
-							<div class="row">
-								<!-- 프로필 이미지 -->
-								<div class="col-md-3 text-center">
-									<label for="profileImage"> <img
-										src="https://via.placeholder.com/150" class="profile-image"
-										id="profilePreview" alt="프로필 이미지">
-									</label> <input type="file" id="profileImage" class="d-none">
-									<button class="btn btn-sm btn-outline-secondary mt-2">📷
-										변경</button>
-								</div>
-
-								<!-- 사원 정보 입력 -->
-								<div class="col-md-9">
-									<div class="mb-2">
-										<label class="fw-bold">사원번호</label>
-										<div class="d-flex align-items-center">
-											<input type="text" class="form-control me-2"
-												id="employeeIdInput" disabled>
-
+	<form id="empRegisterForm">
+		<!--  사원 등록 모달 -->
+		<div th:fragment="empRegisterModal" class="modal fade"
+			id="empRegisterModal" tabindex="-1"
+			aria-labelledby="employeeRegisterLabel" aria-hidden="true">
+			<div class="modal-dialog modal-lg modal-dialog-centered">
+				<div class="modal-content shadow">
+				
+					<!-- 모달 헤더 -->
+					<div class="modal-header bg-light">
+						<h5 class="modal-title fw-bold text-primary">사원 등록</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+					</div>
+	
+					<!-- 모달 바디 -->
+					<div class="modal-body">
+						<!-- 기본정보 & 추가정보 탭 -->
+						<ul class="nav nav-tabs">
+							<li class="nav-item"><a class="nav-link active"
+								id="basic-tab" data-bs-toggle="tab" href="#basic-info">기본정보</a></li>
+							<li class="nav-item"><a class="nav-link" id="additional-tab"
+								data-bs-toggle="tab" href="#additional-info">추가정보</a></li>
+						</ul>
+	
+						<div class="tab-content p-3">
+							<!--  기본정보 -->
+							<div class="tab-pane fade show active" id="basic-info">
+								<div class="row">
+									<!-- 프로필 이미지 -->
+									<div class="col-md-3 text-center">
+										<label for="profileImage"> <img
+											src="https://via.placeholder.com/150" class="profile-image"
+											id="profilePreview" alt="프로필 이미지">
+										</label> <input type="file" id="profileImage" class="d-none">
+										<button class="btn btn-sm btn-outline-secondary mt-2">📷
+											등록</button>
+									</div>
+	
+									<!-- 사원 정보 입력 -->
+									<div class="col-md-9">
+										<div class="mb-2">
+											<label class="fw-bold">사원번호</label>
+											<div class="d-flex align-items-center">
+												<input type="text" class="form-control me-2"
+													id="employeeIdInput" disabled>
+	
+											</div>
+										</div>
+										<div class="mb-2">
+											<label class="fw-bold">사원명</label> <input type="text"
+												class="form-control">
+										</div>
+										
+										<div class="mb-2">
+										    <label class="fw-bold">이메일</label>
+										    <div class="input-group">
+										        <!-- 이메일 아이디 입력 필드 -->
+										        <input type="text" id="emailInput" class="form-control">
+										        <span class="input-group-text" id="emailAt">@</span>
+										
+										        <!-- 도메인 선택 -->
+										        <select id="emailDomainSelect" class="form-select">
+										            <option value="">선택</option>
+										            <option value="custom">직접 입력</option>
+												    <option value="naver.com">naver.com</option>
+												    <option value="gmail.com">gmail.com</option>
+												    <option value="daum.net">daum.net</option>
+												    <option value="nate.com">nate.com</option>
+												    <option value="hotmail.com">hotmail.com</option>
+												    <option value="outlook.com">outlook.com</option>
+												    <option value="yahoo.com">yahoo.com</option>
+												    <option value="kakao.com">kakao.com</option>
+												    <option value="hanmail.net">hanmail.net</option>
+												    <option value="icloud.com">icloud.com</option>
+												    <option value="korea.com">korea.com</option>
+										        </select>
+										    </div>
+										</div>
+	
+										<div class="mb-2">
+											<label class="fw-bold">연락처</label>
+											<div class="d-flex">
+												<input type="text" class="form-control me-1"
+													style="width: 30%;"> <input type="text"
+													class="form-control me-1" style="width: 30%;"> <input
+													type="text" class="form-control" style="width: 40%;">
+											</div>
+										</div>
+										<div class="mb-2">
+											<label class="fw-bold">입사일</label> <input type="date"
+												class="form-control">
+										</div>
+										
+										<div class="row mb-2 align-items-center">
+											<!-- 부서 -->
+											<div class="col-md-6">
+											    <label class="fw-bold">부서</label>
+											    <select class="form-select" id="modalDepartment"></select>
+											</div>
+										
+											<!-- 하위 부서 -->
+											<div class="col-md-6">
+											    <label class="fw-bold">하위 부서</label>
+											    <select class="form-select" id="modalSubDepartment"></select>
+											</div>
+										</div>
+										
+										<!-- 직급 -->
+										<div class="mb-2">
+										    <label class="fw-bold">직급</label>
+										    <select class="form-select" id="modalPosition"></select>
+										</div>
+										
+										<div class="mb-2">
+											<label class="fw-bold">근무유형</label>
+											<div id="employmentTypeContainer"></div>
 										</div>
 									</div>
-									<div class="mb-2">
-										<label class="fw-bold">사원명</label> <input type="text"
-											class="form-control">
-									</div>
-									<div class="mb-2">
-										<label class="fw-bold">이메일</label>
+								</div>
+							</div>
+	
+							<!--  추가정보 -->
+							<div class="tab-pane fade" id="additional-info">
+								<!--  추가정보 탭 -->
+								<div class="row">
+									<!-- 급여 -->
+									<div class="col-md-12 mb-3">
+										<label class="fw-bold">급여</label>
 										<div class="input-group">
-											<input type="text" class="form-control"> <span
-												class="input-group-text">@</span> <select
-												class="form-select">
-												<option>naver.com</option>
-												<option>gmail.com</option>
-												<option>daum.net</option>
-											</select>
-										</div>
-									</div>
-									<div class="mb-2">
-										<label class="fw-bold">연락처</label>
-										<div class="d-flex">
-											<input type="text" class="form-control me-1"
-												style="width: 30%;"> <input type="text"
-												class="form-control me-1" style="width: 30%;"> <input
-												type="text" class="form-control" style="width: 40%;">
-										</div>
-									</div>
-									<div class="mb-2">
-										<label class="fw-bold">입사일</label> <input type="date"
-											class="form-control">
-									</div>
-									
-									<div class="mb-2">
-										<label class="fw-bold">부서</label> <select class="form-select">
-											<option>없음</option>
-											<option>인사</option>
-											<option>영업</option>
-										</select>
-									</div>
-									
-									<div class="mb-2">
-										<label class="fw-bold">직급</label> <select class="form-select">
-											<option>없음</option>
-											<option>사원</option>
-											<option>대리</option>
-										</select>
-									</div>
-									
-									<div class="mb-2">
-										<label class="fw-bold">근무유형</label>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input"
-												name="employmentType" checked> <label
-												class="form-check-label">정규직</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input"
-												name="employmentType"> <label
-												class="form-check-label">계약직</label>
+											<select class="form-select" style="max-width: 120px;">
+												<option>월급</option>
+											</select> <input type="text" class="form-control" placeholder="0">
 										</div>
 									</div>
 								</div>
-							</div>
-						</div>
-
-						<!--  추가정보 -->
-						<div class="tab-pane fade" id="additional-info">
-							<!--  추가정보 탭 -->
-							<div class="row">
-								<!-- 급여 -->
+	
+								<div class="row">
+									<!-- 급여계좌 -->
+									<div class="col-md-12 mb-3">
+									    <label class="fw-bold">급여계좌</label>
+									    <div class="input-group">
+									        <select class="form-select" id="bankSelect">
+									            <option value="">선택</option>
+									            <option value="004">KB국민은행</option>
+									            <option value="088">신한은행</option>
+									            <option value="020">우리은행</option>
+									            <option value="081">하나은행</option>
+									            <option value="011">NH농협은행</option>
+									            <option value="003">IBK기업은행</option>
+									            <option value="023">SC제일은행</option>
+									            <option value="032">부산은행</option>
+									            <option value="031">대구은행</option>
+									            <option value="089">케이뱅크</option>
+									            <option value="090">카카오뱅크</option>
+									        </select>
+									        <input type="text" class="form-control" id="accountNumber" placeholder="계좌번호 '-' 제외">
+									        <input type="text" class="form-control" id="birthDate" placeholder="생년월일 8자리">
+									        <button class="btn btn-outline-primary" id="checkAccountOwnerBtn">🔍 예금주 확인</button>
+									    </div>
+									    <input type="text" class="form-control mt-2" id="accountHolderName" placeholder="예금주" readonly>
+									</div>
+								</div>
+	
+								<!-- 주소 -->
 								<div class="col-md-12 mb-3">
-									<label class="fw-bold">급여</label>
-									<div class="input-group">
-										<select class="form-select" style="max-width: 120px;">
-											<option>월급</option>
-										</select> <input type="text" class="form-control" placeholder="0">
-									</div>
+								    <label class="fw-bold">주소</label>
+								    <div class="input-group">
+								        <button class="btn btn-outline-secondary" type="button" onclick="openPostcode()">📌 우편번호 검색</button>
+								        <input type="text" class="form-control" id="zipcode" placeholder="우편번호" readonly>
+								    </div>
+								    <input type="text" class="form-control mt-2" id="address" placeholder="기본 주소" readonly>
+								    <input type="text" class="form-control mt-2" id="addressDetail" placeholder="상세주소 입력">
 								</div>
-							</div>
-
-							<div class="row">
-								<!-- 급여계좌 -->
+	
+								<!-- 메모 -->
 								<div class="col-md-12 mb-3">
-									<label class="fw-bold">급여계좌</label>
-									<div class="input-group">
-										<select class="form-select" style="max-width: 150px;">
-											<option>선택</option>
-											<option>국민은행</option>
-											<option>신한은행</option>
-											<option>우리은행</option>
-										</select> <input type="text" class="form-control"
-											placeholder="계좌번호 '-' 제외하고 입력"> <input type="text"
-											class="form-control" placeholder="예금주">
-										<button class="btn btn-outline-primary">🔍 예금주 조회</button>
+									<label class="fw-bold">메모</label>
+									<textarea class="form-control" rows="4" id="memo" placeholder="필요시 메모하세요."
+										maxlength="100"></textarea>
+									<div class="text-end text-muted">
+										<small>0/100자</small>
 									</div>
-								</div>
-							</div>
-
-							<!-- 주소 -->
-							<div class="col-md-12 mb-3">
-								<label class="fw-bold">주소</label>
-								<div class="input-group">
-									<button class="btn btn-outline-secondary">📌 우편번호 검색</button>
-									<input type="text" class="form-control" placeholder="기본 주소">
-								</div>
-								<input type="text" class="form-control mt-2"
-									placeholder="상세주소 입력">
-							</div>
-
-							<!-- 메모 -->
-							<div class="col-md-12 mb-3">
-								<label class="fw-bold">메모</label>
-								<textarea class="form-control" rows="4" placeholder="필요시 메모하세요."
-									maxlength="100"></textarea>
-								<div class="text-end text-muted">
-									<small>0/100자</small>
 								</div>
 							</div>
 						</div>
 					</div>
-				</div>
-
-				<!--  모달 푸터 -->
-				<div class="modal-footer bg-light">
-					<button class="btn btn-outline-secondary btn-icon">초기화</button>
-					<button class="btn btn-danger btn-icon" data-bs-dismiss="modal">취소</button>
-					<button class="btn btn-primary btn-icon">등록</button>
+	
+					<!--  모달 푸터 -->
+					<div class="modal-footer bg-light">
+						<button class="btn btn-outline-secondary btn-icon" type="reset" id="resetBtn">초기화</button>
+						<button class="btn btn-danger btn-icon" data-bs-dismiss="modal">취소</button>
+						<button class="btn btn-primary btn-icon" id="registerEmployeeBtn">등록</button>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
+	</form>
+	
+	<script>
+
+
+	</script>
+
+	<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+	<script src="/js/hr/common-codes.js"></script>
+	<script src="/js/hr/emp_register_modal.js"></script>
+
 </body>
 </html>
