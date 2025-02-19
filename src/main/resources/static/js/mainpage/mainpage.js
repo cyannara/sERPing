@@ -89,12 +89,20 @@ async function downloadPDF(dataset) {
 }
 
 const processApproval = (inApprovalId, processStr) => {
+    const header = document.querySelector('meta[name="_csrf_header"]').content;
+    const token = document.querySelector('meta[name="_csrf"]').content;
+
+    const reason = document.getElementById('rejectReason').value
+
     const url = `/mainpage/rest/approval/${inApprovalId}/process/${processStr}`;
     fetch(url, {
-        method: "GET",
+        method: "POST",
         headers: {
+            'header': header,
             "Content-Type": "application/json",
-        }
+            'X-CSRF-Token': token
+        },
+        body: reason
     })
         .then(result => result.json())
         .then(data => {

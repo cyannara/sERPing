@@ -10,6 +10,6 @@ public interface ApprovalService {
   ApprovalDTO info(Long inApprovalId, Long companyNum);
   List<ApprovalDTO> waitingList(ApprovalSearchDTO dto, Long companyNum);
   int count(ApprovalSearchDTO dto, Long companyNum);
-  int update(Long inApprovalId, String processStr, Long companyNum);
+  int update(Long inApprovalId, String processStr, Long companyNum, String reason);
   List<DocumentDTO> documentList(Long companyNum);
 }

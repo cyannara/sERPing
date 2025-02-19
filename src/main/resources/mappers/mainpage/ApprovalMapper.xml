@@ -22,7 +22,7 @@
 			set in_approval_status = 'APPROVED'
 		</if>
 		<if test="processStr == 'reject'">
-			set in_approval_status = 'REJECTED'
+			set in_approval_status = 'REJECTED', IN_APPROVAL_REJECTED_CONTENT = #{reason}
 		</if>
 		where company_num = #{companyNum}
 			and in_approval_id = #{inApprovalId}

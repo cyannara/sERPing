@@ -34,8 +34,8 @@ public class ApprovalServiceImpl implements ApprovalService{
 	}
 	
 	@Override
-	public int update(Long inApprovalId, String processStr, Long companyNum) {
-		return approvalMapper.update(inApprovalId, processStr, companyNum);
+	public int update(Long inApprovalId, String processStr, Long companyNum, String reason) {
+		return approvalMapper.update(inApprovalId, processStr, companyNum, reason);
 	}
 	
 	@Override

@@ -69,12 +69,13 @@ public class MainpageRestController {
     return approvalService.info(approvalId, companyNum);
   }
   
-  @GetMapping("/approval/{id}/process/{processStr}")
+  @PostMapping("/approval/{id}/process/{processStr}")
   public int processApproval(@PathVariable("id") Long approvalId,
-                                     @PathVariable("processStr") String processStr,
-                                        @AuthenticationPrincipal CustomerUser user) {
+                             @PathVariable("processStr") String processStr,
+                             @RequestBody String reason,
+                              @AuthenticationPrincipal CustomerUser user) {
     Long companyNum = user.getUserDTO().getCompanyNum();
-    return approvalService.update(approvalId, processStr, companyNum);
+    return approvalService.update(approvalId, processStr, companyNum, reason);
   }
   
   @GetMapping("/approval/type")
