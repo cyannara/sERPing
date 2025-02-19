@@ -116,23 +116,24 @@ order by classification_id desc
 
 <!-- 상품 등록 프로시저 호출  -->
 <insert id="goodsinsert" statementType="CALLABLE">
-	call purchs_product_register(
-		#{goodsName},
-		#{goodsCost}
-	    #{goodsPrice},
-	    #{goodsSupplyPrice},
-	    #{goodsStandard},
-	    #{goodsDescription},
-	    #{goodsImage},
-	    #{classificationId},  
-	    #{brandId},
-	    #{employeeNum},
-	    #{vendorId},
-	    #{companyNum},
-	    #{files,typeHandler=com.beauty1nside.purchs.OracleArrayProductHandler}  
-	)
-	
+    {CALL purchs_product_register(
+        #{goodsName, mode=IN, jdbcType=VARCHAR},
+        #{goodsCost, mode=IN, jdbcType=NUMERIC},
+        #{goodsPrice, mode=IN, jdbcType=NUMERIC},
+        #{goodsSupplyPrice, mode=IN, jdbcType=NUMERIC},
+        #{goodsStandard, mode=IN, jdbcType=VARCHAR},
+        #{goodsDescription, mode=IN, jdbcType=VARCHAR},
+        #{goodsImage, mode=IN, jdbcType=VARCHAR},
+        #{classificationId, mode=IN, jdbcType=NUMERIC},
+        #{brandId, mode=IN, jdbcType=NUMERIC},
+        #{employeeNum, mode=IN, jdbcType=NUMERIC},
+        #{vendorId, mode=IN, jdbcType=NUMERIC},
+        #{companyNum, mode=IN, jdbcType=NUMERIC},
+        #{files, mode=IN, jdbcType=ARRAY, typeHandler=com.beauty1nside.purchs.OracleArrayProductHandler}
+    )}
 </insert>
+
+
 
 
 </mapper>
