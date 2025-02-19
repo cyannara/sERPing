@@ -35,6 +35,14 @@ public interface ErpUserMapper {
 	public List<erpSubscriptionInfoListDTO> sublist(int comapnyNum);
 	
 	/**
+     * 회사 계약 상태 여부를 내보냄
+     *
+     * @param int
+     * @return int
+     */
+	public int subcontact(int comapnyNum);
+	
+	/**
      * 회사 인사인원 확인
      *
      * @param int
@@ -84,5 +92,29 @@ public interface ErpUserMapper {
      * @return erpSubscriptionInfoListDTO
      */
 	public erpSubscriptionInfoListDTO subinfo(@Param("companyNum") int companyNum, @Param("subnamenum1") int subnamenum1, @Param("subnamenum2") int subnamenum2);
+	
+	/**
+     * 구독정보를 업데이트 한다 (기간구독)
+     *
+     * @param erpSubscriptionInfoListDTO
+     * @return void
+     */
+	public void prosubupdate(erpSubscriptionInfoListDTO dto);
+	
+	/**
+     * 구독정보를 인서트 한다 (기간구독)
+     *
+     * @param erpSubscriptionInfoListDTO
+     * @return void
+     */
+	public void prosubinsert(erpSubscriptionInfoListDTO dto);
+	
+	/**
+     * 그룹웨어 옵션 정보를 불러온다
+     *
+     * @param int
+     * @return int
+     */
+	public int gpoptioninfo(int comapnyNum);
 	
 }

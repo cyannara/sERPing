@@ -200,7 +200,7 @@
 					            <th>
 					                <select class="select-box" id="payment-method">
 					                    <option value="카드결제">카드결제</option>
-					                    <option value="계좌이체">계좌이체</option>
+					                    <!-- <option value="계좌이체">계좌이체</option> -->
 					                </select>
 					            </th>
 					        </tr>
@@ -243,7 +243,7 @@
             tag = "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp";
             if(window.subscriptionState.groupObj == "date"){
             	let hrpersonnel = await hr_list([[${session.companyNum}]]);
-            	tag += `그룹웨어 직원 ${hrpersonnel}명 입니다.`;
+            	tag += `[${window.subscriptionState.gpOption}명 서비스 사용중 / 현재사원 ${hrpersonnel}명]`;
             	if(hrpersonnel > 100){
             		document.querySelector("#group-sub-50").remove();
             		document.querySelector("#group-sub-100").remove();
@@ -255,7 +255,7 @@
             	tag += `현재 정기 구독중 입니다. [결제 불가 합니다]`;
             }
             document.querySelector(".subgroup").insertAdjacentHTML("beforeend", tag);
-            console.log(tag);
+            //console.log(tag);
             
           //인사, 지점, 회계 서비스 현황
           tag = "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp";
@@ -266,7 +266,7 @@
         
         async function hr_list(data){
         	const url = "/erp/rest/hrlist/"+data;
-        	console.log(url);
+        	//console.log(url);
         	return fetch( url, {
         			method:"get",
         			headers: {
@@ -280,50 +280,73 @@
         	})
         }
         
-     // 구독기간에 맞게 가격을 변경
+     	// 구독기간에 맞게 가격을 변경
         function remake_date(redate) {
-            let newdate = window.subscriptionState.subObjdate + redate;
-            //가격 변경 대상 및 배수 설정
-            const elementsToUpdate = [
-                { selector: "#group-sub-100", multiplier: 1000 },
-                { selector: "#group-sub-limit", multiplier: 2000 },
-                { selector: "#hr-sub-custom", multiplier: 500 },
-                { selector: "#branch-sub-custom", multiplier: 500 },
-                { selector: "#account-sub-custom", multiplier: 500 }
-            ];
+    let baseDate = window.subscriptionState.subObjdate + redate;
+    //console.log("현재구독기간:", baseDate);
 
-            elementsToUpdate.forEach(({ selector, multiplier }) => {
-                let element = document.querySelector(selector);
-                if (element) {
-                    let parentLabel = element.parentElement;
-                    let labelHTML = parentLabel.innerHTML;
+    // 가격 변경 대상 및 배수 설정
+    const elementsToUpdate = [
+        { selector: "#group-sub-100", key: "groupObjdate", multiplier: 1000 },
+        { selector: "#group-sub-limit", key: "groupObjdate", multiplier: 2000 },
+        { selector: "#hr-sub-custom", key: "hrObjdate", multiplier: 500 },
+        { selector: "#branch-sub-custom", key: "pointObjdate", multiplier: 500 },
+        { selector: "#account-sub-custom", key: "accountObjdate", multiplier: 500 }
+    ];
 
-                    // 정규식을 사용하여 모든 가격(숫자 + "원")을 찾아 새로운 가격으로 변경
-                    let updatedHTML = labelHTML.replace(/\d{1,3}(,\d{3})*원/g, (newdate * multiplier).toLocaleString() + "원");
+    elementsToUpdate.forEach(({ selector, key, multiplier }) => {
+        let adjustedDate = baseDate - (window.subscriptionState[key] || 0);
+        let element = document.querySelector(selector);
+        
+        if (element) {
+            let parentLabel = element.parentElement;
+            let updatedPrice;
 
-                    // 변경된 HTML을 다시 적용
-                    parentLabel.innerHTML = updatedHTML;
-                }
-            });
-            // 라디오 버튼 표시 설정 (단일 forEach 루프 사용으로 중복 제거)
-            const radioGroups = [
-                { minDays: 30, selectors: ["#hr-sub-30", "#branch-sub-30", "#account-sub-30"] },
-                { minDays: 90, selectors: ["#hr-sub-90", "#branch-sub-90", "#account-sub-90"] },
-                { minDays: 180, selectors: ["#hr-sub-180", "#branch-sub-180", "#account-sub-180"] },
-                { minDays: 360, selectors: ["#hr-sub-360", "#branch-sub-360", "#account-sub-360"] }
-            ];
-            radioGroups.forEach(({ minDays, selectors }) => {
-                selectors.forEach(selector => {
-                    let element = document.querySelector(selector);
-                    if (element) {
-                        let label = element.closest("label"); // input을 감싸는 label 요소 찾기
-                        if (label) {
-                            label.style.display = newdate < minDays ? "none" : "inline-block"; // label을 직접 숨기거나 표시
-                        }
-                    }
-                });
-            });
+            // 특정 옵션 적용 시 가격 조정
+            if (window.subscriptionState.gpOption === "100" && selector === "#group-sub-limit") {
+                updatedPrice = (redate * multiplier) + (window.subscriptionState.groupObjdate * multiplier / 2);
+            } else {
+                updatedPrice = adjustedDate * multiplier;
+            }
+
+            // 가격 업데이트
+            parentLabel.innerHTML = parentLabel.innerHTML.replace(/\d{1,3}(,\d{3})*원/g, updatedPrice.toLocaleString() + "원");
+
+            //console.log(`업데이트된 가격 (${selector}):`, updatedPrice);
+
+            // 마지막 값이 " 0원"이면 display: none 처리
+            /* if (parentLabel.innerHTML.trim().endsWith("0원")) {
+                parentLabel.style.display = "none";
+            } else {
+                parentLabel.style.display = "inline-block";
+            } */
         }
+    });
+
+    // 라디오 버튼 표시 설정
+    const radioGroups = [
+        { key: "hrObjdate", selectors: ["#hr-sub-30", "#hr-sub-90", "#hr-sub-180", "#hr-sub-360"] },
+        { key: "pointObjdate", selectors: ["#branch-sub-30", "#branch-sub-90", "#branch-sub-180", "#branch-sub-360"] },
+        { key: "accountObjdate", selectors: ["#account-sub-30", "#account-sub-90", "#account-sub-180", "#account-sub-360"] }
+    ];
+
+    radioGroups.forEach(({ key, selectors }) => {
+        let adjustedDate = baseDate - (window.subscriptionState[key] || 0);
+
+        selectors.forEach(selector => {
+            let element = document.querySelector(selector);
+            if (element) {
+                let label = element.closest("label");
+                if (label) {
+                    let minDays = parseInt(selector.match(/\d+/)[0]); // 예: "#hr-sub-30" → 30 추출
+                    label.style.display = adjustedDate < minDays ? "none" : "inline-block";
+                }
+            }
+        });
+    });
+}
+
+
         
 		document.addEventListener("DOMContentLoaded", function () {
 		    document.addEventListener("change", function (event) {
@@ -339,8 +362,8 @@
 		                let selectedValue = target.value; // 선택한 값
 		                let selectedPrice = target.parentElement.textContent.trim(); // 가격 텍스트 가져오기
 	
-		                console.log("선택한 구독:", selectedValue);
-		                console.log("가격:", selectedPrice);
+		                //console.log("선택한 구독:", selectedValue);
+		                //console.log("가격:", selectedPrice);
 		                
 		                updateSubscriptionSummary();
 		            }
@@ -489,7 +512,8 @@ document.querySelector(".periodpaygo").addEventListener("click", async function 
 		.then( result => {
 			console.log("결제 결과" + result);
 			if(result==="OK"){
-				alert("기간 구독에 성공 했습니다");
+				alert("★성공★ 했습니다");
+				//이때 페이지를 이동 시켜버리자!!!
 			}else{
 				alert("기간 구독에 실패 했습니다");
 			}

@@ -32,6 +32,18 @@
 	</select>
 	
 	<!-- 
+     * 회사 계약 상태 여부를 내보냄
+     *
+     * @param int
+     * @return erpSubscriptionInfoListDTO
+	-->
+	<select id="subcontact">
+		select count(*)
+		from erp_contract_document
+		where company_num = #{companyNum}
+	</select>
+	
+	<!-- 
      * 회사 회원 인원수를 내보냄
      *
      * @param int
@@ -44,7 +56,7 @@
 	</select>
 	
 	<!-- 
-     * 구독목록(결제헤더)를 등록한다
+     * 구독목록(결제헤더)를 등록한다 [ 최초등록 ]
      *
      * @param map
      * @return int
@@ -53,6 +65,7 @@
 		INSERT INTO erp_subscription_list VALUES
 		(erp_subscrpt_seq.nextval, #{companyNum}, #{employeeNum}, DEFAULT, #{paymethod}, null, #{price}, 'ES04', sysdate)
 	</insert>
+	
 	
 	<!-- 
      * 구독목록(결제헤더)의 마지막 결제 기본키를 가져온다
@@ -114,6 +127,58 @@
 		from erp_subscription_info_list
 		where company_num = #{companyNum}
 		and subscription_name_num in ( #{subnamenum1}, #{subnamenum2} )
+	</select>
+	
+	<!-- 
+     * 구독정보를 업데이트 한다 (기간구독)
+     *
+     * @param erpSubscriptionInfoListDTO
+     * @return int
+	-->
+	<update id="prosubupdate" parameterType="erpSubscriptionInfoListDTO">
+		update erp_subscription_info_list
+		<set>
+	    	subscription_update_date = sysdate,
+	        subscription_end_date = #{subscriptionEndDate},
+	        subscription_option_num = #{subscriptionOptionNum},
+	        subscription_name_num = #{subscriptionNameNum},
+	        subscription_form = #{subscriptionForm},
+	    </set>
+	    WHERE subscription_num = #{subscriptionNum}
+	</update>
+	
+	<!-- 
+     * 구독정보를 인서트 한다 (기간구독)
+     *
+     * @param erpSubscriptionInfoListDTO
+     * @return int
+	-->
+	<insert id="prosubinsert" parameterType="erpSubscriptionInfoListDTO">
+		INSERT INTO erp_subscription_info_list VALUES
+		( 
+			erp_subscrpt_info_seq.nextval, 
+			#{companyNum}, 
+			DEFAULT, 
+			#{subscriptionNameNum}, 
+			#{subscriptionOptionNum}, 
+			#{subscriptionEndDate}, 
+			sysdate
+		)
+	</insert>
+	
+	<!-- 
+     * 그룹웨어 옵션 정보를 불러온다
+     *
+     * @param int
+     * @return int
+	-->
+	<select id="gpoptioninfo">
+		select subscription_period
+		from erp_subscription_info_list s
+		left join erp_subscription_option o
+		on s.subscription_option_num = o.subscription_option_num
+		where s.subscription_name_num in (2,7)
+		and s.company_num = #{companyNum}
 	</select>
 
 </mapper>
