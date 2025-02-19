@@ -64,6 +64,53 @@
 				</div></li>
 		</ul>
 	</div>
+	<div th:if="${#strings.equals('hr', param.menu) or #strings.equals('hr', menu)}">
+	    <li class="nav-item">
+	        <a class="nav-link" data-bs-toggle="collapse" href="/hr/employee" aria-expanded="false" aria-controls="hrMenu">
+	            <i class="icon-grid menu-icon"></i>
+	            <span class="menu-title">인사관리</span>
+	            <i class="menu-arrow"></i>
+	        </a>
+	        <div class="collapse" id="hrMenu">
+	            <ul class="nav flex-column sub-menu">
+	                <li class="nav-item">
+	                    <a class="nav-link" href="/hr/employee">사원정보관리</a>
+	                </li>
+	                <li class="nav-item">
+	                    <a class="nav-link" href="/hr/organization">조직도관리</a>
+	                </li>
+	                <li class="nav-item">
+	                    <a class="nav-link" href="/hr/emp_change">인사발령관리</a>
+	                </li>
+	                <li class="nav-item">
+	                    <a class="nav-link" href="/hr/emp_contract">근로계약관리</a>
+	                </li>
+	            </ul>
+	        </div>
+	    </li>
+	</div>
+	<div th:if="${#strings.equals('branch', param.menu) or #strings.equals('branch', menu)}">
+    <ul class="nav">
+        <li class="nav-item">
+          <a class="nav-link" href="/bhf/order">
+            <i class="icon-grid menu-icon"></i>
+            <span class="menu-title">상품 발주 요청</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/bhf/ordList">
+            <i class="icon-grid menu-icon"></i>
+            <span class="menu-title">상품 발주 조회</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/bhf/return">
+            <i class="icon-grid menu-icon"></i>
+            <span class="menu-title">교환 및 반품 요청</span>
+          </a>
+        </li>
+      </ul>
+  </div>
 
 	<div
 		th:if="${#strings.equals('hr', param.menu) or #strings.equals('hr', menu)}">
