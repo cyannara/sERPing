@@ -53,7 +53,7 @@
     <div id="grid"></div>
 
     <!-- 페이지네이션 -->
-    <div class="pagination-container">
+    <!-- <div class="pagination-container">
         <button class="btn btn-outline-secondary">&lt;</button>
         <button class="btn btn-outline-secondary">1</button>
         <button class="btn btn-outline-secondary">2</button>
@@ -61,7 +61,7 @@
         <button class="btn btn-outline-secondary">4</button>
         <button class="btn btn-outline-secondary">5</button>
         <button class="btn btn-outline-secondary">&gt;</button>
-    </div>
+    </div> -->
 
     <!-- 제품 등록 버튼 -->
     <div class="text-end">
@@ -71,28 +71,31 @@
 
 <!-- Toast Grid 스크립트 -->
 <script>
-    const grid = new tui.Grid({
-        el: document.getElementById('grid'),
-        data: [
-            { 상품명: "헤라 선샤인 누드 글로스 5g", 상품번호: "LHR001", 옵션명: "422호 렌제리", 옵션번호: "LHO001", 브랜드: "헤라", 규격: "1 box 6piece", 대표이미지: "<img src='lip.jpg' width='40'>" },
-            { 상품명: "헤라 블랙 쿠션 파운데이션", 상품번호: "FHR001", 옵션명: "17N1", 옵션번호: "LHO002", 브랜드: "헤라", 규격: "1 box 6piece", 대표이미지: "<img src='cushion.jpg' width='40'>" },
-            { 상품명: "헤라 UV프로텍터 멀티디펜스", 상품번호: "BHR001", 옵션명: "50ml", 옵션번호: "LHO003", 브랜드: "헤라", 규격: "1 box 6piece", 대표이미지: "<img src='sunscreen.jpg' width='40'>" }
-        ],
-        columns: [
-            { header: "상품명", name: "상품명", width: 200 },
-            { header: "상품번호", name: "상품번호", width: 100 },
-            { header: "옵션명", name: "옵션명", width: 150 },
-            { header: "옵션번호", name: "옵션번호", width: 100 },
-            { header: "브랜드", name: "브랜드", width: 100 },
-            { header: "규격", name: "규격", width: 120 },
-            { header: "대표이미지", name: "대표이미지", width: 100, align: "center" }
-        ],
-        rowHeaders: ['checkbox'],
-        pageOptions: {
-            useClient: true,
-            perPage: 5
-        }
-    });
+const grid = new tui.Grid({
+    el: document.getElementById('grid'),
+    data: [
+        { 상품명: "헤라 선샤인 누드 글로스 5g", 상품번호: "LHR001", 옵션명: "422호 렌제리", 옵션번호: "LHO001", 브랜드: "헤라", 규격: "1 box 6piece", 대표이미지: "<img src='lip.jpg' width='40'>" },
+        { 상품명: "헤라 선샤인 누드 글로스 5g", 상품번호: "LHR001", 옵션명: "308호 체리쉬", 옵션번호: "LHO002", 브랜드: "헤라", 규격: "1 box 6piece", 대표이미지: "<img src='lip.jpg' width='40'>" },
+        { 상품명: "헤라 선샤인 누드 글로스 5g", 상품번호: "LHR001", 옵션명: "462호 스피치리스", 옵션번호: "LHO003", 브랜드: "헤라", 규격: "1 box 6piece", 대표이미지: "<img src='lip.jpg' width='40'>" },
+        { 상품명: "헤라 블랙 쿠션 파운데이션", 상품번호: "FHR001", 옵션명: "17N1", 옵션번호: "LHO004", 브랜드: "헤라", 규격: "1 box 6piece", 대표이미지: "<img src='cushion.jpg' width='40'>" },
+        { 상품명: "헤라 블랙 쿠션 파운데이션", 상품번호: "FHR001", 옵션명: "21N1", 옵션번호: "LHO005", 브랜드: "헤라", 규격: "1 box 6piece", 대표이미지: "<img src='cushion.jpg' width='40'>" }
+    ],
+    columns: [
+        { header: "상품명", name: "상품명", width: 200, rowSpan: true },  // 상품명 병합
+        { header: "상품번호", name: "상품번호", width: 100, rowSpan: true }, // 상품번호 병합
+        { header: "옵션명", name: "옵션명", width: 150 },
+        { header: "옵션번호", name: "옵션번호", width: 100 },
+        { header: "브랜드", name: "브랜드", width: 100 ,rowSpan: true},
+        { header: "규격", name: "규격", width: 120 ,rowSpan: true },
+        { header: "대표이미지", name: "대표이미지", width: 100, align: "center" ,rowSpan: true }
+    ],
+    rowHeaders: ['checkbox'],
+    pageOptions: {
+        useClient: true,
+        perPage: 5
+    }
+});
+
 </script>
 
 </body>

@@ -23,6 +23,7 @@ public class OracleArrayProductHandler implements TypeHandler<Object> {
 		return null;
 	}
 	
+	
 	@Override
 	public Object getResult(CallableStatement cs, int columnIndex) throws SQLException {
 		return cs.getString(columnIndex);
@@ -34,7 +35,7 @@ public class OracleArrayProductHandler implements TypeHandler<Object> {
 	    if (parameter == null) return;
 
 	   
-	   
+	  
 	    OracleConnection conn = ps.getConnection().unwrap(OracleConnection.class); 	
 
 	    System.out.println("=====>>>>>"+parameter);
