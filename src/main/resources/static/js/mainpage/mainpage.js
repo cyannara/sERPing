@@ -111,3 +111,13 @@ const processApproval = (inApprovalId, processStr) => {
         })
         .catch(error => console.error("Error fetching data:", error));
 }
+
+const doApprove = (buttonApprove) => {
+    const inApprovalId = buttonApprove.dataset.inApprovalId;
+    processApproval(inApprovalId, 'approve')
+}
+
+const doReject = (buttonReject) => {
+    const inApprovalId = buttonReject.dataset.inApprovalId;
+    processApproval(inApprovalId, 'reject')
+}

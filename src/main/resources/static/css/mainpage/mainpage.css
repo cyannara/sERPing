@@ -89,3 +89,23 @@
     }
 
 }
+
+#commonModal {
+    .modal-body {
+        > div {
+            display: none;
+            &.show {
+                display: block;
+            }
+            .warningTxt {
+                display: none;
+                color: red;
+                font-size: 12px;
+                margin-top: 8px;
+                &.show {
+                    display: block;
+                }
+            }
+        }
+    }
+}

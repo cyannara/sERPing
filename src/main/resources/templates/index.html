@@ -102,8 +102,8 @@
                 name: "process",
                 formatter: ({row}) => {
                   return `
-                    <button class="btn btn-approve" data-in-approval-id="${row.inApprovalId}">승인</button>
-                    <button class="btn btn-reject" data-in-approval-id="${row.inApprovalId}">반려</button>`
+                    <button class="btn btn-approve" data-bs-toggle="modal" data-bs-target="#commonModal" data-in-approval-id="${row.inApprovalId}">승인</button>
+                    <button class="btn btn-reject" data-bs-toggle="modal" data-bs-target="#commonModal" data-in-approval-id="${row.inApprovalId}">반려</button>`
                 }
               },
               {
@@ -147,15 +147,13 @@
   });
 
   document.addEventListener("click", function (event) {
-    const buttonApprove = event.target.closest(".btn-approve");
-    const buttonReject = event.target.closest(".btn-reject");
+    let buttonApprove = event.target.closest(".btn-approve");
+    let buttonReject = event.target.closest(".btn-reject");
 
     if (buttonApprove) {
-      const inApprovalId = buttonApprove.dataset.inApprovalId;
-      processApproval(inApprovalId, 'approve')
+      setModalContent('전자 결재 처리', 'approval-approved', '취소', '승인', () => doApprove(buttonApprove))
     } else if(buttonReject) {
-      const inApprovalId = buttonReject.dataset.inApprovalId;
-      processApproval(inApprovalId, 'reject')
+      setModalContent('전자 결재 처리', 'approval-rejected', '취소', '반려', () => doReject(buttonReject))
     }
   });
 
