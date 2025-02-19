@@ -2,16 +2,19 @@ package com.beauty1nside.purchs.service.impl;
 
 import java.util.List;
 
+
 import org.springframework.stereotype.Service;
 
 import com.beauty1nside.purchs.dto.ProductDTO;
 import com.beauty1nside.purchs.dto.ProductSearchDTO;
+import com.beauty1nside.purchs.controller.ProductRestController;
 import com.beauty1nside.purchs.dto.ProdInsertVO;
 import com.beauty1nside.purchs.mapper.productMapper;
 import com.beauty1nside.purchs.service.productService;
 
 import lombok.RequiredArgsConstructor;
-
+import lombok.extern.log4j.Log4j2;
+@Log4j2	//log4j 가 안되면 버전높은 log4j2 사용
 @Service //★이거 무조건 넣어!!
 @RequiredArgsConstructor
 //@AllArgsConstructor	//모든필드를 생성자 초기화 한다
@@ -58,6 +61,7 @@ public class productServiceImpl implements productService{
 
 	@Override
 	public void goodsinsert(ProdInsertVO vo) {
+		log.info("서비스 == {}",vo);
 		productMapper.goodsinsert(vo);
 		
 	}

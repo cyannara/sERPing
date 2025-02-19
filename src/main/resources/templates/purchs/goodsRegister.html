@@ -38,7 +38,7 @@
 <div class="container mt-4" >
 	<h2 class="mb-4">상품 등록</h2>
 	
-    <!-- <form action="/purchs/register" method="post" enctype="multipart/form-data"> -->
+   
     	<!-- <input type="hidden" id="csrfToken" name="_csrf" th:value="${_csrf.token}"> -->
     	<div id="custom-container">
 	    	<div class="row mb-3">
@@ -130,28 +130,27 @@
 	        </div>
 	        
 	      
-	
-	        <div class="row mb-3">
-	            <div class="col-md-6">
-	                <label class="form-label">대표 이미지</label>
-	                  <div class="input-group">
-						    <input type="file" class="form-control" id="goodsImage" accept=".jpg, .jpeg, .png, .pdf" style="width: 400px;">
-						    <button class="btn btn-outline-secondary" type="button" id="uploadImageBtn">업로드</button>
-						</div>
-						
-						<!-- ✅ 업로드된 이미지 파일명을 저장할 hidden input -->
-						<input type="hidden" id="uploadedImageName" name="goodsImage" th:value="${ProductDTO.goodsImage}">
-	        
-	                 	
-	            		
-	            </div>
-	            <div class="col-md-6">
-	                <label class="form-label">상품설명</label>
-	                <div class="input-group">
-	                    <textarea class="form-control" name="goodsDescription" id="goodsDescription" rows="2" th:text="${ProductDTO.goodsDescription}"></textarea>
-	                </div>
-	            </div>
-	        </div>
+			<form action="#" method="post" enctype="multipart/form-data"> 
+		        <div class="row mb-3">
+		            <div class="col-md-6">
+		                <label class="form-label">대표 이미지</label>
+		                  <div class="input-group">
+							    <input type="file" class="form-control" id="goodsImage" name="file" accept=".jpg, .jpeg, .png, .pdf" style="width: 400px;">
+							    <button class="btn btn-outline-secondary" type="button" id="uploadImageBtn">업로드</button>
+							</div>
+							
+							<!-- ✅ 업로드된 이미지 파일명을 저장할 hidden input -->
+							<input type="hidden" id="uploadedImageName" name="goodsImage" th:value="${ProductDTO.goodsImage}">
+		            </div>
+		            <div class="col-md-6">
+		                <label class="form-label">상품설명</label>
+		                <div class="input-group">
+		                    <textarea class="form-control" name="goodsDescription" id="goodsDescription" rows="2" th:text="${ProductDTO.goodsDescription}"></textarea>
+		                </div>
+		            </div>
+		            
+		        </div>
+	        </form>
 		
 		</div>
        
@@ -183,11 +182,12 @@
         </div>
         
       
-    <!--</form>-->
 </div>
 
 <script>
 let grid;
+const header = document.querySelector('meta[name="_csrf_header"]').content;
+const token = document.querySelector('meta[name="_csrf"]').content;
 
 
 
@@ -409,6 +409,7 @@ let grid;
        });
    }
     */
+    //이미지전송 함수
     async function imgSave() {
         const fileInput = document.getElementById("goodsImage");
         const file = fileInput.files[0];
@@ -420,10 +421,14 @@ let grid;
 
         const formData = new FormData();
         formData.append("file", file);
-
+        
         try {
             const response = await fetch("/purchs/rest/product/uploadGoodsImages", {
                 method: "POST",
+                headers: {
+                    'header': header,
+                    'X-CSRF-Token': token
+                },
                 body: formData
             });
 
@@ -436,6 +441,7 @@ let grid;
 
             if (data.success) {
                 console.log("✅ 업로드된 파일명:", data.fileName);
+                document.getElementById("uploadedImageName").value = data.fileName;
                 return data.fileName; // ✅ 파일명 반환
             } else {
                 console.warn("❌ 파일 업로드 실패:", data.message);
@@ -455,8 +461,8 @@ let grid;
                 console.log("✅ 이미지 파일명 저장됨:", uploadedFileName);
 
                 // ✅ 업로드된 파일명을 <input>에 반영
-                document.getElementById("uploadedImageName").value = uploadedFileName;
-                console.log("✅ Hidden Input 값 업데이트됨: ", document.getElementById("uploadedImageName").value);
+                //document.getElementById("uploadedImageName").value = uploadedFileName;
+                //console.log("✅ Hidden Input 값 업데이트됨: ", document.getElementById("uploadedImageName").value);
             } else {
                 console.warn("⚠️ 서버에서 파일명을 반환하지 않았습니다.");
             }
@@ -674,28 +680,84 @@ document.getElementById('warehouseModal').addEventListener('shown.bs.modal', fun
 	    function productInsert(event){
 	    	event.preventDefault();
 	    	
+	    	//토스트 그리드 데이터 불러오기 
+	    	const gridData = grid.getData();
+	    	console.log("그리드데이터=",gridData);
+	    	
+	    	let gridInfo = [];
+	    	for (let i of gridData) {
+	    	    console.log("옵션이름=", i.optionName, "창고이름=", i.warehouseId);
+
+	    	    gridInfo.push({
+	    	        optionName: i.optionName,
+	    	        warehouseId: parseInt(i.warehouseId, 10)
+	    	    });
+	    	}
+	    	
+	    	console.log(gridInfo);
+
+	    	
 	    	//상품 데이터 불러오기 
 	    	
-	    	let prodInfo = {
+	    	 /* let prodInfo = {
 	    		    goodsName: document.querySelector('#goodsName').value, //유효성 체크 
 	    		    goodsCost: parseInt(document.querySelector('#goodsCost')?.value, 10) || 0,
 	    		    goodsPrice: parseInt(document.querySelector('#goodsPrice')?.value, 10) || 0,
 	    		    goodsSupplyPrice: parseInt(document.querySelector('#goodsSupplyPrice')?.value, 10) || 0,
 	    		    goodsGoodsStandard: document.querySelector('#goodsStandard').value, //유효성 체크 
-	    		    goodsdescription : document.querySelector('#goodsdescription')?.value || "",
+	    		    goodsdescription : document.querySelector('#goodsDescription')?.value || "",
 	    		    goodsImage : document.querySelector('#uploadedImageName')?.value || "",
 	    		    classificationId: parseInt(document.querySelector('#classificationId').value, 10),//유효성체크
 	    		    brandId: parseInt(document.querySelector('#brandId').value, 10), //유효성체크
 	    		    employeeNum: parseInt(document.querySelector('#employeeNum').value, 10), //유효성체크
 	    		    vendorId: parseInt(document.querySelector('#vendorId')?.value, 10) || 0,
-	    		    companyNum: parseInt(document.querySelector('#companyNum')?.value, 10) || 0
-	    		};
+	    		    companyNum: parseInt(document.querySelector('#companyNum')?.value, 10) || 0,
+	    		    files : gridInfo
+	    		};  */
+	    	
+	    	 let prodInfo = {
+	    		    goodsName: "dfsfd", //유효성 체크 
+	    		    goodsCost: 456456,
+	    		    goodsPrice: 456456,
+	    		    goodsSupplyPrice: 56545,
+	    		    goodsStandard: "sfdsfdsfd", //유효성 체크 
+	    		    goodsDescription : "sdsfdsfdsfds",
+	    		    goodsImage : "sfdsfdsfds",
+	    		    classificationId: 0,
+	    		    brandId: 5, //유효성체크
+	    		    employeeNum: 1, //유효성체크
+	    		    vendorId: 1,
+	    		    companyNum: 1,
+	    		    files : [{optionName: 'ㄴㄹㅇㄴㄹㄴㅇ', warehouseId: 3},{optionName: 'ㄴㄹㅇㄴㄹ', warehouseId: 4}]
+	    		}; 
 	    	
 	    	console.log("데이터",prodInfo)
 	    	
-	    	//토스트 그리드 데이터 불러오기 
-	    	const gridData = grid.getData();
-	    	console.log("그리드데이터=",gridData);
+	    	fetch("http://localhost:81/purchs/rest/product/insert",{
+	    		method: "POST",
+	    		headers: {
+                    "Content-Type": "application/json",
+                    'X-CSRF-Token': token
+                },
+                body : JSON.stringify(prodInfo) // orderInfo 객체를 JSON 형식으로 변환(JSON.parse는 JSON을 객체로 변환)
+	    	})
+	    	.then(response => response.json())
+	    	.then(data => {
+	    	    if (data.status === "success") {
+	    	        showAlert('상품등록 완료 되었습니다.', 'success');
+	    	        
+	    	        // ✅ 1초 후 페이지 리로딩
+	    	        setTimeout(() => {
+	    	            location.reload();
+	    	        }, 1000);
+	    	        
+	    	    } else {
+	    	        showAlert('상품등록 실패 하였습니다.', 'danger');
+	    	    }
+	    	})
+
+	    	
+	    	
 	    	
 	    }
 
