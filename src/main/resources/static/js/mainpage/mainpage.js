@@ -34,18 +34,34 @@ getApprovalType()
 function reset(){
     let documentType = document.querySelector('#documentType');
     let employeeName = document.querySelector('#employeeName');
+    let inApprovalRequestDateStart = document.querySelector('#inApprovalRequestDateStart');
+    let inApprovalRequestDateEnd = document.querySelector('#inApprovalRequestDateEnd');
 
     documentType.value = '';
     employeeName.value = '';
+    inApprovalRequestDateStart.value = '';
+    inApprovalRequestDateEnd.value = '';
 
-    grid.setRequestParams({ "documentType" : documentType.value, "employeeName" : employeeName.value })
+    grid.setRequestParams({
+        "documentType" : documentType.value,
+        "employeeName" : employeeName.value,
+        "inApprovalRequestDateStart" : inApprovalRequestDateStart.value,
+        "inApprovalRequestDateEnd" : inApprovalRequestDateEnd.value
+    })
     grid.readData();
 }
 
 function search(){
     let documentType = document.querySelector('#documentType').value.toString();
     let employeeName = document.querySelector('#employeeName').value.toString();
-    grid.setRequestParams({"documentType" : documentType, "employeeName" : employeeName })
+    let inApprovalRequestDateStart = document.querySelector('#inApprovalRequestDateStart').value.toString();
+    let inApprovalRequestDateEnd = document.querySelector('#inApprovalRequestDateEnd').value.toString();
+    grid.setRequestParams({
+        "documentType" : documentType,
+        "employeeName" : employeeName,
+        "inApprovalRequestDateStart" : inApprovalRequestDateStart,
+        "inApprovalRequestDateEnd" : inApprovalRequestDateEnd
+    })
     grid.readData();
 }
 

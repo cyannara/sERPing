@@ -12,6 +12,10 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Log4j2
@@ -33,6 +37,22 @@ public class MainpageRestController {
     
     dto.setStart(paging.getFirst());
     dto.setEnd(paging.getLast());
+    
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    
+    if(dto.getInApprovalRequestDateStart() != null && !dto.getInApprovalRequestDateStart().isEmpty()) {
+      LocalDate startDate = LocalDate.parse(dto.getInApprovalRequestDateStart());
+      LocalDateTime startOfDay = startDate.atStartOfDay();
+      String formattedStartDate = startOfDay.format(formatter);
+      dto.setInApprovalRequestDateStart(formattedStartDate);
+    }
+    
+    if(dto.getInApprovalRequestDateEnd() != null && !dto.getInApprovalRequestDateEnd().isEmpty()) {
+      LocalDate endDate = LocalDate.parse(dto.getInApprovalRequestDateEnd());
+      LocalDateTime endOfDay = endDate.atTime(23, 59, 59);
+      String formattedEndDate = endOfDay.format(formatter);
+      dto.setInApprovalRequestDateEnd(formattedEndDate);
+    }
     
     Long companyNum = user.getUserDTO().getCompanyNum();
     paging.setTotalRecord(approvalService.count(dto, companyNum));

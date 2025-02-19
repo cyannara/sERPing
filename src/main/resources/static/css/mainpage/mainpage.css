@@ -1,5 +1,16 @@
 .approval {
-
+    .search-grid > .row {
+        display: flex;
+        > div {
+            width: 50%;
+        }
+    }
+    .btn-box {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 20px 0;
+    }
     .btn {
         display: inline-block;
         border: 0;
