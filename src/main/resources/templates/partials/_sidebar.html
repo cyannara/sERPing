@@ -103,21 +103,23 @@
             <span class="menu-title">교환 및 반품 요청</span>
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/bhf/returnList">
+            <i class="icon-grid menu-icon"></i>
+            <span class="menu-title">교환 및 반품 조회</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/bhf/goodsIn">
+            <i class="icon-grid menu-icon"></i>
+            <span class="menu-title">상품 입고</span>
+          </a>
+        </li>
       </ul>
   </div>
 
-	<div
-		th:if="${#strings.equals('hr', param.menu) or #strings.equals('hr', menu)}">
-		<span class="menu-title">hr</span>
-	</div>
-	<div
-		th:if="${#strings.equals('account', param.menu) or #strings.equals('account', menu)}">
-		<span class="menu-title">account</span>
-	</div>
-	<div
-		th:if="${#strings.equals('branch', param.menu) or #strings.equals('branch', menu)}">
-		<span class="menu-title">branch</span>
-	</div>
+
+
 
 
 

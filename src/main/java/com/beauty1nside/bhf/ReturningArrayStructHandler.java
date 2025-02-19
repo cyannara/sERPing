@@ -7,15 +7,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Struct;
 import java.util.List;
-import oracle.jdbc.OracleConnection;
 
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 import org.springframework.util.StringUtils;
 
-import com.beauty1nside.bhf.dto.goodsorder.BhfOrdDtlVO;
+import com.beauty1nside.bhf.dto.returning.BhfReturningDtlVO;
 
-public class OracleArrayStructHandler implements TypeHandler<Object> {
+import oracle.jdbc.OracleConnection;
+
+public class ReturningArrayStructHandler implements TypeHandler<Object> {
 
 	@Override
 	public Object getResult(ResultSet rs, int columnIndex) throws SQLException {
@@ -33,23 +34,24 @@ public class OracleArrayStructHandler implements TypeHandler<Object> {
 		
 		OracleConnection conn = ps.getConnection().unwrap(OracleConnection.class); 
 		
-		List<BhfOrdDtlVO> files = (List<BhfOrdDtlVO>)parameter;
+		List<BhfReturningDtlVO> files = (List<BhfReturningDtlVO>)parameter;
 		
-	    Object[] filetype = new Object[6]; //필드의 크기가 6, 배열의 크기를 6으로 지정
-	    Struct[] array = new Struct[files.size()];
+		Object[] returningFileType = new Object[7]; 
+	    Struct[] returningArray = new Struct[files.size()];
 
-	    int arrayIndex = 0;
-	    for (BhfOrdDtlVO file : files) {
-	    	filetype[0] = file.getGoodsCode();
-	    	filetype[1] = file.getGoodsName();
-	    	filetype[2] = file.getOptionCode();
-	    	filetype[3] = file.getOptionName();
-	    	filetype[4] = file.getGoodsStandard();
-	    	filetype[5] = file.getQuantity();
-	    	array[arrayIndex++] = conn.createStruct("FILETYPE", filetype);//FILETYPE은 Oracle에서 지정한 배열타입 이름 
+	    int returningIndex = 0;
+	    for (BhfReturningDtlVO file : files) {
+	    	returningFileType[0] = file.getGoodsCode();
+	        returningFileType[1] = file.getGoodsName();
+	        returningFileType[2] = file.getOptionCode();
+	        returningFileType[3] = file.getOptionName();
+	        returningFileType[4] = file.getQuantity();
+	        returningFileType[5] = file.getExchangeReturningChoice(); 
+	        returningFileType[6] = file.getReturningReason(); 
+	        returningArray[returningIndex++] = conn.createStruct("RETURNINGFILETYPE", returningFileType);
 	    }		
-		Array filearray = (Array)conn.createOracleArray("FILEARRAY", (Struct[]) array);//FILEARRAY는 Oracle에서 지정한 배열타입 이름		
-		ps.setArray(i, filearray);
+	    Array returningFileArray = (Array)conn.createOracleArray("RETURNINGFILEARRAY", (Struct[]) returningArray); 		
+		ps.setArray(i, returningFileArray);
 	}
 
 	@Override
