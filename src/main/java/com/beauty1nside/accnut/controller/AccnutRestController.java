@@ -1,5 +1,6 @@
 package com.beauty1nside.accnut.controller;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.beauty1nside.accnut.dto.AssetDTO;
 import com.beauty1nside.accnut.dto.AssetSearchDTO;
+import com.beauty1nside.accnut.dto.DealBookDTO;
 import com.beauty1nside.accnut.dto.DealBookSearchDTO;
 import com.beauty1nside.accnut.dto.DebtSearchDTO;
 import com.beauty1nside.accnut.dto.EtcBookSearchDTO;
@@ -26,6 +28,7 @@ import com.beauty1nside.accnut.service.EtcBookService;
 import com.beauty1nside.accnut.service.IncidentalCostService;
 import com.beauty1nside.accnut.service.SalaryBookService;
 import com.beauty1nside.common.GridArray;
+import com.beauty1nside.common.GridData;
 import com.beauty1nside.common.Paging;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -187,6 +190,7 @@ public class AccnutRestController {
 	
 	// 삽입
 	
+	
 	@PostMapping("/asset/insert")
 	public ResponseEntity<Map<String, Object>> assetsInsert(@RequestBody AssetDTO dto) {
 	    Map<String, Object> response = new HashMap<>();
@@ -203,5 +207,15 @@ public class AccnutRestController {
 	    }
 	}
 	
-	
+	@PostMapping("/book/insert")
+	public Map register(@RequestBody GridData<DealBookDTO> dto) {
+		dto.getCreatedRows().forEach(dtos -> {
+			log.info("list: " + dtos);
+			if(dtos.getSection() != null) {
+				dealBookService.insert(dtos);
+			}
+		});
+		
+		return Collections.singletonMap("result", true);
+	}
 }

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layouts/layout}"
+      lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>제품 재고 / 제품 조회</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Toast Grid CSS -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/tui.grid/latest/tui-grid.css">
+    
+    <!-- jQuery & Toast Grid JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://uicdn.toast.com/tui.grid/latest/tui-grid.js"></script>
+
+    <style>
+        .container { max-width: 1200px; margin: 20px auto; }
+        .header-box { background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 10px; }
+        .search-container { margin-bottom: 15px; }
+        .pagination-container { text-align: center; margin-top: 10px; }
+        .btn-search { background-color: #28a745; color: white; }
+        .btn-reset { background-color: #007bff; color: white; }
+        .btn-register { background-color: #28a745; color: white; margin-top: 10px; }
+    </style>
+</head>
+<body layout:fragment="content">
+
+<div class="container">
+    <!-- 검색 영역 -->
+    <div class="header-box">
+        <div class="row">
+            <div class="col-md-5">
+                <label class="form-label">상품명</label>
+                <input type="text" class="form-control">
+            </div>
+            <div class="col-md-5">
+                <label class="form-label">브랜드</label>
+                <input type="text" class="form-control">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button class="btn btn-search w-50">검색</button>
+                <button class="btn btn-reset w-50 ms-2">초기화</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Grid -->
+    <div id="grid"></div>
+
+    <!-- 페이지네이션 -->
+    <div class="pagination-container">
+        <button class="btn btn-outline-secondary">&lt;</button>
+        <button class="btn btn-outline-secondary">1</button>
+        <button class="btn btn-outline-secondary">2</button>
+        <button class="btn btn-outline-secondary">3</button>
+        <button class="btn btn-outline-secondary">4</button>
+        <button class="btn btn-outline-secondary">5</button>
+        <button class="btn btn-outline-secondary">&gt;</button>
+    </div>
+
+    <!-- 제품 등록 버튼 -->
+    <div class="text-end">
+        <button class="btn btn-register">제품 등록</button>
+    </div>
+</div>
+
+<!-- Toast Grid 스크립트 -->
+<script>
+    const grid = new tui.Grid({
+        el: document.getElementById('grid'),
+        data: [
+            { 상품명: "헤라 선샤인 누드 글로스 5g", 상품번호: "LHR001", 옵션명: "422호 렌제리", 옵션번호: "LHO001", 브랜드: "헤라", 규격: "1 box 6piece", 대표이미지: "<img src='lip.jpg' width='40'>" },
+            { 상품명: "헤라 블랙 쿠션 파운데이션", 상품번호: "FHR001", 옵션명: "17N1", 옵션번호: "LHO002", 브랜드: "헤라", 규격: "1 box 6piece", 대표이미지: "<img src='cushion.jpg' width='40'>" },
+            { 상품명: "헤라 UV프로텍터 멀티디펜스", 상품번호: "BHR001", 옵션명: "50ml", 옵션번호: "LHO003", 브랜드: "헤라", 규격: "1 box 6piece", 대표이미지: "<img src='sunscreen.jpg' width='40'>" }
+        ],
+        columns: [
+            { header: "상품명", name: "상품명", width: 200 },
+            { header: "상품번호", name: "상품번호", width: 100 },
+            { header: "옵션명", name: "옵션명", width: 150 },
+            { header: "옵션번호", name: "옵션번호", width: 100 },
+            { header: "브랜드", name: "브랜드", width: 100 },
+            { header: "규격", name: "규격", width: 120 },
+            { header: "대표이미지", name: "대표이미지", width: 100, align: "center" }
+        ],
+        rowHeaders: ['checkbox'],
+        pageOptions: {
+            useClient: true,
+            perPage: 5
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -9,9 +9,54 @@
 >
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>결재문서</title>
+
+    <!-- TOAST UI Editor 최신 안정화 버전 (3.2.2) -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/3.2.2/toastui-editor.min.css" />
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor-plugin-table-merged-cell/3.2.2/toastui-editor-plugin-table-merged-cell.min.css" />
+
+    <script defer src="https://uicdn.toast.com/editor/3.2.2/toastui-editor-all.min.js"></script>
+    <script defer src="https://uicdn.toast.com/editor-plugin-table-merged-cell/3.2.2/toastui-editor-plugin-table-merged-cell.min.js"></script>
 </head>
 <body layout:fragment="content">
-doc
+<h3 class="mb-4">결재문서 관리</h3>
+
+<h2>Editor</h2>
+<div id="editor"></div>
+
+<h2>Viewer</h2>
+<div id="viewer"></div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const { Editor } = toastui;
+        const tableMergedCell = new toastui.Editor.plugin.tableMergedCell();
+
+        console.log("tableMergedCell 플러그인 확인:", tableMergedCell); // 확인 로그 추가
+
+        const tableContent = `
+            | Header 1 | Header 2 | Header 3 |
+            |----------|----------|----------|
+            | A1       | A2       | A3       |
+            | B1       | B2       | B3       |
+            `;
+
+        const editor = new Editor({
+            el: document.querySelector('#editor'),
+            previewStyle: 'vertical',
+            height: '500px',
+            initialValue: tableContent,
+            plugins: [tableMergedCell], // ✅ 플러그인 적용
+            toolbarItems: [
+                ['heading', 'bold', 'italic', 'strike'],
+                ['hr', 'quote'],
+                ['ul', 'ol', 'task'],
+                ['table', 'image', 'link'],
+                ['code', 'codeblock'],
+                ['mergeCells', 'splitCells'] // ✅ 병합/분할 버튼 추가
+            ]
+        });
+    });
+</script>
 </body>
 </html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layouts/layout}"
+      lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>발주서 / 발주서 등록</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Toast Grid CSS -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/tui.grid/latest/tui-grid.css">
+    
+    <!-- jQuery & Toast Grid JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://uicdn.toast.com/tui.grid/latest/tui-grid.js"></script>
+
+    <style>
+        .form-control { width: 100%; }
+        
+        .button-container { margin-top: 15px; }
+        #custom-container{
+		background-color: #f8f9fa; /* 연한 회색 배경 */
+		padding: 20px;
+		border-radius: 10px;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 박스 그림자 */
+		margin-bottom: 20px;
+	
+		}
+        #grid { height: 300px; }
+    </style>
+</head>
+<body layout:fragment="content">
+<div class="container mt-4" >
+<h2 class="mb-4">발주서 등록</h2>
+	<div class="container">
+	    <!-- 🔹 발주서 정보 -->
+	    <div id="custom-container">
+	        <div class="row g-3">
+	            <div class="col-md-3">
+	                <label class="form-label">일자</label>
+	               <input type="date" class="form-control" th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" readonly>
+	            </div>
+	            <div class="col-md-3">
+	                <label class="form-label">담당자</label>
+	                <input type="text" class="form-control" th:value="${session.employeeName}" readonly>
+	            </div>
+	            <div class="col-md-3">
+	                <label class="form-label">입고창고</label>
+	                <input type="text" class="form-control" value="MU01">
+	            </div>
+	            <div class="col-md-3">
+	                <label class="form-label">납기일자</label>
+	                <input type="date" class="form-control" value="2025-04-05">
+	            </div>
+	        </div>
+	
+	        <!-- 🔹 부가세율(VAT) 선택 -->
+	        <div class="d-flex align-items-center mt-3">
+	            <div class="form-check me-3">
+	                <input class="form-check-input" type="checkbox" id="vatUnchecked">
+	                <label class="form-check-label" for="vatUnchecked">부가세율(VAT) 미적용</label>
+	            </div>
+	            <div class="form-check">
+	                <input class="form-check-input" type="checkbox" id="vatChecked" checked>
+	                <label class="form-check-label" for="vatChecked">부가세율(VAT) 적용</label>
+	            </div>
+	        </div>
+	    </div>
+	
+	    <!-- 🔹 버튼 -->
+	    <div class="mb-3 d-flex justify-content-between">
+	        <div>
+	            <button class="btn btn-secondary">주문서 조회</button>
+	            <button class="btn btn-secondary">제조 조회</button>
+	            <button class="btn btn-secondary">계획 조회</button>
+	        </div>
+	        <button class="btn btn-primary">발주 추가</button>
+	    </div>
+	
+	    <!-- 🔹 Toast Grid -->
+	    <div id="grid"></div>
+	
+	    <!-- 🔹 저장 및 초기화 버튼 -->
+	    <div class="button-container text-center mt-3">
+	        <button class="btn btn-success">저장</button>
+	        <button class="btn btn-secondary">초기화</button>
+	    </div>
+	</div>
+</div>
+
+
+<script>
+    // Toast Grid 데이터 설정
+    const grid = new tui.Grid({
+        el: document.getElementById('grid'),
+        data: [
+            { 상품번호: 'LHR001', 상품명: '해외 허브 티 5g', 옵션번호: 'LHO001', 옵션명: '432B 완제', 거래처명: '(주)제이팜', 규격: '1Box 8piece', 수량: 100, 단가: 110000, 공급가격: 11000000, 부가세: 1100000 },
+            { 상품번호: 'LHR001', 상품명: '해외 허브 티 5g', 옵션번호: 'LHO002', 옵션명: '303B 차세대', 거래처명: '(주)제이팜', 규격: '1Box 8piece', 수량: 100, 단가: 110000, 공급가격: 11000000, 부가세: 1100000 },
+            { 상품번호: 'LHR001', 상품명: '해외 허브 티 5g', 옵션번호: 'LHO003', 옵션명: '462B 스트릭스', 거래처명: '(주)제이팜', 규격: '1Box 8piece', 수량: 100, 단가: 110000, 공급가격: 11000000, 부가세: 1100000 },
+            { 상품번호: 'LHR001', 상품명: '해외 허브 티 5g', 옵션번호: 'LHO004', 옵션명: '432B 녹차', 거래처명: '(주)제이팜', 규격: '1Box 8piece', 수량: 100, 단가: 110000, 공급가격: 11000000, 부가세: 1100000 }
+        ],
+        columns: [
+            { header: '✔', name: '선택', width: 50, align: 'center', formatter: () => '<input type="checkbox">' },
+            { header: '상품번호', name: '상품번호', width: 100 },
+            { header: '상품명', name: '상품명', width: 150 },
+            { header: '옵션번호', name: '옵션번호', width: 100 },
+            { header: '옵션명', name: '옵션명', width: 120 },
+            { header: '거래처명', name: '거래처명', width: 150 },
+            { header: '규격', name: '규격', width: 120 },
+            { header: '수량', name: '수량', width: 80, align: 'right' },
+            { header: '단가', name: '단가', width: 120, align: 'right', formatter: ({ value }) => value.toLocaleString() },
+            { header: '공급가격', name: '공급가격', width: 120, align: 'right', formatter: ({ value }) => value.toLocaleString() },
+            { header: '부가세', name: '부가세', width: 120, align: 'right', formatter: ({ value }) => value.toLocaleString() }
+        ],
+        rowHeaders: ['rowNum'],
+        scrollX: true,
+        scrollY: 300
+    });
+</script>
+
+</body>
+</html>

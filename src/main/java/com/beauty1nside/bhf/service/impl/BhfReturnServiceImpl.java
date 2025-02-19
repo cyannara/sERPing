@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.beauty1nside.bhf.dto.returning.BhfGdsOptDTO;
 import com.beauty1nside.bhf.dto.returning.BhfGdsOptSearchDTO;
+import com.beauty1nside.bhf.dto.returning.BhfReturningVO;
 import com.beauty1nside.bhf.mapper.BhfReturnMapper;
 import com.beauty1nside.bhf.service.BhfReturnService;
 
@@ -32,6 +33,12 @@ public class BhfReturnServiceImpl implements BhfReturnService {
 	public List<BhfGdsOptDTO> optionList(BhfGdsOptSearchDTO dto) {
 		
 		return mapper.optionList(dto);
+	}
+
+	@Override
+	public void returnGoods(BhfReturningVO vo) {
+		
+		mapper.returnGoods(vo);
 	}
 
 }

@@ -45,4 +45,16 @@ public class BhfVueController {
 		return "/bhf/returnRequest";
 	}
 	
+	// 교환 및 반품 조회 페이지
+	@GetMapping("/returnList")
+	public String returnList() {
+		return "/bhf/returnList";
+	}
+	
+	// 상품 입고 페이지
+	@GetMapping("/goodsIn")
+	public String goodsIn() {
+		return "/bhf/goodsIn";
+	}
+	
 }

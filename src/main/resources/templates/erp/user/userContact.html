@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+ <!-- =======================================================
+ * 사용계약서를 작성 할 수 있다
+ * @author 개발팀 표하연
+ * @since 2025.02.17
+ * @version 1.0
+ * @see
+ *
+ * <pre>
+ * << 개정이력(Modification Information) >>
+ *
+ *   수정일      수정자          수정내용
+ *  -------    --------    ---------------------------
+ *  2025.02.19  표하연          최초 생성
+ *
+ *  </pre>
+ ======================================================== -->
+<html layout:decorate="~{layouts/layout}"
+      lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<body layout:fragment="content">
+    <div class="container">
+    	<h1>사용계약서</h1>
+    </div>
+<body>
+<script th:inline="javascript">
+	setTimeout(async () => {
+		console.log("여기는 사용하는곳:", window.subscriptionState);
+	}, 500);
+</script>

@@ -12,18 +12,24 @@
 		<div class="row">
 			<h3 class="mt-2 mb-2">교환 및 반품 요청</h3>
 			<hr>
-			<div class="col-md-6 mt-2 mb-5">
+			<div class="col-md-6 mt-2 mb-2">
 				<div class="row">
 					<label class="col-sm-4">상품명</label> 
 					<input type="text" class="col-sm-5" id="goodsName">
 					<button type="button" class="col-sm-2" onclick="search()">검색</button>
 				</div>
 			</div>
-			<div class="col-md-6 mt-2 mb-5">
+			<div class="col-md-6 mt-2 mb-2">
 				<div class="row">
-					
+					<div class="col-sm-1"></div>
 					<label class="col-sm-4">주문 지점</label> 
 					<input type="text"class="col-sm-7" id="branchOfficeId">
+				</div>
+			</div>
+			<div class="col-md-12 mt-2 mb-5">
+				<div class="row">
+					<label class="col-sm-2">비고</label> 
+					<input type="text"class="col-sm-10" id="remark">
 				</div>
 			</div>
 			<div class="col-md-6 stretch-card mt-2 mb-2">
@@ -51,7 +57,7 @@
 						<div id="returning"></div>
 						<div id="pagination" class="tui-pagination"></div>
 						<div style="text-align : center">
-							<button onclick="orderInsert()">등록</button>
+							<button onclick="returnInsert()">등록</button>
 							<button onclick="reset()">초기화</button>
 						</div>
 					</div>
@@ -61,6 +67,9 @@
 	</div>
 	
 	<script>
+		const header = document.querySelector('meta[name="_csrf_header"]').content; //서버에서 요구하는 CSRF 헤더이름
+	    const token = document.querySelector('meta[name="_csrf"]').content; //서버에서 생성한 CSRF 토큰 값
+		
 		var Grid = tui.Grid;
 		
 		//페이지가 로드되면 테이블에 데이터가 없을때 뜨는 문구 함수 실행
@@ -173,11 +182,76 @@
 			data: ""
 		});
 		
+		// 교환,반품 등록 함수
+		function returnInsert(){
+			let returnData = grid3.getData();
+			
+			// 교환,반품 테이블에 데이터가 있는지 확인
+			if (returnData.length === 0) {
+		        alert("교환 및 반품할 상품을 추가해주세요.");
+		        return;
+		    }
+			// 발주 수량을 적었는지 확인
+			for (let i = 0; i < returnData.length; i++) {
+				const quantity = Number(returnData[i].quantity); // 문자열을 숫자로 변환(0도 비교하기 위해서)
+				const choice = returnData[i].exchangeReturningChoice;
+				const reason = returnData[i].returningReason;
+				
+			    if (quantity === 0 || quantity === "" || quantity === null) {  // 수량이 비어있는지 확인
+		            alert("수량을 입력해주세요.");
+		            return;  // 수량이 없으면 더 이상 진행하지 않음
+		        }
+			    if (choice !== "교환" && choice !== "반품"){
+			    	alert("교환,반품 둘중 하나를 적어주세요.");
+			    	return;
+			    }
+			    if (reason === "" || reason === null){
+			    	alert("사유를 작성 해주세요.");
+			    	return
+			    }
+		    }
+	
+		     let returnInfo = {
+		        files: returnData,  // 상세 내역 (상품 정보)
+		        branchOfficeId: document.querySelector('#branchOfficeId').value, //주문 지점
+		        remark: document.querySelector('#remark').value,  // 비고
+		        companyNum: 1 // 아직 회사번호를 가져올떄가 없어서 1로 넣었놨음
+		    };
+	 	    fetch("http://localhost:81/bhf/rest/return/insert", {
+		        method: "POST",
+		        headers: {
+		            "Content-Type": "application/json",
+		            //위에 변수로 저장한 헤더이름,토큰값 넣어주기
+		        	'header': header, 
+		            'X-CSRF-Token': token
+		        },
+		        body: JSON.stringify(returnInfo) // returnInfo 객체를 JSON 형식으로 변환(JSON.parse는 JSON을 객체로 변환)
+		    })
+		    .then(response => response.json())
+		    .then(data => {
+		        if (data.status === "success") {
+		            alert("교환 및 반품 등록 성공");
+		         	// 등록 후 초기화
+		         	document.getElementById('branchOfficeId').value = "";
+					document.getElementById('remark').value = "";
+		            grid2.resetData([]);
+		            grid3.resetData([]);  
+		           
+		        } else {
+		            alert("교환 및 반품 등록 실패: " + data.message);
+		        }
+		        //테이블 데이터 없을떄 나오는 문구 다시 실행
+		        OPnodata();
+		        RTnodata();
+		    })  
+		}
+		
 		// 검색 함수
 		function search(){
 			let goodsName = document.querySelector('#goodsName').value;
 			grid.setRequestParams({"goodsName" : goodsName})
 			grid.readData();
+			//document.querySelector('#goodsName').value = "";
 		}
 		
 		// 초기화 버튼 함수

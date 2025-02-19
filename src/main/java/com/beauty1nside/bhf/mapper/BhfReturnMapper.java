@@ -4,8 +4,11 @@ import java.util.List;
 
 import com.beauty1nside.bhf.dto.returning.BhfGdsOptDTO;
 import com.beauty1nside.bhf.dto.returning.BhfGdsOptSearchDTO;
+import com.beauty1nside.bhf.dto.returning.BhfReturningVO;
 
 public interface BhfReturnMapper {
+	
+	public void returnGoods(BhfReturningVO vo);
 
 	//창고 상품 조회
 	public List<BhfGdsOptDTO> goodsList(BhfGdsOptSearchDTO dto);

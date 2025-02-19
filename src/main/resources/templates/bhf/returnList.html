@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layouts/layout}"
+      lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<title>교환 및 반품 조회</title>
+</head>
+<body layout:fragment="content">
+	<div class="container">
+		<div class="row">
+			<h3 class="mt-2 mb-2">상품 발주 조회</h3>
+			<hr>
+			<div class="col-md-6 mt-2 mb-2">
+				<div class="row">
+					<label class="col-sm-4">신청 일자</label> 
+					<input type="date"class="col-sm-7" id="requestDate"> 
+				</div>
+			</div>
+			<div class="col-md-6 mt-2 mb-2">
+				<div class="row">
+					<label class="col-sm-4">진행 상태</label> 
+					<select name="progressStatus" id="progressStatus" class="col-sm-7">
+						<option value="" selected>선택 하세요.</option>
+						<option value="신청">신청</option>
+						<option value="승인">승인</option>
+						<option value="취소">취소</option>
+					</select>
+				</div>
+			</div>
+			<div class="col-md-12 mt-2 mb-2">
+				<div class="row">
+					<div class="col-sm-5"></div>
+					<button class="col-sm-1" onclick="search()">검색</button>
+					<button class="col-sm-1" onclick="reset()">초기화</button>
+					<div class="col-sm-5"></div>
+				</div>
+			</div>
+			<div class="col-md-6 stretch-card mt-2 mb-2">
+				<div class="card">
+					<div class="card-body">
+						<h6 class="mb-4">교환 및 반품</h6>
+						<div id="returning"></div>
+						<div id="pagination" class="tui-pagination"></div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6 stretch-card mt-2 mb-2">
+				<div class="card">
+					<div class="card-body">
+						<h6 class="mb-4">교환 및 반품 상세</h6>
+						<div id="returningDtl"></div>
+						<div id="pagination" class="tui-pagination"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script>
+		var Grid = tui.Grid;
+		
+		//페이지가 로드되면 테이블에 데이터가 없을때 뜨는 문구 함수 실행
+		document.addEventListener("DOMContentLoaded",()=>{
+			REDnodata();
+		})
+		
+		// 교환및반품 조회 쿼리 호출
+		const dataSource = {
+			api: {
+				readData: { url: 'http://localhost:81/bhf/rest/return/list', method: 'GET', initParams: { page: 1 }},
+			},
+			contentType: 'application/json'
+			
+		};
+		// 교환및반품 테이블
+		const grid = new Grid({
+			el: document.getElementById('returning'), 
+			pageOptions: {
+				useClient: false,
+				perPage: 5,
+			},
+			columns: [ 
+				{ header : "교환및반품 코드", name : "returningCode"},
+				{ header : "신청일자", name : "requestDate"},
+				{ header : "진행상태", name : "progressStatus"},
+				{ header : "비고", name : "remark"}
+			],
+			data: dataSource
+		});
+		// 교환및반품 테이블 행 선택
+		grid.on('click', (ev) => {
+			const rowKey = ev.rowKey;  	// 클릭된 행의 키값
+			if(rowKey != undefined){ 	// 행 말고 다른데 클릭해도 이 함수가 실행되서 행의 키값이 있을때만 실행되게 함
+				
+				const rowData = grid.getRow(rowKey); //해당 행의 데이터 가져오기
+				const returningCode = rowData.returningCode; // 교환및반품 코드
+				
+				// 교환및반품 상세 조회 쿼리호출(orderCode)
+			    fetch('http://localhost:81/bhf/rest/return/detail?returningCode=' + returningCode, {
+			        method: 'GET',
+			        headers: {
+			            'Content-Type': 'application/json'
+			        }
+			    })
+			    .then(response => response.json())
+			    .then(data => {
+			        grid2.resetData(data.data.contents);  // 교환및반품 상세 테이블 데이터 업데이트
+			    })
+			    .catch(error => console.error("데이터 요청 실패:", error));
+			}
+		});
+		
+		// 교환및반품 상세 테이블
+		const grid2 = new Grid({
+			el: document.getElementById('returningDtl'), 
+			pageOptions: {
+				useClient: false,
+				perPage: 5,
+			},
+			columns: [ 
+				{ header : "상품명", name : "goodsName"},
+				{ header : "옵션명", name : "optionName"},
+				{ header : "수량", name : "quantity"},
+				{ header : "교환 및 반품", name : "exchangeReturningChoice"},
+				{ header : "사유", name : "returningReason"}
+			],
+			data: ""
+		});
+		
+		// 검색 함수
+		function search(){
+			// 값 가져와서 변수선언
+			let requestDate = document.querySelector('#requestDate').value;
+			let progressStatus = document.querySelector('#progressStatus').value;
+			// 객체로 담을 변수선언
+			let parameter = {};
+			// 객체 담기
+			parameter.progressStatus = progressStatus;
+			// sql로 선언한 Date는 null값이 들어가면 오류가 나서 null이 아닐때 넣는거로 선언
+			if(requestDate != ''){
+				parameter.requestDate = requestDate;
+			}
+			// 검색 조건들 보내기
+			grid.setRequestParams(parameter);
+			grid.readData();
+			//데이터가 없으면 뜨는 문구
+			REnodata();
+		}
+		
+		// 검색 초기화 함수
+		function reset(){
+			// 입력칸 빈칸으로 변경
+			let requestDate = document.querySelector('#requestDate').value = '';
+			let progressStatus = document.querySelector('#progressStatus').value = '';
+			// 빈 값을 보냄
+			grid.setRequestParams({});
+			grid.readData();
+		}
+		
+		// 교환및반품 테이블 데이터 없을때 나오는 문구
+		function REnodata(){
+			console.log("nodata실행")
+			setTimeout( () => {
+				let nodata = document.querySelectorAll('.tui-grid-layer-state-content p')[0];
+				nodata.innerHTML = '해당하는 데이터가 없습니다.';
+			}, 100)
+		}
+		// 교환및반품 상세 테이블 데이터 없을때 나오는 문구
+		function REDnodata(){
+			setTimeout( () => {
+				let nodata = document.querySelectorAll('.tui-grid-layer-state-content p')[1];
+				nodata.innerHTML = '교환 및 반품 내역을 선택 해주세요';
+			}, 100)
+		}
+	</script>
+	
+</body>
+</html>
