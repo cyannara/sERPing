@@ -38,6 +38,8 @@ public class ProductDTO {
 	private String vendorName;
 	
 	
+	private int companyNum;
+	
 	//옵션
 	private String optionCode;
 	private String optionName;
