@@ -307,7 +307,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		    ]
 		});
 
-		
+		//검색
 		function search(){
 			let selectedOption = document.querySelector('input[name="optionsRadios"]:checked').value; // 라디오 버튼 선택 값
 		    let startDate = document.getElementById("startDate").value; // 시작 날짜
@@ -339,6 +339,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		    //grid.readData();
 		}
 		
+		//검색 조건 초기화
 		function reset(){
 			// 라디오 버튼 선택 값 초기화
 		    // "사용안함" 라디오 버튼을 체크하도록 설정
@@ -358,7 +359,23 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		}
 		
 		
-		
+		// 주문등록, 발주취소 한뒤 화면 초기화
+		function refreshOrderGrid() {
+			
+			
+		    // 상세 테이블 초기화
+		    detailGrid.resetData([]);
+
+		    // 그리드 데이터 갱신
+		    grid.reloadData();
+
+		    // 요청 정보 출력 삭제
+		    document.querySelector('#selectedOrder').innerHTML = '';
+		    
+		    selectedRow = null; // 선택된 주문 정보 초기화
+			detailData = [];    // 상세 데이터 정보 초기화
+		}
+
 		
 		
 		
@@ -410,8 +427,8 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		 	// 등록 함수 호출(실험하기 위해 막아둠)
 		    //registerOrder(orderDTO);
 		 	
-		 	//상세 테이블 초기화(임시용, 위 주석 해제시 밑에 코드 제거)
-		    detailGrid.resetData([]);
+		 	//화면 초기화 함수
+		 	refreshOrderGrid();
 		 	
 		}
 
@@ -507,11 +524,8 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		    .then(data => {
 		        if (data.status === "success") {
 		            showAlert('주문 등록 성공', 'success');
-		         	// 값 초기화
-		            selectedRow = null; // 선택된 주문 정보 초기화
-	    			detailData = [];    // 상세 데이터 정보 초기화
-	    			
-	    			detailGrid.resetData([]);	//상세 그리드 빈배열로 초기화
+		         	// 값 초기화 + 값 초기화
+		            refreshOrderGrid();
 		           
 		        } else {
 		            showAlert('발주 등록 실패:'+ data.message, 'danger');
