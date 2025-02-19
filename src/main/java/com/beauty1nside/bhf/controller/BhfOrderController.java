@@ -27,7 +27,7 @@ import lombok.extern.log4j.Log4j2;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/bhf/rest/*")
-public class BhfRestController {
+public class BhfOrderController {
 
 	BhfOrderService bhforderservice;
 	
@@ -59,8 +59,6 @@ public class BhfRestController {
 	@GetMapping("/option/list")
 	public Object optionList(@RequestParam(name = "perPage", defaultValue = "2", required = false) int perPage, 
 			@RequestParam(name = "page", defaultValue = "1", required = false) int page, 
-			// 화면에서 보내주는 goodsCode받기
-			@RequestParam(name = "goodsCode", required = false) String goodsCode,
 			BhfOrdSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
 		// 페이징 유닛 수
 		paging.setPageUnit(perPage);
@@ -77,7 +75,7 @@ public class BhfRestController {
 		
 		// grid 배열 처리
 		GridArray grid = new GridArray();
-		Object result = grid.getArray( paging.getPage(), bhforderservice.count(dto), bhforderservice.optionList(goodsCode) );//goodsCode넣기
+		Object result = grid.getArray( paging.getPage(), bhforderservice.count(dto), bhforderservice.optionList(dto) );//goodsCode넣기
 		return result;
 	}
 	

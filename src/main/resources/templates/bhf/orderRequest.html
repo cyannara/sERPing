@@ -1,10 +1,13 @@
 <!-- 발주 요청 페이지 -->
 
 <!DOCTYPE html>
-<html>
+<html layout:decorate="~{layouts/layout}"
+      lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>상품 발주 요청</title>
 
 <!-- Bootstrap -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -29,7 +32,8 @@
 <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 
 </head>
-<body>
+<body layout:fragment="content">
+
 	<div class="container">
 		<div class="row">
 			<h3 class="mt-2 mb-2">상품 발주 요청</h3>
@@ -90,205 +94,221 @@
 			</div>
 		</div>
 	</div>
-</body>
-
-<script>
-	var Grid = tui.Grid;
 	
-	//페이지가 로드되면 테이블에 데이터가 없을때 뜨는 문구 함수 실행
-	document.addEventListener("DOMContentLoaded",()=>{
-		OPnodata();
-		ODnodata();
-	})
-	
-	// 상품조회 쿼리 호출
-	const dataSource = {
-		api: {
-			readData: { url: 'http://localhost:81/bhf/rest/goods/list', method: 'GET', initParams: { page: 1 }},
-		},
-		contentType: 'application/json'
+	<script>
+		// layout.html <meta>태그에 있는 값 불러오기
+		const header = document.querySelector('meta[name="_csrf_header"]').content; //서버에서 요구하는 CSRF 헤더이름
+	    const token = document.querySelector('meta[name="_csrf"]').content; //서버에서 생성한 CSRF 토큰 값
 		
-	};
-	//상품 테이블
-	const grid = new Grid({
-		el: document.getElementById('goods'), // 컨테이너 엘리먼트
-		pageOptions: {
-			useClient: true,
-			perPage: 5,
-		},
-		columns: [ 
-			{ header : "상품코드", name : "goodsCode"},
-			{ header : "상품명", name : "goodsName"},
-			{ header : "규격", name : "goodsStandard"}
-		],
-		data: dataSource
-	});
-	// 상품 테이블 행 선택
-	grid.on('click', (ev) => {
-		const rowKey = ev.rowKey;  // 클릭된 행의 키값
-		const rowData = grid.getRow(rowKey);  //해당 행의 데이터 가져오기
-		const goodsCode = rowData.goodsCode;  //url의 보내기 위해서 변수담기	
-		// 옵션조회 쿼리 호출(goodsCode)
-	    fetch('http://localhost:81/bhf/rest/option/list?goodsCode=' + goodsCode, {
-	        method: 'GET',
-	        headers: {
-	            'Content-Type': 'application/json'
-	        }
-	    })
-	    .then(response => response.json())
-	    .then(data => {
-	        grid2.resetData(data.data.contents);  // 옵션 테이블 데이터 업데이트
-	    })
-	    .catch(error => console.error("데이터 요청 실패:", error));
-	});
-	// 옵션 테이블
-	const grid2 = new Grid({
-		el: document.getElementById('option'), 
-		pageOptions: {
-			useClient: false,
-			perPage: 5
-		},
-		columns: [ 
-			{ header : "상품코드", name : "goodsCode"},
-			{ header : "옵션코드", name : "optionCode"},
-			{ header : "옵션명", name : "optionName"}
-		],
-		data: "",
-	});
-	// 옵션 테이블 행 선택
-	grid2.on('click', (ev) => {
-	    const rowData = grid2.getRow(ev.rowKey); // 해당 행의 데이터 가져오기
-        if (rowData) {
-	        const currentData = grid3.getData(); // 기존 데이터 가져오기
-	        
-	        // 중복 체크(옵션코드가 동일한 행에 이미 있으면 추가하지 않음)
-	        const check = currentData.find(item => item.optionCode === rowData.optionCode );
-	        if(check){
-	        	alert("이미 추가된 옵션입니다.")
-	        }else{	        	
-	        	grid3.resetData([...currentData, rowData]); // 기존 데이터에 새로운 행 추가하여 발주테이블 업데이트
-	        }
-	    }
-	});
-	
-	// 발주 테이블
-	const grid3 = new Grid({
-		el: document.getElementById('order'), // 컨테이너 엘리먼트
-		pageOptions: {
-			useClient: true,
-			perPage: 5
-		},
-		columns: [ 
-			{ header : "상품코드", name : "goodsCode"},
-			{ header : "상품명", name : "goodsName"},
-			{ header : "옵션코드", name : "optionCode"},
-			{ header : "옵션명", name : "optionName"},
-			{ header : "규격", name : "goodsStandard"},
-			{ 
-				header : "발주수량", 
-				name : "quantity", 
-				editor: 'text',
-				onAfterChange: function(ev) { // onAfterChange는 해당 열에 변경이 있을때마다 호출되는 이벤트
-	                // ev.value:사용자가 입력한 값, ev.rowkey:변경된 셀이 어떤 행인지 알려주는 키
-	                // 값이 숫자만 포함하고 있는지 확인
-	                const value = /^[0-9]*$/.test(ev.value); // 숫자만 허용하는 정규식
-	                // 숫자가 아닌 값이 들어왔을 때 
-	                if (!value) {
-	                    grid3.setValue(ev.rowKey, ev.columnName, '');  // 해당 셀을 비웁니다
-	                    alert("발주수량은 숫자만 입력할 수 있습니다.");
-	                }
-	            }
+		var Grid = tui.Grid;
+		
+		//페이지가 로드되면 테이블에 데이터가 없을때 뜨는 문구 함수 실행
+		document.addEventListener("DOMContentLoaded",()=>{
+			OPnodata();
+			ODnodata();
+		})
+		
+		// 상품조회 쿼리 호출
+		const dataSource = {
+			api: {
+				readData: { url: 'http://localhost:81/bhf/rest/goods/list', method: 'GET', initParams: { page: 1 }},
+			},
+			contentType: 'application/json'
+			
+		};
+		//상품 테이블
+		const grid = new Grid({
+			el: document.getElementById('goods'), // 컨테이너 엘리먼트
+			pageOptions: {
+				useClient: false,
+				perPage: 5,
+			},
+			columns: [ 
+				{ header : "상품코드", name : "goodsCode"},
+				{ header : "상품명", name : "goodsName"},
+				{ header : "규격", name : "goodsStandard"}
+			],
+			data: dataSource
+		});
+		// 상품 테이블 행 선택
+		grid.on('click', (ev) => {
+			const rowKey = ev.rowKey;  	// 클릭된 행의 키값
+			if(rowKey != undefined){	// 행 말고 다른데 클릭해도 이 함수가 실행되서 행의 키값이 있을때만 실행되게 함
+				const rowData = grid.getRow(rowKey);  //해당 행의 데이터 가져오기
+				const goodsCode = rowData.goodsCode;  //url의 보내기 위해서 변수담기	
+				// 옵션조회 쿼리 호출(goodsCode)
+			    fetch('http://localhost:81/bhf/rest/option/list?goodsCode=' + goodsCode, {
+			        method: 'GET',
+			        headers: {
+			            'Content-Type': 'application/json'
+			        }
+			    })
+			    .then(response => response.json())
+			    .then(data => {
+			        grid2.resetData(data.data.contents);  // 옵션 테이블 데이터 업데이트
+			    })
+			    .catch(error => console.error("데이터 요청 실패:", error));
 			}
-		],
-		data: ""
-	});
-	
-	// 발주 등록 함수
-	function orderInsert(){
-		let orderData = grid3.getData();
-		let dueDt = document.getElementById('dueDate').value;
+		});
+		// 옵션 테이블
+		const grid2 = new Grid({
+			el: document.getElementById('option'), 
+			pageOptions: {
+				useClient: false,
+				perPage: 5
+			},
+			columns: [ 
+				{ header : "상품코드", name : "goodsCode"},
+				{ header : "옵션코드", name : "optionCode"},
+				{ header : "옵션명", name : "optionName"}
+			],
+			data: "",
+		});
+		// 옵션 테이블 행 선택
+		grid2.on('click', (ev) => {
+		    const rowData = grid2.getRow(ev.rowKey); // 해당 행의 데이터 가져오기
+	        if (rowData) {
+		        const currentData = grid3.getData(); // 기존 데이터 가져오기
+		        
+		        // 중복 체크(옵션코드가 동일한 행에 이미 있으면 추가하지 않음)
+		        const check = currentData.find(item => item.optionCode === rowData.optionCode );
+		        if(check){
+		        	alert("이미 추가된 옵션입니다.")
+		        }else{	        	
+		        	grid3.resetData([...currentData, rowData]); // 기존 데이터에 새로운 행 추가하여 발주테이블 업데이트
+		        }
+		    }
+		});
 		
-		// 납기일자 있는지 확인
-		if(!dueDt){
-			 alert("납기일자를 선택해주세요.");
-		     return;
+		// 발주 테이블
+		const grid3 = new Grid({
+			el: document.getElementById('order'), // 컨테이너 엘리먼트
+			pageOptions: {
+				useClient: false,
+				perPage: 5
+			},
+			columns: [ 
+				{ header : "상품코드", name : "goodsCode"},
+				{ header : "상품명", name : "goodsName"},
+				{ header : "옵션코드", name : "optionCode"},
+				{ header : "옵션명", name : "optionName"},
+				{ header : "규격", name : "goodsStandard"},
+				{ 
+					header : "발주수량", 
+					name : "quantity", 
+					editor: 'text',
+					onAfterChange: function(ev) { // onAfterChange는 해당 열에 변경이 있을때마다 호출되는 이벤트
+		                // ev.value:사용자가 입력한 값, ev.rowkey:변경된 셀이 어떤 행인지 알려주는 키
+		                // 값이 숫자만 포함하고 있는지 확인
+		                const value = /^[0-9]*$/.test(ev.value); // 숫자만 허용하는 정규식
+		                // 숫자가 아닌 값이 들어왔을 때 
+		                if (!value) {
+		                    grid3.setValue(ev.rowKey, ev.columnName, '');  // 해당 셀을 비웁니다
+		                    alert("발주수량은 숫자만 입력할 수 있습니다.");
+		                }
+		            }
+				}
+			],
+			data: ""
+		});
+		
+		// 발주 등록 함수
+		function orderInsert(){
+			let orderData = grid3.getData();
+			let dueDt = document.getElementById('dueDate').value;
+			
+			// 납기일자 있는지 확인
+			if(!dueDt){
+				 alert("납기일자를 선택해주세요.");
+			     return;
+			}
+			// 발주 테이블에 데이터가 있는지 확인
+			if (orderData.length === 0) {
+		        alert("발주할 상품을 추가해주세요.");
+		        return;
+		    }
+			// 발주 수량을 적었는지 확인
+			for (let i = 0; i < orderData.length; i++) {
+				const quantity = Number(orderData[i].quantity); // 문자열을 숫자로 변환(0도 비교하기 위해서)
+			    if (quantity === 0 || quantity === "" || quantity === null) {  // 발주수량이 비어있는지 확인
+		            alert("발주수량을 입력해주세요.");
+		            return;  // 발주수량이 없으면 더 이상 진행하지 않음
+		        }
+		    }
+	
+		    let orderInfo = {
+		        files: orderData,  // 상세 내역 (상품 정보)
+		        branchOfficeId: document.querySelector('#branchOfficeId').value, //주문 지점
+		        dueDate: document.querySelector('#dueDate').value,  // 납기 일자
+		        remark: document.querySelector('#remark').value,  // 비고
+		        companyNum: 1 // 아직 회사번호를 가져올떄가 없어서 1로 넣었놨음
+		    };
+	 	    fetch("http://localhost:81/bhf/rest/order/insert", {
+		        method: "POST",
+		        headers: {
+		            "Content-Type": "application/json",
+		            //위에 변수로 저장한 헤더이름,토큰값 넣어주기
+		        	'header': header, 
+		            'X-CSRF-Token': token
+		        },
+		        body: JSON.stringify(orderInfo) // orderInfo 객체를 JSON 형식으로 변환(JSON.parse는 JSON을 객체로 변환)
+		    })
+		    .then(response => response.json())
+		    .then(data => {
+		        if (data.status === "success") {
+		            alert("발주 등록 성공");
+		         	// 등록 후 초기화
+		         	document.getElementById('branchOfficeId').value = "";
+					document.getElementById('dueDate').value = "";
+					document.getElementById('remark').value = "";
+		            grid2.resetData([]);
+		            grid3.resetData([]);  
+		           
+		        } else {
+		            alert("발주 등록 실패: " + data.message);
+		        }
+		        //테이블 데이터 없을떄 나오는 문구 다시 실행
+		        OPnodata();
+		        ODnodata();
+		    }) 
 		}
-		// 발주 테이블에 데이터가 있는지 확인
-		if (orderData.length === 0) {
-	        alert("발주할 상품을 추가해주세요.");
-	        return;
-	    }
-		// 발주 수량을 적었는지 확인
-		for (let i = 0; i < orderData.length; i++) {
-			const quantity = Number(orderData[i].quantity); // 문자열을 숫자로 변환(0도 비교하기 위해서)
-		    if (quantity === 0 || quantity === "" || quantity === null) {  // 발주수량이 비어있는지 확인
-	            alert("발주수량을 입력해주세요.");
-	            return;  // 발주수량이 없으면 더 이상 진행하지 않음
-	        }
-	    }
-
-	    let orderInfo = {
-	        files: orderData,  // 상세 내역 (상품 정보)
-	        branchOfficeId: document.querySelector('#branchOfficeId').value, //주문 지점
-	        dueDate: document.querySelector('#dueDate').value,  // 납기 일자
-	        remark: document.querySelector('#remark').value,  // 비고
-	        companyNum: 1 // 아직 회사번호를 가져올떄가 없어서 1로 넣었놨음
-	    };
- 	    fetch("http://localhost:81/bhf/rest/order/insert", {
-	        method: "POST",
-	        headers: {
-	            "Content-Type": "application/json"
-	        },
-	        body: JSON.stringify(orderInfo) // orderInfo 객체를 JSON 형식으로 변환(JSON.parse는 JSON을 객체로 변환)
-	    })
-	    .then(response => response.json())
-	    .then(data => {
-	        if (data.status === "success") {
-	            alert("발주 등록 성공");
-	         	// 테이블 초기화
-	            grid2.resetData([]);
-	            grid3.resetData([]);  
-	           
-	        } else {
-	            alert("발주 등록 실패: " + data.message);
-	        }
-	        //테이블 데이터 없을떄 나오는 문구 다시 실행
+		
+		// 초기화 버튼 함수
+		function orderReset(){
+			document.getElementById('branchOfficeId').value = "";
+			document.getElementById('dueDate').value = "";
+			document.getElementById('remark').value = "";
+			grid2.resetData([]);
+	        grid3.resetData([]);
+	     	//테이블 데이터 없을떄 나오는 문구 다시 실행
 	        OPnodata();
-	        ODnodata()
-	    }) 
-	}
+	        ODnodata();
+		}
+		
+		
+		// 검색 함수
+		function search(){
+			let goodsName = document.querySelector('#goodsName').value;
+			grid.setRequestParams({"goodsName" : goodsName})
+			grid.readData();
+		}
+		
+		// 옵션 테이블 데이터 없을때 나오는 문구
+		function OPnodata(){
+			setTimeout( () => {
+				let nodata = document.querySelectorAll('.tui-grid-layer-state-content p')[1];
+				nodata.innerHTML = '상품을 선택 해주세요.';
+			}, 10)
+		}
+		// 발주 테이블 데이터 없을때 나오는 문구
+		function ODnodata(){
+			setTimeout( () => {
+				let nodata = document.querySelectorAll('.tui-grid-layer-state-content p')[2];
+				nodata.innerHTML = '옵션을 선택 해주세요';
+			}, 10)
+		}
+		
+	</script>
 	
-	// 초기화 버튼 함수
-	function orderReset(){
-		document.getElementById('branchOfficeId').value = "";
-		document.getElementById('dueDate').value = "";
-		document.getElementById('remark').value = "";
-		grid2.resetData([]);
-        grid3.resetData([]);
-	}
-	
-	
-	// 검색 함수
-	function search(){
-		let goodsName = document.querySelector('#goodsName').value;
-		grid.setRequestParams({"goodsName" : goodsName})
-		grid.readData();
-	}
-	
-	// 옵션 테이블 데이터 없을때 나오는 문구
-	function OPnodata(){
-		setTimeout( () => {
-			let nodata = document.querySelectorAll('.tui-grid-layer-state-content p')[1];
-			nodata.innerHTML = '상품을 선택 해주세요.';
-		}, 10)
-	}
-	// 발주 테이블 데이터 없을때 나오는 문구
-	function ODnodata(){
-		setTimeout( () => {
-			let nodata = document.querySelectorAll('.tui-grid-layer-state-content p')[2];
-			nodata.innerHTML = '옵션을 선택 해주세요';
-		}, 10)
-	}
-	
-</script>
+</body>
 </html>

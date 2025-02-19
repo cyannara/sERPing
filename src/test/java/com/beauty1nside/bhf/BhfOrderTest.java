@@ -18,7 +18,7 @@ public class BhfOrderTest {
 	@Autowired 
 	BhfOrderMapper mapper;
 	
-	//@Test
+	@Test
 	public void testStruct() {
 		BhfOrdVO vo = new BhfOrdVO();
 		vo.setBranchOfficeId("Yedam");
@@ -41,11 +41,11 @@ public class BhfOrderTest {
 		System.out.println(list);
 	}
 	
-	@Test
-	public void optionListTest() {
-		String goodsCode = "LH001";
-		List<BhfGoodsOpDTO> list = mapper.optionList(goodsCode);
-		System.out.println(list);
-	}
+//	@Test
+//	public void optionListTest() {
+//		String goodsCode = "LH001";
+//		List<BhfGoodsOpDTO> list = mapper.optionList(goodsCode);
+//		System.out.println(list);
+//	}
 	
 }
