@@ -10,6 +10,11 @@ document.addEventListener("DOMContentLoaded", function () {
     fetchNewEmployeeId(); // 모달 열릴 때 사원번호 자동 입력
     initializeEmailInput(); // ✅ 이메일 입력 필드 초기화
     
+    document.getElementById("empRegisterModal").addEventListener("show.bs.modal", function () {
+    populateModalData();  // 모달 공통 코드 데이터 로드
+});
+
+    
         // ✅ 초기화 버튼 이벤트 리스너 연결 (id 일치 확인)
     let resetBtn = document.getElementById("resetBtn");
     if (resetBtn) {
@@ -85,7 +90,7 @@ function initializeGrid() {
         ],
         data: dataSource,
         rowHeaders: ['checkbox'],
-        
+        	
     });
 }
 
@@ -327,80 +332,14 @@ function registerEmployee() {
     })
     .catch(error => console.error("❌ 등록 실패:", error));
     
-    
-    
-document.getElementById("checkAccountOwnerBtn").addEventListener("click", function () {
-    let bankCode = document.getElementById("bankSelect").value;
-    let accountNumber = document.getElementById("accountNumber").value;
-    let birthDate = document.getElementById("birthDate").value; // 생년월일 (YYYYMMDD)
-
-    if (!bankCode || !accountNumber || !birthDate) {
-        alert("은행, 계좌번호, 생년월일을 입력하세요!");
-        return;
-    }
-
-    // 현재 시간 (yyyyMMddHHmmss)
-    let now = new Date();
-    let tran_dtime = now.getFullYear() +
-        String(now.getMonth() + 1).padStart(2, '0') +
-        String(now.getDate()).padStart(2, '0') +
-        String(now.getHours()).padStart(2, '0') +
-        String(now.getMinutes()).padStart(2, '0') +
-        String(now.getSeconds()).padStart(2, '0');
-
-    let requestData = {
-        bank_code_std: bankCode,
-        account_num: accountNumber,
-        account_holder_info_type: " ",
-        account_holder_info: birthDate,
-        tran_dtime: tran_dtime
-    };
-
-    fetch("https://testapi.openbanking.or.kr/v2.0/inquiry/real_name", {
-        method: "POST",
-        headers: {
-            "Authorization": "Bearer YOUR_ACCESS_TOKEN",
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(requestData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.rsp_code === "A0000") {
-            document.getElementById("accountHolderName").value = data.account_holder_name;
-            alert("예금주: " + data.account_holder_name);
-        } else {
-            alert("예금주 확인 실패: " + data.rsp_message);
-        }
-    })
-    .catch(error => console.error("API 요청 실패:", error));
-});
 }
 
-// ✅ 예금주 조회 기능
-function checkAccountOwner() {
-    const bankCode = document.getElementById("bankSelect").value;
-    const accountNumber = document.getElementById("accountNumber").value;
+    
+let globalDepartments = [];
+let globalSubDepartments = [];
+    
 
-    if (!bankCode || !accountNumber) {
-        alert("⚠️ 은행 및 계좌번호를 입력하세요.");
-        return;
-    }
-
-    fetch(`/api/iamport/account-holder?bankCode=${bankCode}&accountNumber=${accountNumber}`)
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById("accountHolderName").value = data;
-        })
-        .catch(error => console.error("❌ 예금주 조회 실패:", error));
-}
-
-document.getElementById("empRegisterModal").addEventListener("show.bs.modal", function () {
-    populateModalData();  // 모달 공통 코드 데이터 로드
-});
-
-
-// ✅ 모달 공통 코드 데이터 불러와서 채우는 함수
+// ✅ 모달 공통 코드 데이터 로드
 function populateModalData() {
     console.log("🔹 모달 공통 코드 데이터 불러오는 중...");
 
@@ -414,43 +353,70 @@ function populateModalData() {
 
             console.log("📥 불러온 공통 코드 데이터:", data);
 
-            // ✅ 부서 (Department) 데이터 채우기
+            // ✅ 전역 변수에 부서 및 하위 부서 저장
+            globalDepartments = data.departments;  
+            globalSubDepartments = data.departments.filter(dept => dept.PARENT_DEPARTMENT_NUM !== null); // 하위 부서만 저장
+
+            // ✅ 부서 (Department) 선택 리스트 설정
             const departmentSelect = document.getElementById("modalDepartment");
-            departmentSelect.innerHTML = '<option value="">선택</option>';
-            data.departments.forEach(dept => {
-                departmentSelect.innerHTML += `<option value="${dept.DEPARTMENT_NUM}">${dept.DEPARTMENT_NAME}</option>`;
-            });
+            departmentSelect.innerHTML = `
+                <option value="">선택</option>
+                <option value="1">본사</option>
+                <option value="8">지점</option>
+            `;
 
-            // ✅ 하위 부서 (Sub-Department) 데이터 채우기
-            const subDepartmentSelect = document.getElementById("modalSubDepartment");
-            subDepartmentSelect.innerHTML = '<option value="">선택</option>';
-            data.subDepartments.forEach(subDept => {
-                subDepartmentSelect.innerHTML += `<option value="${subDept.SUB_DEPT_NUM}">${subDept.SUB_DEPT_NAME}</option>`;
-            });
+            // ✅ 하위 부서 초기화 (모든 하위 부서 표시)
+            populateSubDepartments("");
 
-            // ✅ 직급 (Position) 데이터 채우기
-            const positionSelect = document.getElementById("modalPosition");
-            positionSelect.innerHTML = '<option value="">선택</option>';
-            data.positions.forEach(pos => {
-                positionSelect.innerHTML += `<option value="${pos.CMMNCODE}">${pos.CMMNNAME}</option>`;
-            });
+            // ✅ 부서 선택 시 이벤트 리스너 추가
+            departmentSelect.removeEventListener("change", handleDepartmentChange);
+            departmentSelect.addEventListener("change", handleDepartmentChange);
 
-            // ✅ 근무 유형 (Employment Type) 라디오 버튼 채우기
-            const employmentTypeContainer = document.getElementById("employmentTypeContainer");
-            employmentTypeContainer.innerHTML = '';
-            data.employmentTypes.forEach((type, index) => {
-                const typeId = `employmentType_${index}`;
-                employmentTypeContainer.innerHTML += `
-                    <div class="form-check form-check-inline">
-                        <input type="radio" class="form-check-input" id="${typeId}" name="employmentType" value="${type.CMMNCODE}">
-                        <label class="form-check-label" for="${typeId}">${type.CMMNNAME}</label>
-                    </div>
-                `;
-            });
-
-            console.log("✅ 모달 공통 코드 데이터 적용 완료!");
+            console.log("✅ 부서 목록 업데이트 완료!");
         })
         .catch(error => console.error("❌ 모달 공통 코드 데이터 불러오기 실패:", error));
 }
 
+// ✅ 부서 선택 변경 시 실행할 핸들러 함수
+function handleDepartmentChange() {
+    const selectedDeptNum = document.getElementById("modalDepartment").value;
+    console.log("📌 선택한 부서:", selectedDeptNum);
+    populateSubDepartments(selectedDeptNum);
+}
 
+// ✅ 선택된 부서에 따른 하위 부서 필터링 (동적 표시)
+function populateSubDepartments(selectedDeptNum) {
+    const subDepartmentSelect = document.getElementById("modalSubDepartment");
+
+    // ✅ 기존 옵션 초기화 ("선택" 추가)
+    subDepartmentSelect.innerHTML = `
+        <option value="">선택</option>
+    `;
+
+    let filteredSubDepartments = [];
+
+    if (!selectedDeptNum) {
+        // ✅ "선택" 상태에서는 모든 하위 부서 표시
+        filteredSubDepartments = globalSubDepartments;
+    } else {
+        // ✅ "본사" 또는 "지점"을 선택하면 해당 부서의 하위 부서만 표시
+        filteredSubDepartments = globalSubDepartments.filter(
+            subDept => String(subDept.PARENT_DEPARTMENT_NUM) === String(selectedDeptNum) // 🔥 `String` 변환하여 비교 오류 방지
+        );
+    }
+
+    console.log("📌 선택한 부서:", selectedDeptNum);
+    console.log("📌 필터링된 하위 부서 목록:", filteredSubDepartments); // 🔥 콘솔에 확인
+    
+    
+
+    // ✅ 하위 부서 옵션 추가 (실제 데이터 기반)
+    filteredSubDepartments.forEach(subDept => {
+        let option = document.createElement("option");
+        option.value = subDept.DEPARTMENT_NUM;
+        option.textContent = subDept.DEPARTMENT_NAME;
+        subDepartmentSelect.appendChild(option);
+    });
+
+    console.log("✅ 하위 부서 목록 업데이트 완료!", subDepartmentSelect.innerHTML); // 🔥 콘솔에서 확인
+}

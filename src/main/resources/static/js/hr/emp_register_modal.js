@@ -26,48 +26,6 @@ document.addEventListener("DOMContentLoaded", function () {
     
 });
 
-// ✅ 공통 코드 데이터를 모달에 적용하는 함수
-function applyCommonCodesToModal() {
-    console.log("📥 공통 코드 데이터를 모달에 적용 중...");
-
-    // ✅ 부서 선택 적용
-    const departmentSelect = document.getElementById("modalDepartment");
-    departmentSelect.innerHTML = '<option value="">선택</option>';
-    departments.forEach(dept => {
-        departmentSelect.innerHTML += `<option value="${dept.DEPARTMENT_NUM}">${dept.DEPARTMENT_NAME}</option>`;
-    });
-
-    // ✅ 직급 선택 적용
-    const positionSelect = document.getElementById("modalPosition");
-    positionSelect.innerHTML = '<option value="">선택</option>';
-    positions.forEach(pos => {
-        positionSelect.innerHTML += `<option value="${pos.CMMNCODE}">${pos.CMMNNAME}</option>`;
-    });
-
-    // ✅ 재직 상태 버튼 적용
-    populateStatusButtons("modalStatusGroup", statuses);
-
-    // ✅ 근무 유형 버튼 적용
-    populateEmploymentButtons("modalEmploymentTypeGroup", employmentTypes);
-}
-
-// ✅ 모달 초기화 함수
-function initEmployeeRegisterModal() {
-    console.log("✅ 사원 등록 모달 초기화...");
-    
-    applyCommonCodesToModal();
-    
-    // 모달이 열릴 때마다 실행될 이벤트 추가
-    let empRegisterModal = document.getElementById("empRegisterModal");
-    empRegisterModal.addEventListener("shown.bs.modal", resetEmployeeForm);
-    
-    // 기본 데이터 로드
-    fetchNewEmployeeId();  // 사원번호 자동 생성
-
-    // 버튼 이벤트 리스너 추가
-    document.getElementById("registerEmployeeBtn").addEventListener("click", registerEmployee);
-}
-
 // ✅ 예금주 조회 기능
 function checkAccountOwner() {
     const bankCode = document.getElementById("bankSelect").value;
