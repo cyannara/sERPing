@@ -26,12 +26,11 @@ WHERE progress_status = '신청'
 <![CDATA[
 AND ROWNUM <= #{end}
 ]]>
-ORDER by TO_NUMBER(REGEXP_SUBSTR(order_code, '\d+'))
 ) WHERE RN >= #{start}
 <include refid="searchInfoBhfOrder"></include>
 
 
-ORDER BY order_date, due_date
+ORDER BY TO_NUMBER(REGEXP_SUBSTR(order_code, '\d+')), order_date, due_date
 
 </select>
 
