@@ -2,6 +2,7 @@ package com.beauty1nside.mainpage.service.impl;
 
 import com.beauty1nside.mainpage.dto.ApprovalDTO;
 import com.beauty1nside.mainpage.dto.ApprovalSearchDTO;
+import com.beauty1nside.mainpage.dto.DocumentDTO;
 import com.beauty1nside.mainpage.mapper.ApprovalMapper;
 import com.beauty1nside.mainpage.service.ApprovalService;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +34,12 @@ public class ApprovalServiceImpl implements ApprovalService{
 	}
 	
 	@Override
-	public int update(Long inApprovalId, String processStr, Long companyNum) {
-		return approvalMapper.update(inApprovalId, processStr, companyNum);
+	public int update(Long inApprovalId, String processStr, Long companyNum, String reason) {
+		return approvalMapper.update(inApprovalId, processStr, companyNum, reason);
+	}
+	
+	@Override
+	public List<DocumentDTO> documentList(Long companyNum) {
+		return approvalMapper.documentList(companyNum);
 	}
 }
