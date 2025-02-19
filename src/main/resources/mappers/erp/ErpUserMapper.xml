@@ -173,12 +173,15 @@
      * @return int
 	-->
 	<select id="gpoptioninfo">
-		select subscription_period
-		from erp_subscription_info_list s
-		left join erp_subscription_option o
-		on s.subscription_option_num = o.subscription_option_num
-		where s.subscription_name_num in (2,7)
-		and s.company_num = #{companyNum}
+		SELECT CASE 
+		           WHEN COUNT(*) = 0 THEN 50
+		           ELSE MAX(subscription_period)
+		       END AS subscription_period
+		FROM erp_subscription_info_list s
+		LEFT JOIN erp_subscription_option o
+		    ON s.subscription_option_num = o.subscription_option_num
+		WHERE s.subscription_name_num IN (2,7)
+		AND s.company_num = #{companyNum}
 	</select>
 
 </mapper>
