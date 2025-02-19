@@ -143,7 +143,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
     <div class="row mt-3">
         <div class="col-12 text-center">
             <button class="btn btn-success" id="registerButton">✅ 승인 (등록)</button>
-            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancleModal">🚫 거부 (취소)</button>
+            <button class="btn btn-danger"  id="cancelButton">🚫 거부 (취소)</button>
         </div>
     </div>
     
@@ -364,6 +364,59 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		
 		
 		// 모든 페이지에서 데이터를 불러오는 함수
+		async function loadAllOrderDetails(orderCode) {
+		    if (!orderCode) {
+		        console.warn("유효하지 않은 주문 코드입니다.");
+		        return;
+		    }
+		
+		    let allDetails = [];
+		    let page = 1;
+		    let isLastPage = false;
+		
+		    while (!isLastPage) {
+		        try {
+		            const response = await fetch(`http://localhost:81/bsn/rest/bhforder/detail?orderCode=${orderCode}&perPage=5&page=${page}`);
+		            if (!response.ok) throw new Error(`HTTP 오류! 상태: ${response.status}`);
+		            
+		            const data = await response.json();
+		            if (data?.data?.contents?.length) {
+		                allDetails = allDetails.concat(data.data.contents);
+		                page++;
+		            } else {
+		                isLastPage = true;
+		            }
+		        } catch (error) {
+		            console.error("데이터 로드 중 오류 발생:", error);
+		            isLastPage = true;
+		        }
+		    }
+		
+		    console.log("모든 상세 데이터:", allDetails);
+		
+		    let orderDTO = {
+		        orderCode: selectedRow.orderCode,
+		        branchOfficeId: selectedRow.branchOfficeId,
+		        orderDate: selectedRow.orderDate,
+		        dueDate: selectedRow.dueDate,
+		        remark: selectedRow.remark,
+		        companyNum: selectedRow.companyNum,
+		        employeeNum: 1234,
+		        orderDetails: allDetails
+		    };
+		
+		    console.log("등록할 주문:", orderDTO);
+		    
+		 	// 등록 함수 호출(실험하기 위해 막아둠)
+		    //registerOrder(orderDTO);
+		 	
+		 	//상세 테이블 초기화(임시용, 위 주석 해제시 밑에 코드 제거)
+		    detailGrid.resetData([]);
+		 	
+		}
+
+		//구 코드
+		/*
 		function loadAllOrderDetails(orderCode) {
 		    if (!orderCode) {
 		        console.warn("유효하지 않은 주문 코드입니다.");
@@ -429,6 +482,10 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		        }
 		    }, 100);  // 100ms 간격으로 데이터 로드 완료 여부 체크
 		}
+		*/
+		
+		
+		
 		
 		
 	    
@@ -451,8 +508,10 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		        if (data.status === "success") {
 		            showAlert('주문 등록 성공', 'success');
 		         	// 값 초기화
-		            selectedRow = null; // 선택된 주문 정보
-	    			detailData = [];    // 상세 데이터 정보 
+		            selectedRow = null; // 선택된 주문 정보 초기화
+	    			detailData = [];    // 상세 데이터 정보 초기화
+	    			
+	    			detailGrid.resetData([]);	//상세 그리드 빈배열로 초기화
 		           
 		        } else {
 		            showAlert('발주 등록 실패:'+ data.message, 'danger');
@@ -462,50 +521,73 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		    }) 
 		}
 
-		// 주문 등록 버튼 클릭 이벤트
-		document.getElementById('registerButton').addEventListener('click', () => {
+		// 모달 인스턴스 생성
+		const registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
+		const cancleModal = new bootstrap.Modal(document.getElementById('cancleModal'));
+
+		// 주문 선택 확인 함수
+		function checkOrderSelection(modal) {
 		    if (selectedRow && selectedRow.orderCode) {
-		    	const registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
-		        registerModal.show();
-		    
-		        //loadAllOrderDetails(selectedRow.orderCode);  // 모든 상세 데이터를 가져와서 등록
+		        modal.show();
 		    } else {
 		        showAlert('주문을 선택해주세요!', 'danger');
 		    }
-		});
-		
-		
-		document.getElementById('btn-register').addEventListener('click', () => {
-		    if (selectedRow && selectedRow.orderCode) {
-		        loadAllOrderDetails(selectedRow.orderCode);
+		}
 
-		        // 모달 닫기 (기존 인스턴스가 있으면 가져오고, 없으면 생성)
-		        const registerModalEl = document.getElementById('registerModal');
-		        const registerModal = bootstrap.Modal.getOrCreateInstance(registerModalEl);
-		        registerModal.hide();
-		    }
+		// 주문 등록 버튼 클릭 이벤트
+		document.getElementById('registerButton').addEventListener('click', () => {
+		    checkOrderSelection(registerModal); // 등록 모달 띄우기
 		});
 
+		// 주문 거부 버튼 클릭 이벤트
+		document.getElementById('cancelButton').addEventListener('click', () => {
+		    checkOrderSelection(cancleModal); // 거부 모달 띄우기
+		});
 
-		
-		
-		
-		
-//		document.getElementById('registerButton').addEventListener('click', () => {
-//			if (!selectedRow) {
-//		          alert("주문을 선택해주세요.");
-//		          return;
-//		      }
-//		      
-//		      if (detailData.length === 0) {
-//		          alert("상세 정보를 로드해주세요.");
-//		          return;
-//		      }
-//
-		      // 선택된 주문 정보와 상세 정보 활용
-//		      console.log("선택된 주문:", selectedRow);
-//		      console.log("상세 정보:", detailData);
-//		});
+		// 공통된 버튼을 다루되, 모달에 따라 다르게 동작하도록 설정
+		document.querySelectorAll('.modal-footer #btn-register').forEach(button => {
+		    button.addEventListener('click', () => {
+		        if (selectedRow && selectedRow.orderCode) {
+		            // 현재 show 클래스가 있는 모달 찾기
+		            const activeModal = document.querySelector('.modal.show');
+		            
+		            if (activeModal) {
+		                if (activeModal.id === 'registerModal') {
+		                    // 주문 등록 처리
+		                    loadAllOrderDetails(selectedRow.orderCode);
+		                    registerModal.hide();
+		                } else if (activeModal.id === 'cancleModal') {
+		                    // 발주 취소 처리 로직
+		                    cancleModal.hide();
+		                }
+		            }
+		        } else {
+		            showAlert('주문을 선택해주세요!', 'danger');
+		        }
+		    });
+		});
+
+		document.querySelectorAll('.modal-footer .btn-secondary').forEach(button => {
+		    button.addEventListener('click', () => {
+		        // 현재 활성화된 모달 찾기
+		        const activeModal = document.querySelector('.modal.show');
+
+		        if (activeModal) {
+		        	//console.log(activeModal);
+		        	if (activeModal.id === 'registerModal') {
+	                    // 주문 등록 처리
+	                    registerModal.hide();
+	                } else if (activeModal.id === 'cancleModal') {
+	                    // 발주 취소 처리 로직
+	                    cancleModal.hide();
+	                }
+		        }
+		    });
+		});
+
+
+
+
 
 	  </script>
 

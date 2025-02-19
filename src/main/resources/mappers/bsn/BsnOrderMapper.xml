@@ -30,7 +30,7 @@ AND ROWNUM <= #{end}
 <include refid="searchInfoBhfOrder"></include>
 
 
-ORDER BY TO_NUMBER(REGEXP_SUBSTR(order_code, '\d+')), order_date, due_date
+ORDER BY TO_NUMBER(REGEXP_SUBSTR(order_code, '\d+')) desc, order_date desc, due_date desc
 
 </select>
 
