@@ -25,8 +25,8 @@ public class OrdDtlArrayTypeHandler implements TypeHandler<Object> {
 		OracleConnection conn = ps.getConnection().unwrap(OracleConnection.class); 
 		List<BsnOrderDetailDTO> orderDetails = (List<BsnOrderDetailDTO>)parameter;
 		
-		//배열의 크기 지정 : 8
-		Object[] filetype = new Object[8]; 
+		//배열의 크기 지정 : 10
+		Object[] filetype = new Object[10]; 
 	    Struct[] array = new Struct[orderDetails.size()];
 		
 	    int arrayIndex = 0;
@@ -39,6 +39,8 @@ public class OrdDtlArrayTypeHandler implements TypeHandler<Object> {
 	    	filetype[5] = detail.getGoodsStandard();
 	    	filetype[6] = detail.getUnitPrice();
 	    	filetype[7] = detail.getSummationAmt();
+	    	filetype[8] = detail.getGoodsName();
+	    	filetype[9] = detail.getOptionName();
 	    	
 	    	array[arrayIndex++] = conn.createStruct("BSN_ORD_DTL_FILETYPE", filetype);//FILETYPE은 Oracle에서 지정한 배열타입 이름 
 	    }		

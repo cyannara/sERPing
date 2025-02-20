@@ -23,4 +23,7 @@ public interface BsnOrderMapper {
 	
 	//주문 등록
 	void insertBsnOrder(BsnOrderDTO bsnOrderDTO);
+	
+	//발주신청 취소
+	void updateCancelBhfOrder(BhfOrderDTO bhfOrderDTO);
 }

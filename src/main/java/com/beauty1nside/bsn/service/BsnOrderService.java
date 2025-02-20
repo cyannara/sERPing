@@ -23,4 +23,7 @@ public interface BsnOrderService {
 	//주문 등록
 	public void registerOrder(BsnOrderDTO bsnOrederDTO);
 	
+	//발주 요청 취소
+	public void cancelBhfOrder(BhfOrderDTO bhfOrderDTO);
+	
 }

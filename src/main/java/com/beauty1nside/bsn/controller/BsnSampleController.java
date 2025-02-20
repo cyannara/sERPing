@@ -44,26 +44,46 @@ public class BsnSampleController {
 	};
 	
 	
-	
-	
-	
 	@GetMapping("/order")
-	public String order(
+	public String order() {
+		return "redirect:/bsn/orderRegist";
+	};
+	
+	
+	@GetMapping("/orderRegist")
+	public String orderRegist(
 			OrderSearchDTO searchDTO, Paging paging, Model model
 			) {
 		
 //		//페이징을 위해 검색결과 수 구하기
-		paging.setTotalRecord(bsnOrderService.getCountOfBhfOrder(searchDTO));
+//		paging.setTotalRecord(bsnOrderService.getCountOfBhfOrder(searchDTO));
 		
 //		//첫 페이지, 마지막 페이지
-		searchDTO.setStart(paging.getFirst());
-		searchDTO.setEnd(paging.getLast());
+//		searchDTO.setStart(paging.getFirst());
+//		searchDTO.setEnd(paging.getLast());
+		
 //		
 //		
 //		//검색결과 - 해당 페이지 내용
-		model.addAttribute("bhfOrder", bsnOrderService.getBhfOrder(searchDTO));
-		return "/bsn/order";
+//		model.addAttribute("bhfOrder", bsnOrderService.getBhfOrder(searchDTO));
+		return "/bsn/orderRegist";
 	};
 	
+	@GetMapping("/orderList")
+	public String orderList() {
+		
+//		//페이징을 위해 검색결과 수 구하기
+//		paging.setTotalRecord(bsnOrderService.getCountOfBhfOrder(searchDTO));
+		
+//		//첫 페이지, 마지막 페이지
+//		searchDTO.setStart(paging.getFirst());
+//		searchDTO.setEnd(paging.getLast());
+		
+//		
+//		
+//		//검색결과 - 해당 페이지 내용
+//		model.addAttribute("bhfOrder", bsnOrderService.getBhfOrder(searchDTO));
+		return "/bsn/orderList";
+	};
 	
 }

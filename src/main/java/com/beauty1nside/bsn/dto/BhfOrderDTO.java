@@ -18,4 +18,6 @@ public class BhfOrderDTO extends OrderSearchDTO {
 	private Date dueDate;
 	private String remark;
     private int companyNum;
+
+    private String orderCancelReason;
 }
