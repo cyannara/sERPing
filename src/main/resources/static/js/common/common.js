@@ -1,3 +1,9 @@
+
+// csrf
+const header_csrf = document.querySelector('meta[name="_csrf_header"]').content;
+const token_csrf = document.querySelector('meta[name="_csrf"]').content;
+
+
 function formatDateTime(dateString) {
     const date = new Date(dateString);
     const year = date.getFullYear();

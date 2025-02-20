@@ -72,7 +72,16 @@
             case '통장' :   
                             html += `<div class="row removeRow">
                                             <span class="col-2">은행</span>
-                                            <input type="text" class="col-8" id="financialInstitution">
+                                            <select class="col-8" id="financialInstitution">
+                                            	<option value="">은행</option>
+                                            	<option value="FI01">농협</option>
+                                            	<option value="FI02">국민</option>
+                                            	<option value="FI03">기업</option>
+                                            	<option value="FI04">신한</option>
+                                            	<option value="FI05">IM(대구)</option>
+                                            	<option value="FI06">하나</option>
+                                            	<option value="FI07">우리</option>
+                                            </select>
                                         </div>
 
                                         <div class="row removeRow">
@@ -87,7 +96,16 @@
             case '카드' :   
                             html += `<div class="row removeRow">
                                             <span class="col-2">카드사</span>
-                                            <input type="text" class="col-8" id="financialInstitution">
+                                            <select class="col-8" id="financialInstitution">
+	                                        	<option value="">은행</option>
+	                                        	<option value="FI01">농협</option>
+	                                        	<option value="FI02">국민</option>
+	                                        	<option value="FI03">기업</option>
+	                                        	<option value="FI04">신한</option>
+	                                        	<option value="FI05">IM(대구)</option>
+	                                        	<option value="FI06">하나</option>
+	                                        	<option value="FI07">우리</option>
+	                                        </select>
                                         </div>
 
                                         <div class="row removeRow">
@@ -136,7 +154,7 @@
 
 	})
 
-    // 디테일 모달이 닫힐 때
+    // 자산 등록 모달이 닫힐 때
     document.querySelector('#assetaddModal').addEventListener('hidden.bs.modal', () => {
         document.querySelectorAll('.removeRow').forEach(div => {
             div.remove();

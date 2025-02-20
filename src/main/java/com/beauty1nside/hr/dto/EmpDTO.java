@@ -29,6 +29,7 @@ public class EmpDTO {
     private String status; // 재직 상태 (공통코드: ST)
     private Date quitDate; // 퇴사일
     private String address; // 주소
+    private String addressDetail; // 상세주소
     private String zipCode; // 우편번호
     private String employmentType; // 근무 유형 (공통코드: ET)
     private String bankName; // 급여 지급 은행명
@@ -39,5 +40,8 @@ public class EmpDTO {
     private Date updateDate; // 수정일
     private Long companyNum; // 회사번호 (FK)
     private Long departmentNum; // 부서번호 (FK)
+    private Long salary; //연봉
     private String departmentName; //부서명
+    private String modalDepartment; //상위부서번호(departmentNum)
+    private String modalSubDepartment; //하위부서코드(departmentCode)
 }

@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.beauty1nside.bhf.dto.goodsin.BhfGoodsInVO;
-import com.beauty1nside.bhf.dto.goodsin.BhfGoodsOrdDTO;
-import com.beauty1nside.bhf.dto.goodsin.BhfGoodsOrdSearchDTO;
 import com.beauty1nside.bhf.mapper.BhfGoodsInMapper;
 import com.beauty1nside.bhf.service.BhfGoodsInService;
 
@@ -21,24 +19,6 @@ public class BhfGoodsInServiceImpl implements BhfGoodsInService {
 	public int goodsIn(List<BhfGoodsInVO> goodsList) {
 		
 		return mapper.goodsIn(goodsList);
-	}
-
-	@Override
-	public List<BhfGoodsOrdDTO> goodsOrdList(BhfGoodsOrdSearchDTO dto) {
-		
-		return mapper.goodsOrdList(dto);
-	}
-
-	@Override
-	public List<BhfGoodsOrdDTO> goodsOrdDtlList(BhfGoodsOrdSearchDTO dto) {
-		
-		return mapper.goodsOrdDtlList(dto);
-	}
-
-	@Override
-	public int count(BhfGoodsOrdSearchDTO dto) {
-		
-		return mapper.count(dto);
 	}
 
 	

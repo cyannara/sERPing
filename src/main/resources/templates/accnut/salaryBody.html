@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"></head>
+<body>    
+    <div class="container">
+    	<!-- 그리드 들어올 부분 -->
+		<hr>
+		<h2 id="payString" style="text-align: center;">다음과 같이 지급하시겠습니까? <br></h2>
+	</div>
+<script type="text/javascript">
+	let html = "";
+	// 급여 처리 모달 열 때
+	document.querySelector('#salaryModal').addEventListener('shown.bs.modal', (e) => {
+		if(document.querySelector('#salgrid')){ document.querySelector('#salgrid').remove(); }
+		html += `<div id="salgrid"></div>`;
+		document.querySelector('#salaryModal').querySelector('.container').insertAdjacentHTML("afterbegin", html);
+		//console.log(checkArray);
+		let total = 0;
+		for(let i = 0; i < checkArray.length; i++){
+			total += checkArray[i].paymentAmount;
+		}
+		/*
+		let newArray = [...checkArray];
+		newArray.unshift({"employeeName" : "총합", "paymentAmount" : total });
+		*/
+		const salgrid = new Grid({
+			el : document.querySelector('#salgrid'),
+			pageOptions: {
+				useClient : true,
+				perPage: 5,
+				},
+			/*
+			rowHeaders: ['checkbox'],
+			*/
+			columns: [
+				{ header : "직원", name : "employeeName",  align: "center"},
+				/*
+	      { header : "부서", name : "department",  },
+	      { header : "급여", name : "salary",  },
+	      { header : "초과수당", name : "excessAllowance",  },
+	      { header : "보너스", name : "bonus",  },
+	      { header : "부대비용", name : "incidentailCost",  },
+	      { header : "공제항목", name : "deductionItem",  },
+				 */
+	      { header : "지급금액", name : "paymentAmount",  align: "center"},
+			],
+			data : checkArray
+		});
+		
+		document.querySelector('#payString').insertAdjacentText("beforeend", `${checkArray[0].employeeName} 외 ${checkArray.length - 1}명, ${total}원`);
+
+		
+	});
+	
+	// 급여 처리 모달 닫을 때
+	document.querySelector('#salaryModal').addEventListener('hidden.bs.modal', (e) => {
+		document.querySelector('#salaryModal').querySelector('.container').querySelector('#salgrid').remove();
+		document.querySelector('#payString').innerHTML = '다음과 같이 지급하시겠습니까? <br>';
+		html = "";
+	});
+	
+	
+</script>
+</body>
+</html>

@@ -2,7 +2,7 @@
  <!-- =======================================================
  * 사용계약서를 작성 할 수 있다
  * @author 개발팀 표하연
- * @since 2025.02.17
+ * @since 2025.02.19
  * @version 1.0
  * @see
  *
@@ -20,12 +20,476 @@
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <body layout:fragment="content">
+	<style>
+		/* 전체 폰트 크기 조정 */
+		.container {
+		    font-size: 12px; /* 텍스트 크기 12px */
+		}
+		.contact-document{
+			width: 900px;
+		}
+		/* 인풋박스 스타일 조정 */
+		.input-box {
+		    height: 28px; /* 높이 줄이기 */
+		    font-size: 12px; /* 글씨 크기 조정 */
+		    padding: 2px 5px; /* 내부 패딩 조정 */
+		    width: auto; /* 기본 크기 자동 조정 */
+		    display: inline-block;
+		    font-weight: bold; /* 입력 텍스트 굵게 */
+		    color: black; /* 입력 텍스트 검은색 */
+		    text-align: right; /* 텍스트 오른쪽 정렬 */
+		}
+		/* <p> 태그 사이의 간격 줄이기 */
+		p {
+		    margin-bottom: 5px; /* 아래쪽 여백 최소화 */
+		    line-height: 1.2; /* 줄 간격 줄이기 */
+		}
+		.input-box::placeholder {
+		    color: #6c757d; /* Bootstrap text-secondary 색상 */
+		    opacity: 0.5; /* 투명도 조정 (기본값 0.5) */
+		}
+		/* 버튼 크기 통일 */
+		.btn-lg {
+		    width: 200px; /* 버튼 너비 동일하게 설정 */
+		    height: 60px; /* 버튼 높이 동일하게 설정 */
+		    font-size: 24px !important; /* 글자 크기 24px */
+		    font-weight: bold; /* 글자 굵게 */
+		    text-align: center; /* 텍스트 중앙 정렬 */
+		    display: flex;
+		    justify-content: center; /* 버튼 내부 텍스트 중앙 정렬 */
+		    align-items: center; /* 버튼 내부 텍스트 수직 중앙 정렬 */
+		    white-space: nowrap; /* 줄바꿈 방지 */
+		    min-width: 180px; /* 최소 너비 설정 */
+		    padding: 10px; /* 버튼 내부 패딩 추가 */
+		}
+		#drawCanvas {
+		    border: 1px solid black;
+		    cursor: crosshair;
+		    background-color: white;
+		}
+		.btn-container {
+		    margin-top: 10px;
+		}
+	</style>
     <div class="container">
-    	<h1>사용계약서</h1>
+    	<form action="">
+    		<div class="d-flex justify-content-between align-items-start" style="width: 1200px;">
+	    		<div class="bg-white contact-document">
+			        <h2 class="text-center fw-bold pt-4">사용계약서</h2>
+			        <div class="p-4">
+			            <p><strong>beautyInside</strong> (이하 "제공자"이라 칭함)과 
+			                <input type="text" class="form-control d-inline-block w-auto input-box" id="contract1" placeholder="업체명"> 
+			                (이하 "사용자"이라 칭함)간에 sERPing 사용 계약을 체결한다.</p>
+			            
+			            <h5 class="fw-bold mt-4">제 1조 &lt;목적&gt;</h5>
+			            <p>본 계약의 목적은 "제공자"의 sERPing 프로그램(이하 "프로그램"이라 칭함)을 "사용자"에게 제공함에 있어 <br>"제공자", "사용자" 양자간의 제반 약정 내용을 규정함에 있다.</p>
+			
+			            <h5 class="fw-bold mt-4">제 2조 &lt;"프로그램" 사용범위&gt;</h5>
+			            <p>가. "사용자"는 "제공자"의 "프로그램"을 
+			                <input type="text" class="form-control d-inline-block w-auto input-box" id="contract2" placeholder="사용기간">
+			                에 맞게 
+			                <input type="text" class="form-control d-inline-block w-auto input-box" id="contract3" placeholder="금액"> 
+			                을 지불하여 사용한다.
+			            </p>
+			
+			            <p>나. "사용자"는 "프로그램"을 
+			                <input type="text" class="form-control d-inline-block w-auto input-box" id="contract4" placeholder="기능">
+			                을 필요한 형태에 맞게 사용한다.
+			            </p>
+			            
+			            <p>다. "프로그램"에 일부 기능은 
+			                <input type="text" class="form-control d-inline-block w-auto input-box" id="contract5" placeholder="별도">
+			                의 
+			                <input type="text" class="form-control d-inline-block w-auto input-box" id="contract6" placeholder="금액">
+			                을 
+			                <input type="text" class="form-control d-inline-block w-auto input-box" id="contract7" placeholder="지불">
+			                하여 사용한다.
+			            </p>
+			
+			            <h5 class="fw-bold mt-4">제 3조 &lt;"프로그램" 사용기간&gt;</h5>
+			            <p>가. 사용기간은 "제공자"에 의해 변경 될 수 있으며 변경전 "사용자"에게 고지 한다.</p>
+			
+			            <p>나. 최초 사용시에는 계약서를 작성하며, 
+			                <input type="text" class="form-control d-inline-block w-auto input-box" id="contract8" placeholder="서비스연장">
+			                및 
+			                <input type="text" class="form-control d-inline-block w-auto input-box" id="contract9" placeholder="추가결제">
+			                에 대해서는 계약서 작성 하지 않는다.
+			            </p>
+			            
+			            <h5 class="fw-bold mt-4">제 4조 &lt;조건&gt;</h5>
+			            <p>가. "사용자"는 "프로그램" 사용중 
+				            <input type="text" class="form-control d-inline-block w-auto input-box" id="contract10" placeholder="계약종료"> 
+				            가능하다.
+				        </p>
+			
+			            <p>나. "제공자"는 "사용자"의  
+			                <input type="text" class="form-control d-inline-block w-auto input-box" id="contract11" placeholder="위법적사용"> 
+			                , 
+			                <input type="text" class="form-control d-inline-block w-auto input-box" id="contract12" placeholder="사용료장기미납"> 
+			                의 사유로 "프로그램"계약을 종료 할 수 있다.
+			            </p>
+			            
+			            <p>다. 계약종료 될 경우 남은 서비스기간 및 할인율을 계산하여   
+			                <input type="text" class="form-control d-inline-block w-auto input-box" id="contract13" placeholder="환불">  
+			                받을 수 있다.
+			            </p>
+			            
+			            <p>라. "프로그램"의   
+			                <input type="text" class="form-control d-inline-block w-auto input-box" id="contract14" placeholder="화면"> 
+			                , 
+			                <input type="text" class="form-control d-inline-block w-auto input-box" id="contract15" placeholder="기능">  
+			                은 "제공자"에 의해
+			                <input type="text" class="form-control d-inline-block w-auto input-box" id="contract16" placeholder="변경">  
+			                될 수 있다. <br>변경되는 경우 30일 이전에 "사용자"에게 고지 한다.
+			            </p>
+			            
+			            <h5 class="fw-bold mt-4">제 5조 &lt;귀속&gt;</h5>
+			            <p>가. "프로그램"은 "제공자"의 저작권리가 있으며 "사용자"는 "프로그램"의 
+			            	<input type="text" class="form-control d-inline-block w-auto input-box" id="contract17" placeholder="내부기능"> 
+			            	을 사용하여 만들어진   <br>
+			            	<input type="text" class="form-control d-inline-block w-auto input-box" id="contract18" placeholder="작업물"> 
+			            	에 대해서는 "사용자"에게 저작권리가 있다.
+			            </p>
+			
+			            <p>나. 최초 사용시에는 계약서를 작성하며, 
+			                <input type="text" class="form-control d-inline-block w-auto input-box" id="contract19" placeholder="서비스연장">
+			                및 
+			                <input type="text" class="form-control d-inline-block w-auto input-box" id="contract20" placeholder="추가결제">
+			                에 대해서는 계약서 작성 하지 않는다.
+			            </p>
+			            <br>
+			            <div class="text-end contract-date">
+						    <span class="fw-bold">계약을 체결 후</span>
+						    <input type="text" class="form-control d-inline-block w-auto input-box" id="contract21" placeholder="즉시효력발생">
+						    <span class="fw-bold">한다.</span>
+						    <br><br>
+						    <input type="text" class="form-control d-inline-block w-auto input-box" id="contract22" placeholder="2025"> <span class="fw-bold">년</span>
+						    <input type="text" class="form-control d-inline-block w-auto input-box" id="contract23" placeholder="02"> <span class="fw-bold">월</span>
+						    <input type="text" class="form-control d-inline-block w-auto input-box" id="contract24" placeholder="04"> <span class="fw-bold">일</span>
+						</div>
+			        </div>
+			    </div>
+			    <!-- 버튼 영역 -->
+			    <div class="btn-section text-center">
+				    <div class="d-flex flex-column align-items-center mb-3">
+				        <!-- 전자서명 캔버스 영역 -->
+				        <div class="p-2">
+				            <canvas id="drawCanvas" width="300" height="150" style="display: none;"></canvas>
+				            <img id="imgCanvas" width="300" height="150" style="display: none;"/>
+				        </div>
+				
+				        <!-- 상단 버튼 (재서명) -->
+				        <div class="p-2"><button type="button" class="btn btn-primary btn-lg" onclick="clearCanvas()" style="visibility: hidden;">재서명</button></div>
+				
+				        <!-- 간격 추가 -->
+				        <div class="p-3"></div>
+				
+				        <!-- 하단 버튼 (계약완료, 초기화) -->
+				        <div class="p-2"><button type="button" class="btn btn-success btn-lg" id="register" style="visibility: hidden;">계약완료</button></div>
+				        <div class="p-2"><button type="button" class="btn btn-dark btn-lg" id="reset" style="visibility: hidden;">초기화</button></div>
+				    </div>
+				</div>
+		    </div>
+    	</form>
     </div>
+    <script th:inline="javascript">
+		setTimeout(async () => {
+			console.log("여기는 사용하는곳:", window.subscriptionState);
+			if(window.subscriptionState.subcon == "1"){
+				contactRead([[${session.companyNum}]]);
+			}else{
+				document.querySelectorAll(".btn-lg").forEach(btn => {
+					btn.style.visibility = "visible";
+			    });
+				document.querySelector("#drawCanvas").style.display = "block";
+			}
+		}, 500);
+		
+		//계약정보가 있으면 버튼지우고, DB에서 데이터가져와서 인풋박스에 다 집어넣기
+		function contactRead(companyNum){
+			document.querySelectorAll(".btn-lg").forEach(btn => {
+				btn.style.visibility = "hidden";
+		    });
+			console.log("회사번호"+companyNum);
+			fetch('/erp/rest/contactread/'+companyNum, {
+	            method: 'GET',
+	            headers: {
+	                "Content-Type": "application/json"
+	            },
+	            //body: JSON.stringify(contractData)
+	        })
+	        .then(response => response.json())
+	        .then(result => {
+		        if (result) {
+		            console.log(result);
+		            //계약정보를 인풋박스에 넣음 // 전자서명 못하게 막아버림
+		           	inputInsert(result);
+		        } else {
+		            alert("계약정보 불러오기 실패");
+		            return;
+		        }
+		    })
+		}
+		
+		// 계약 정보를 인풋박스에 자동 입력
+		function inputInsert(data) {
+		    // contract1 ~ contract24까지 자동 입력
+		    for (let i = 1; i <= 24; i++) {
+		        let input = document.querySelector(`#contract${i}`);
+		        if (input) {
+		            input.value = data[`contract${i}`] || ""; // 값이 없으면 빈 문자열로 설정
+		            input.readOnly = true; // 입력 필드 읽기 전용으로 변경
+		        }
+		    }
+		    //전자서명 불가 이미지로 대체
+		    document.querySelector("#drawCanvas").style.display = "none";
+		    //이미지 보이게
+		    document.querySelector("#imgCanvas").src = "http://www.hanalin.net/erp/signup/"+data.erpContractDocument;
+		    document.querySelector("#imgCanvas").style.display = "block";
+		}
+
+		
+		//초기화
+	    document.getElementById("reset").addEventListener("click", function() {
+	        document.querySelectorAll(".input-box").forEach(input => input.value = "");
+	        clearCanvas();
+	    });
+		
+		
+	    document.addEventListener("DOMContentLoaded", function() {
+	        const today = new Date();
+	        const year = today.getFullYear();
+	        const month = String(today.getMonth() + 1).padStart(2, "0"); // 1월 → 01월
+	        const day = String(today.getDate()).padStart(2, "0"); // 9일 → 09일
+
+	        document.getElementById("contract22").placeholder = year;
+	        document.getElementById("contract23").placeholder = month;
+	        document.getElementById("contract24").placeholder = day;
+	    });
+
+	    document.getElementById("register").addEventListener("click", async function() {
+	        let contract1 = document.getElementById("contract1");
+	        // contract1이 비어있을 경우 경고 및 포커스
+	        if (!contract1.value.trim()) {
+	            contract1.focus();
+	            alert(`[${contract1.placeholder}] 값을 입력해주세요`);
+	            return;
+	        }
+	        let fields = [
+	            { id: "contract2", placeholder: "사용기간" },
+	            { id: "contract3", placeholder: "금액" },
+	            { id: "contract4", placeholder: "기능" },
+	            { id: "contract5", placeholder: "별도" },
+	            { id: "contract6", placeholder: "금액" },
+	            { id: "contract7", placeholder: "지불" },
+	            { id: "contract8", placeholder: "서비스연장" },
+	            { id: "contract9", placeholder: "추가결제" },
+	            { id: "contract10", placeholder: "계약종료" },
+	            { id: "contract11", placeholder: "위법적사용" },
+	            { id: "contract12", placeholder: "사용료장기미납" },
+	            { id: "contract13", placeholder: "환불" },
+	            { id: "contract14", placeholder: "화면" },
+	            { id: "contract15", placeholder: "기능" },
+	            { id: "contract16", placeholder: "변경" },
+	            { id: "contract17", placeholder: "내부기능" },
+	            { id: "contract18", placeholder: "작업물" },
+	            { id: "contract19", placeholder: "서비스연장" },
+	            { id: "contract20", placeholder: "추가결제" },
+	            { id: "contract21", placeholder: "즉시효력발생" },
+	            { id: "contract22", placeholder: new Date().getFullYear().toString() },
+	            { id: "contract23", placeholder: String(new Date().getMonth() + 1).padStart(2, "0") },
+	            { id: "contract24", placeholder: String(new Date().getDate()).padStart(2, "0") }
+	        ];
+	        
+	        let contractData = { contract1: contract1.value.trim() };
+	        
+	        for (let field of fields) {
+	            let input = document.getElementById(field.id);
+	            if (input && input.value.trim() !== field.placeholder) {
+	                input.focus();
+	                alert(`[${field.placeholder}] 값을 입력해주세요`);
+	                return;
+	            }
+	            contractData[field.id] = input.value.trim();
+	        }
+	        
+	        if (!isCanvasSigned()) {
+	            alert("전자 서명을 해주세요!");
+	            return;
+	        }
+	        
+	        /* let contractData = {
+	        	    contract1: "업체명",
+	        	    contract2: "사용기간",
+	        	    contract3: "금액",
+	        	    contract4: "기능",
+	        	    contract5: "별도",
+	        	    contract6: "금액",
+	        	    contract7: "지불",
+	        	    contract8: "서비스연장",
+	        	    contract9: "추가결제",
+	        	    contract10: "계약종료",
+	        	    contract11: "위법적사용",
+	        	    contract12: "사용료장기미납",
+	        	    contract13: "환불",
+	        	    contract14: "화면",
+	        	    contract15: "기능",
+	        	    contract16: "변경",
+	        	    contract17: "내부기능",
+	        	    contract18: "작업물",
+	        	    contract19: "서비스연장",
+	        	    contract20: "추가결제",
+	        	    contract21: "즉시효력발생",
+	        	    contract22: new Date().getFullYear().toString(), // 현재 연도
+	        	    contract23: String(new Date().getMonth() + 1).padStart(2, "0"), // 현재 월 (2자리)
+	        	    contract24: String(new Date().getDate()).padStart(2, "0") // 현재 일 (2자리)
+	        	}; */
+	        
+	        //모두 완료된상태
+	        console.log(contractData);
+	        
+	        //이미지 등록 및 계약서 등록
+	        if(contractData){
+	        	
+	        	//이미지 등록
+	        	let uploadedFileName = "";
+	        	uploadedFileName = await uploadCanvasImage();
+	        	//console.log("업로드완료",uploadedFileName);
+	        	//이미지파일이 존재할 경우
+	        	if(uploadedFileName){
+	        		contractData["erpContractDocument"] = uploadedFileName.trim();
+	        		contractData["companyNum"] = [[${session.companyNum}]];
+	        		
+	        		console.log("최종데이터", contractData);
+	        		fetch('/erp/rest/contactinput', {
+			            method: 'POST',
+			            headers: {
+			                "Content-Type": "application/json"
+			            },
+			            body: JSON.stringify(contractData)
+			        })
+			        .then(response => response.json())
+			        .then(isSuccess => {
+				        if (isSuccess) {
+				            //alert("계약서 등록 성공");
+				            location.reload();
+				            return;
+				        } else {
+				            alert("계약서 등록에 실패 했습니다");
+				            return;
+				        }
+				    })
+	        	}else{
+	        		alert("전자서명이 이상합니다");
+	        		return;
+	        	}
+	        }
+	    });
+	    
+
+	    let isSigned = false; // 서명 여부 저장 변수
+	    let drawnPoints = []; // 서명 좌표값 저장 배열
+	    // 캔버스 요소 및 컨텍스트 가져오기
+	    const canvas = document.getElementById("drawCanvas");
+	    const ctx = canvas.getContext("2d");
+	    let painting = false;
+	    // 배경 설정 및 글자 추가
+	    function drawBackgroundText() {
+	        ctx.fillStyle = "white"; // 캔버스 배경색 (흰색)
+	        ctx.fillRect(0, 0, canvas.width, canvas.height); // 캔버스 초기화
+	        ctx.font = "50px Arial"; // 글꼴 및 크기 설정
+	        ctx.fillStyle = "gray"; // 글자 색상 설정
+	        ctx.textAlign = "center"; // 중앙 정렬
+	        ctx.fillText("전자서명", canvas.width / 2, canvas.height / 1.6);
+	    }
+	    // 처음 실행 시 배경 그리기
+	    drawBackgroundText();
+	    // 마우스 좌표 가져오기
+	    function getMousePos(event) {
+	        const rect = canvas.getBoundingClientRect();
+	        return {
+	            x: event.clientX - rect.left,
+	            y: event.clientY - rect.top
+	        };
+	    }
+	    // 마우스 드래그 시작
+	    function startPosition(event) {
+	        painting = true;
+	        isSigned = true; // 서명 상태를 true로 변경
+	        drawnPoints.push(getMousePos(event)); // 첫 좌표 저장
+	    }
+	    // 마우스 이동 중 (드래그)
+	    function draw(event) {
+	        if (!painting) return;
+	        const pos = getMousePos(event);
+	        drawnPoints.push(pos); // 이동한 좌표 저장
+	        ctx.lineWidth = 3;
+	        ctx.lineCap = "round";
+	        ctx.strokeStyle = "black";
+	        ctx.lineTo(pos.x, pos.y);
+	        ctx.stroke();
+	    }
+	    // 마우스 드래그 종료
+	    function endPosition() {
+	        painting = false;
+	        ctx.beginPath();
+	    }
+	    // 캔버스 초기화 (지우기)
+	    function clearCanvas() {
+	        ctx.clearRect(0, 0, canvas.width, canvas.height);
+	        isSigned = false; // 서명 상태 초기화
+	        drawnPoints = []; // 저장된 좌표도 초기화
+	        drawBackgroundText(); // 배경 다시 그리기
+	    }
+	    // 서명 여부 확인 함수
+	    function isCanvasSigned() {
+	        return drawnPoints.length > 0; // 좌표값이 하나라도 있으면 서명됨
+	    }
+	    // 캔버스를 이미지로 변환 후 저장 (PNG 다운로드)
+	    /* function saveCanvasAsImage() {
+	        const image = canvas.toDataURL("image/png"); // PNG 형식으로 변환
+	        const link = document.createElement("a");
+	        link.href = image;
+	        link.download = "signature.png"; // 파일 이름 지정
+	        link.click(); // 자동 다운로드 실행
+	    } */
+	    // 이미지를 서버에 업로드 blob
+	    function uploadCanvasImage() {
+		    return new Promise((resolve, reject) => {
+		        const canvas = document.getElementById("drawCanvas");
+		        if (!isCanvasSigned()) {
+		            alert("전자 서명을 해주세요!");
+		            resolve(""); // 서명이 없으면 빈 값 반환
+		            return;
+		        }
+		        canvas.toBlob((blob) => {
+		            const formData = new FormData();
+		            formData.append("file", blob, "signature.png");
+		            fetch('/erp/rest/uploadsignup', {
+		                method: 'POST',
+		                body: formData
+		            })
+		            .then(response => response.text()) // 서버 응답을 텍스트로 받기
+		            .then(data => {
+		                if (data !== "FAIL") {
+		                    resolve(data); // 업로드된 파일명을 반환
+		                } else {
+		                    alert("업로드 실패");
+		                    resolve(""); // 실패 시 빈 값 반환
+		                }
+		            })
+		            .catch(error => {
+		                console.error("업로드 실패:", error);
+		                resolve(""); // 에러 발생 시 빈 값 반환
+		            });
+		        }, "image/png");
+		    });
+		}
+	    
+	    // 이벤트 리스너 추가
+	    canvas.addEventListener("mousedown", startPosition);
+	    canvas.addEventListener("mousemove", draw);
+	    canvas.addEventListener("mouseup", endPosition);
+	    canvas.addEventListener("mouseleave", endPosition);
+	</script>
 <body>
-<script th:inline="javascript">
-	setTimeout(async () => {
-		console.log("여기는 사용하는곳:", window.subscriptionState);
-	}, 500);
-</script>

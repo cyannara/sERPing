@@ -21,10 +21,28 @@
 		<ul class="nav">
 			<li class="nav-item"><a class="nav-link"
 				href="/bsn/order"> <i class="icon-grid menu-icon"></i> <span
-					class="menu-title">주문등록</span>
+					class="menu-title">주문관리</span>
+			</a>
+			<div class="collapse" id="ui-basic-1">
+					<ul class="nav flex-column sub-menu">
+						<li class="nav-item"><a class="nav-link"
+							href="/bsn/orderList">주문조회</a></li>
+						<li class="nav-item"><a class="nav-link"
+							href="/bsn/orderRegist">주문등록</a></li>
+						<li class="nav-item"><a class="nav-link"
+							href="/bsn/order">상품재고조회</a></li>
+					</ul>
+				</div>
+			</li>
+			<li class="nav-item"><a class="nav-link"
+				href="/bsn/order"> <i class="icon-grid menu-icon"></i> <span
+					class="menu-title">출고관리</span>
+			</a></li>
+			<li class="nav-item"><a class="nav-link"
+				href="/bsn/order"> <i class="icon-grid menu-icon"></i> <span
+					class="menu-title">CS관리</span>
 			</a></li>
 		</ul>
-		<span class="menu-title">inventory</span>
 	</div>
 	<div
 		th:if="${#strings.equals('inventory', param.menu) or #strings.equals('inventory', menu)}">

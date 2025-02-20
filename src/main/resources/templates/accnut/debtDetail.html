@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"></head>
+<body>    
+    <div class="container">
+        <div class="row">
+            <span class="col-2">채무 코드</span>
+            <input type="text" class="col-8" id="debtCode" readonly>
+        </div>
+
+        <div class="row">
+            <span class="col-2">구분</span>
+            <input type="text" class="col-8" id="section" readonly>
+        </div>
+
+        <div class="row">
+            <span class="col-2">채무명</span>
+            <input type="text" class="col-8" id="debtName" readonly>
+        </div>
+
+        <div class="row">
+            <span class="col-2">채권자</span>
+            <input type="text" class="col-8" id="creditor" readonly>
+        </div>
+
+        <div class="row">
+            <span class="col-2">금액</span>
+            <input type="number" class="col-8" id="amount" readonly>
+        </div>
+
+        <div class="row">
+            <span class="col-2">등록일</span>
+            <input type="date" class="col-8" id="registerDate" readonly>
+        </div>
+        
+    </div>
+<script type="text/javascript">
+    // 디테일 모달이 보여질때
+	document.querySelector('#debtdetailModal').addEventListener('shown.bs.modal', (e) => {
+        // 당겨올 데이터가 있을 때
+        if(rowData != []){
+            // 디테일 모달 태그 접근
+            let con = document.querySelector('#debtdetailModal').querySelector('.modal-body .container');
+
+            let debtCode =  con.querySelector('#debtCode');
+            let section = con.querySelector('#section');
+            let debtName = con.querySelector('#debtName');
+            let creditor = con.querySelector('#creditor');
+            let amount = con.querySelector('#amount');
+            let registerDate = con.querySelector('#registerDate');
+
+            // 디테일 모달 값 넣기
+            debtCode.value = rowData.debtCode;
+            section.value = rowData.section;
+            debtName.value = rowData.debtName;
+            creditor.value = rowData.creditor;
+            amount.value = rowData.amount;
+            registerDate.value = rowData.registerDate;
+
+
+            let html = "";
+            switch(rowData.section){
+                case '대출금' :   html += `	<div class="row removeRow">
+												<span class="col-2">이자율</span>
+												<input type="number" class="col-8" id="interest" readonly value="${rowData.interest}">
+											</div>
+											
+											<div class="row removeRow">
+												<span class="col-2">예정납기일</span>
+												<input type="date" class="col-8" id="prearrangementDueDate" readonly value="${rowData.prearrangementDueDate}">
+											</div>
+                                    `;
+                                amount.closest("div.row").insertAdjacentHTML("afterend", html);
+                                break;
+                case '미지급금' :   html += `	<div class="row removeRow">
+												<span class="col-2">예정납기일</span>
+												<input type="date" class="col-8" id="prearrangementDueDate" readonly value="${rowData.prearrangementDueDate}">
+											</div>
+                                    `;
+                                amount.closest("div.row").insertAdjacentHTML("afterend", html);
+                                break;
+                case '외상매입금' :   html += `<div class="row removeRow">
+													<span class="col-2">이자율</span>
+													<input type="number" class="col-8" id="interest" readonly value="${rowData.interest}">
+												</div>
+									 
+									 		<div class="row removeRow">
+												<span class="col-2">기한</span>
+												<input type="date" class="col-8" id="timeLimit" readonly value="${rowData.timeLimit}">
+											</div>
+                                    `;
+                                amount.closest("div.row").insertAdjacentHTML("afterend", html);
+                                break;
+                default : break;
+            } //switch
+            html = "";
+        } // if(!rowData)
+    });
+
+    // 디테일 모달이 닫힐 때
+    document.querySelector('#debtdetailModal').addEventListener('hidden.bs.modal', () => {
+        rowData = [];
+        document.querySelectorAll('.removeRow').forEach(div => {
+            div.remove();
+        })
+    });
+
+
+</script>
+</body>
+</html>

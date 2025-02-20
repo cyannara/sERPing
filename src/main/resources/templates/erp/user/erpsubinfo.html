@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+ <!-- =======================================================
+ * ERP 사용 회사의 구독 정보를 확인 한다
+ * @author 개발팀 표하연
+ * @since 2025.02.20
+ * @version 1.0
+ * @see
+ *
+ * <pre>
+ * << 개정이력(Modification Information) >>
+ *
+ *   수정일      수정자          수정내용
+ *  -------    --------    ---------------------------
+ *  2025.02.20  표하연          최초 생성
+ *
+ *  </pre>
+ ======================================================== -->
+<html layout:decorate="~{layouts/layout}"
+      lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<body layout:fragment="content">
+	<style>
+	</style>
+	<div class="container">
+		<div class="container">
+        <h3>구독 정보</h3>
+        <nav class="p-0 m-0 d-flex justify-content-start">
+		    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+		        <button class="nav-link border active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-fp"
+		            type="button" role="tab" aria-controls="#nav-fp" aria-selected="true">구독 상태</button>
+		        <button class="nav-link border" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-rg"
+		            type="button" role="tab" aria-controls="#nav-rg" aria-selected="false">구독 목록</button>
+		    </div>
+		</nav>
+
+
+        <div class="tab-content border" id="nav-tabContent" style="background-color: #ffffff;">
+            <!-- 구독 상태 -->
+            <div class="tab-pane fade show active" id="nav-fp" role="tabpanel" aria-labelledby="nav-fp-tab" tabindex="0">
+                <h3>구독 상태</h3>
+			</div>
+            <!-- 구독 목록 -->
+            <div class="tab-pane fade" id="nav-rg" role="tabpanel" aria-labelledby="nav-rg-tab" tabindex="0">
+                <h3>구독 목록</h3>
+            </div>
+        </div>
+    </div>
+	</div>
+	<script th:inline="javascript">
+		setTimeout(async () => {
+			console.log("여기는 사용하는곳:", window.subscriptionState);
+		}, 500);
+	</script>
+</body>
