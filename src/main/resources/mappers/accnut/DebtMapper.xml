@@ -48,5 +48,25 @@
 		
 	</sql>
 	
+	<insert id="insert" parameterType="com.beauty1nside.accnut.dto.DebtDTO">
+		INSERT INTO accnut_debt(debt_code, section, debt_name, creditor, amount, register_date, company_num
+		<if test="prearrangementDueDate != null and ! prearrangementDueDate.equals('')"></if>	
+			, prearrangement_due_date		
+		<if test="interest != null and interest != 0"></if>
+			, interest		
+		<if test="timeLimit != null and ! timeLimit.equals('')"></if>
+			, time_limit
+		)
+		VALUES (accnut_debt_seq.nextval, #{section}, #{debtName}, #{creditor}, #{amount}, #{registerDate}, #{companyNum}
+		<if test="prearrangementDueDate != null and ! prearrangementDueDate.equals('')"></if>
+			, #{prearrangementDueDate}
+		<if test="interest != null and interest != 0"></if>
+			, #{interest}
+		<if test="timeLimit != null and ! timeLimit.equals('')"></if>
+			, #{timeLimit}
+		)
+	
+	</insert>
+	
 
 </mapper>

@@ -7,14 +7,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 >
 
 <head>
-  <title>sERPing</title>
-
  
-
-  
-
-  
-  
   <style>
   	#custom-container{
 		background-color: #f8f9fa; /* 연한 회색 배경 */
@@ -161,10 +154,10 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
      
       
      <div th:include="bsn/modal/bsnModalTemplate :: ModalTemplate(
-						    	'cancleModal', 
+						    	'cancelModal', 
 						    	'modal-md', 
 						    	'발주 거부 및 취소', 
-						    	'bsn/modal/bsnOrdCancle', 
+						    	'bsn/modal/bsnOrdCancel', 
 						    	'bsn/modal/bsnModalFooter')">
      </div>
      
@@ -196,7 +189,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		
 		const dataSource = {
 				api: {
-					readData: { url: 'http://localhost:81/bsn/rest/bhforder', method: 'GET', 
+					readData: { url: 'http://localhost:81/bsn/rest/bhfOrder', method: 'GET', 
 						initParams: { page: 1 }},
 				},
 				contentType: 'application/json'
@@ -251,6 +244,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		            <p><strong>납기일:</strong> ${formatDate(selectedRow.dueDate, 'due')}</p>
 		            ${selectedRow.remark ? `<p><strong>비고:</strong> ${selectedRow.remark}</p>` : ''}
 		        `;
+		        
 		    }
 			
 			
@@ -269,7 +263,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		        return;
 		    }
 
-		    fetch(`http://localhost:81/bsn/rest/bhforder/detail?orderCode=${orderCode}&perPage=5&page=1`)
+		    fetch(`http://localhost:81/bsn/rest/bhfOrder/detail?orderCode=${orderCode}&perPage=5&page=1`)
 		        .then(response => {
 		            if (!response.ok) throw new Error(`HTTP 오류! 상태: ${response.status}`);
 		            return response.json();
@@ -307,7 +301,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		    ]
 		});
 
-		
+		//검색
 		function search(){
 			let selectedOption = document.querySelector('input[name="optionsRadios"]:checked').value; // 라디오 버튼 선택 값
 		    let startDate = document.getElementById("startDate").value; // 시작 날짜
@@ -339,6 +333,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		    //grid.readData();
 		}
 		
+		//검색 조건 초기화
 		function reset(){
 			// 라디오 버튼 선택 값 초기화
 		    // "사용안함" 라디오 버튼을 체크하도록 설정
@@ -358,7 +353,23 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		}
 		
 		
-		
+		// 주문등록, 발주취소 한뒤 화면 초기화
+		function refreshOrderGrid() {
+			
+			
+		    // 상세 테이블 초기화
+		    detailGrid.resetData([]);
+
+		    // 그리드 데이터 갱신
+		    grid.reloadData();
+
+		    // 요청 정보 출력 삭제
+		    document.querySelector('#selectedOrder').innerHTML = '';
+		    
+		    selectedRow = null; // 선택된 주문 정보 초기화
+			detailData = [];    // 상세 데이터 정보 초기화
+		}
+
 		
 		
 		
@@ -376,7 +387,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		
 		    while (!isLastPage) {
 		        try {
-		            const response = await fetch(`http://localhost:81/bsn/rest/bhforder/detail?orderCode=${orderCode}&perPage=5&page=${page}`);
+		            const response = await fetch(`http://localhost:81/bsn/rest/bhfOrder/detail?orderCode=${orderCode}&perPage=5&page=${page}`);
 		            if (!response.ok) throw new Error(`HTTP 오류! 상태: ${response.status}`);
 		            
 		            const data = await response.json();
@@ -408,10 +419,10 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		    console.log("등록할 주문:", orderDTO);
 		    
 		 	// 등록 함수 호출(실험하기 위해 막아둠)
-		    //registerOrder(orderDTO);
+		    registerOrder(orderDTO);
 		 	
-		 	//상세 테이블 초기화(임시용, 위 주석 해제시 밑에 코드 제거)
-		    detailGrid.resetData([]);
+		 	//화면 초기화 함수
+		 	//refreshOrderGrid();
 		 	
 		}
 
@@ -429,7 +440,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		
 		    // 모든 페이지의 데이터를 순차적으로 가져오는 함수
 		    function fetchPageData() {
-		        fetch(`http://localhost:81/bsn/rest/bhforder/detail?orderCode=${orderCode}&perPage=5&page=${page}`)
+		        fetch(`http://localhost:81/bsn/rest/bhfOrder/detail?orderCode=${orderCode}&perPage=5&page=${page}`)
 		            .then(response => {
 		                if (!response.ok) throw new Error(`HTTP 오류! 상태: ${response.status}`);
 		                return response.json();
@@ -507,11 +518,8 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		    .then(data => {
 		        if (data.status === "success") {
 		            showAlert('주문 등록 성공', 'success');
-		         	// 값 초기화
-		            selectedRow = null; // 선택된 주문 정보 초기화
-	    			detailData = [];    // 상세 데이터 정보 초기화
-	    			
-	    			detailGrid.resetData([]);	//상세 그리드 빈배열로 초기화
+		         	// 값 초기화 + 값 초기화
+		            refreshOrderGrid();
 		           
 		        } else {
 		            showAlert('발주 등록 실패:'+ data.message, 'danger');
@@ -520,14 +528,65 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 
 		    }) 
 		}
+		
+		//취소 사유 입력용 객체 생성
+		function createCancelRequest() {
+			const cancelReasonInput = document.querySelector('#cancelReason');
+		    const cancelReason = cancelReasonInput.value.trim(); // 공백 제거
+
+		    if (!cancelReason) { // 빈 값 체크
+		        showAlert('취소 사유를 입력해주세요!', 'danger');
+		        cancelReasonInput.focus(); // 입력창에 포커스
+		        return null; // 유효하지 않은 입력이면 null 반환
+		    }
+		    
+		    return {
+		        orderCode: selectedRow.orderCode, // 선택된 주문 코드
+		        orderCancelReason: cancelReason //cancelReasonInput.value
+		    };
+		}
+		
+		// 발주 취소 함수
+		function cancelOrder(cancelRequest) {
+			const header = document.querySelector('meta[name="_csrf_header"]').content;
+		    const token = document.querySelector('meta[name="_csrf"]').content;
+			
+		    fetch('http://localhost:81/bsn/rest/bhfOrder/cancel', {
+		        method: 'POST',
+		        headers: {
+		        	'header': header,
+		        	'X-CSRF-Token': token,
+		            'Content-Type': 'application/json'  // JSON 형식으로 보내기
+		        },
+		        body: JSON.stringify(cancelRequest)  // 객체를 JSON으로 변환하여 전송
+		    })
+		    .then(response => response.json())
+		    .then(data => {
+		        if (data.status === "success") {
+		            showAlert('발주 취소 완료', 'success');
+		         	// 그리드 초기화 + 값 초기화
+		            refreshOrderGrid();
+		            document.querySelector('#cancelReason').value = '';
+		           
+		        } else {
+		            showAlert('발주 취소 실패:'+ data.message, 'danger');
+		        }
+
+
+		    }) 
+		}
 
 		// 모달 인스턴스 생성
 		const registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
-		const cancleModal = new bootstrap.Modal(document.getElementById('cancleModal'));
+		const cancelModal = new bootstrap.Modal(document.getElementById('cancelModal'));
 
 		// 주문 선택 확인 함수
 		function checkOrderSelection(modal) {
 		    if (selectedRow && selectedRow.orderCode) {
+		    	// 모달이 'cancelModal'이면 발주 코드 표시
+		        if (modal === cancelModal) {
+		            document.getElementById("cancelOrderCode").textContent = selectedRow.orderCode;
+		        }
 		        modal.show();
 		    } else {
 		        showAlert('주문을 선택해주세요!', 'danger');
@@ -541,7 +600,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 
 		// 주문 거부 버튼 클릭 이벤트
 		document.getElementById('cancelButton').addEventListener('click', () => {
-		    checkOrderSelection(cancleModal); // 거부 모달 띄우기
+		    checkOrderSelection(cancelModal); // 거부 모달 띄우기
 		});
 
 		// 공통된 버튼을 다루되, 모달에 따라 다르게 동작하도록 설정
@@ -556,9 +615,15 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		                    // 주문 등록 처리
 		                    loadAllOrderDetails(selectedRow.orderCode);
 		                    registerModal.hide();
-		                } else if (activeModal.id === 'cancleModal') {
-		                    // 발주 취소 처리 로직
-		                    cancleModal.hide();
+		                    
+		                } else if (activeModal.id === 'cancelModal') {
+		                	// 발주요청 취소용 객체 생성
+		                    const cancelRequest = createCancelRequest();
+		                    if (!cancelRequest) return; // 취소 사유가 없으면 중단
+		                    //발주요청 취소 처리
+		                    cancelOrder(cancelRequest);
+		                    //console.log(cancelRequest);
+		                    cancelModal.hide();
 		                }
 		            }
 		        } else {
@@ -577,9 +642,10 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		        	if (activeModal.id === 'registerModal') {
 	                    // 주문 등록 처리
 	                    registerModal.hide();
-	                } else if (activeModal.id === 'cancleModal') {
+	                } else if (activeModal.id === 'cancelModal') {
 	                    // 발주 취소 처리 로직
-	                    cancleModal.hide();
+	                    document.querySelector('#cancelReason').value = '';
+	                    cancelModal.hide();
 	                }
 		        }
 		    });

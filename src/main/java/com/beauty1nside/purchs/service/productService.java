@@ -25,6 +25,10 @@ public interface productService {
 	//상품등록 (옵션 등록)
 	public void goodsinsert(ProdInsertVO vo);
 	
+	//상품리스트 조회
+	public List<ProductDTO> getProductlist(ProductSearchDTO dto);
+	int productcount(ProductSearchDTO vo);
+	
 	
 	
 }

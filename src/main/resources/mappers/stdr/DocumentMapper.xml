@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beauty1nside.stdr.mapper.DocumentMapper">
+	<select id="documentList" resultType="com.beauty1nside.stdr.dto.DocumentDTO" parameterType="com.beauty1nside.stdr.dto.DocumentSearchDTO">
+		SELECT s.document_id,
+		s.document_type,
+		s.document_name,
+		s.document_template,
+		s.dept_name,
+		s.approval_type,
+		s.company_num
+		FROM (
+		SELECT /*+ INDEX_DESC(stdr_document pk_stdr_document) */
+		rownum rn,
+		document_id,
+		document_type,
+		document_name,
+		document_template,
+		dept_name,
+		approval_type,
+		company_num
+		FROM stdr_document
+		<![CDATA[
+            WHERE rownum <= #{dto.end}
+            AND
+        ]]>
+		company_num LIKE '%' || #{dto.companyNum} || '%'
+		) s
+		WHERE rn >= #{dto.start}
+	</select>
+
+	<select id="count">
+		SELECT COUNT(document_id)
+		FROM stdr_document
+		<where>
+			company_num LIKE '%' || #{dto.companyNum} || '%'
+		</where>
+	</select>
+</mapper>

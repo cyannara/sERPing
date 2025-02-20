@@ -1,7 +1,6 @@
 package com.beauty1nside.bsn.dto;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,6 +21,8 @@ public class BsnOrderDetailDTO {
 	private String goodsStandard;
 	private Double unitPrice;
 	private Double summationAmt;
+	private String goodsName;
+	private String optionName;
 	
 	
 

@@ -15,17 +15,14 @@
 		WHERE in_approval_id = #{inApprovalId} and company_num = #{companyNum}
 	
 	</select>
-
-	<update id="update">
+	<update id="update" parameterType="com.beauty1nside.mainpage.dto.ApprovalDTO">
 		update grpwr_in_approval
-		<if test="processStr == 'approve'">
-			set in_approval_status = 'APPROVED'
-		</if>
-		<if test="processStr == 'reject'">
-			set in_approval_status = 'REJECTED', IN_APPROVAL_REJECTED_CONTENT = #{reason}
+		set in_approval_status = #{inApprovalStatus}
+		<if test="inApprovalStatus == 'REJECTED'">
+			, IN_APPROVAL_REJECTED_CONTENT = #{inApprovalRejectedContent}
 		</if>
 		where company_num = #{companyNum}
-			and in_approval_id = #{inApprovalId}
+		and in_approval_id = #{inApprovalId}
 	</update>
 
 	<select id="waitingList" resultType="com.beauty1nside.mainpage.dto.ApprovalDTO" parameterType="com.beauty1nside.mainpage.dto.ApprovalSearchDTO">
@@ -80,7 +77,7 @@
 
 	</select>
 
-	<select id="documentList" resultType="com.beauty1nside.mainpage.dto.DocumentDTO">
+	<select id="documentList" resultType="com.beauty1nside.stdr.dto.DocumentDTO">
 		select * from stdr_document
 	</select>
 

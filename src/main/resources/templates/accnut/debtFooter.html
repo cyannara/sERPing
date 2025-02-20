@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"></head>
+<body>    
+    
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+    
+        <script type="text/javascript">
+            //등록 모달이 보여질때
+            document.querySelector('#debtaddModal').addEventListener('shown.bs.modal', (e) => {
+                let footer = document.querySelector('#debtaddModal').querySelector('.modal-footer');
+                if (!footer.querySelector('.insertbtn')) {
+                    let btn = footer.querySelector('.btn-secondary');
+                    let html = `<button type="button" class="btn btn-success insertbtn" data-bs-dismiss="modal">등록</button>`;
+                    btn.insertAdjacentHTML("beforebegin", html);
+
+                    // 버튼에 이벤트 걸기
+                    footer.querySelector('.insertbtn').addEventListener('click', (e)=>{
+                        let param = {};
+
+                        let con = document.querySelector('#debtaddModal').querySelector('.modal-body .container');
+                        
+                        let debtCode =  con.querySelector('#debtCode');
+                        let section = con.querySelector('#section');
+                        let debtName = con.querySelector('#debtName');
+                        let creditor = con.querySelector('#creditor');
+                        let amount = con.querySelector('#amount');
+                        let registerDate = con.querySelector('#registerDate');
+
+                        param.debtCode = debtCode.value;
+                        param.section = section.value;
+                        param.debtName = debtName.value;
+                        param.creditor = creditor.value;
+                        param.amount = amount.value;
+                        param.registerDate = registerDate.value;
+                        param.companyNum = 0;
+                        
+                        if(con.querySelector('#interest')){
+                            let interest =  con.querySelector('#interest');
+                            param.interest = interest.value;
+                        }
+                        
+                        if(con.querySelector('#prearrangementDueDate')){
+                            let prearrangementDueDate =  con.querySelector('#prearrangementDueDate');
+                            param.prearrangementDueDate = prearrangementDueDate.value;
+                        }
+                        
+                        if(con.querySelector('#timeLimit')){
+                            let timeLimit =  con.querySelector('#timeLimit');
+                            param.timeLimit = timeLimit.value;
+                        }
+                        
+
+                        console.log(param);
+                        
+                        const header = document.querySelector('meta[name="_csrf_header"]').content;
+                        const token = document.querySelector('meta[name="_csrf"]').content;
+                        
+                        
+                        // 등록
+                        
+                        fetch("http://localhost:81/accnut/rest/debt/insert", {
+	        					method: "POST",
+	        					headers: {
+	        						 	'header': header,
+	        			                "Content-Type": "application/json",
+	        			                'X-CSRF-Token': token				
+	       						 },
+	        				body: JSON.stringify(param) // orderInfo 객체를 JSON 형식으로 변환(JSON.parse는 JSON을 객체로 변환)
+	    					})
+	   						 .then(response => response.json())
+	    					 .then(data => { 
+	    					 	grid.readData();
+	    					 })
+                        
+                        
+                    })	// footer.querySelector('.insertbtn').addEventListener
+                        
+                } // if (!footer.querySelector('.insertbtn'))
+            });
+            
+            // 등록 모달이 닫힐 때
+            document.querySelector('#debtaddModal').addEventListener('hidden.bs.modal', () => {
+                document.querySelectorAll('.insertbtn').forEach(btn => {
+                    btn.remove();
+                })
+            });
+            
+        </script>
+       
+</body>
+</html>

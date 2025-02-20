@@ -17,6 +17,7 @@ import com.beauty1nside.accnut.dto.AssetDTO;
 import com.beauty1nside.accnut.dto.AssetSearchDTO;
 import com.beauty1nside.accnut.dto.DealBookDTO;
 import com.beauty1nside.accnut.dto.DealBookSearchDTO;
+import com.beauty1nside.accnut.dto.DebtDTO;
 import com.beauty1nside.accnut.dto.DebtSearchDTO;
 import com.beauty1nside.accnut.dto.EtcBookSearchDTO;
 import com.beauty1nside.accnut.dto.IncidentalCostSearchDTO;
@@ -49,6 +50,7 @@ public class AccnutRestController {
 	final EtcBookService etcBookService;
 	final IncidentalCostService incidentalCostService;
 	
+	// 목록 조회 ------------------------------------------------------------------------------------------
 	
 	@GetMapping("/asset/list")
 	public Object assetList(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage, 
@@ -188,7 +190,7 @@ public class AccnutRestController {
 		return result;
 	}
 	
-	// 삽입
+	// 삽입 ----------------------------------------------------------------------------------------------
 	
 	
 	@PostMapping("/asset/insert")
@@ -196,6 +198,22 @@ public class AccnutRestController {
 	    Map<String, Object> response = new HashMap<>();
 	    try {
 	    	assetService.insert(dto);
+	        response.put("status", "success");
+	        response.put("message", "등록 성공");
+	        return ResponseEntity.ok(response); // JSON 형태 응답
+	    } catch (Exception e) {
+	        log.error("등록 실패", e);
+	        response.put("status", "error");
+	        response.put("message", "등록 실패");
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+	    }
+	}
+	
+	@PostMapping("/debt/insert")
+	public ResponseEntity<Map<String, Object>> debtInsert(@RequestBody DebtDTO dto) {
+	    Map<String, Object> response = new HashMap<>();
+	    try {
+	    	debtService.insert(dto);
 	        response.put("status", "success");
 	        response.put("message", "등록 성공");
 	        return ResponseEntity.ok(response); // JSON 형태 응답
@@ -218,4 +236,10 @@ public class AccnutRestController {
 		
 		return Collections.singletonMap("result", true);
 	}
+	
+	
+	
+	
+	
+	
 }

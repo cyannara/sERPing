@@ -19,29 +19,39 @@ public class BsnOrderServiceImpl implements BsnOrderService {
 	
 	private final BsnOrderMapper bsnOrderMapper;
 
+	//발주요청 조회
 	@Override
 	public List<BhfOrderDTO> getBhfOrder(OrderSearchDTO orderSearchDTO) {
 		return bsnOrderMapper.selectBhfOrder(orderSearchDTO);
 	}
-
+	//발주요청 페이징용 전체 수 구하기
 	@Override
 	public int getCountOfBhfOrder(OrderSearchDTO orderSearchDTO) {
 		return  bsnOrderMapper.getCountOfBhfOrder(orderSearchDTO);
 	}
 
+	//발주요청 상세조회
 	@Override
 	public List<BhfOrderDetailDTO> getBhfOrderDetail(BhfOrderDTO bhfOrderDTO) {
 		return bsnOrderMapper.selectBhfOrderDetail(bhfOrderDTO);
 	}
 
+	//발주요청 상세 페이징용 전체 수 구하기
 	@Override
 	public int getCountOfBhfOrderDetail(BhfOrderDTO bhfOrderDTO) {
 		return bsnOrderMapper.getCountOfBhfOrderDetail(bhfOrderDTO);
 	}
 
+	//주문등록
 	@Override
 	public void registerOrder(BsnOrderDTO bsnOrederDTO) {
 		bsnOrderMapper.insertBsnOrder(bsnOrederDTO);
+		
+	}
+	//발주요청 취소
+	@Override
+	public void cancelBhfOrder(BhfOrderDTO bhfOrderDTO) {
+		bsnOrderMapper.updateCancelBhfOrder(bhfOrderDTO);
 		
 	}
 

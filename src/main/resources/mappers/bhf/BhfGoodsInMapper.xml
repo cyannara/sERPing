@@ -6,8 +6,8 @@
 	<insert id="goodsIn" parameterType="java.util.List">
 		MERGE  INTO bhf_warehouse b
 		USING(
-			<!-- collection="list" item="item" 이거는 디폴트 -->
-			<foreach collection="list" item="item" open="" close="" index="idx" separator="">
+			<!-- collection="list" item="item" 이거는 디폴트, dual을 여러개 반복할때는 separator="UNION" 넣기 -->
+			<foreach collection="list" item="item" open="" close="" index="idx" separator="UNION">
 				select 
 					 #{item.branchOfficeId} as branchOfficeId,
 		             #{item.goodsCode} as goodsCode,
@@ -15,7 +15,7 @@
 		             #{item.optionCode} as optionCode,
 		             #{item.optionName} as optionName,
 		             #{item.goodsStandard} as goodsStandard,
-		             #{item.quantity} as quantity,
+		             #{item.stockQuantity} as stockQuantity,
 		             #{item.companyNum} as companyNum
 		        from dual
 			</foreach>       
@@ -23,7 +23,7 @@
 		 ON (b.option_code = m.optionCode)
 		 WHEN MATCHED THEN
 		      UPDATE
-		         SET b.quantity = (b.quantity + m.quantity)
+		         SET b.stock_quantity = (b.stock_quantity + m.stockQuantity)
 		 WHEN NOT MATCHED THEN
 		      INSERT (b.warehouse_code, 
 		              b.branch_office_id,   
@@ -32,7 +32,7 @@
 		              b.option_code, 
 		              b.option_name, 
 		              b.goods_standard, 
-		              b.quantity, 
+		              b.stock_quantity, 
 		              b.company_num)
 		      VALUES ('bhf_home' || WAREHOUSE_CODE_SEQ.nextval, 
 		              m.branchOfficeId, 
@@ -41,8 +41,69 @@
 		              m.optionCode, 
 		              m.optionName, 
 		              m.goodsStandard, 
-		              m.quantity, 
+		              m.stockQuantity, 
 		              m.companyNum)
 	</insert>
+	
+	<!-- 주문서 조회 -->
+	<select id="goodsOrdList" resultType="BhfGoodsOrdDTO" parameterType="BhfGoodsOrdSearchDTO">
+		select  order_id, 
+	   			order_code, 
+	  			order_date, 
+	   			due_date, 
+	   			remark
+		from ( 	select  rownum rn,
+						order_id, 
+			   			order_code, 
+			  			order_date, 
+			   			due_date, 
+			   			remark
+				from   	bsn_order
+		<![CDATA[
+				where rownum <= #{end}
+		]]>
+				and <include refid="searchInfo"></include>
+				)
+		where rn >= #{start}
+	</select>
+	
+	<!-- 페이징에 전체숫자 알려주기 위해서 -->
+	<select id="count" parameterType="BhfGoodsOrdSearchDTO">
+		SELECT COUNT(order_id)
+		FROM bsn_order
+		<where>
+			<include refid="searchInfo"></include>
+		</where>
+	</select>
+	
+	<!-- 검색조건(검색을 안하면 그냥 조회가 되게) -->
+	<sql id="searchInfo">
+		company_num = 1<!-- #{companyNum}  --> AND order_status = 'VS002'<!-- 완료 상태인 주문서만 조회 -->
+		<if test="orderDate != null and ! orderDate.equals('')">
+			AND TO_CHAR(order_date, 'yyyy-mm-dd') = #{orderDate}
+		</if>
+	</sql>
+	
+	<!-- 주문서 상세조회 -->
+	<select id="goodsOrdDtlList" resultType="BhfGoodsOrdDTO" parameterType="BhfGoodsOrdSearchDTO">
+		select  goods_name, 
+				option_code, 
+				option_name, 
+				goods_standard, 
+				quantity
+		from(	select 	rownum rn,
+						goods_name, 
+						option_code, 
+						option_name, 
+						goods_standard, 
+						quantity
+				from 	bsn_order_detail
+				<![CDATA[
+				where rownum <= #{end}
+		]]>
+				and order_id = #{orderId}
+				)
+		where rn >= #{start}
+	</select>
 	
 </mapper>

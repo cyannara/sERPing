@@ -1,10 +1,148 @@
 <!DOCTYPE html>
-<html>
+<html layout:decorate="~{layouts/layout}" lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta charset="UTF-8">
 <title>조직도 관리</title>
-</head>
-<body>
+  <link rel="stylesheet" href="https://uicdn.toast.com/tui.grid/latest/tui-grid.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://uicdn.toast.com/tui.grid/latest/tui-grid.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      background: #f8f9fa;
+    }
 
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .header-section {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .content-section {
+      display: flex;
+      gap: 20px;
+    }
+
+    .org-chart {
+      width: 30%;
+      background: white;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .employee-table {
+      flex: 1;
+      background: white;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .department-tree ul {
+      list-style: none;
+      padding-left: 20px;
+    }
+
+    .toggle-btn {
+      cursor: pointer;
+      margin-right: 5px;
+    }
+
+    #grid {
+      width: 100%;
+      height: 300px;
+    }
+  </style>
+</head>
+
+<body layout:fragment="content">
+  <div class="container mt-3">
+    <div class="header-section">
+      <h5 class="fw-bold">인사 관리 / 조직도 관리</h5>
+      <div class="d-flex gap-2">
+        <button class="btn btn-primary btn-sm">➕ 부서 추가</button>
+        <button class="btn btn-secondary btn-sm" disabled>✏️ 부서 수정</button>
+        <button class="btn btn-danger btn-sm">❌ 부서 삭제</button>
+      </div>
+    </div>
+
+    <div class="content-section">
+      <section class="org-chart">
+        <input type="text" class="form-control mb-3" placeholder="부서 검색 후 [Enter]">
+        <div class="department-tree">
+          <ul>
+            <li>
+              <span class="toggle-btn">▶</span> (주)YEDAM ERP
+              <ul>
+                <li>
+                  <span class="toggle-btn">▶</span> 경영지원본부(6)
+                  <ul>
+                    <li>📄 인사팀(6)</li>
+                    <li>📄 회계팀(5)</li>
+                  </ul>
+                </li>
+                <li>
+                  <span class="toggle-btn">▶</span> 서비스본부(6)
+                  <ul>
+                    <li>📄 고객지원팀(0)</li>
+                    <li>
+                      <span class="toggle-btn">▶</span> 영업교육팀(0)
+                      <ul>
+                        <li>📄 영업팀(6)</li>
+                        <li>📄 교육팀(0)</li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="employee-table">
+        <h5 class="fw-bold">선택한 부서: 경영지원본부</h5>
+        <input type="text" class="form-control mb-3" placeholder="사원 검색 후 [Enter]">
+        <div id="grid"></div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    $(document).ready(function () {
+      $('.toggle-btn').click(function () {
+        $(this).siblings('ul').toggle();
+        $(this).text($(this).text() === '▶' ? '▼' : '▶');
+      });
+    });
+
+    const grid = new tui.Grid({
+      el: document.getElementById('grid'),
+      data: [
+        { id: '2520401', name: '홍길동', department: '영업', position: '과장', email: 'seozzini@gmail.com' },
+        { id: '2520402', name: '김길동', department: '인사', position: '대리', email: 'seozzini@gmail.com' }
+      ],
+      columns: [
+        { header: '사원번호', name: 'id' },
+        { header: '사원명', name: 'name' },
+        { header: '부서', name: 'department' },
+        { header: '직급', name: 'position' },
+        { header: '이메일', name: 'email' }
+      ]
+    });
+  </script>
 </body>
 </html>
