@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head><meta charset="UTF-8"></head>
+<head><meta charset="UTF-8">
+</head>
 <body>    
     
     <button type="button" class="btn btn-primary payBtn" data-bs-dismiss="modal">지급</button>
     <button type="button" class="btn btn-secondary cancelBtn" data-bs-dismiss="modal">취소</button>
 <script type="text/javascript">
+
 	document.querySelector('#salaryModal').addEventListener('shown.bs.modal', (ev) => {
 		document.querySelector('#salaryModal').querySelector('.payBtn').addEventListener('click', (e)=>{
 			console.log(checkArray);
@@ -14,9 +16,11 @@
 		
 		document.querySelector('#salaryModal').querySelector('.cancelBtn').addEventListener('click', (e)=>{
 			e.target.blur();
+		    
 		},{once : true});
 		
 	});
+
 	
 </script>
 </body>

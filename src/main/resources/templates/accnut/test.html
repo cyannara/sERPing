@@ -39,11 +39,11 @@
       
       	<!-- 자산 등록 -->
 		<div th:replace="purchs/ModalTemplate :: ModalTemplate (
-						    	'salaryModal', 
+						    	'testModal', 
 						    	'modal-xl', 
-						    	'일괄 처리', 
-						    	'accnut/salaryBody',
-						    	'accnut/salaryFooter'
+						    	'테스트', 
+						    	'accnut/dbtest',
+						    	'accnut/testFooter'
 						    )"></div>
 
   </div>
@@ -225,7 +225,7 @@
   			type: SearchableSelectEditor,
   			options: { listItems: departmentList }
   		}},
-  		{ header : "모달", name : "asd", type: 'text'},
+  		{ header : "모달", name : "asd", formatter : () => '<input type="text" id="textinput" data-bs-toggle="modal" data-bs-target="#testModal">', editor: "text"},
   		{ header : "삭제", name : "del", formatter : () => '<button class="btn btn-danger btn-sm btnDel"><i class="mdi mdi-delete" style="line-height: 15px;"></i></button>', align: 'center', width: '40'},
       ],
       data : dataSource,
@@ -258,16 +258,18 @@
     }
     
     grid.on("click", (ev) => {
+    /*
         if (ev.columnName === 'asd') { // "모달" 컬럼 클릭 시
-            let modalEl = document.getElementById('salaryModal');
+            let modalEl = document.getElementById('testModal');
 
             // ✅ Bootstrap 5 방식으로 모달 열기
             let modal = new bootstrap.Modal(modalEl);
             modal.show();
         }
+    */
+    console.log(grid.getRow(ev.rowKey));
     });
 
-    
     
     
   </script>
