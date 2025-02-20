@@ -24,4 +24,8 @@ public interface productMapper {
 	
 	//상품,옵션 등록 
 	public void goodsinsert(ProdInsertVO vo);
+	
+	//상품리스트 조회
+	List<ProductDTO>goodslist(ProductSearchDTO dto);
+	int productcount(ProductSearchDTO dto);
 }
