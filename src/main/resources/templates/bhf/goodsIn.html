@@ -115,7 +115,31 @@
 			{ header : "규격", name : "goodsStandard"},
 			{ header : "발주수량", name : "quantity"},
 			{ header : "낱개수량", name : "stockQuantity"}, //창고에 들어갈 수량
-			{ header : "입고수량", name : ""}
+			{ 
+				header : "입고수량", 
+				name : "inQuantity", 
+				editor: 'text',
+				onAfterChange: function(ev) {
+					
+					let rowKey = ev.rowKey;
+					let inQuantity = ev.value; // 입고수량 값 가져오기
+			        let rowData = grid2.getRow(rowKey); // 해당 행 데이터 가져오기
+			        let goodsStandard = rowData.goodsStandard; // 데이터에서 규격 가져오기
+			        
+			        // 규격에서 숫자만 추출(앞에 숫자는 뺴고)
+			        let standardValue = goodsStandard.replace(/^[0-9]|[^0-9]/g, ""); 
+			        // 낱개수량 계산
+			        let stockQuantity = inQuantity * standardValue;
+			        // 그리드 값 업데이트
+			        grid2.setValue(rowKey, "stockQuantity", stockQuantity); // 계산된 값 적용
+			        
+			        // 입고수량에 숫자를 제외한 값들이 들어오면
+			        if (!/^[0-9]*$/.test(ev.value)) {
+	                    grid2.setValue(ev.rowKey, ev.columnName, '');  // 해당 셀을 비웁니다
+	                    alert("수량은 숫자만 입력할 수 있습니다.");
+	                }
+				}
+			}
 		],
 		data: ""
 	});
