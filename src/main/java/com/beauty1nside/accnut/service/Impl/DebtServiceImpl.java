@@ -39,4 +39,10 @@ public class DebtServiceImpl implements DebtService{
 		return debtMapper.count(dto);
 	}
 	
+	@Override
+	public int insert(DebtDTO dto) {
+		// TODO Auto-generated method stub
+		return debtMapper.insert(dto);
+	}
+	
 }
