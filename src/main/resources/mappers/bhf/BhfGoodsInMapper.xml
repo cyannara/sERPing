@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beauty1nside.bhf.mapper.BhfGoodsInMapper">
+	
+	<!-- MERGE문 사용해서 창고에 상품입고 하기 -->
+	<insert id="goodsIn" parameterType="java.util.List">
+		MERGE  INTO bhf_warehouse b
+		USING(
+			<!-- collection="list" item="item" 이거는 디폴트 -->
+			<foreach collection="list" item="item" open="" close="" index="idx" separator="">
+				select 
+					 #{item.branchOfficeId} as branchOfficeId,
+		             #{item.goodsCode} as goodsCode,
+		             #{item.goodsName} as goodsName,
+		             #{item.optionCode} as optionCode,
+		             #{item.optionName} as optionName,
+		             #{item.goodsStandard} as goodsStandard,
+		             #{item.quantity} as quantity,
+		             #{item.companyNum} as companyNum
+		        from dual
+			</foreach>       
+		        )m
+		 ON (b.option_code = m.optionCode)
+		 WHEN MATCHED THEN
+		      UPDATE
+		         SET b.quantity = (b.quantity + m.quantity)
+		 WHEN NOT MATCHED THEN
+		      INSERT (b.warehouse_code, 
+		              b.branch_office_id,   
+		              b.goods_code, 
+		              b.goods_name, 
+		              b.option_code, 
+		              b.option_name, 
+		              b.goods_standard, 
+		              b.quantity, 
+		              b.company_num)
+		      VALUES ('bhf_home' || WAREHOUSE_CODE_SEQ.nextval, 
+		              m.branchOfficeId, 
+		              m.goodsCode, 
+		              m.goodsName, 
+		              m.optionCode, 
+		              m.optionName, 
+		              m.goodsStandard, 
+		              m.quantity, 
+		              m.companyNum)
+	</insert>
+	
+</mapper>

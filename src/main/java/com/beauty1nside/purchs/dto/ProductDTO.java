@@ -1,5 +1,7 @@
 package com.beauty1nside.purchs.dto;
 
+import org.springframework.beans.factory.annotation.Value;
+
 import groovy.transform.builder.Builder;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -43,6 +45,10 @@ public class ProductDTO {
 	
 	private Long warehouseId;
 	private String warehouseName;
+	
+	//파일 이미지 업로드
+	@Value("${img.upload}")
+	private String imgUpload;
 	
 
 	

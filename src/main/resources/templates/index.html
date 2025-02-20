@@ -2,7 +2,6 @@
 <html
         layout:decorate="~{layouts/layout}"
       lang="en"
-      xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         xmlns="http://www.w3.org/1999/xhtml"
         xmlns:sec=""
@@ -13,72 +12,47 @@
     <div class="row">
       <div class="col-12 col-xl-8 mb-4 mb-xl-0">
         <h3 class="font-weight-bold">결재문서</h3>
-<!--        <div sec:authorize="isAnonymous()">-->
-<!--          로그인 전-->
-<!--        </div>-->
         <div sec:authorize="isAuthenticated()">
           환영합니다. <span sec:authentication="name" class="h4"></span>님!
-<!--          <p sec:authentication="principal.username"></p>-->
-<!--          <p sec:authentication="principal.userDTO.deptName"></p>-->
-<!--          <p th:text="${session.deptName}"></p>-->
         </div>
       </div>
-<!--      <div class="col-12 col-xl-4">-->
-<!--        <div class="justify-content-end d-flex">-->
-<!--          <div class="dropdown flex-md-grow-1 flex-xl-grow-0">-->
-<!--            <button class="btn btn-sm btn-light bg-white dropdown-toggle" type="button" id="dropdownMenuDate2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">-->
-<!--              <i class="mdi mdi-calendar"></i> Today (10 Jan 2021)-->
-<!--            </button>-->
-<!--            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuDate2">-->
-<!--              <a class="dropdown-item" href="#">January - March</a>-->
-<!--              <a class="dropdown-item" href="#">March - June</a>-->
-<!--              <a class="dropdown-item" href="#">June - August</a>-->
-<!--              <a class="dropdown-item" href="#">August - November</a>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
     </div>
   </div>
 </div>
 <div class="row approval">
-<!--  <div th:replace="~{mainpage/mainpage :: approval}"></div>-->
-<!--  <body>-->
   <div class="container">
     <div class="search-grid">
-      <div class="row 1row">
-        <div class="col-5 row">
-          <label class="label-search col-4" for="inApprovalType">요청 구분</label>
-          <select name="inApprovalType" id="inApprovalType" class="col-8 input-box">
+      <div class="row">
+        <div class="">
+          <label class="label-search col-4" for="documentType">요청 구분</label>
+          <select name="documentType" id="documentType" class="col-8 input-box">
             <option value="" selected>선택</option>
-            <option value="WAITING">대기</option>
-            <option value="APPROVED">승인</option>
-            <option value="REJECTED">반려</option>
           </select>
         </div>
-      </div>
-      <div class="row 2row">
-        <div class="col-1"></div>
-        <div class="col-5 row ">
-          <label class="label-search col-4" for="requester">요청자</label>
-          <input type="text" name="requester" id="requester" class="col-8 input-box">
+        <div class="">
+          <span class="label-search col-4">요청 날짜</span>
+          <input type="date" id="inApprovalRequestDateStart" class="col-8 input-box"/>~
+          <input type="date" id="inApprovalRequestDateEnd" class="col-8 input-box"/>
         </div>
-        <div class="col-1"></div>
-        <div class="col-5 row ">
+      </div>
+      <div class="row">
+        <div class="">
+          <label class="label-search col-4" for="employeeName">요청자</label>
+          <input type="text" name="employeeName" id="employeeName" class="col-8 input-box">
+        </div>
+        <div class="">
           <label class="label-search col-4" for="display_amount">표시수량</label>
           <select name="display_amount" id="display_amount" class="col-8 input-box" onchange="changeDisplay()">
-            <option value="5" selected>5</option>
-            <option value="10">10</option>
+            <option value="5">5</option>
+            <option value="10" selected>10</option>
             <option value="20">20</option>
             <option value="50">50</option>
             <option value="100">100</option>
           </select>
         </div>
       </div>
-      <div class="row 3row">
-        <div class="col-4"></div>
+      <div class="row btn-box">
         <button type="button" class="btn btn-primary col-1" onclick="search()">검색</button>
-        <div class="col-1"></div>
         <button type="button" class="btn btn-secondary col-1" onclick="reset()">초기화</button>
       </div>
 
@@ -88,59 +62,10 @@
       <div id="grid"></div>
       <div id="pagination" class="tui-pagination"></div>
     </div>
-    <!-- 하부 버튼 -->
-    <!--		<div class="button-bar row">-->
-    <!--			<div class="col-1"></div>-->
-    <!--			<button type="button" class="btn btn-primary col-1">Excel</button>-->
-    <!--			<button type="button" class="btn btn-secondary col-1">PDF</button>-->
-    <!--			<div class="col-7"></div>-->
-    <!--			<div class="btn-group dropup col-2">-->
-    <!--				<button type="button" class="btn btn-success unpay">미지급금등록</button>-->
-    <!--				<button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split" id="dropupMenuSplitButton3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
-    <!--					<span class="sr-only"></span>-->
-    <!--				</button>-->
-    <!--				<div class="dropdown-menu" aria-labelledby="dropupMenuSplitButton3">-->
-    <!--					<h6 class="dropdown-header">채무 등록</h6>-->
-    <!--					<a class="dropdown-item" href="#">외상매입금 등록</a>-->
-    <!--					<a class="dropdown-item" href="#">대출금 등록</a>-->
-    <!--					<div class="dropdown-divider"></div>-->
-    <!--					<a class="dropdown-item" href="#">미지급금 등록</a>-->
-    <!--				</div>-->
-    <!--			</div>-->
-    <!--		</div>-->
   </div>
-
-
-<!--  </body>-->
-
 </div>
 <script>
 
-  document.addEventListener("DOMContentLoaded",()=>{
-    // grid.readData(1);
-  })
-  // function gotobtn(){
-  // 	document.querySelector(".dropup").addEventListener("click", ()=>{
-  // 		if(event.target.className.includes("unpay")){
-  // 			console.log("미지급금");
-  // 		} else if(event.target.className.includes("dropdown-item")){
-  // 			switch (event.target.innerHTML) {
-  // 				case "외상매입금 등록":
-  // 					console.log("외상매입금")
-  // 					break;
-  // 				case "대출금 등록":
-  // 					console.log("대출금")
-  // 					break;
-  // 				case "미지급금 등록":
-  // 					console.log("미지급금")
-  // 					break;
-  // 				default:
-  // 					break;
-  // 			}
-  // 		}
-  //
-  // 	})
-  // }
 
   let Grid = tui.Grid;
 
@@ -157,7 +82,7 @@
             scrollY: false,
             pageOptions: {
               useClient: false,
-              perPage: 5,
+              perPage: 10,
             },
             columns: [
               {header: "번호", name: "inApprovalId", sortable: true},
@@ -177,8 +102,8 @@
                 name: "process",
                 formatter: ({row}) => {
                   return `
-                    <button class="btn btn-approve" data-in-approval-id="${row.inApprovalId}">승인</button>
-                    <button class="btn btn-reject" data-in-approval-id="${row.inApprovalId}">반려</button>`
+                    <button class="btn btn-approve" data-bs-toggle="modal" data-bs-target="#commonModal" data-in-approval-id="${row.inApprovalId}">승인</button>
+                    <button class="btn btn-reject" data-bs-toggle="modal" data-bs-target="#commonModal" data-in-approval-id="${row.inApprovalId}">반려</button>`
                 }
               },
               {
@@ -217,24 +142,18 @@
               <i class="mdi mdi-folder-download"></i>
             </button>`;
         }
-      }
-
-      // { header : "반려 내용", name : "inApprovalRejectedContent",  sortable : true},
-      // { header : "승인 파일 주소", name : "inApprovalFilePath",  sortable : true}
-    ],
+      }  ],
     data : dataSource,
   });
 
   document.addEventListener("click", function (event) {
-    const buttonApprove = event.target.closest(".btn-approve");
-    const buttonReject = event.target.closest(".btn-reject");
+    let buttonApprove = event.target.closest(".btn-approve");
+    let buttonReject = event.target.closest(".btn-reject");
 
     if (buttonApprove) {
-      const inApprovalId = buttonApprove.dataset.inApprovalId;
-      processApproval(inApprovalId, 'approve')
+      setModalContent('전자 결재 처리', 'approval-approved', '취소', '승인', () => doApprove(buttonApprove))
     } else if(buttonReject) {
-      const inApprovalId = buttonReject.dataset.inApprovalId;
-      processApproval(inApprovalId, 'reject')
+      setModalContent('전자 결재 처리', 'approval-rejected', '취소', '반려', () => doReject(buttonReject))
     }
   });
 

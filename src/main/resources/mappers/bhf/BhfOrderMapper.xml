@@ -14,7 +14,7 @@
 	</insert>
 	
 	<!-- 상품조회 -->
-	<select id="goodsList" resultType="BhfGoodsOpDTO" parameterType="BhfGoodsOpDTO">
+	<select id="goodsList" resultType="BhfGoodsOpDTO" parameterType="BhfOrdSearchDTO">
 		select goods_code,
 	           goods_name,
 	           goods_standard
@@ -33,8 +33,8 @@
 	</select>
 
 	<!-- 페이징에 전체숫자 알려주기 위해서 -->
-	<select id="count" parameterType="BhfGoodsOpDTO">
-		SELECT COUNT(g.goods_num)
+	<select id="count" parameterType="BhfOrdSearchDTO">
+		SELECT COUNT(g.goods_code)
 		FROM purchse_goods g
 		<where>
 			<include refid="searchInfo"></include>
@@ -53,14 +53,26 @@
 	</sql>
 		
 	<!-- 상품 선택시 옵션조회 -->
-	<select id="optionList" resultType="BhfGoodsOpDTO">
-		select g.goods_code,
-			   g.goods_name,
-			   g.goods_standard,
-		       o.option_code,
-		       o.option_name
-		from   purchse_goods g join purchse_option o on g.goods_num = o.goods_num
-		where g.company_num = 1 and g.goods_code = #{goodsCode} 		
+	<select id="optionList" resultType="BhfGoodsOpDTO" parameterType="BhfOrdSearchDTO">
+		select goods_code,
+			   goods_name,
+			   goods_standard,
+		       option_code,
+		       option_name
+		from (select /*+INDEX_DESC(purchse_option pk_purchse_option)*/
+					 rownum rn,
+					 g.goods_code,
+			   		 g.goods_name,
+			   		 g.goods_standard,
+		       		 o.option_code,
+		       		 o.option_name
+			  from   purchse_goods g join purchse_option o on g.goods_num = o.goods_num
+		<![CDATA[
+			where rownum <= #{end}
+		]]>
+			and <include refid="searchInfo"></include>
+			)
+		where rn >= #{start}
 	</select>
 	
 </mapper>

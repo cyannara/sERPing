@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.beauty1nside.bhf.dto.goodsorder.BhfOrdSearchDTO;
-import com.beauty1nside.bhf.dto.goodsorder.BhfOrdVO;
-import com.beauty1nside.bhf.service.BhfOrderService;
+import com.beauty1nside.bhf.dto.returning.BhfGdsOptSearchDTO;
+import com.beauty1nside.bhf.dto.returning.BhfReturningVO;
+import com.beauty1nside.bhf.service.BhfReturnService;
 import com.beauty1nside.common.GridArray;
 import com.beauty1nside.common.Paging;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -27,15 +27,15 @@ import lombok.extern.log4j.Log4j2;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/bhf/rest/*")
-public class BhfRestController {
-
-	BhfOrderService bhforderservice;
+public class BhfReturnController {
+	
+	BhfReturnService service;
 	
 	// 상품조회 및 상품검색
-	@GetMapping("/goods/list")
+	@GetMapping("/housegoods/list")
 	public Object goodsList(@RequestParam(name = "perPage", defaultValue = "2", required = false) int perPage, 
-			@RequestParam(name = "page", defaultValue = "1", required = false) int page, 
-			BhfOrdSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
+							@RequestParam(name = "page", defaultValue = "1", required = false) int page, 
+							BhfGdsOptSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
 		// 페이징 유닛 수
 		paging.setPageUnit(perPage);
 		paging.setPage(page);
@@ -47,21 +47,19 @@ public class BhfRestController {
 		dto.setEnd(paging.getLast());
 		
 		// 페이징 처리
-		paging.setTotalRecord(bhforderservice.count(dto));
+		paging.setTotalRecord(service.count(dto));
 		
 		// grid 배열 처리
 		GridArray grid = new GridArray();
-		Object result = grid.getArray( paging.getPage(), bhforderservice.count(dto), bhforderservice.goodsList(dto) );
+		Object result = grid.getArray( paging.getPage(), service.count(dto), service.goodsList(dto) );
 		return result;
 	}
 	
 	// 옵션조회
-	@GetMapping("/option/list")
+	@GetMapping("/houseoption/list")
 	public Object optionList(@RequestParam(name = "perPage", defaultValue = "2", required = false) int perPage, 
-			@RequestParam(name = "page", defaultValue = "1", required = false) int page, 
-			// 화면에서 보내주는 goodsCode받기
-			@RequestParam(name = "goodsCode", required = false) String goodsCode,
-			BhfOrdSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
+							@RequestParam(name = "page", defaultValue = "1", required = false) int page, 
+							BhfGdsOptSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
 		// 페이징 유닛 수
 		paging.setPageUnit(perPage);
 		paging.setPage(page);
@@ -73,31 +71,29 @@ public class BhfRestController {
 		dto.setEnd(paging.getLast());
 		
 		// 페이징 처리
-		paging.setTotalRecord(bhforderservice.count(dto));
+		paging.setTotalRecord(service.count(dto));
 		
 		// grid 배열 처리
 		GridArray grid = new GridArray();
-		Object result = grid.getArray( paging.getPage(), bhforderservice.count(dto), bhforderservice.optionList(goodsCode) );//goodsCode넣기
+		Object result = grid.getArray( paging.getPage(), service.count(dto), service.optionList(dto) );
 		return result;
 	}
 	
-	// 발주서 등록
-	@PostMapping("/order/insert")
-	// Map을 같이 사용해서 status,message 등을 사용 가능하다
-	// BhfOrdVO 안에 List<BhfOrdDtlVO> files 있어서 BhfOrdDtlVO를 따로 넣지 않아도 된다.
-	public ResponseEntity<Map<String, Object>> ordinsert(@RequestBody BhfOrdVO bhfOrdVO) {
+	// 교환및반품 등록
+	@PostMapping("/return/insert")
+	public ResponseEntity<Map<String, Object>> reinsert(@RequestBody BhfReturningVO vo) {
 	    Map<String, Object> response = new HashMap<>();
 	    try {
-	    	bhforderservice.orderPrd(bhfOrdVO);
+	    	service.returnGoods(vo);
 	        response.put("status", "success");
-	        response.put("message", "발주 등록 성공");
+	        response.put("message", "교환 및 반품 등록 성공");
 	        return ResponseEntity.ok(response); // JSON 형태 응답
 	    } catch (Exception e) {
-	        log.error("발주 등록 실패", e);
+	        log.error("교환 및 반품 등록 실패", e);
 	        response.put("status", "error");
-	        response.put("message", "발주 등록 실패");
+	        response.put("message", "교환 및 반품 등록 실패");
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 	    }
 	}
-	
+
 }

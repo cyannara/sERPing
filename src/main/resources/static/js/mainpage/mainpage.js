@@ -1,20 +1,67 @@
+const getApprovalType = () => {
+    const url = `/mainpage/rest/approval/type`;
+    fetch(url, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+        }
+    })
+        .then(result => result.json())
+        .then(data => {
+            const docType = data.map((doc) => {
+                return doc.documentType
+            })
+
+            const selectElement = document.getElementById("documentType");
+
+            // populate는 "채우다", "입력하다", "삽입하다" 등의 의미
+            function populateSelect(options, select) {
+                options.forEach(optionText => {
+                    const option = document.createElement("option");
+                    option.value = optionText;  // value 값 설정
+                    option.textContent = optionText; // 표시할 텍스트
+                    select.appendChild(option); // select 요소에 추가
+                });
+            }
+
+            populateSelect(docType, selectElement);
+        })
+        .catch(error => console.error("Error fetching data:", error));
+}
+
+getApprovalType()
+
 function reset(){
-    let inApprovalType = document.querySelector('#inApprovalType');
-    let requester = document.querySelector('#requester');
+    let documentType = document.querySelector('#documentType');
+    let employeeName = document.querySelector('#employeeName');
+    let inApprovalRequestDateStart = document.querySelector('#inApprovalRequestDateStart');
+    let inApprovalRequestDateEnd = document.querySelector('#inApprovalRequestDateEnd');
 
-    inApprovalType.value = '';
-    requester.value = '';
+    documentType.value = '';
+    employeeName.value = '';
+    inApprovalRequestDateStart.value = '';
+    inApprovalRequestDateEnd.value = '';
 
-
-    grid.setRequestParams({ "inApprovalType" : inApprovalType.value, "requester" : requester.value })
+    grid.setRequestParams({
+        "documentType" : documentType.value,
+        "employeeName" : employeeName.value,
+        "inApprovalRequestDateStart" : inApprovalRequestDateStart.value,
+        "inApprovalRequestDateEnd" : inApprovalRequestDateEnd.value
+    })
     grid.readData();
-
 }
 
 function search(){
-    let inApprovalType = document.querySelector('#inApprovalType').value.toString();
-    let requester = document.querySelector('#requester').value.toString();
-    grid.setRequestParams({"inApprovalType" : inApprovalType, "requester" : requester })
+    let documentType = document.querySelector('#documentType').value.toString();
+    let employeeName = document.querySelector('#employeeName').value.toString();
+    let inApprovalRequestDateStart = document.querySelector('#inApprovalRequestDateStart').value.toString();
+    let inApprovalRequestDateEnd = document.querySelector('#inApprovalRequestDateEnd').value.toString();
+    grid.setRequestParams({
+        "documentType" : documentType,
+        "employeeName" : employeeName,
+        "inApprovalRequestDateStart" : inApprovalRequestDateStart,
+        "inApprovalRequestDateEnd" : inApprovalRequestDateEnd
+    })
     grid.readData();
 }
 
@@ -42,12 +89,20 @@ async function downloadPDF(dataset) {
 }
 
 const processApproval = (inApprovalId, processStr) => {
+    const header = document.querySelector('meta[name="_csrf_header"]').content;
+    const token = document.querySelector('meta[name="_csrf"]').content;
+
+    const reason = document.getElementById('rejectReason').value
+
     const url = `/mainpage/rest/approval/${inApprovalId}/process/${processStr}`;
     fetch(url, {
-        method: "GET",
+        method: "POST",
         headers: {
+            'header': header,
             "Content-Type": "application/json",
-        }
+            'X-CSRF-Token': token
+        },
+        body: reason
     })
         .then(result => result.json())
         .then(data => {
@@ -63,4 +118,14 @@ const processApproval = (inApprovalId, processStr) => {
             grid.reloadData();
         })
         .catch(error => console.error("Error fetching data:", error));
+}
+
+const doApprove = (buttonApprove) => {
+    const inApprovalId = buttonApprove.dataset.inApprovalId;
+    processApproval(inApprovalId, 'approve')
+}
+
+const doReject = (buttonReject) => {
+    const inApprovalId = buttonReject.dataset.inApprovalId;
+    processApproval(inApprovalId, 'reject')
 }
