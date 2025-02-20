@@ -21,6 +21,14 @@ public class PurchaseDTO {
 	private int orderPlanTotalAmount;
 	private int companyNum;
 	
+	
+	private String goodsCode;
+	private String goodsName;
+	private String optionCode;
+	private String optionName;
+	private String classificationName;
+	private String goodsStandard;
+	
 	//발주서 바디
 	private int purchaseBodyNum;
 	private int puchaseQuantity;
@@ -29,5 +37,7 @@ public class PurchaseDTO {
 	private int puchaseVat;
 	private int orderPlanBodyNum;
 	private int optionNum;
+	private int vendorId;
+	private String vendorName;
 	
 }

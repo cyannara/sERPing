@@ -49,12 +49,8 @@
 	                <input type="text" class="form-control" th:value="${session.employeeName}" readonly>
 	            </div>
 	            <div class="col-md-3">
-	                <label class="form-label">입고창고</label>
-	                <input type="text" class="form-control">
-	            </div>
-	            <div class="col-md-3">
 	                <label class="form-label">납기일자</label>
-	                <input type="date" class="form-control" value="2025-04-05">
+	                <input type="date" class="form-control" th:value="${PurchaseDTO.puchaseDueDate}">
 	            </div>
 	        </div>
 	
@@ -75,51 +71,150 @@
 	    <div class="mb-3 d-flex justify-content-between">
 	        <div>
 	            <button class="btn btn-secondary">주문서 조회</button>
-	            <button class="btn btn-secondary">제조 조회</button>
+	            <button class="btn btn-secondary">재고 조회</button>
 	            <button class="btn btn-secondary">계획 조회</button>
 	        </div>
-	        <button class="btn btn-primary">발주 추가</button>
+	        <button class="btn btn-primary" id="bttAdd">발주 추가</button>
 	    </div>
 	
 	    <!-- 🔹 Toast Grid -->
 	    <div id="grid"></div>
-	
+	    <div id="pagination" class="tui-pagination"></div>
+        
+	 
 	    <!-- 🔹 저장 및 초기화 버튼 -->
 	    <div class="button-container text-center mt-3">
 	        <button class="btn btn-success">저장</button>
 	        <button class="btn btn-secondary">초기화</button>
 	    </div>
 	</div>
+	
 </div>
 
 
 <script>
-    // Toast Grid 데이터 설정
-    const grid = new tui.Grid({
+
+let grid;
+const header = document.querySelector('meta[name="_csrf_header"]').content;
+const token = document.querySelector('meta[name="_csrf"]').content;
+
+document.addEventListener("DOMContentLoaded", function(){
+	
+	var Grid = tui.Grid;
+	const dataSource = [];
+	  // Toast Grid 데이터 설정
+  	grid = new Grid({
         el: document.getElementById('grid'),
-        data: [
-            { 상품번호: 'LHR001', 상품명: '해외 허브 티 5g', 옵션번호: 'LHO001', 옵션명: '432B 완제', 거래처명: '(주)제이팜', 규격: '1Box 8piece', 수량: 100, 단가: 110000, 공급가격: 11000000, 부가세: 1100000 },
-            { 상품번호: 'LHR001', 상품명: '해외 허브 티 5g', 옵션번호: 'LHO002', 옵션명: '303B 차세대', 거래처명: '(주)제이팜', 규격: '1Box 8piece', 수량: 100, 단가: 110000, 공급가격: 11000000, 부가세: 1100000 },
-            { 상품번호: 'LHR001', 상품명: '해외 허브 티 5g', 옵션번호: 'LHO003', 옵션명: '462B 스트릭스', 거래처명: '(주)제이팜', 규격: '1Box 8piece', 수량: 100, 단가: 110000, 공급가격: 11000000, 부가세: 1100000 },
-            { 상품번호: 'LHR001', 상품명: '해외 허브 티 5g', 옵션번호: 'LHO004', 옵션명: '432B 녹차', 거래처명: '(주)제이팜', 규격: '1Box 8piece', 수량: 100, 단가: 110000, 공급가격: 11000000, 부가세: 1100000 }
-        ],
+       
         columns: [
-            { header: '✔', name: '선택', width: 50, align: 'center', formatter: () => '<input type="checkbox">' },
-            { header: '상품번호', name: '상품번호', width: 100 },
-            { header: '상품명', name: '상품명', width: 150 },
-            { header: '옵션번호', name: '옵션번호', width: 100 },
-            { header: '옵션명', name: '옵션명', width: 120 },
-            { header: '거래처명', name: '거래처명', width: 150 },
-            { header: '규격', name: '규격', width: 120 },
-            { header: '수량', name: '수량', width: 80, align: 'right' },
-            { header: '단가', name: '단가', width: 120, align: 'right', formatter: ({ value }) => value.toLocaleString() },
-            { header: '공급가격', name: '공급가격', width: 120, align: 'right', formatter: ({ value }) => value.toLocaleString() },
-            { header: '부가세', name: '부가세', width: 120, align: 'right', formatter: ({ value }) => value.toLocaleString() }
+       
+            { header: '상품코드', name: 'goodsCode' },
+            { header: '상품명', name: 'goodsName' },
+            { header: '옵션코드', name: 'optionCode'},
+            { header: '옵션명', name: 'optionName'},
+            { header: '거래처명', name: 'vendorName'},
+            { header: '규격', name: 'goodsStandard'},
+            { header: '수량', name: 'puchaseQuantity'},
+            { header: '단가', name: 'puchaseUnitPrice'},
+            { header: '공급가격', name: 'puchaseSupplyPrice'},
+            { header: '부가세', name: 'puchaseVat'}
         ],
-        rowHeaders: ['rowNum'],
+        rowHeaders: ['checkbox'],
+        data : dataSource,
         scrollX: true,
         scrollY: 300
     });
+    
+    const bttAdd = document.getElementById("bttAdd");
+    
+    bttAdd.addEventListener("click", function () {
+       grid.appendRow({}, { at: 0 }); // 빈 행 추가
+    });
+    
+ 	/* //상품 선택 시 적용될 데이터 예시
+    function onProductSelect(selectedProduct) {
+        // 현재 선택된 rowKey 가져오기
+        const rowKey = grid.getFocusedCell().rowKey;
+        
+        if (rowKey === null) {
+            alert("행을 먼저 선택하세요!");
+            return;
+        }
+
+        // 선택된 상품 정보를 여러 칸(column)에 적용
+        grid.setValue(rowKey, "goodsCode", selectedProduct.goodsCode);
+        grid.setValue(rowKey, "goodsName", selectedProduct.goodsName);
+        grid.setValue(rowKey, "optionCode", selectedProduct.optionCode);
+        grid.setValue(rowKey, "optionName", selectedProduct.optionName);
+        grid.setValue(rowKey, "vendorName", selectedProduct.vendorName);
+        grid.setValue(rowKey, "goodsStandard", selectedProduct.goodsStandard);
+        grid.setValue(rowKey, "goodsPrice", selectedProduct.goodsPrice);
+        grid.setValue(rowKey, "goodsSupplyPrice", selectedProduct.goodsSupplyPrice);
+    }
+ 	
+    //상품 및 옵션 칸 클릭 하면 정보리스트 모달 출력 
+    grid.on("click", (ev) => {
+    if (ev.columnName === "goodsName" || ev.columnName === "goodsCode" || ev.columnName === "optionName" || ev.columnName === "optionCode") {
+        openProductModal(ev.rowKey);
+	    }
+	});
+	
+    //모달이 열린 후 작업 
+    function openProductModal(rowKey){
+    	 sessionStorage.setItem("selectedRowKey", rowKey);
+    	 let selectedRowKey = parseInt(sessionStorage.getItem("selectedRowKey"), 10);
+    	 
+    	 
+
+    	    // 모달 요소 가져오기
+    	    const modalElement = document.getElementById('goodsModal');
+    	    if (!modalElement) {
+    	        console.error("warehouseModal 요소를 찾을 수 없습니다.");
+    	        return;
+    	    }
+    	    
+
+    	    // 창고 그리드가 정의되어 있는지 확인 후 데이터 갱신
+    	    if (typeof productGrid !== 'undefined' && productGrid !== null) {
+    	        console.log("📢 창고 모달: 데이터 초기화 및 새로고침 시작");
+    	
+    	        // 기존 데이터 초기화
+    	    
+    	        let Data = productGrid.getData();
+    	        console.log("그리드데이터",Data)
+    	        console.log(bootstrap.Version);
+
+    	        
+    	        productGrid.readData();
+    	        
+    	        setTimeout(() => {
+    	        	productGrid.refreshLayout();  // 기존 데이터 초기화
+    	        	
+    			}, 500);
+   
+
+    	        // 데이터를 다 불러온 후 모달 열기 (onGridUpdated 이벤트 활용)
+    	         productGrid.on("onGridUpdated", function () {
+    	            console.log("창고 모달: 데이터 새로고침 완료");
+    	            
+
+    	            // 데이터 로드 완료 후 모달 열기
+    	            const modalInstance = new bootstrap.Modal(modalElement);
+    	            modalInstance.show(); // 모달 열기
+    	            
+    	            
+    	            console.log("창고 모달 열림:", rowKey);
+    	        }); 
+    	    } else {
+    	        console.warn("warehouseGrid가 정의되지 않았습니다.");
+    	    } 
+    }
+    
+  */
+    
+})
+
+  
 </script>
 
 </body>

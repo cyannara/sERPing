@@ -133,8 +133,7 @@ order by classification_id desc
     )}
 </insert>
 
-<!-- goodslist  상품리스트 조회 -->
-
+<!-- 상품조회 -->
 <select id="goodslist" resultType="ProductDTO">
     SELECT * FROM (
         SELECT /*+index_desc(purchse_goods PK_PURCHSE_GOODS)*/
@@ -147,6 +146,11 @@ order by classification_id desc
                g.goods_cost,
                g.goods_supply_price,
                g.goods_description,
+               g.brand_id,
+               g.classification_id,
+               g.vendor_id,
+               w.warehouse_id,
+               o.option_num,
                o.option_name,
                o.option_code,
                o.option_safety_invoice,
@@ -163,9 +167,9 @@ order by classification_id desc
         LEFT JOIN stdr_warehouse w ON o.warehouse_id = w.warehouse_id
         WHERE g.company_num = #{companyNum}  <!-- 기본 WHERE 조건 (회사번호 필수)-->
         <include refid="searchproductlistInfo"/>  <!-- 추가 검색 조건 -->
+        ORDER BY g.goods_code DESC
     ) 
     WHERE RN BETWEEN #{start} AND #{end}  <!-- 페이징 조건 추가 -->
-    ORDER BY goods_code DESC
 </select>
 
 <!-- 상품 수 카운트 -->
@@ -177,19 +181,21 @@ order by classification_id desc
     JOIN stdr_classification c ON g.classification_id = c.classification_id
     JOIN grpwr_vendor v ON g.vendor_id = v.vendor_id
     LEFT JOIN stdr_warehouse w ON o.warehouse_id = w.warehouse_id
-    WHERE g.company_num = #{companyNum}  <!-- 기본 WHERE 조건 (회사번호 필수)-->
-    <include refid="searchproductlistInfo"/>  <!-- 추가 검색 조건 -->
+    WHERE g.company_num = #{companyNum}  <!-- ✅ 기본 WHERE 조건 -->
+    <include refid="searchproductlistInfo"/>  <!-- ✅ 추가 검색 조건 -->
 </select>
 
 <!-- 검색 조건 쿼리 -->
 <sql id="searchproductlistInfo">
     <if test="goodsName != null and goodsName != ''">
-        AND g.goods_name LIKE CONCAT('%', #{goodsName}, '%')
+        AND g.goods_name LIKE '%' || #{goodsName} || '%'
     </if>
     <if test="brandName != null and brandName != ''">
-        AND b.brand_name LIKE CONCAT('%', #{brandName}, '%')
+        AND b.brand_name LIKE '%' || #{brandName} || '%'
     </if>
 </sql>
+
+
 
 
 
