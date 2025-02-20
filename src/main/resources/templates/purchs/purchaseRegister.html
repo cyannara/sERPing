@@ -46,11 +46,11 @@
 	        <!-- 🔹 부가세율(VAT) 선택 -->
 	        <div class="d-flex align-items-center mt-3">
 	            <div class="form-check me-3">
-	                <input class="form-check-input" type="checkbox" id="vatUnchecked">
+	                <input class="form-check-input" type="checkbox" id="vatUnchecked" checked>
 	                <label class="form-check-label" for="vatUnchecked">부가세율(VAT) 미적용</label>
 	            </div>
 	            <div class="form-check">
-	                <input class="form-check-input" type="checkbox" id="vatChecked" checked>
+	                <input class="form-check-input" type="checkbox" id="vatChecked" >
 	                <label class="form-check-label" for="vatChecked">부가세율(VAT) 적용</label>
 	            </div>
 	        </div>
@@ -86,23 +86,18 @@
 
 <!-- ✅ JS 파일 로드 순서 조정 (defer 적용) -->
 	 <script src="/js/purchs/purchseResgister.js"></script>
+	
 	 
 <!-- 상품 모달 -->
  <div th:include="purchs/ModalTemplate :: ModalTemplate (
-  'productGrid', 
+  'goodsModal', 
   'modal-xl', 
   '상품 조회', 
   'purchs/goodsTable', 
   'purchs/brandFooter'
   )"></div> 
 
-<script>
 
-	console.log(hello);
-	
-    console.log("✅ purchaseRegister.js 확인");
-</script>
-	
 	
 </body>
 
