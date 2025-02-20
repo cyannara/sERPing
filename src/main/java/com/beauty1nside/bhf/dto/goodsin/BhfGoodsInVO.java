@@ -11,13 +11,13 @@ public class BhfGoodsInVO {
 	private String optionCode;
 	private String optionName;
 	private String goodsStandard;
-	private int quantity;
+	private int stockQuantity;
 	private int companyNum;
 	
 	public BhfGoodsInVO() {}
 
 	public BhfGoodsInVO(String branchOfficeId, String goodsCode, String goodsName, String optionCode, String optionName,
-			String goodsStandard, int quantity, int companyNum) {
+			String goodsStandard, int stockQuantity, int companyNum) {
 		super();
 		this.branchOfficeId = branchOfficeId;
 		this.goodsCode = goodsCode;
@@ -25,7 +25,7 @@ public class BhfGoodsInVO {
 		this.optionCode = optionCode;
 		this.optionName = optionName;
 		this.goodsStandard = goodsStandard;
-		this.quantity = quantity;
+		this.stockQuantity = stockQuantity;
 		this.companyNum = companyNum;
 	}
 	

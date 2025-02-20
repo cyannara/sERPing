@@ -57,7 +57,7 @@
 	// 주문 조회 쿼리 호출
 	const dataSource = {
 		api: {
-			readData: { url: 'http://localhost:81/bhf/rest/', method: 'GET', initParams: { page: 1 }},
+			readData: { url: 'http://localhost:81/bhf/rest/bsn/order', method: 'GET', initParams: { page: 1 }},
 		},
 		contentType: 'application/json'
 		
@@ -70,10 +70,10 @@
 			perPage: 5,
 		},
 		columns: [ 
-			{ header : "주문번호", name : "returningCode"},
-			{ header : "발주서코드", name : "requestDate"},
-			{ header : "발주일자", name : "progressStatus"},
-			{ header : "납기일자", name : "progressStatus"},
+			{ header : "주문번호", name : "orderId"},
+			{ header : "발주서코드", name : "orderCode"},
+			{ header : "발주일자", name : "orderDate"},
+			{ header : "납기일자", name : "dueDate"},
 			{ header : "비고", name : "remark"}
 		],
 		data: dataSource
@@ -84,10 +84,10 @@
 		if(rowKey != undefined){ 	// 행 말고 다른데 클릭해도 이 함수가 실행되서 행의 키값이 있을때만 실행되게 함
 			
 			const rowData = grid.getRow(rowKey); //해당 행의 데이터 가져오기
-			const returningCode = rowData.returningCode; // 교환및반품 코드
+			const orderId = rowData.orderId; // 주문서 코드
 			
-			// 교환및반품 상세 조회 쿼리호출(orderCode)
-		    fetch('http://localhost:81/bhf/rest/return/detail?returningCode=' + returningCode, {
+			// 주문서 상세 조회 쿼리호출(orderId)
+		    fetch('http://localhost:81/bhf/rest/bsn/ordlist?orderId=' + orderId, {
 		        method: 'GET',
 		        headers: {
 		            'Content-Type': 'application/json'
@@ -112,25 +112,25 @@
 			{ header : "상품명", name : "goodsName"},
 			{ header : "옵션명", name : "optionName"},
 			{ header : "옵션코드", name : "optionCode", hidden : 1},
-			{ header : "규격", name : "optionName"},
+			{ header : "규격", name : "goodsStandard"},
 			{ header : "발주수량", name : "quantity"},
-			{ header : "낱개수량", name : "exchangeReturningChoice"},
-			{ header : "입고수량", name : "returningReason"}
+			{ header : "낱개수량", name : "stockQuantity"}, //창고에 들어갈 수량
+			{ header : "입고수량", name : ""}
 		],
 		data: ""
 	});
 	
 	// 검색 함수
 	function search(){
+		console.log("check")
 		// 값 가져와서 변수선언
 		let orderDate = document.querySelector('#orderDate').value;
 		// 객체로 담을 변수선언
 		let parameter = {};
 		// 객체 담기
-		parameter.progressStatus = progressStatus;
 		// sql로 선언한 Date는 null값이 들어가면 오류가 나서 null이 아닐때 넣는거로 선언
 		if(orderDate != ''){
-			parameter.requestDate = requestDate;
+			parameter.orderDate = orderDate;
 		}
 		// 검색 조건들 보내기
 		grid.setRequestParams(parameter);

@@ -82,7 +82,7 @@ public class BhfOrderTest {
 	        Assertions.assertTrue(result > 0, "입고 처리 실패 (0행 적용)");
 
 	        // 성공 메시지 출력
-	        System.out.println("✅ 상품 입고 MERGE 테스트 성공! " + result + " rows affected.");
+	        System.out.println("상품 입고 MERGE 테스트 성공 " + result);
 	    }
 	    
 
