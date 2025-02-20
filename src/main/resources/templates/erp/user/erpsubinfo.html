@@ -32,6 +32,10 @@
 			text-align: center;
 			font-size: 26px;
 	    }
+	    /* 그리드 선택하면 생기는 색상 */
+		.tui-grid-row-highlight {
+		    background-color: #f0f8ff !important; /* 연한 하늘색 */
+		}
 	</style>
 	<div class="container">
 		<div class="row">
@@ -39,6 +43,7 @@
 				구독현황
 			</div>
 			<div id="custom-container">
+				<!-- 
 				<div class="d-flex">
 					<div class="p-1 flex-fill">
 						<div class="d-flex">
@@ -46,7 +51,6 @@
 								구독형태
 							</div>
 							<div class="p-1 flex-fill border border-primary-subtle border-2">
-								<span id=subObj></span>
 							</div>
 						</div>
 					</div>
@@ -56,7 +60,6 @@
 								남은기간
 							</div>
 							<div class="p-1 flex-fill border border-primary-subtle border-2">
-								<span id="subObjdate"></span>
 							</div>
 						</div>
 					</div>
@@ -66,39 +69,45 @@
 								만료일
 							</div>
 							<div class="p-1 flex-fill border border-primary-subtle border-2">
-								<span id="subObjdateDay"></span>
 							</div>
 						</div>
 					</div>
 				</div>
-				<div class="d-flex justify-content-between" style="font-size: 20px;">
+				 -->
+				<div class="d-flex justify-content-center" style="font-size: 20px;">
 					<div class="d-flex flex-column mb-3">
-						<div class="p-1 bg-primary-subtle">유형</div>
-						<div class="p-1 bg-primary-subtle">남은기간</div>
-						<div class="p-1 bg-primary-subtle">만료일</div>
+						<div class="p-1 bg-primary-subtle">구독형태</div>
+						<div class="p-1 bg-primary-subtle border border-primary-subtle border-2 border-bottom-0">남은기간</div>
+						<div class="p-1 bg-primary-subtle border border-primary-subtle border-2">만료일</div>
 					</div>
 					<div class="d-flex flex-column mb-3">
-						<div class="p-1">Flex item 1</div>
-						<div class="p-1">Flex item 2</div>
-						<div class="p-1">Flex item 3</div>
+						<div class="p-1 bg-primary-subtle"><span id=subObj></span></div>
+						<div class="p-1 border border-primary-subtle border-2 border-bottom-0"><span id="subObjdate"></span></div>
+						<div class="p-1 border border-primary-subtle border-2"><span id="subObjdateDay"></span></div>
 					</div>
 					<div class="d-flex flex-column mb-3">
-						<div class="p-1">Flex item 1</div>
-						<div class="p-1">Flex item 2</div>
-						<div class="p-1">Flex item 3</div>
+						<div class="p-1 bg-primary-subtle">그룹웨어</div>
+						<div class="p-1 border border-primary-subtle border-2 border-bottom-0"><span id="gpOption"></span></div>
+						<div class="p-1 border border-primary-subtle border-2"><span id="groupObj"></span></div>
 					</div>
 					<div class="d-flex flex-column mb-3">
-						<div class="p-1">Flex item 1</div>
-						<div class="p-1">Flex item 2</div>
-						<div class="p-1">Flex item 3</div>
+						<div class="p-1 bg-primary-subtle">인사관리</div>
+						<div class="p-1 border border-primary-subtle border-2 border-bottom-0"><span id="hrObj"></span></div>
+						<div class="p-1 border border-primary-subtle border-2"><span id="hrObjdate"></span></div>
 					</div>
 					<div class="d-flex flex-column mb-3">
-						<div class="p-1">Flex item 1</div>
-						<div class="p-1">Flex item 2</div>
-						<div class="p-1">Flex item 3</div>
+						<div class="p-1 bg-primary-subtle">지점관리</div>
+						<div class="p-1 border border-primary-subtle border-2 border-bottom-0"><span id="pointObj"></span></div>
+						<div class="p-1 border border-primary-subtle border-2"><span id="pointObjdate"></span></div>
+					</div>
+					<div class="d-flex flex-column mb-3">
+						<div class="p-1 bg-primary-subtle">회계관리</div>
+						<div class="p-1 border border-primary-subtle border-2 border-bottom-0"><span id="accountObj"></span></div>
+						<div class="p-1 border border-primary-subtle border-2"><span id="accountObjdate"></span></div>
 					</div>
 				</div>
 			</div>
+			<!-- 
 			<div class="col-md-6 mt-2 mb-2">
 				<div class="row">
 					<label class="col-sm-4">상품명</label> 
@@ -119,23 +128,20 @@
 					<input type="text"class="col-sm-10" id="remark">
 				</div>
 			</div>
-			<div class="col-md-12 stretch-card mt-3 mb-5">
+			 -->
+			<div class="col-md-12 stretch-card mt-0 mb-2">
 				<div class="card">
 					<div class="card-body">
-						<h6 class="mb-4">요청서 작성</h6>
-						<div id="returning"></div>
+						<h6 class="mb-2">구독목록</h6>
+						<div id="sublist"></div>
 						<div id="pagination" class="tui-pagination"></div>
-						<div style="text-align : center">
-							<button onclick="returnInsert()">등록</button>
-							<button onclick="reset()">초기화</button>
-						</div>
 					</div>
 				</div>
 			</div>
 			<div class="col-md-6 stretch-card mt-2 mb-2">
 				<div class="card">
 					<div class="card-body">
-						<h6 class="mb-4">보유 상품</h6>
+						<h6 class="mb-4">구독상세</h6>
 						<div id="housegoods"></div>
 						<div id="pagination" class="tui-pagination"></div>
 					</div>
@@ -144,7 +150,7 @@
 			<div class="col-md-6 stretch-card mt-2 mb-2">
 				<div class="card">
 					<div class="card-body">
-						<h6 class="mb-4">상품별 옵션</h6>
+						<h6 class="mb-4">처리상세</h6>
 						<div id="option"></div>
 						<div id="pagination" class="tui-pagination"></div>
 					</div>
@@ -158,6 +164,14 @@
 			let subObj = document.querySelector("#subObj");
 			let subObjdate = document.querySelector("#subObjdate");
 			let subObjdateDay = document.querySelector("#subObjdateDay");
+			let gpOption = document.querySelector("#gpOption");
+			let groupObj = document.querySelector("#groupObj");
+			let hrObj = document.querySelector("#hrObj");
+			let hrObjdate = document.querySelector("#hrObjdate");
+			let pointObj = document.querySelector("#pointObj");
+			let pointObjdate = document.querySelector("#pointObjdate");
+			let accountObj = document.querySelector("#accountObj");
+			let accountObjdate = document.querySelector("#accountObjdate");
 			
 			//subObj
 			if(window.subscriptionState.subObj=="date"){
@@ -174,10 +188,140 @@
 				today.setDate(today.getDate()+window.subscriptionState.subObjdate);
 				let result = today.toISOString().split("T")[0];
 				subObjdateDay.innerHTML = result;
+				groupObj.innerHTML = result;
 			}else{
 				subObjdate.innerHTML = "만료";
 				subObjdateDay.innerHTML = "-";
 			}
-		}, 500);
+			//gpOption
+			if(window.subscriptionState.subObjdate=="50"){
+				gpOption.innerHTML = "50명";
+			}else if(window.subscriptionState.subObjdate=="100"){
+				gpOption.innerHTML = "100명";
+			}else{
+				gpOption.innerHTML = "인원 무제한";
+			}
+			
+			//hrObj //hrObjdate
+			if(window.subscriptionState.hrObjdate && window.subscriptionState.hrObjdate != 0){
+				//만료 남은 기간
+				hrObj.innerHTML = window.subscriptionState.hrObjdate+"일";
+				//만료일자
+				let today = new Date();
+				today.setDate(today.getDate()+window.subscriptionState.hrObjdate);
+				let result = today.toISOString().split("T")[0];
+				hrObjdate.innerHTML = result;
+			}else{
+				hrObj.innerHTML = "만료";
+				hrObjdate.innerHTML = "-";
+			}
+			
+			//pointObj //pointObjdate
+			if(window.subscriptionState.pointObjdate && window.subscriptionState.pointObjdate != 0){
+				//만료 남은 기간
+				pointObj.innerHTML = window.subscriptionState.pointObjdate+"일";
+				//만료일자
+				let today = new Date();
+				today.setDate(today.getDate()+window.subscriptionState.pointObjdate);
+				let result = today.toISOString().split("T")[0];
+				pointObjdate.innerHTML = result;
+			}else{
+				pointObj.innerHTML = "만료";
+				pointObjdate.innerHTML = "-";
+			}
+			
+			//pointObj //pointObjdate
+			if(window.subscriptionState.accountObjdate && window.subscriptionState.accountObjdate != 0){
+				//만료 남은 기간
+				accountObj.innerHTML = window.subscriptionState.accountObjdate+"일";
+				//만료일자
+				let today = new Date();
+				today.setDate(today.getDate()+window.subscriptionState.accountObjdate);
+				let result = today.toISOString().split("T")[0];
+				accountObjdate.innerHTML = result;
+			}else{
+				accountObj.innerHTML = "만료";
+				accountObjdate.innerHTML = "-";
+			}
+		}, 1000);
+		
+		
+		//구독목록 그리드 선언
+		var Grid = tui.Grid;
+		
+		//그리드 호출 항목 생성
+		const sublistdataSource = {
+				api : {
+					readData: { url: '/erp/rest/subscriptionlist', method: 'GET', initParams: { companyNum: [[${session.companyNum}]] }},
+				},
+				contentType : 'application/json',
+				headers: { 'x-custom-header': 'custom-header' },
+			};
+		//그리드 생성
+		const sublistgrid = new Grid({
+			el : document.getElementById('sublist'), // 컨테이너 엘리먼트
+			pageOptions : {
+				useClient : false, //페이지 네이션 할꺼면 false // 자동으로 하게할껴면 true
+				perPage : 5, //한페이지에 몇개 보여줄지
+			},
+			//칼럼 정하기
+			columns: [
+				{ header: "구독번호", name: "subscriptionNum", editor: 'text' },
+				{ header: "구독수단", name: "subscriptionMeanName", editor: 'text' },
+				{ header: "구독형태", name: "subscriptionFormName", editor: 'text' },
+				{ header: "구독금액", name: "subscriptionAmount", editor: 'text' },
+				{ header: "구독일시", name: "subscriptionDate", editor: 'text' },
+				{ header: "거래명세서", name: "transactionstatement", editor: 'text',
+					formatter: function({ row }) {
+				        return `<button class="btn btn-info btn-sm contract-btn" data-id="${row.subscriptionNum}">거래명세서</button>`;
+				    },
+				},
+				{ header: "세금계산서", name: "taxinvoice", editor: 'text',
+					formatter: function({ row }) {
+						if(row.subscriptionMeanName=="카드" || row.subscriptionMeanName=="카카오페이" || row.subscriptionMeanName=="네이버페이"){
+							if(row.billNum){
+								return `<button class="btn btn-info btn-sm contract-btn" data-id="${row.subscriptionNum}">계산서보기</button>`;
+							}else{
+					        	return `<button class="btn btn-info btn-sm contract-btn" data-id="${row.subscriptionNum}">발행하기</button>`;							
+							}
+						}else{
+							return `-`;
+						}
+				    },
+				},
+				{ header: "현금영수증", name: "cashreceipt", editor: 'text',
+					formatter: function({ row }) {
+						if(row.subscriptionMeanName=="무통장" || row.subscriptionMeanName=="계좌이체"){
+							if(row.billNum){
+								return `<button class="btn btn-info btn-sm contract-btn" data-id="${row.subscriptionNum}">영수증보기</button>`;
+							}else{
+					        	return `<button class="btn btn-info btn-sm contract-btn" data-id="${row.subscriptionNum}">발행하기</button>`;							
+							}
+						}else{
+							return `-`;
+						}
+				    },
+				},
+			],
+			//초기 데이터 뭘로 할지
+			data : sublistdataSource,
+		});
+		//현재 그리드에 강조된행을 기록할 변수
+		let selectedRowKey = null;
+		sublistgrid.on('click', function (ev) {
+			if (ev.rowKey !== null) {
+				//현재 강조된 행 클래스 초기화
+				if (selectedRowKey !== null) {
+					sublistgrid.removeRowClassName(selectedRowKey, 'tui-grid-row-highlight');
+		        }
+				// 클릭한 행에 강조 효과 추가
+				sublistgrid.addRowClassName(ev.rowKey, 'tui-grid-row-highlight');
+				 // 현재 강조된 행을 기록
+		        selectedRowKey = ev.rowKey;
+				
+				rowData = sublistgrid.getRow(ev.rowKey);
+				console.log(`클릭한 행 데이터:\n${JSON.stringify(rowData, null, 2)}`);
+			}
+		});
 	</script>
 </body>
