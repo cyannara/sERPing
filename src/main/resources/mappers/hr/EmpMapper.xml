@@ -22,7 +22,7 @@
 		e.department_num = d.department_num
 		WHERE e.employee_num =
 		#{employee_num}
-		ORDER BY e.employee_num DESC;
+		ORDER BY e.employee_num DESC
 	</select>
 
 	<select id="list" resultType="com.beauty1nside.hr.dto.EmpDTO"
@@ -219,6 +219,41 @@
 	    SELECT COUNT(*) FROM HR_EMPLOYEE WHERE EMAIL = #{email}
 	</select>
 	
+	<!-- 특정 부서의 사원 목록 가져오기 -->
+	<select id="listByDept" resultType="com.beauty1nside.hr.dto.EmpDTO"
+										 parameterType="com.beauty1nside.hr.dto.EmpSearchDTO">
+		
+	    SELECT * FROM (
+	        SELECT ROWNUM rn, employeeNum, employeeId, employeeName, email, phone,
+	        hireDate, position, status, employmentType, departmentName, authority
+	        FROM (
+	            SELECT
+	                e.employee_num AS employeeNum,
+	                e.employee_id AS employeeId,
+	                e.employee_name AS employeeName,
+	                e.email AS email,
+	                e.phone AS phone,
+	                e.hire_date AS hireDate,
+				    fn_get_cmmn_name(e.position) as position, 
+				    fn_get_cmmn_name(e.status) as status, 
+				    fn_get_cmmn_name(e.authority) as authority,  
+				    fn_get_cmmn_name(e.employment_type) as employmentType, 
+	                d.department_name AS departmentName
+	            FROM hr_employee e
+	            LEFT JOIN hr_department d ON e.department_num = d.department_num
+	            <where>
+	                <if test="departmentNum != null">
+	                    AND e.department_num = #{departmentNum}  <!-- 특정 부서 필터 추가 -->
+	                </if>
+	                <include refid="searchInfo"></include>  <!-- 기존 검색 조건 유지 -->
+	            </where>
+	        ) 
+        <![CDATA[
+        WHERE ROWNUM <= #{end} 
+         ]]>
+	    )
+	    WHERE rn >= #{start}
+	</select>
 
 
 </mapper>

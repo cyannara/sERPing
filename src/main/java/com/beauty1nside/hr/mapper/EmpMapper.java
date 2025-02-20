@@ -26,11 +26,14 @@ public interface EmpMapper {
     // 가장 최근 등록된 사원 ID 조회
     String getMaxEmployeeId(); 
     
-    // 🔹 사원 등록
+    // 사원 등록
     void insertEmployee(EmpDTO empDTO);
     
-    // 🔹 이메일 중복 체크 추가
+    // 이메일 중복 체크 추가
     int checkEmailExists(String email);
+    
+    // 특정 부서의 사원 목록 가져오기 (부서 이름 포함)
+    List<EmpDTO> listByDept(EmpSearchDTO dto);
 
     
 

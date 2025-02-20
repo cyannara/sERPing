@@ -137,6 +137,11 @@ public class EmpServiceImpl implements EmpService {
 		// TODO Auto-generated method stub
 		return empMapper.getSubDepartments(departmentNum); // ✅ 하위 부서 조회 추가
 	}
+	
+    @Override
+    public List<EmpDTO> listByDept(EmpSearchDTO searchDTO) {
+        return empMapper.listByDept(searchDTO);
+    }
     
     
     

@@ -15,10 +15,9 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 @Alias("DeptDTO")  // 별칭 추가
-public class DepartmentDTO {
+public class DeptDTO {
 
     private Long departmentNum;      // 부서 고유 번호 (PK)
-    private String departmentCode;   // 부서 코드 (규칙 기반 생성)
     private String departmentName;   // 부서 이름
     private Long parentDepartmentNum;// 상위 부서 번호 (NULL이면 최상위 부서)
     private String departmentType;   // 부서 유형 (DT001 기본값)
@@ -27,4 +26,10 @@ public class DepartmentDTO {
     private Date registerDate;       // 등록일
     private Date updateDate;         // 수정일
     private Long companyNum;         // 소속 회사 번호
+    private String companyName;
+    private String companyEngName;
+    private Integer employeeCount; 
+    private Integer totalEmployeeCount; // 하위 부서 포함 직원 수
+    
+    
 }

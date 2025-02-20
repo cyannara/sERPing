@@ -46,5 +46,4 @@ public class EmpDTO {
     private String firstSsn; //주민번호 앞자리
     private String secondSsn; //주민번호 뒷자리
     
-    
 }

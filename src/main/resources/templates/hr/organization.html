@@ -83,38 +83,37 @@
       <section class="org-chart">
         <input type="text" class="form-control mb-3" placeholder="부서 검색 후 [Enter]">
         <div class="department-tree">
-          <ul>
-            <li>
-              <span class="toggle-btn">▶</span> (주)YEDAM ERP
-              <ul>
-                <li>
-                  <span class="toggle-btn">▶</span> 경영지원본부(6)
-                  <ul>
-                    <li>📄 인사팀(6)</li>
-                    <li>📄 회계팀(5)</li>
-                  </ul>
-                </li>
-                <li>
-                  <span class="toggle-btn">▶</span> 서비스본부(6)
-                  <ul>
-                    <li>📄 고객지원팀(0)</li>
-                    <li>
-                      <span class="toggle-btn">▶</span> 영업교육팀(0)
-                      <ul>
-                        <li>📄 영업팀(6)</li>
-                        <li>📄 교육팀(0)</li>
-                      </ul>
-                    </li>
-                  </ul>
-                </li>
-              </ul>
-            </li>
-          </ul>
+			<ul>
+			    <!-- ✅ 회사 정보 -->
+			    <li th:data-company-id="${company.companyNum}">
+			        <span class="toggle-btn">▶</span> 
+			        <span th:text="${company.companyName}"></span> / 
+			        <span th:text="${company.companyEngName}"></span> 
+			        (<span th:text="${company.totalEmployeeCount}"></span>)
+			
+			        <ul>
+			            <!-- ✅ 본사 & 지점 -->
+			            <li th:each="dept : ${departments}" th:if="${dept.parentDepartmentNum == null}" th:data-dept-id="${dept.departmentNum}">
+			                <span class="toggle-btn">▶</span> 
+			                <span th:text="${dept.departmentName}"></span> 
+			                (<span th:text="${dept.totalEmployeeCount}"></span>)
+			
+			                <ul>
+			                    <!-- ✅ 하위 부서 -->
+			                    <li th:each="subDept : ${departments}" th:if="${subDept.parentDepartmentNum == dept.departmentNum}" th:data-dept-id="${subDept.departmentNum}">
+			                        📄 <span th:text="${subDept.departmentName}"></span> 
+			                        (<span th:text="${subDept.totalEmployeeCount}"></span>)
+			                    </li>
+			                </ul>
+			            </li>
+			        </ul>
+			    </li>
+			</ul>
         </div>
       </section>
 
       <section class="employee-table">
-        <h5 class="fw-bold">선택한 부서: 경영지원본부</h5>
+        <h5 class="fw-bold">선택한 부서: 선택한부서이름</h5>
         <input type="text" class="form-control mb-3" placeholder="사원 검색 후 [Enter]">
         <div id="grid"></div>
       </section>
@@ -122,27 +121,58 @@
   </div>
 
   <script>
-    $(document).ready(function () {
-      $('.toggle-btn').click(function () {
-        $(this).siblings('ul').toggle();
-        $(this).text($(this).text() === '▶' ? '▼' : '▶');
-      });
-    });
+	  $(document).ready(function () {
+		    // ✅ 트리 메뉴 토글 버튼
+		    $(document).on("click", ".toggle-btn", function () {
+		        $(this).siblings("ul").toggle(); // 하위 부서 목록 보이기/숨기기
+		        $(this).text($(this).text() === "▶" ? "▼" : "▶"); // 버튼 아이콘 변경
+		    });
+	
+		    // ✅ 부서 클릭 시 직원 정보 가져오기
+		    $(document).on("click", ".department-tree li", function () {
+		        let departmentNum = $(this).data("dept-id"); // 부서번호 가져오기
+		        let isCompany = $(this).hasClass("company-node"); // 회사인지 확인
+		        let departmentName = $(this).find("span").first().text().trim(); // 부서명 가져오기
+	
+		        console.log("📌 선택한 조직 번호:", departmentNum, "회사 여부:", isCompany);
+	
+		        // ✅ UI 업데이트 (선택한 부서 이름 표시)
+		        $(".employee-table h5").text("선택한 부서: " + departmentName);
+	
+		        // ✅ AJAX 요청으로 직원 목록 가져오기
+		        $.ajax({
+		            url: isCompany ? `/api/hr/employees/company/${departmentNum}` : `/api/hr/employees/${departmentNum}`,
+		            type: "GET",
+		            dataType: "json",
+		            success: function (data) {
+		                console.log("✅ 조회된 사원 목록:", data);
+		                grid.resetData(data);
+		            },
+		            error: function (xhr, status, error) {
+		                console.error("🚨 사원 조회 오류:", error);
+		            }
+		        });
+		    });
+	
+		    // ✅ TUI Grid 초기화
+		    const grid = new tui.Grid({
+		        el: document.getElementById("grid"),
+		        pageOptions: {
+		            useClient: true, // ✅ 클라이언트 측 페이지네이션 적용
+		            perPage: 5
+		        },
+		        columns: [
+		            { header: "사원 ID", name: "employeeId" },
+		            { header: "사원명", name: "employeeName" },
+		            { header: "이메일", name: "email" },
+		            { header: "직급", name: "position" },
+		            { header: "부서", name: "departmentName" }
+		        ]
+		    });
+		});
 
-    const grid = new tui.Grid({
-      el: document.getElementById('grid'),
-      data: [
-        { id: '2520401', name: '홍길동', department: '영업', position: '과장', email: 'seozzini@gmail.com' },
-        { id: '2520402', name: '김길동', department: '인사', position: '대리', email: 'seozzini@gmail.com' }
-      ],
-      columns: [
-        { header: '사원번호', name: 'id' },
-        { header: '사원명', name: 'name' },
-        { header: '부서', name: 'department' },
-        { header: '직급', name: 'position' },
-        { header: '이메일', name: 'email' }
-      ]
-    });
+
+
   </script>
 </body>
 </html>
