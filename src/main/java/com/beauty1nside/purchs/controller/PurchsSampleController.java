@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.beauty1nside.purchs.dto.ProductDTO;
+import com.beauty1nside.purchs.dto.PurchaseDTO;
 import com.beauty1nside.purchs.service.productService;
 
 import lombok.AllArgsConstructor;
@@ -41,16 +42,16 @@ public class PurchsSampleController {
 	
 	//발주서 등록 페이지 이동 
 	@GetMapping("/purchaseRegister")
-	public String purchseRegister() {
-		return "/purchs/purchaseRegister";
+	public void purchseRegister(Model model) {
+		model.addAttribute("PurchaseDTO" , new PurchaseDTO());
 	}
 	
 	
 	//발주서 등록 페이지 이동 
-		@GetMapping("/goodslist")
-		public String goodslist() {
-			return "/purchs/goodslist";
-		}
+	@GetMapping("/goodslist")
+	public String goodslist() {
+		return "/purchs/goodslist";
+	}
 	
 
 

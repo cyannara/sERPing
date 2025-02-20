@@ -183,11 +183,33 @@ public class ProductRestController {
 			 }
 			
 		}
-//		
-//		 @PostMapping("/product/insert")
-//		    public int productInsert(@RequestBody Map<String, Object> prodInfo) {
-//		        log.info("컨트롤러====={}", prodInfo);  // ✅ 로그 출력 방식 수정
-//		        return 1;
-//		    }
+		
+		//상품 리스트 데이터 조회 
+				@GetMapping("/product/list")
+				public Object productList(@RequestParam(name="perPage",defaultValue="2", required = false) int perPage,
+										@RequestParam(name="page", defaultValue = "1" ,required = false) int page,
+										 @RequestParam(name="companyNum", required=true) int companyNum,  // ✅ 회사번호 필수
+										@ModelAttribute ProductSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
+					// 회사 번호를 DTO에 설정 (필수)
+				    dto.setCompanyNum(companyNum); 
+					
+					//페이징 유닛 수 
+					paging.setPageUnit(perPage);
+					paging.setPage(page);
+					
+					//페이징 조건
+					dto.setStart(paging.getFirst());
+					dto.setEnd(paging.getLast());
+					
+					//페이징 처리 
+					paging.setTotalRecord(productService.productcount(dto));
+					
+					//grid배열 처리 
+					GridArray grid = new GridArray();
+					Object result = grid.getArray(paging.getPage(), productService.productcount(dto), productService.getProductlist(dto));
+					return result;
+				
+				}
 }
+
 	

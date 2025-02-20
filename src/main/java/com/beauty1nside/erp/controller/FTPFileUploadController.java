@@ -29,6 +29,7 @@ import lombok.extern.log4j.Log4j2;
  *   수정일      수정자          수정내용
  *  -------    --------    ---------------------------
  *  2025.02.14  표하연          최초 생성
+ *  2025.02.20  표하연          전자서명 이미지를 저장
  *
  *  </pre>
 */
@@ -120,4 +121,71 @@ public class FTPFileUploadController {
             }
         }
     }
+    
+    /**
+     * 전자서명 이미지를 저장
+     *
+     * @param MultipartFile
+     * @return String
+     */
+    @PostMapping("/uploadsignup")
+    public String uploadsignup(@RequestParam("file") MultipartFile file) {
+        FTPClient ftpClient = new FTPClient();
+
+        try {
+            // 1. FTP 서버 연결
+            ftpClient.connect(ftpHost, ftpPort);
+            ftpClient.login(ftpUser, ftpPass);
+            ftpClient.enterLocalPassiveMode();
+            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+            
+            // **💡 FTPClient 인코딩 UTF-8 설정**
+            ftpClient.setControlEncoding("UTF-8");
+
+            // 2. 파일명 뒤에 현재 시간 추가 (yyyyMMdd_HHmmss)
+            String originalFileName = file.getOriginalFilename();
+            if (originalFileName == null || originalFileName.isEmpty()) {
+                return "FAIL"; // 파일명이 없을 경우 실패 처리
+            }
+
+            // 파일 확장자 분리
+            String extension = "";
+            int dotIndex = originalFileName.lastIndexOf(".");
+            if (dotIndex != -1) {
+                extension = originalFileName.substring(dotIndex); // 확장자 포함
+                originalFileName = originalFileName.substring(0, dotIndex); // 확장자 제외한 파일명
+            }
+
+            // 현재 날짜 및 시간 추가
+            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            String newFileName = originalFileName + "_" + timestamp + extension;
+            
+            // **💡 한글 파일명 깨짐 방지 처리**
+            newFileName = new String(newFileName.getBytes("UTF-8"), "ISO-8859-1");
+
+            // 3. 파일 업로드
+            String UploadUrl = "/www/erp/signup/";
+            String remoteFilePath = UploadUrl + newFileName;
+            try (InputStream inputStream = file.getInputStream()) {
+                boolean uploaded = ftpClient.storeFile(remoteFilePath, inputStream);
+                
+                String utf8FileName = new String(newFileName.getBytes("ISO-8859-1"), "UTF-8");
+                
+                return uploaded ? utf8FileName : "FAIL";
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "FAIL";
+        } finally {
+            try {
+                if (ftpClient.isConnected()) {
+                    ftpClient.logout();
+                    ftpClient.disconnect();
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+    
 }

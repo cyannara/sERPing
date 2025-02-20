@@ -65,6 +65,16 @@ public class productServiceImpl implements productService{
 		productMapper.goodsinsert(vo);
 		
 	}
+
+	@Override
+	public List<ProductDTO> getProductlist(ProductSearchDTO dto) {
+		return productMapper.goodslist(dto);
+	}
+
+	@Override
+	public int productcount(ProductSearchDTO vo) {
+		return productMapper.productcount(vo);
+	}
 	
 
 }

@@ -126,7 +126,13 @@ call insert_Bsn_Order(
 ) 
 </insert>
 
-
+<!-- 발주요청 거부사유를 입력하고 취소 -->
+<update id="updateCancelBhfOrder" parameterType="BhfOrderDTO">
+UPDATE bhf_order
+SET    order_cancel_reason = #{orderCancelReason}, 
+       PROGRESS_STATUS = '취소'
+WHERE  order_code = #{orderCode}
+</update>
 
 
 </mapper>

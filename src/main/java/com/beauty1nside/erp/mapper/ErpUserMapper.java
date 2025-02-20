@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.beauty1nside.erp.dto.ContractDTO;
 import com.beauty1nside.erp.dto.ErpSubOptionDTO;
 import com.beauty1nside.erp.dto.erpSubscriptionInfoListDTO;
 
@@ -21,6 +22,8 @@ import com.beauty1nside.erp.dto.erpSubscriptionInfoListDTO;
  *   수정일      수정자          수정내용
  *  -------    --------    ---------------------------
  *  2025.02.17  표하연          최초 생성
+ *  2025.02.18  표하연          기간 구독 결제 서비스 생성
+ *  2025.02.20  표하연          사용계약서 정보를 CR 한다
  *
  *  </pre>
 */
@@ -116,5 +119,21 @@ public interface ErpUserMapper {
      * @return int
      */
 	public int gpoptioninfo(int comapnyNum);
+	
+	/**
+     * 사용계약서를 등록한다
+     *
+     * @param ContractDTO
+     * @return int
+     */
+	public int insertcontract(ContractDTO dto);
+	
+	/**
+     * 사용계약서 정보를 불러온다
+     *
+     * @param int
+     * @return ContractDTO
+     */
+	public ContractDTO readcontract(int companyNum);
 	
 }

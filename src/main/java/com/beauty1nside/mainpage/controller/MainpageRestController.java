@@ -4,19 +4,22 @@ import com.beauty1nside.common.GridArray;
 import com.beauty1nside.common.Paging;
 import com.beauty1nside.mainpage.dto.ApprovalDTO;
 import com.beauty1nside.mainpage.dto.ApprovalSearchDTO;
-import com.beauty1nside.mainpage.dto.DocumentDTO;
+import com.beauty1nside.stdr.dto.DocumentDTO;
 import com.beauty1nside.mainpage.service.ApprovalService;
 import com.beauty1nside.security.service.CustomerUser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Log4j2
 @RestController
@@ -69,13 +72,16 @@ public class MainpageRestController {
     return approvalService.info(approvalId, companyNum);
   }
   
-  @PostMapping("/approval/{id}/process/{processStr}")
-  public int processApproval(@PathVariable("id") Long approvalId,
-                             @PathVariable("processStr") String processStr,
-                             @RequestBody String reason,
-                              @AuthenticationPrincipal CustomerUser user) {
+  @PostMapping("/approval/process")
+  public ResponseEntity<Map<String, Object>> processApproval(@RequestBody ApprovalDTO dto,
+                                                             @AuthenticationPrincipal CustomerUser user) {
     Long companyNum = user.getUserDTO().getCompanyNum();
-    return approvalService.update(approvalId, processStr, companyNum, reason);
+    dto.setCompanyNum(companyNum);
+    
+    Map<String, Object> response = new HashMap<>();
+    int isSuccess = approvalService.update(dto);
+    response.put("message", isSuccess == 1 ? "success" : "fail");
+    return ResponseEntity.ok(response);
   }
   
   @GetMapping("/approval/type")
