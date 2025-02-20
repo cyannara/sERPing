@@ -63,6 +63,14 @@
     
     };
     
+    const departmentList = [
+        { text: '인사팀', value: 'HR' },
+        { text: '영업팀', value: 'SALES' },
+        { text: '개발팀', value: 'DEV' },
+        { text: '회계팀', value: 'ACCOUNT' },
+        { text: '마케팅팀', value: 'MARKETING' }
+    ];
+    
  // "부서" 컬럼의 formatter 직접 정의
     function departmentFormatter({ value }) {
         const department = departmentList.find(item => item.value === value);
@@ -107,8 +115,8 @@
    	        // 드롭다운 아이템 클릭 시 값 설정
    	        this.dropdown.addEventListener('click', (event) => {
    	            if (event.target.tagName === 'LI') {
-   	                this.input.value = event.target.innerText;
-   	                console.log(event.target);
+   	            	let idx = departmentList.findIndex(dp => dp.text == event.target.innerText)
+   	                this.input.value = departmentList[idx].value;
    	                this.dropdown.style.display = 'none'; // 선택 후 드롭다운 숨김
    	            }
    	        });
@@ -156,13 +164,7 @@
    	    }
    	}
     
-    const departmentList = [
-        { text: '인사팀', value: 'HR' },
-        { text: '영업팀', value: 'SALES' },
-        { text: '개발팀', value: 'DEV' },
-        { text: '회계팀', value: 'ACCOUNT' },
-        { text: '마케팅팀', value: 'MARKETING' }
-    ];
+    
     
     const grid = new Grid({
       el : document.querySelector('#grid'),
@@ -208,12 +210,13 @@
         													  		  type : "date",
         													  		  timepicker : false
   		}}},
-  		{ header : "삭제", name : "del", formatter : () => '<button class="btn btn-danger btn-sm btnDel"><i class="mdi mdi-delete" style="line-height: 15px;"></i></button>', align: 'center', width: '40'},
+  		
   		{ header : "회사번호", name : "companyNum", formatter : () => '0', hidden: '1'},
   		{ header : "부서", name : "department", formatter: departmentFormatter, align: 'center', editor: {
   			type: SearchableSelectEditor,
   			options: { listItems: departmentList }
-  		}}
+  		}},
+  		{ header : "삭제", name : "del", formatter : () => '<button class="btn btn-danger btn-sm btnDel"><i class="mdi mdi-delete" style="line-height: 15px;"></i></button>', align: 'center', width: '40'},
       ],
       data : dataSource,
     });
@@ -230,9 +233,6 @@
       grid.on("click", (ev)=>{
         if(ev.columnName == 'del'){
         	grid.removeRow(ev.rowKey);
-        }
-        if(ev.columnName == 'department'){
-        	console.log(grid.getRow(ev.rowKey));
         }
       })
     }
