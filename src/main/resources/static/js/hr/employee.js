@@ -368,16 +368,18 @@ function validateEmployeeForm() {
 
 
 function registerEmployee() {
+	let statusId = document.querySelector("input[name='modalEmploymentType']:checked")?.id;
+	let statusValue = statusId ? statusId.substring(statusId.lastIndexOf("_") + 1) : "";
     let empData = {
 		employeeId: document.getElementById("employeeIdInput")?.value || "",
         employeeName: document.getElementById("employeeName")?.value || "",
         email: document.getElementById("email")?.value || "",
         phone: document.getElementById("phone")?.value || "",
         hireDate: document.getElementById("hireDate")?.value || "",
-        departmentNum: document.getElementById("department")?.value || "",
+        departmentNum: document.getElementById("modalSubDepartment")?.value || "",
         position: document.getElementById("modalPosition")?.value || "",
-        status: document.querySelector("input[name='modalEmploymentType']:checked")?.id || "",
-        employmentType: document.querySelector("input[name='employmentType']:checked")?.value || "",
+        status: statusValue || "",
+        employmentType: "ST001",
         salary: document.getElementById("salary")?.value || "",
         bankName: document.getElementById("bankSelect")?.options[document.getElementById("bankSelect").selectedIndex].text.trim() || "",
         accountNum: document.getElementById("accountNumber")?.value || "",
@@ -385,8 +387,7 @@ function registerEmployee() {
         address: document.getElementById("address")?.value || "",
         addressDetail: document.getElementById("addressDetail")?.value || "",
         memo: document.getElementById("memo")?.value || "",
-        modalDepartment: document.getElementById("modalDepartment")?.value || "",
-        modalSubDepartment: document.getElementById("modalSubDepartment")?.value || ""
+        parentDeptNum: document.getElementById("modalDepartment")?.value || "",
     };
 
 	console.log("empData::::::",empData);

@@ -93,7 +93,7 @@ function populateSubDepartments(parentCode) {
     
     let lowDepartmentSelect = "";
     subDepartments.forEach(ele => {
-		lowDepartmentSelect += ` <option value="${ele.DEPARTMENT_CODE}">${ele.DEPARTMENT_NAME}</option>`;
+		lowDepartmentSelect += ` <option value="${ele.DEPARTMENT_NUM}">${ele.DEPARTMENT_NAME}</option>`;
 	});
 	console.log("lowDepartmentSelect:::",lowDepartmentSelect);
     document.getElementById("modalSubDepartment").innerHTML = lowDepartmentSelect;

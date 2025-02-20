@@ -42,6 +42,6 @@ public class EmpDTO {
     private Long departmentNum; // 부서번호 (FK)
     private Long salary; //연봉
     private String departmentName; //부서명
-    private String modalDepartment; //상위부서번호(departmentNum)
-    private String modalSubDepartment; //하위부서코드(departmentCode)
+    private String parentDeptNum; //상위부서번호(departmentNum)
+    
 }
