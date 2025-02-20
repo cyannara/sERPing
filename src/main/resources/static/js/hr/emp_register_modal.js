@@ -24,7 +24,36 @@ document.addEventListener("DOMContentLoaded", function () {
         console.error("❌ empRegisterModal을 찾을 수 없습니다.");
     }
     
+    
+    // ✅ 등록 버튼 이벤트 리스너 추가
+/*    let registerBtn = document.getElementById("registerEmployeeBtn");
+    if (registerBtn) {
+        registerBtn.addEventListener("click", function (event) {
+            event.preventDefault(); // 기본 동작 방지
+
+            Swal.fire({
+                title: "📌 사원 등록",
+                text: "정말 등록하시겠습니까?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "네, 등록합니다",
+                cancelButtonText: "아니요, 취소",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    registerEmployee(); // ✅ 사원 등록 처리 함수 호출
+                    Swal.fire("✅ 등록 완료!", "사원이 성공적으로 등록되었습니다.", "success");
+                } else {
+                    Swal.fire("🚫 등록 취소", "사원 등록이 취소되었습니다.", "error");
+                }
+            });
+        });
+        console.log("✅ 등록 버튼 이벤트 리스너 연결 완료");
+    } else {
+        console.error("❌ registerEmployeeBtn 요소를 찾을 수 없습니다.");
+    }*/
+    
 });
+
 
 // ✅ 예금주 조회 기능
 function checkAccountOwner() {
@@ -84,39 +113,6 @@ function resetEmployeeForm() {
     console.log("✅ 초기화 완료");
 }
 
-// ✅ 사원 등록
-function registerEmployee() {
-    let employeeData = {
-        employeeName: document.getElementById("employeeName").value,
-        email: document.getElementById("emailInput").value + "@" + document.getElementById("emailDomainSelect").value,
-        phone: document.getElementById("phoneNumber").value,
-        hireDate: document.getElementById("hireDate").value,
-        departmentNum: document.getElementById("modalDepartment").value,
-        position: document.getElementById("modalPosition").value,
-        employmentStatus: document.querySelector("input[name='employmentStatus']:checked")?.value || "",
-        employmentType: document.querySelector("input[name='modalEmploymentType']:checked")?.value || "",
-        salary: document.getElementById("salaryInput").value,
-        bankName: document.getElementById("bankSelect").value,
-        accountNum: document.getElementById("accountNumber").value,
-        zipcode: document.getElementById("zipcode").value,
-        address: document.getElementById("address").value,
-        memo: document.getElementById("memo").value
-    };
-
-    console.log("📥 사원 등록 요청 데이터:", employeeData);
-
-    fetch("/hr/rest/emp/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(employeeData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        alert("✅ 사원 등록 완료!");
-        location.reload();
-    })
-    .catch(error => console.error("❌ 서버 오류:", error));
-}
 
 
 // ✅ 이메일 입력 방식 초기화 함수
@@ -150,4 +146,6 @@ function initializeEmailInput() {
     });
     
 }
+
+
 

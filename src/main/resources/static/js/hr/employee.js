@@ -8,11 +8,31 @@ document.addEventListener("DOMContentLoaded", function () {
     initializeGrid();
     setupEventListeners();
     fetchNewEmployeeId(); // 모달 열릴 때 사원번호 자동 입력
-    initializeEmailInput(); // ✅ 이메일 입력 필드 초기화
+    
+    let registerBtn = document.getElementById("registerBtn");
+    
+    if (registerBtn) {
+        registerBtn.addEventListener("click", function (event) {
+            console.log("🔍 등록 버튼 클릭됨!");
+
+            // 🔹 입력값 검증 후 실행
+            if (!validateEmployeeForm()) {
+                console.warn("⚠️ 필수 입력값이 누락되었습니다. 등록을 중단합니다.");
+                return;
+            }
+
+            // 🔹 사원 등록 실행
+            registerEmployee();
+        });
+
+        console.log("✅ 등록 버튼 이벤트 리스너 연결 완료!");
+    } else {
+        console.error("❌ registerBtn 요소를 찾을 수 없습니다!");
+    }
     
     document.getElementById("empRegisterModal").addEventListener("show.bs.modal", function () {
-    populateModalData();  // 모달 공통 코드 데이터 로드
-});
+	    populateModalData();  // 모달 공통 코드 데이터 로드
+	});
 
     
         // ✅ 초기화 버튼 이벤트 리스너 연결 (id 일치 확인)
@@ -291,6 +311,7 @@ document.querySelectorAll("input[name='searchStatus']").forEach(btn => {
     });
 });
 
+
 // 🔹 새 사원번호 가져오기
 function fetchNewEmployeeId() {
     fetch("/hr/rest/emp/new-employee-id")
@@ -301,24 +322,75 @@ function fetchNewEmployeeId() {
         .catch(error => console.error("❌ 사원번호 생성 오류:", error));
 }
 
+/**
+ * 📌 입력값 검증 함수
+ */
+function validateEmployeeForm() {
+    let employeeName = document.getElementById("employeeName")?.value.trim();
+    let email = document.getElementById("email")?.value.trim();
+    let phone = document.getElementById("phone")?.value.trim();
+    let hireDate = document.getElementById("hireDate")?.value.trim();
+    let departmentNum = document.getElementById("modalDepartment")?.value.trim();
+    let position = document.getElementById("modalPosition")?.value.trim();
+    let employmentType = document.querySelector("input[name='modalEmploymentType']:checked")?.value;
+
+    if (!employeeName) {
+        alert("⚠️ 사원명을 입력하세요.");
+        return false;
+    }
+    if (!email) {
+        alert("⚠️ 이메일을 입력하세요.");
+        return false;
+    }
+    if (!phone) {
+        alert("⚠️ 연락처를 입력하세요.");
+        return false;
+    }
+    if (!hireDate) {
+        alert("⚠️ 입사일을 선택하세요.");
+        return false;
+    }
+    if (!departmentNum) {
+        alert("⚠️ 부서를 선택하세요.");
+        return false;
+    }
+    if (!position) {
+        alert("⚠️ 직급을 선택하세요.");
+        return false;
+    }
+    if (!employmentType) {
+        alert("⚠️ 근무 유형을 선택하세요.");
+        return false;
+    }
+
+    return true;
+}
+
 
 function registerEmployee() {
     let empData = {
-        employeeName: document.getElementById("employeeName").value,
-        email: document.getElementById("email").value,
-        phone: document.getElementById("phone").value,
-        hireDate: document.getElementById("hireDate").value,
-        position: document.getElementById("position").value,
-        status: document.querySelector("input[name='status']:checked").value,
-        employmentType: document.querySelector("input[name='employmentType']:checked").value,
-        departmentNum: document.getElementById("department").value,
-        salary: document.getElementById("salary").value,
-        bankName: document.getElementById("bankName").value,
-        accountNum: document.getElementById("accountNum").value,
-        zipcode: document.getElementById("zipcode").value,
-        address: document.getElementById("address").value,
-        memo: document.getElementById("memo").value
+		employeeId: document.getElementById("employeeIdInput")?.value || "",
+        employeeName: document.getElementById("employeeName")?.value || "",
+        email: document.getElementById("email")?.value || "",
+        phone: document.getElementById("phone")?.value || "",
+        hireDate: document.getElementById("hireDate")?.value || "",
+        departmentNum: document.getElementById("department")?.value || "",
+        position: document.getElementById("modalPosition")?.value || "",
+        status: document.querySelector("input[name='modalEmploymentType']:checked")?.id || "",
+        employmentType: document.querySelector("input[name='employmentType']:checked")?.value || "",
+        salary: document.getElementById("salary")?.value || "",
+        bankName: document.getElementById("bankSelect")?.options[document.getElementById("bankSelect").selectedIndex].text.trim() || "",
+        accountNum: document.getElementById("accountNumber")?.value || "",
+        zipcode: document.getElementById("zipcode")?.value || "",
+        address: document.getElementById("address")?.value || "",
+        addressDetail: document.getElementById("addressDetail")?.value || "",
+        memo: document.getElementById("memo")?.value || "",
+        modalDepartment: document.getElementById("modalDepartment")?.value || "",
+        modalSubDepartment: document.getElementById("modalSubDepartment")?.value || ""
     };
+
+	console.log("empData::::::",empData);
+	return;
 
     fetch("/hr/rest/emp/register", {
         method: "POST",
@@ -397,7 +469,10 @@ function populateSubDepartments(selectedDeptNum) {
 
     if (!selectedDeptNum) {
         // ✅ "선택" 상태에서는 모든 하위 부서 표시
-        filteredSubDepartments = globalSubDepartments;
+            subDepartmentSelect.innerHTML += `
+        <option value="">선택</option>
+    `;
+
     } else {
         // ✅ "본사" 또는 "지점"을 선택하면 해당 부서의 하위 부서만 표시
         filteredSubDepartments = globalSubDepartments.filter(
@@ -420,3 +495,21 @@ function populateSubDepartments(selectedDeptNum) {
 
     console.log("✅ 하위 부서 목록 업데이트 완료!", subDepartmentSelect.innerHTML); // 🔥 콘솔에서 확인
 }
+
+// Daum 우편번호 API를 활용한 주소 검색 함수
+function openPostcode() {
+    new daum.Postcode({
+        oncomplete: function(data) {
+            // 우편번호 입력
+            document.getElementById("zipcode").value = data.zonecode;
+
+            // 주소 입력
+            document.getElementById("address").value = data.roadAddress || data.jibunAddress;
+
+            // 상세주소 입력란에 포커스 이동
+            document.getElementById("addressDetail").focus();
+        }
+    }).open();
+}
+
+
