@@ -22,7 +22,7 @@
 			set in_approval_status = 'APPROVED'
 		</if>
 		<if test="processStr == 'reject'">
-			set in_approval_status = 'REJECTED'
+			set in_approval_status = 'REJECTED', IN_APPROVAL_REJECTED_CONTENT = #{reason}
 		</if>
 		where company_num = #{companyNum}
 			and in_approval_id = #{inApprovalId}
@@ -54,14 +54,34 @@
 		g.company_num
 		FROM grpwr_in_approval g
 		<![CDATA[
-            WHERE rownum <= #{dto.end}
+            WHERE rownum <= #{dto.end} and g.in_approval_status = 'WAITING'
             AND
         ]]>
-		<include refid="searchInfo"></include>
+<!--		<include refid="searchInfo"></include>-->
+		company_num LIKE '%' || #{companyNum} || '%'
+		<if test="dto.inApprovalRequestDateStart != null and ! dto.inApprovalRequestDateStart.equals('')">
+			AND g.in_approval_request_date >= TO_DATE(#{dto.inApprovalRequestDateStart}, 'YYYY-MM-DD HH24:MI:SS')
+		</if>
+		<if test="dto.inApprovalRequestDateEnd != null and ! dto.inApprovalRequestDateEnd.equals('')">
+			<![CDATA[
+				AND g.in_approval_request_date <= TO_DATE(#{dto.inApprovalRequestDateEnd}, 'YYYY-MM-DD HH24:MI:SS')
+		   ]]>
+		</if>
 		) g
 		JOIN hr_employee h ON g.employee_num = h.employee_num
 		join stdr_document s on g.document_id = s.document_id
-		WHERE rn >= #{dto.start} and g.in_approval_status = 'WAITING'
+		WHERE rn >= #{dto.start}
+		<if test="dto.documentType != null and ! dto.documentType.equals('')">
+			AND s.document_type Like '%' || #{dto.documentType} || '%'
+		</if>
+		<if test="dto.employeeName != null and ! dto.employeeName.equals('')">
+			AND h.employee_name Like '%' || #{dto.employeeName} || '%'
+		</if>
+
+	</select>
+
+	<select id="documentList" resultType="com.beauty1nside.mainpage.dto.DocumentDTO">
+		select * from stdr_document
 	</select>
 
 
@@ -69,14 +89,23 @@
 		SELECT COUNT(in_approval_id)
 		FROM grpwr_in_approval
 		<where>
-			<include refid="searchInfo"></include>
+			company_num LIKE '%' || #{companyNum} || '%'
+				AND in_approval_status = 'WAITING'
 		</where>
+		<if test="dto.inApprovalRequestDateStart != null and ! dto.inApprovalRequestDateStart.equals('')">
+			AND in_approval_request_date >= TO_DATE(#{dto.inApprovalRequestDateStart}, 'YYYY-MM-DD HH24:MI:SS')
+		</if>
+		<if test="dto.inApprovalRequestDateEnd != null and ! dto.inApprovalRequestDateEnd.equals('')">
+			<![CDATA[
+				AND in_approval_request_date <= TO_DATE(#{dto.inApprovalRequestDateEnd}, 'YYYY-MM-DD HH24:MI:SS')
+		   ]]>
+		</if>
 	</select>
 
-	<sql id="searchInfo">
-		company_num LIKE '%' || #{companyNum} || '%'
-		<if test="dto.inApprovalStatus != null and ! dto.inApprovalStatus.equals('')">
-			AND in_approval_status Like '%' || #{dto.inApprovalStatus} || '%'
-		</if>
-	</sql>
+<!--	<sql id="searchInfo">-->
+<!--		company_num LIKE '%' || #{companyNum} || '%'-->
+<!--		<if test="dto.documentType != null and ! dto.documentType.equals('')">-->
+<!--			AND document_type Like '%' || #{dto.documentType} || '%'-->
+<!--		</if>-->
+<!--	</sql>-->
 </mapper>

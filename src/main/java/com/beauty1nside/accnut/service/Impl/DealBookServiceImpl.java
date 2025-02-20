@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import com.beauty1nside.accnut.dto.DealBookDTO;
 import com.beauty1nside.accnut.dto.DealBookSearchDTO;
 import com.beauty1nside.accnut.mapper.DealBookMapper;
-import com.beauty1nside.accnut.mapper.DebtMapper;
 import com.beauty1nside.accnut.service.DealBookService;
 
 import lombok.RequiredArgsConstructor;
@@ -38,5 +37,11 @@ public class DealBookServiceImpl implements DealBookService{
 	public int count(DealBookSearchDTO dto) {
 		// TODO Auto-generated method stub
 		return dealBookMapper.count(dto);
+	}
+	
+	@Override
+	public int insert(DealBookDTO dto) {
+		// TODO Auto-generated method stub
+		return dealBookMapper.insert(dto);
 	}
 }

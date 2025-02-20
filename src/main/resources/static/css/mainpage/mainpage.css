@@ -1,5 +1,16 @@
 .approval {
-
+    .search-grid > .row {
+        display: flex;
+        > div {
+            width: 50%;
+        }
+    }
+    .btn-box {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 20px 0;
+    }
     .btn {
         display: inline-block;
         border: 0;
@@ -77,4 +88,24 @@
         }
     }
 
+}
+
+#commonModal {
+    .modal-body {
+        > div {
+            display: none;
+            &.show {
+                display: block;
+            }
+            .warningTxt {
+                display: none;
+                color: red;
+                font-size: 12px;
+                margin-top: 8px;
+                &.show {
+                    display: block;
+                }
+            }
+        }
+    }
 }

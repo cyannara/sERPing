@@ -42,6 +42,11 @@
 			AND TO_CHAR(deal_date, 'yyyy-mm-dd') = #{dealDate}
 		</if>
 	</sql>
+	
+	<insert id="insert" parameterType="com.beauty1nside.accnut.dto.DealBookDTO">
+		INSERT INTO accnut_dealings_account_book(dealings_account_book_code, section, types_of_transaction, amount, vat_alternative, dealings_contents, deal_date, company_num, department)
+		VALUES(accnut_dealings_book_seq.nextval, #{section}, #{typesOfTransaction}, #{amount}, #{vatAlternative}, #{dealingsContents}, #{dealDate}, #{companyNum}, #{department})
+	</insert>
 
 
 

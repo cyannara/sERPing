@@ -9,4 +9,5 @@ public interface DealBookMapper {
 	DealBookDTO info(String dealingsAccountBookCode);
 	List<DealBookDTO> list(DealBookSearchDTO dto);
 	int count(DealBookSearchDTO dto);
+	int insert(DealBookDTO dto);
 }

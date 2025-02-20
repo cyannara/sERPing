@@ -33,6 +33,14 @@ public interface ErpUserService {
 	public List<erpSubscriptionInfoListDTO> sublist(int comapnyNum); 
 	
 	/**
+     * 회사 계약 상태 여부를 내보냄
+     *
+     * @param int
+     * @return int
+     */
+	public int subcontact(int comapnyNum);
+	
+	/**
      * 회사 인사인원 확인
      *
      * @param int
@@ -47,5 +55,13 @@ public interface ErpUserService {
      * @return int
      */
 	public int periodservicepay(Map<String, Object> requestData);
+	
+	/**
+     * 그룹웨어 옵션 정보를 불러온다
+     *
+     * @param int
+     * @return int
+     */
+	public int gpoptioninfo(int comapnyNum);
 
 }

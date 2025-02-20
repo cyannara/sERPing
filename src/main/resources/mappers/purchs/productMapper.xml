@@ -129,7 +129,7 @@ order by classification_id desc
         #{employeeNum, mode=IN, jdbcType=NUMERIC},
         #{vendorId, mode=IN, jdbcType=NUMERIC},
         #{companyNum, mode=IN, jdbcType=NUMERIC},
-        #{files, mode=IN, jdbcType=ARRAY, typeHandler=com.beauty1nside.purchs.OracleArrayProductHandler}
+        #{files, mode=IN, typeHandler=com.beauty1nside.purchs.OracleArrayProductHandler}
     )}
 </insert>
 
