@@ -43,5 +43,8 @@ public class EmpDTO {
     private Long salary; //연봉
     private String departmentName; //부서명
     private String parentDeptNum; //상위부서번호(departmentNum)
+    private String firstSsn; //주민번호 앞자리
+    private String secondSsn; //주민번호 뒷자리
+    
     
 }

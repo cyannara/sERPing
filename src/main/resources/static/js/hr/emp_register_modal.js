@@ -94,6 +94,12 @@ function resetEmployeeForm() {
     if (radioButtons.length > 0) {
         radioButtons[0].checked = true;
     }
+    
+    // 4️⃣ 하위 부서 초기화
+    populateSubDepartments("");  // ✅ 하위 부서 필터링 함수 호출
+
+    // 5️⃣ 메모 필드 초기화
+    document.getElementById("memo").value = "";  // ✅ textarea는 수동 초기화 필요
 
     // 4️⃣ 프로필 이미지 기본 이미지로 변경
     let profilePreview = document.getElementById("profilePreview");

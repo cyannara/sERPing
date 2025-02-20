@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,6 +30,7 @@ import lombok.extern.log4j.Log4j2;
 @RequestMapping("/hr/rest")
 public class HrRestController {
 	final EmpService empService;
+	final PasswordEncoder passwordEncoder;
 	
 	@GetMapping("/emp/list")
 	public Object empList(@RequestParam(name = "perPage", defaultValue = "2", required = false) int perPage, 
@@ -76,6 +78,27 @@ public class HrRestController {
     // 🔹 사원 등록 API
     @PostMapping("/emp/register")
     public ResponseEntity<String> registerEmployee(@RequestBody EmpDTO empDTO) {
+    	
+    	log.info("empDTO={}",empDTO);
+    	log.info("ssnFirstPart={}",empDTO.getSsn());
+    	
+    	//ssn 합치기
+    	String newSsn = empDTO.getFirstSsn()+"-"+empDTO.getSecondSsn();
+    	newSsn = passwordEncoder.encode(newSsn);
+    	empDTO.setSsn(newSsn);
+    	
+    	//비밀번호: 생년월일 8자리
+    	String ssnFirstPart = empDTO.getFirstSsn();
+    	log.info("ssnFirstPart={}",ssnFirstPart);
+    	ssnFirstPart = passwordEncoder.encode(ssnFirstPart);
+    	log.info("암호화한 ssnFirstPart={}",ssnFirstPart);
+    	empDTO.setEmployeePw(ssnFirstPart);
+    	
+    	//주소 합치기
+    	String newAddress = empDTO.getAddress()+"("+empDTO.getAddressDetail()+")";
+    	empDTO.setAddress(newAddress);
+    	
+    	log.info("변경된 empDTO={}",empDTO);
         try {
             empService.registerEmployee(empDTO);
             return ResponseEntity.ok("사원 등록 성공! 사번: " + empDTO.getEmployeeId());

@@ -25,8 +25,11 @@ public interface EmpService {
     // 사원 등록 (사번 자동 생성)
     void registerEmployee(EmpDTO empDTO);
     
-    String getNewEmployeeId();  // 최신 사번 조회
+    // 최신 사번 조회
+    String getNewEmployeeId();  
     
+    // 이메일 중복 체크 추가
+    boolean checkEmailExists(String email);
     
     List<String> getDepartments(); // ✅ 기존 방식 유지
     List<Map<String, Object>> getDepartmentList(); // ✅ 새로운 방식 추가

@@ -191,11 +191,11 @@
 	    INSERT INTO hr_employee (
 	        employee_num, employee_id, employee_pw, employee_name, email, phone, hire_date, 
 	        position, authority, status, employment_type, department_num, salary, bank_name, 
-	        account_num, register_date
+	        account_num, register_date, ssn, address, zip_code, memo, company_num
 	    ) VALUES (
 	        HR_EMPLOYEE_SEQ.NEXTVAL, #{employeeId}, #{employeePw}, #{employeeName}, #{email}, #{phone}, #{hireDate},
 	        #{position}, #{authority}, #{status}, #{employmentType}, #{departmentNum}, #{salary}, #{bankName},
-	        #{accountNum}, SYSDATE
+	        #{accountNum}, SYSDATE, #{ssn}, #{address}, #{zipCode}, #{memo}, #{companyNum}
 	    )
 	</insert>
 
@@ -206,6 +206,18 @@
 	    WHERE REGEXP_LIKE(employee_id, '^[0-9]{6}[0-9]{3}$') -- 숫자로 된 9자리 employee_id만 선택
 	</select>
 
+
+	<!-- 권한 목록 조회 (최고관리자 AU001,관리자 AU002,지점장 AU003,사원 AU004)-->
+	<select id="getAuths" resultType="map">
+		SELECT DISTINCT c.cmmn_code AS cmmnCode, c.cmmn_name AS cmmnName
+		FROM cmmn c
+		WHERE c.upper_cmmn_code = 'AU'
+		ORDER BY c.cmmn_code DESC		
+	</select>
+	
+	<select id="checkEmailExists" resultType="int">
+	    SELECT COUNT(*) FROM HR_EMPLOYEE WHERE EMAIL = #{email}
+	</select>
 	
 
 

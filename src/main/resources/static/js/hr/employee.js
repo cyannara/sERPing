@@ -3,6 +3,8 @@
  */
 
 let grid;
+const header = document.querySelector('meta[name="_csrf_header"]').content;
+const token = document.querySelector('meta[name="_csrf"]').content;
 
 document.addEventListener("DOMContentLoaded", function () {
     initializeGrid();
@@ -16,10 +18,10 @@ document.addEventListener("DOMContentLoaded", function () {
             console.log("🔍 등록 버튼 클릭됨!");
 
             // 🔹 입력값 검증 후 실행
-            if (!validateEmployeeForm()) {
+           /* if (!validateEmployeeForm()) {
                 console.warn("⚠️ 필수 입력값이 누락되었습니다. 등록을 중단합니다.");
                 return;
-            }
+            }*/
 
             // 🔹 사원 등록 실행
             registerEmployee();
@@ -138,6 +140,11 @@ function populateFilters() {
     const statusSelect = document.getElementById("statusFilter");
     const employmentTypeSelect = document.getElementById("employmentTypeFilter");
     const departmentSelect = document.getElementById("departmentFilter");
+    
+    if (!positionSelect || !statusSelect || !employmentTypeSelect || !departmentSelect) {
+        console.error("❌ populateFilters() 실행 실패! 필터 요소 중 일부가 존재하지 않습니다.");
+        return; // 🔴 요소가 없으면 함수 실행 중단
+    }
 
     // 기존 옵션 제거
     positionSelect.innerHTML = '<option value="">전체</option>';
@@ -368,8 +375,8 @@ function validateEmployeeForm() {
 
 
 function registerEmployee() {
-	let statusId = document.querySelector("input[name='modalEmploymentType']:checked")?.id;
-	let statusValue = statusId ? statusId.substring(statusId.lastIndexOf("_") + 1) : "";
+	let employmentId = document.querySelector("input[name='modalEmploymentType']:checked")?.id;
+	let employmentValue = employmentId ? employmentId.substring(employmentId.lastIndexOf("_") + 1) : "";
     let empData = {
 		employeeId: document.getElementById("employeeIdInput")?.value || "",
         employeeName: document.getElementById("employeeName")?.value || "",
@@ -378,30 +385,66 @@ function registerEmployee() {
         hireDate: document.getElementById("hireDate")?.value || "",
         departmentNum: document.getElementById("modalSubDepartment")?.value || "",
         position: document.getElementById("modalPosition")?.value || "",
-        status: statusValue || "",
-        employmentType: "ST001",
+        status: "ST001",
+        employmentType: employmentValue || "",
         salary: document.getElementById("salary")?.value || "",
         bankName: document.getElementById("bankSelect")?.options[document.getElementById("bankSelect").selectedIndex].text.trim() || "",
         accountNum: document.getElementById("accountNumber")?.value || "",
-        zipcode: document.getElementById("zipcode")?.value || "",
+        zipCode: document.getElementById("zipcode")?.value || "",
         address: document.getElementById("address")?.value || "",
         addressDetail: document.getElementById("addressDetail")?.value || "",
         memo: document.getElementById("memo")?.value || "",
         parentDeptNum: document.getElementById("modalDepartment")?.value || "",
+        companyNum: document.getElementById("companyNumSJ")?.value || "",
+        firstSsn: document.getElementById("firstSsn")?.value || "",
+        secondSsn: document.getElementById("secondSsn")?.value || "",
+        authority: document.getElementById("modalAutority")?.value || "",
     };
+    
+    
+/*    	empData = {
+	    employeeId: "250220007",
+	    employeeName: "길동이",
+	    email: "seozzini@gmail.com",
+	    phone: "01000000000",
+	    hireDate: "2025-02-22",
+	    accountNum: "302015151210",
+	    address: "경기 성남시 분당구 서판교로 32",
+	    addressDetail: "10층",
+	    bankName: "KB국민은행",
+	    departmentNum: "7",         // 하위 부서
+	    parentDeptNum: "8",         // 상위 부서
+	    status: "ST001",
+	    memo: "메모메모메",
+	    phone: "01000000000",
+	    position: "PO013",
+	    salary: "50000000",
+	    employmentType: "ET002",
+	    zipCode: "13479",
+	    companyNum: "1",
+	    authority: "AU004",
+	    ssn: "910000-2000000"
+	    
+	};*/
+
+
 
 	console.log("empData::::::",empData);
-	return;
 
     fetch("/hr/rest/emp/register", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+                'header': header,
+                "Content-Type": "application/json",
+                'X-CSRF-Token': token
+            },
         body: JSON.stringify(empData)
     })
     .then(response => response.text())
     .then(message => {
         alert(message);
-        location.reload();
+        return;
+        //location.reload();
     })
     .catch(error => console.error("❌ 등록 실패:", error));
     
