@@ -11,6 +11,8 @@
     <meta charset="UTF-8">
     <title>결재문서</title>
 
+    <link rel="stylesheet" href="/css/stdr/doc.css"/>
+
     <!-- TOAST UI Editor CSS -->
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
     <link rel="stylesheet" href="https://uicdn.toast.com/editor-plugin-table-merged-cell/latest/toastui-editor-plugin-table-merged-cell.min.css" />
@@ -25,133 +27,92 @@
 
 <!--    <script defer src="https://uicdn.toast.com/editor/3.2.2/toastui-editor-all.min.js"></script>-->
 <!--    <script defer src="https://uicdn.toast.com/editor-plugin-table-merged-cell/3.2.2/toastui-editor-plugin-table-merged-cell.min.js"></script>-->
-
+    <script src="/js/stdr/doc.js"></script>
 </head>
 <body layout:fragment="content">
-<h3 class="mb-4">결재문서 관리</h3>
+    <h3 class="mb-4">문서 조회</h3>
+    <div id="table-container">
+        <div id="grid"></div>
+        <div id="pagination" class="tui-pagination"></div>
+    </div>
+    <h3 class="mb-4">문서 등록</h3>
+    <div id="custom-container">
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <label class="form-label">요청구분</label>
+            <input type="text" class="form-control" name="documentType" id="documentType">
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">문서제목</label>
+            <input type="text" class="form-control" name="documentName"  id="documentName">
+        </div>
+        <div class="col-md-4 dropdown-container">
+            <label class="form-label">결재부서</label>
+            <input type="text" class="form-control" name="deptName" id="deptName" placeholder="부서를 선택하세요" readonly>
+            <ul class="dropdown-menu" id="dropdownMenu">
+            </ul>
+        </div>
+    </div>
+    <div id="editor"></div>
 
-<!--<h2>Editor</h2>-->
-<div id="editor"></div>
-
-<!--<h2>Viewer</h2>-->
 <!--<div id="viewer"></div>-->
 
-<script>
-    const Editor = toastui.Editor;
-    const { tableMergedCell } = Editor.plugin;
+    <button id="addBtn">등록</button>
+    <script>
+        getHqDeptList()
 
-    const tableContent = `
-# 근태 수정 요청서
+        let Grid = tui.Grid;
 
-| 필드명       | 입력 값 |
-|-------------|--------|
-| **사원번호** | [사원번호 입력] |
-| **사원명**  | [사원명 입력] |
-| **부서**    | [부서 입력] |
-| **수정 요청일** | [YYYY-MM-DD] |
-| **기존 출근 시간** | [기존 출근 시간 입력] |
-| **기존 퇴근 시간** | [기존 퇴근 시간 입력] |
-| **실제 출근 시간** | [실제 출근 시간 입력] |
-| **실제 퇴근 시간** | [실제 퇴근 시간 입력] |
-| **수정 사유** | [수정 사유 입력] |
+        const grid = new Grid({
+            el: document.querySelector('#grid'),
+            scrollX: false,
+            scrollY: false,
+            pageOptions: {
+                useClient: false,
+                perPage: 10,
+            },
+            columns: [
+                {header: "번호", name: "documentId", sortable: true},
+                {header: "요청구분", name: "documentType", sortable: true},
+                {header: "문서", name: "documentName", sortable: true},
+                {header: "결재부서", name: "deptName", sortable: true}
+            ],
+            data : dataSource,
+        });
 
----
+        const Editor = toastui.Editor;
+        const { tableMergedCell } = Editor.plugin;
 
-### 📌 요청 내용
-근태 수정 요청 사유를 작성해 주세요.
+        const editor = new Editor({
+            el: document.querySelector('#editor'),
+            previewStyle: 'vertical',
+            height: '500px',
+            initialValue: tableContent,
+            plugins: [tableMergedCell],
+        });
 
-\`\`\`
-[사유 입력]
-\`\`\`
+        const addBtn = document.getElementById('addBtn')
+        addBtn.addEventListener('click', () => {
+            addDocTemplate()
+        })
 
----
+        const input = document.getElementById("deptName");
+        const dropdown = document.getElementById("dropdownMenu");
 
-**📅 작성일:** [YYYY-MM-DD]
-`;
-
-
-
-    const editor = new Editor({
-        el: document.querySelector('#editor'),
-        previewStyle: 'vertical',
-        height: '500px',
-        initialValue: tableContent,
-        plugins: [tableMergedCell],
-        // plugins: [tableMergedCell()],
-        // toolbarItems: [
-        //     ['heading', 'bold', 'italic', 'strike'],
-        //     ['hr', 'quote'],
-        //     ['ul', 'ol', 'task'],
-        //     ['table', 'image', 'link'],
-        //     ['code', 'codeblock'],
-        //     ['mergeCells', 'splitCells']
-        // ]
-    });
-
-    // const viewer = Editor.factory({
-    //     el: document.querySelector('#viewer'),
-    //     viewer: true,
-    //     height: '500px',
-    //     initialValue: tableContent,
-    //     plugins: [tableMergedCell]
-    // });
+        // Input 클릭 시 드롭다운 표시
+        input.addEventListener("click", function () {
+            dropdown.classList.toggle("show");
+        });
 
 
+        // 다른 곳 클릭 시 드롭다운 숨김
+        document.addEventListener("click", function (event) {
+            if (!input.closest(".dropdown-container").contains(event.target)) {
+                dropdown.classList.remove("show");
+            }
+        });
+    </script>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // document.addEventListener("DOMContentLoaded", function () {
-    //     // ✅ 플러그인을 올바른 경로에서 가져오기
-    //     const tableMergedCellPlugin = window.toastui.Editor.plugin.tableMergedCell;
-    //
-    //     if (!tableMergedCellPlugin) {
-    //         console.error("❌ `tableMergedCell` 플러그인이 로드되지 않았습니다!");
-    //         return;
-    //     }
-    //
-    //
-    //     const { Editor } = toastui;
-    //     const tableMergedCell = new toastui.Editor.plugin.tableMergedCell();
-    //
-    //     const tableContent = `
-    //         | Header 1 | Header 2 | Header 3 |
-    //         |----------|----------|----------|
-    //         | A1       | A2       | A3       |
-    //         | B1       | B2       | B3       |
-    //         `;
-    //
-    //     const editor = new Editor({
-    //         el: document.querySelector('#editor'),
-    //         previewStyle: 'vertical',
-    //         height: '500px',
-    //         initialValue: tableContent,
-    //         plugins: [tableMergedCell], // ✅ 플러그인 적용
-    //         toolbarItems: [
-    //             ['heading', 'bold', 'italic', 'strike'],
-    //             ['hr', 'quote'],
-    //             ['ul', 'ol', 'task'],
-    //             ['table', 'image', 'link'],
-    //             ['code', 'codeblock'],
-    //             ['mergeCells', 'splitCells'] // ✅ 병합/분할 버튼 추가
-    //         ]
-    //     });
-    // });
-</script>
+    </div>
 </body>
 </html>
