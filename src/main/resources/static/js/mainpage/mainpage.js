@@ -89,24 +89,25 @@ async function downloadPDF(dataset) {
 }
 
 const processApproval = (inApprovalId, processStr) => {
-    const header = document.querySelector('meta[name="_csrf_header"]').content;
-    const token = document.querySelector('meta[name="_csrf"]').content;
-
     const reason = document.getElementById('rejectReason').value
+    const url = `/mainpage/rest/approval/process`;
 
-    const url = `/mainpage/rest/approval/${inApprovalId}/process/${processStr}`;
     fetch(url, {
         method: "POST",
         headers: {
-            'header': header,
+            'header': header_csrf,
             "Content-Type": "application/json",
-            'X-CSRF-Token': token
+            'X-CSRF-Token': token_csrf
         },
-        body: reason
+        body: JSON.stringify({
+            inApprovalStatus: processStr === 'approve' ? 'APPROVED' : 'REJECTED',
+            inApprovalId: inApprovalId,
+            inApprovalRejectedContent: reason
+        })
     })
         .then(result => result.json())
         .then(data => {
-            if(data) {
+            if(data.message === 'success') {
                 if(processStr === 'approve') {
                     showAlert('결재 승인처리 되었습니다.', 'success')
                 } else {
