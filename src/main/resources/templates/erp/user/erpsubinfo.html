@@ -22,35 +22,162 @@
 <head>
 <body layout:fragment="content">
 	<style>
+		#custom-container{
+	        background-color: #f8f9fa; /* 연한 회색 배경 /
+	        padding: 20px;
+	        border-radius: 10px;
+	        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); / 박스 그림자 */
+	        margin-bottom: 20px;
+			font-weight: bold;
+			text-align: center;
+			font-size: 26px;
+	    }
 	</style>
 	<div class="container">
-		<div class="container">
-        <h3>구독 정보</h3>
-        <nav class="p-0 m-0 d-flex justify-content-start">
-		    <div class="nav nav-tabs" id="nav-tab" role="tablist">
-		        <button class="nav-link border active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-fp"
-		            type="button" role="tab" aria-controls="#nav-fp" aria-selected="true">구독 상태</button>
-		        <button class="nav-link border" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-rg"
-		            type="button" role="tab" aria-controls="#nav-rg" aria-selected="false">구독 목록</button>
-		    </div>
-		</nav>
-
-
-        <div class="tab-content border" id="nav-tabContent" style="background-color: #ffffff;">
-            <!-- 구독 상태 -->
-            <div class="tab-pane fade show active" id="nav-fp" role="tabpanel" aria-labelledby="nav-fp-tab" tabindex="0">
-                <h3>구독 상태</h3>
+		<div class="row">
+			<div class="h3 pb-2 mb-2 text-black border-bottom border-secondary">
+				구독현황
 			</div>
-            <!-- 구독 목록 -->
-            <div class="tab-pane fade" id="nav-rg" role="tabpanel" aria-labelledby="nav-rg-tab" tabindex="0">
-                <h3>구독 목록</h3>
-            </div>
-        </div>
-    </div>
+			<div id="custom-container">
+				<div class="d-flex">
+					<div class="p-1 flex-fill">
+						<div class="d-flex">
+							<div class="p-1 flex-fill bg-primary-subtle">
+								구독형태
+							</div>
+							<div class="p-1 flex-fill border border-primary-subtle border-2">
+								<span id=subObj></span>
+							</div>
+						</div>
+					</div>
+					<div class="p-1 flex-fill">
+						<div class="d-flex">
+							<div class="p-1 flex-fill bg-primary-subtle">
+								남은기간
+							</div>
+							<div class="p-1 flex-fill border border-primary-subtle border-2">
+								<span id="subObjdate"></span>
+							</div>
+						</div>
+					</div>
+					<div class="p-1 flex-fill">
+						<div class="d-flex">
+							<div class="p-1 flex-fill bg-primary-subtle">
+								만료일
+							</div>
+							<div class="p-1 flex-fill border border-primary-subtle border-2">
+								<span id="subObjdateDay"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="d-flex justify-content-between" style="font-size: 20px;">
+					<div class="d-flex flex-column mb-3">
+						<div class="p-1 bg-primary-subtle">유형</div>
+						<div class="p-1 bg-primary-subtle">남은기간</div>
+						<div class="p-1 bg-primary-subtle">만료일</div>
+					</div>
+					<div class="d-flex flex-column mb-3">
+						<div class="p-1">Flex item 1</div>
+						<div class="p-1">Flex item 2</div>
+						<div class="p-1">Flex item 3</div>
+					</div>
+					<div class="d-flex flex-column mb-3">
+						<div class="p-1">Flex item 1</div>
+						<div class="p-1">Flex item 2</div>
+						<div class="p-1">Flex item 3</div>
+					</div>
+					<div class="d-flex flex-column mb-3">
+						<div class="p-1">Flex item 1</div>
+						<div class="p-1">Flex item 2</div>
+						<div class="p-1">Flex item 3</div>
+					</div>
+					<div class="d-flex flex-column mb-3">
+						<div class="p-1">Flex item 1</div>
+						<div class="p-1">Flex item 2</div>
+						<div class="p-1">Flex item 3</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6 mt-2 mb-2">
+				<div class="row">
+					<label class="col-sm-4">상품명</label> 
+					<input type="text" class="col-sm-5" id="goodsName">
+					<button type="button" class="col-sm-2" onclick="search()">검색</button>
+				</div>
+			</div>
+			<div class="col-md-6 mt-2 mb-2">
+				<div class="row">
+					<div class="col-sm-1"></div>
+					<label class="col-sm-4">주문 지점</label> 
+					<input type="text"class="col-sm-7" id="branchOfficeId">
+				</div>
+			</div>
+			<div class="col-md-12 mt-2 mb-5">
+				<div class="row">
+					<label class="col-sm-2">비고</label> 
+					<input type="text"class="col-sm-10" id="remark">
+				</div>
+			</div>
+			<div class="col-md-12 stretch-card mt-3 mb-5">
+				<div class="card">
+					<div class="card-body">
+						<h6 class="mb-4">요청서 작성</h6>
+						<div id="returning"></div>
+						<div id="pagination" class="tui-pagination"></div>
+						<div style="text-align : center">
+							<button onclick="returnInsert()">등록</button>
+							<button onclick="reset()">초기화</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6 stretch-card mt-2 mb-2">
+				<div class="card">
+					<div class="card-body">
+						<h6 class="mb-4">보유 상품</h6>
+						<div id="housegoods"></div>
+						<div id="pagination" class="tui-pagination"></div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6 stretch-card mt-2 mb-2">
+				<div class="card">
+					<div class="card-body">
+						<h6 class="mb-4">상품별 옵션</h6>
+						<div id="option"></div>
+						<div id="pagination" class="tui-pagination"></div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 	<script th:inline="javascript">
 		setTimeout(async () => {
 			console.log("여기는 사용하는곳:", window.subscriptionState);
+			let subObj = document.querySelector("#subObj");
+			let subObjdate = document.querySelector("#subObjdate");
+			let subObjdateDay = document.querySelector("#subObjdateDay");
+			
+			//subObj
+			if(window.subscriptionState.subObj=="date"){
+				subObj.innerHTML = "기간구독";
+			}else{
+				subObj.innerHTML = "정기구독";
+			}
+			//subObjdate //subObjdateDay
+			if(window.subscriptionState.subObjdate && window.subscriptionState.subObjdate != 0){
+				//만료 남은 기간
+				subObjdate.innerHTML = window.subscriptionState.subObjdate+"일";
+				//만료일자
+				let today = new Date();
+				today.setDate(today.getDate()+window.subscriptionState.subObjdate);
+				let result = today.toISOString().split("T")[0];
+				subObjdateDay.innerHTML = result;
+			}else{
+				subObjdate.innerHTML = "만료";
+				subObjdateDay.innerHTML = "-";
+			}
 		}, 500);
 	</script>
 </body>
