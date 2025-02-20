@@ -66,7 +66,7 @@
     <!-- 하부 버튼 -->
 		<div class="button-bar row">
 			<div class="col-1"></div>
-			<button type="button" class="btn btn-secondary col-2" data-bs-toggle="modal" data-bs-target="#salaryModal">일괄처리</button>
+			<button type="button" class="btn btn-secondary col-2 btnPayment" data-bs-toggle="modal" data-bs-target="#salaryModal">일괄처리</button>
 			<div class="col-7"></div>
 		</div>
 		
@@ -85,7 +85,7 @@
 
 <script>
 	document.addEventListener("DOMContentLoaded",()=>{
-		
+		btndisabled();
 	})
 	
 	var checkArray = [];
@@ -151,6 +151,7 @@
 	grid.on('check', (ev)=> {
 		checkArray.push(grid.getRow(ev.rowKey));
 		//console.log(checkArray);
+		btndisabled();
 	})
 	
 	grid.on('uncheck', (ev)=>{
@@ -160,17 +161,31 @@
 			}
 		}
 		//console.log(checkArray);
+		btndisabled();
 	})
 	
 	grid.on('checkAll', (ev) => {
 		checkArray = grid.getData();
 		//console.log(checkArray);
+		btndisabled();
 	})
 	
 	grid.on('uncheckAll', (ev) => {
 		checkArray = [];
 		//console.log(checkArray);
+		btndisabled();
 	})
+	
+	function btndisabled() {
+	console.log(checkArray.length);
+		if(checkArray.length > 0){
+			document.querySelector('.btnPayment').removeAttribute('disabled');	
+		} else {
+			document.querySelector('.btnPayment').setAttribute('disabled', 'true');
+		}
+	}
+	/*
+	*/
 
 </script>
 	

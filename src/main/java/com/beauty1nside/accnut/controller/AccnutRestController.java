@@ -4,14 +4,21 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import com.beauty1nside.accnut.dto.AssetDTO;
 import com.beauty1nside.accnut.dto.AssetSearchDTO;
@@ -241,5 +248,26 @@ public class AccnutRestController {
 	
 	
 	
+	
+	// 금융 결제원 api
+	@GetMapping("bank/your0770")
+	public Object getAccessToken() {
+		String tokenUrl = "https://openapi.openbanking.or.kr/oauth/2.0/token";
+	    
+	    RestTemplate restTemplate = new RestTemplate();
+	    HttpHeaders headers = new HttpHeaders();
+	    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+	    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+	    params.add("client_id", "c659795a-b1ec-46fc-b554-2a2b80eceb8a");
+	    params.add("client_secret", "0165ca41-ef50-4cd8-acf4-40d68a50214d");
+	    params.add("scope", "oob");
+	    params.add("grant_type", "client_credentials");
+
+	    HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(params, headers);
+	    ResponseEntity<Map> response = restTemplate.exchange(tokenUrl, HttpMethod.POST, entity, Map.class);
+
+	    return response.getBody().get("access_token").toString();
+	}
 	
 }

@@ -3,8 +3,21 @@
 <head><meta charset="UTF-8"></head>
 <body>    
     
-    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">지급</button>
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-
+    <button type="button" class="btn btn-primary payBtn" data-bs-dismiss="modal">지급</button>
+    <button type="button" class="btn btn-secondary cancelBtn" data-bs-dismiss="modal">취소</button>
+<script type="text/javascript">
+	document.querySelector('#salaryModal').addEventListener('shown.bs.modal', (ev) => {
+		document.querySelector('#salaryModal').querySelector('.payBtn').addEventListener('click', (e)=>{
+			console.log(checkArray);
+			e.target.blur();
+		},{once : true});
+		
+		document.querySelector('#salaryModal').querySelector('.cancelBtn').addEventListener('click', (e)=>{
+			e.target.blur();
+		},{once : true});
+		
+	});
+	
+</script>
 </body>
 </html>

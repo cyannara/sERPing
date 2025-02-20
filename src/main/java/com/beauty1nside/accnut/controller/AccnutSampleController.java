@@ -108,7 +108,7 @@ public class AccnutSampleController {
 	@GetMapping("test")
 	public String test(Model model) {
 //		model.addAttribute("list", assetService.list());
-		return "accnut/dbtest";
+		return "accnut/test";
 	}
 	
 	@GetMapping("assetTest")
