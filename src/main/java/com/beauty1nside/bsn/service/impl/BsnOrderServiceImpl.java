@@ -54,5 +54,16 @@ public class BsnOrderServiceImpl implements BsnOrderService {
 		bsnOrderMapper.updateCancelBhfOrder(bhfOrderDTO);
 		
 	}
+	
+	//주문 조회
+	@Override
+	public List<BsnOrderDTO> getBsnOrder(OrderSearchDTO orderSearchDTO) {
+		return bsnOrderMapper.selectBsnOrder(orderSearchDTO);
+	}
+	//주문 수
+	@Override
+	public int getCountOfBsnOrder(OrderSearchDTO orderSearchDTO) {
+		return bsnOrderMapper.getCountOfBsnOrder(orderSearchDTO);
+	}
 
 }

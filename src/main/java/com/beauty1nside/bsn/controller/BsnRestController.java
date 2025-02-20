@@ -128,4 +128,34 @@ public class BsnRestController {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
 	}
+	
+	@GetMapping("/orderList")
+	public Object bsnOrder(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
+			@RequestParam(name ="page", defaultValue = "1", required = false) int page,
+			OrderSearchDTO searchDTO, Paging paging) throws JsonMappingException, JsonProcessingException  {
+		
+		//한 페이지에 출력할 수 : 기본값: 5
+		paging.setPageUnit(perPage);
+		//현재 페이지(기본값: 1)
+		paging.setPage(page);
+		
+		
+		
+		//첫 페이지, 마지막 페이지
+		searchDTO.setStart(paging.getFirst());
+		searchDTO.setEnd(paging.getLast());
+		
+		// 날짜 값이 빈 문자열("")로 넘어오면 null로 설정
+
+		GridArray grid = new GridArray();
+		Object result = grid.getArray(paging.getPage(), bsnOrderService.getCountOfBsnOrder(searchDTO), bsnOrderService.getBsnOrder(searchDTO) );
+		
+		//페이징을 위해 검색결과 수 구하기
+
+		//검색결과 - 해당 페이지 내용
+		return result;		
+				
+		
+	};
+	
 }

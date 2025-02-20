@@ -26,4 +26,9 @@ public interface BsnOrderService {
 	//발주 요청 취소
 	public void cancelBhfOrder(BhfOrderDTO bhfOrderDTO);
 	
+	
+	//주문조회
+	public List<BsnOrderDTO> getBsnOrder(OrderSearchDTO orderSearchDTO);
+	//주문 수 구하기
+	public int getCountOfBsnOrder(OrderSearchDTO orderSearchDTO);
 }

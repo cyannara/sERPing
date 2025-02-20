@@ -26,4 +26,12 @@ public interface BsnOrderMapper {
 	
 	//발주신청 취소
 	void updateCancelBhfOrder(BhfOrderDTO bhfOrderDTO);
+	
+	
+	
+	
+	//주문 조회
+	List<BsnOrderDTO> selectBsnOrder(OrderSearchDTO orderSearchDTO);
+	//주문건수 확인
+	int getCountOfBsnOrder(OrderSearchDTO orderSearchDTO);
 }

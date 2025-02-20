@@ -123,29 +123,62 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 
 	const dataSource = {
 			api: {
-				readData: { url: 'http://localhost:81/bsn/rest/bhfOrder', method: 'GET', initParams: { page: 1 }},
+				readData: { url: 'http://localhost:81/bsn/rest/orderList', method: 'GET', initParams: { page: 1 }},
 			},
 			contentType: 'application/json'
 		};
 	//상품 테이블
 	const orderList = new Grid({
-			el: document.getElementById('goods'), // 컨테이너 엘리먼트
+			el: document.getElementById('orderList'), // 컨테이너 엘리먼트
 			pageOptions: {
-			useClient: true,
-			perPage: 5,
+			useClient: false,
+			perPage: 10,
 		},
 		columns: [ 
-			{ header : "주문코드", name : "orderCode"},
+			{ header : "주문ID", name : "orderId", sortable : true},
+			{ header : "주문명", name : "orderName", width: 'auto',  sortable : true},
+			{ header : "발주코드", name : "orderCode"},
 			{ header : "지점코드", name : "branchOfficeId"},
-			{ header : "주문일", name : "orderDate", formatter: ({ value }) => formatDate(value, 'order'), sortable : true},
-			{ header : "납기일", name : "dueDate", formatter: ({ value }) => formatDate(value, 'due'), sortable : true},
-			{ header : "비고", name : "remark"},
-			{ header : "회사번호", name : "companyNum"},
+			// { header : "회사번호", name : "companyNum"},
+			{ header : "주문일", name : "orderDate", formatter: ({ value }) => formatDate(value, 'order'), width: 'auto', sortable : true},
+			{ header : "납기일", name : "dueDate", formatter: ({ value }) => formatDate(value, 'due'), width: 'auto', sortable : true},
+			{ header : "비고", name : "remark", width: 'auto'},
 		],
 		data: dataSource
 	});
+	
+	//그리드 날짜 형식 변경(데이터 수정X, 표기만)
+	function formatDate(dateString, type) {
+	    if (!dateString) return ''; // 데이터가 없으면 빈 문자열 반환
+	    const date = new Date(dateString);
+	    if (isNaN(date)) return dateString; // 날짜 변환이 실패하면 원본 유지
 
-  </script>
+	    return type === 'order' 
+	        ? date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }) // "2025년 2월 17일"
+	        : date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }); // "02/17 (월)"
+	}
+	
+	//검색
+	function search(){
+		let selectedOption = document.querySelector('input[name="optionsRadios"]:checked').value; // 라디오 버튼 선택 값
+	    let startDate = document.getElementById("startDate").value; // 시작 날짜
+	    let endDate = document.getElementById("endDate").value; // 끝 날짜
+	    let selectedBhf = document.getElementById("selectBhf").value; // 발주지점 선택 값
+	    
+	    console.log(selectedOption, startDate, endDate, selectedBhf);
+	    
+	    let params = {
+	    		"deteOption": selectedOption,
+	            "startDate": startDate,
+	            "endDate": endDate,
+	            "branch": selectedBhf
+	    };
+	    
+	    console.log("검색 조건:", params);
+	    
+	    orderList.readData(1, params, true);
+	}
+</script>
 
 
 
