@@ -26,12 +26,11 @@ WHERE progress_status = '신청'
 <![CDATA[
 AND ROWNUM <= #{end}
 ]]>
-ORDER by TO_NUMBER(REGEXP_SUBSTR(order_code, '\d+'))
 ) WHERE RN >= #{start}
 <include refid="searchInfoBhfOrder"></include>
 
 
-ORDER BY order_date, due_date
+ORDER BY TO_NUMBER(REGEXP_SUBSTR(order_code, '\d+')) desc, order_date desc, due_date desc
 
 </select>
 
@@ -127,7 +126,13 @@ call insert_Bsn_Order(
 ) 
 </insert>
 
-
+<!-- 발주요청 거부사유를 입력하고 취소 -->
+<update id="updateCancelBhfOrder" parameterType="BhfOrderDTO">
+UPDATE bhf_order
+SET    order_cancel_reason = #{orderCancelReason}, 
+       PROGRESS_STATUS = '취소'
+WHERE  order_code = #{orderCode}
+</update>
 
 
 </mapper>

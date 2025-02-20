@@ -9,5 +9,5 @@ public interface DebtService {
 	DebtDTO info(String debtCode);
 	List<DebtDTO> list(DebtSearchDTO dto);
 	int count(DebtSearchDTO dto);
-	
+	int insert(DebtDTO dto);
 }

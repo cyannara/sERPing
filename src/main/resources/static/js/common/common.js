@@ -1,3 +1,9 @@
+
+// csrf
+const header_csrf = document.querySelector('meta[name="_csrf_header"]').content;
+const token_csrf = document.querySelector('meta[name="_csrf"]').content;
+
+
 function formatDateTime(dateString) {
     const date = new Date(dateString);
     const year = date.getFullYear();
@@ -46,4 +52,37 @@ const showAlert = (message, type) => {
     }, 3000);
 
     alertPlaceholder.append(wrapper)
+}
+
+//modal
+const setModalContent = (title, contentEleId, dismissBtnName, saveBtnName, onSave) => {
+    let titleEle = document.getElementById('commonModalLabel')
+    titleEle.innerText = title
+
+    let dismissBtn = document.getElementById('dismissBtn')
+    dismissBtn.innerText = dismissBtnName
+
+    let saveBtn = document.getElementById('saveBtn')
+    saveBtn.innerText = saveBtnName
+     
+    // 기존 saveBtn에 이벤트가 계속 누적 등록돼서 똑같은 새 요소를 만듦
+    saveBtn.replaceWith(saveBtn.cloneNode(true))
+    saveBtn = document.getElementById('saveBtn')
+
+    let contentEle = document.getElementById(contentEleId)
+    contentEle.classList.add('show')
+    saveBtn.addEventListener('click', () => {
+        onSave()
+    })
+
+    let modal = document.getElementById('commonModal')
+    modal.addEventListener('hidden.bs.modal', () => {
+        titleEle.innerText = ''
+        contentEle.classList.remove('show')
+        const reason = document.getElementById('rejectReason')
+        reason.value = ''
+        const warningTxt = document.getElementsByClassName('warningTxt')[0]
+        warningTxt.classList.remove('show')
+    })
+
 }

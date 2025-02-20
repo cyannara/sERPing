@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestParam;
  *   수정일      수정자          수정내용
  *  -------    --------    ---------------------------
  *  2025.02.17  표하연          최초 생성
+ *  2025.02.19  표하연          계약서 페이지 작성
+ *  2025.02.20  표하연          구독 정보 확인 페이지 작성
  *
  *  </pre>
 */
@@ -43,5 +45,24 @@ public class ErpUserController {
 		return "/erp/user/fpsubscriptionpay";
 	}
 	
+	/**
+     * 회사 사용계약서 페이지
+     *
+     * @return String
+     */
+	@GetMapping("/usercontact")
+	public String usercontact() {
+		return "/erp/user/userContact";
+	}
+	
+	/**
+     * 회사 구독확인 페이지
+     *
+     * @return String
+     */
+	@GetMapping("/erpsubinfo")
+	public String erpsubinfo() {
+		return "/erp/user/erpsubinfo";
+	}
 
 }

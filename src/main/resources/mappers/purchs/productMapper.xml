@@ -116,23 +116,87 @@ order by classification_id desc
 
 <!-- 상품 등록 프로시저 호출  -->
 <insert id="goodsinsert" statementType="CALLABLE">
-	call purchs_product_register(
-		#{goodsName},
-		#{goodsCost}
-	    #{goodsPrice},
-	    #{goodsSupplyPrice},
-	    #{goodsStandard},
-	    #{goodsDescription},
-	    #{goodsImage},
-	    #{classificationId},  
-	    #{brandId},
-	    #{employeeNum},
-	    #{vendorId},
-	    #{companyNum},
-	    #{files,typeHandler=com.beauty1nside.purchs.OracleArrayProductHandler}  
-	)
-	
+    {CALL purchs_product_register(
+        #{goodsName, mode=IN, jdbcType=VARCHAR},
+        #{goodsCost, mode=IN, jdbcType=NUMERIC},
+        #{goodsPrice, mode=IN, jdbcType=NUMERIC},
+        #{goodsSupplyPrice, mode=IN, jdbcType=NUMERIC},
+        #{goodsStandard, mode=IN, jdbcType=VARCHAR},
+        #{goodsDescription, mode=IN, jdbcType=VARCHAR},
+        #{goodsImage, mode=IN, jdbcType=VARCHAR},
+        #{classificationId, mode=IN, jdbcType=NUMERIC},
+        #{brandId, mode=IN, jdbcType=NUMERIC},
+        #{employeeNum, mode=IN, jdbcType=NUMERIC},
+        #{vendorId, mode=IN, jdbcType=NUMERIC},
+        #{companyNum, mode=IN, jdbcType=NUMERIC},
+        #{files, mode=IN, typeHandler=com.beauty1nside.purchs.OracleArrayProductHandler}
+    )}
 </insert>
+
+<!-- 상품조회 -->
+<select id="goodslist" resultType="ProductDTO">
+    SELECT * FROM (
+        SELECT /*+index_desc(purchse_goods PK_PURCHSE_GOODS)*/
+               ROWNUM RN, 
+               g.goods_name,
+               g.goods_code,
+               g.goods_standard,
+               g.goods_image,
+               g.goods_price,
+               g.goods_cost,
+               g.goods_supply_price,
+               g.goods_description,
+               g.brand_id,
+               g.classification_id,
+               g.vendor_id,
+               w.warehouse_id,
+               o.option_num,
+               o.option_name,
+               o.option_code,
+               o.option_safety_invoice,
+               b.brand_name,
+               c.classification_name,
+               v.vendor_name,
+               w.warehouse_name,
+               erp_employee_name(g.employee_num)
+        FROM purchse_goods g 
+        LEFT JOIN purchse_option o ON g.goods_num = o.goods_num 
+        JOIN stdr_brand b ON g.brand_id = b.brand_id
+        JOIN stdr_classification c ON g.classification_id = c.classification_id
+        JOIN grpwr_vendor v ON g.vendor_id = v.vendor_id
+        LEFT JOIN stdr_warehouse w ON o.warehouse_id = w.warehouse_id
+        WHERE g.company_num = #{companyNum}  <!-- 기본 WHERE 조건 (회사번호 필수)-->
+        <include refid="searchproductlistInfo"/>  <!-- 추가 검색 조건 -->
+        ORDER BY g.goods_code DESC
+    ) 
+    WHERE RN BETWEEN #{start} AND #{end}  <!-- 페이징 조건 추가 -->
+</select>
+
+<!-- 상품 수 카운트 -->
+<select id="productcount" resultType="int">
+    SELECT COUNT(*) 
+    FROM purchse_goods g 
+    LEFT JOIN purchse_option o ON g.goods_num = o.goods_num
+    JOIN stdr_brand b ON g.brand_id = b.brand_id
+    JOIN stdr_classification c ON g.classification_id = c.classification_id
+    JOIN grpwr_vendor v ON g.vendor_id = v.vendor_id
+    LEFT JOIN stdr_warehouse w ON o.warehouse_id = w.warehouse_id
+    WHERE g.company_num = #{companyNum}  <!-- ✅ 기본 WHERE 조건 -->
+    <include refid="searchproductlistInfo"/>  <!-- ✅ 추가 검색 조건 -->
+</select>
+
+<!-- 검색 조건 쿼리 -->
+<sql id="searchproductlistInfo">
+    <if test="goodsName != null and goodsName != ''">
+        AND g.goods_name LIKE '%' || #{goodsName} || '%'
+    </if>
+    <if test="brandName != null and brandName != ''">
+        AND b.brand_name LIKE '%' || #{brandName} || '%'
+    </if>
+</sql>
+
+
+
 
 
 </mapper>

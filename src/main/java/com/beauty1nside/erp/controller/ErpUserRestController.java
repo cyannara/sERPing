@@ -13,10 +13,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.beauty1nside.erp.dto.ContractDTO;
 import com.beauty1nside.erp.dto.erpSubscriptionInfoListDTO;
 import com.beauty1nside.erp.service.ErpUserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 /**
@@ -33,6 +34,7 @@ import lombok.extern.log4j.Log4j2;
  *  -------    --------    ---------------------------
  *  2025.02.17  표하연          최초 생성
  *  2025.02.18  표하연          결제 모듈 등록
+ *  2025.02.20  표하연          전자계약 모듈 등록
  *
  *  </pre>
 */
@@ -58,6 +60,17 @@ public class ErpUserRestController {
 	public List<erpSubscriptionInfoListDTO> subList(@PathVariable(name="compnayNum") int compnayNum){
 		log.info("aaaaaaaaaa "+compnayNum);
 		return erpUserService.sublist(compnayNum);
+	}
+	
+	/**
+     * 회사 계약 상태 여부를 내보냄
+     *
+     * @param int
+     * @return int
+     */
+	@GetMapping("/subcontact/{compnayNum}")
+	public int subcontact(@PathVariable(name="compnayNum") int compnayNum){
+		return erpUserService.subcontact(compnayNum);
 	}
 	
 	/**
@@ -95,15 +108,61 @@ public class ErpUserRestController {
         return response;
     }
 	/**
-     * 기간 구독 결제를 처리한다
+     * 기간구독 결제를 처리한다
      *
      * @return Map<String, String>
      */
 	@PostMapping("/periodservicepay")
 	public String periodservicepay(@RequestBody Map<String, Object> requestData) {
-			//log.info("결제정보 : "+requestData);
-			erpUserService.periodservicepay(requestData);
-			return null;
+		//log.info("결제정보 : "+requestData);
+		int num = erpUserService.periodservicepay(requestData);
+		if(num == 1) {
+			return "OK";
+		}
+		return "NO";
 	}
 	
+	/**
+     * 그룹웨어 옵션 정보를 불러온다
+     *
+     * @param int
+     * @return int
+     */
+	@GetMapping("/subgp/{compnayNum}")
+	public int subgp(@PathVariable(name="compnayNum") int compnayNum){
+		return erpUserService.gpoptioninfo(compnayNum);
+	}
+	
+	
+	/**
+     * 맵데이터를 DTO로 변환 하기위한 오브젝트 맵퍼 의존성 주입
+     *
+     */
+	@Autowired
+	ObjectMapper objectMapper;
+	
+	/**
+     * 회사가 작성한 전자계약서의 내용을 등록한다
+     *
+     * @param Map<String, Object>
+     * @return String
+     */
+	@PostMapping("/contactinput")
+	public boolean contactinput(@RequestBody Map<String, Object> requestData) {
+		log.info("결제정보 : "+requestData);
+		ContractDTO contractDTO = objectMapper.convertValue(requestData, ContractDTO.class);
+        log.info("변환된 DTO: {}", contractDTO);
+		return erpUserService.insertcontract(contractDTO);
+	}
+	
+	/**
+     * 회사가 작성한 전자계약서의 내용을 내보낸다
+     *
+     * @param int
+     * @return ContractDTO
+     */
+	@GetMapping("/contactread/{compnayNum}")
+	public ContractDTO contactread(@PathVariable(name="compnayNum") int compnayNum) {
+		return erpUserService.readcontract(compnayNum);
+	}
 }

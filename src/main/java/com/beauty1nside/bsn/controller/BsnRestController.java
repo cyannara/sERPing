@@ -34,7 +34,7 @@ public class BsnRestController {
 	
 	final private BsnOrderService bsnOrderService;
 	
-	@GetMapping("/bhforder")
+	@GetMapping("/bhfOrder")
 	public Object bhfOrder(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
 			@RequestParam(name ="page", defaultValue = "1", required = false) int page,
 //			@RequestParam(name ="deteOption", defaultValue = "notSelect", required = false) String deteOption,
@@ -68,7 +68,7 @@ public class BsnRestController {
 	};
 	
 	//
-	@GetMapping("/bhforder/detail")
+	@GetMapping("/bhfOrder/detail")
 	public Object bhfOrderDetail(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
 			@RequestParam(name ="page", defaultValue = "1", required = false) int page,
 			@RequestParam(name = "orderCode", defaultValue = "bhf_ord1") String orderCode,
@@ -109,5 +109,23 @@ public class BsnRestController {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
 		
+	}
+	
+	@PostMapping("/bhfOrder/cancel")
+	public ResponseEntity<Map<String, Object>> bhfOrderCancle(@RequestBody BhfOrderDTO bhfOrederDTO){
+		Map<String, Object> response = new HashMap<>();
+		
+		try {
+			bsnOrderService.cancelBhfOrder(bhfOrederDTO);
+			response.put("status", "success");
+	        response.put("message", "취소 성공");
+	        return ResponseEntity.ok(response); // JSON 형태 응답
+			
+		} catch (Exception e) {
+			log.error("취소 실패", e);
+	        response.put("status", "error");
+	        response.put("message", "요청 취소 실패");
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+		}
 	}
 }

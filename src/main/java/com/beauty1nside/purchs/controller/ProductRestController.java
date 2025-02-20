@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.beauty1nside.common.GridArray;
 import com.beauty1nside.common.Paging;
 import com.beauty1nside.purchs.dto.ProdInsertVO;
+import com.beauty1nside.purchs.dto.ProductDTO;
 import com.beauty1nside.purchs.dto.ProductSearchDTO;
 import com.beauty1nside.purchs.service.productService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -33,7 +34,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2	//log4j 가 안되면 버전높은 log4j2 사용
 @RestController
 @AllArgsConstructor
-@RequestMapping("/purchs/rest*")
+@RequestMapping("/purchs/rest/*")
 public class ProductRestController {
 	final productService productService;
 	
@@ -116,9 +117,9 @@ public class ProductRestController {
 		
 	//이미지 업로드
 		@PostMapping("/product/uploadGoodsImages")
-		public ResponseEntity<Map<String, Object>> uploadFile(@RequestParam("file") MultipartFile file) {
+		public ResponseEntity<Map<String, Object>> uploadFile(@RequestParam("file") MultipartFile file , ProductDTO dto ) {
 		    Map<String, Object> response = new HashMap<>();
-		    String UPLOAD_DIR = "C:/atest/";
+		    String UPLOAD_DIR = dto.getImgUpload();
 
 		    try {
 		        if (file.isEmpty()) {
@@ -166,6 +167,7 @@ public class ProductRestController {
 		// Map을 같이 사용해서 status,message 등을 사용 가능하다
 		// ProdInsertVO 안에 List<ProInsertDtlVO> files 있어서 ProInsertDtlVO를 따로 넣지 않아도 된다.
 		public ResponseEntity<Map<String,Object>> productInsert(@RequestBody ProdInsertVO prodInsertVO){
+			log.info("컨트롤러====={}",prodInsertVO);
 			Map<String, Object> response = new HashMap<>();
 			 try {
 				productService.goodsinsert(prodInsertVO);
@@ -173,12 +175,41 @@ public class ProductRestController {
 				response.put("message", "제품 등록 성공");
 				return ResponseEntity.ok(response);
 			 } catch(Exception e) {
-				 log.error("발주등록실패", e);
+				 e.printStackTrace(); // 🔥 로그 출력 추가
+				 log.error("등록실패", e);
 				 response.put("status", "error");
-				 response.put("message", "제품 등록 성공");
+				 response.put("message", "서버 오류 발생: " + e.getMessage()); // 🔥 오류 메시지 반환
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 			 }
 			
 		}
+		
+		//상품 리스트 데이터 조회 
+				@GetMapping("/product/list")
+				public Object productList(@RequestParam(name="perPage",defaultValue="2", required = false) int perPage,
+										@RequestParam(name="page", defaultValue = "1" ,required = false) int page,
+										 @RequestParam(name="companyNum", required=true) int companyNum,  // ✅ 회사번호 필수
+										@ModelAttribute ProductSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
+					// 회사 번호를 DTO에 설정 (필수)
+				    dto.setCompanyNum(companyNum); 
+					
+					//페이징 유닛 수 
+					paging.setPageUnit(perPage);
+					paging.setPage(page);
+					
+					//페이징 조건
+					dto.setStart(paging.getFirst());
+					dto.setEnd(paging.getLast());
+					
+					//페이징 처리 
+					paging.setTotalRecord(productService.productcount(dto));
+					
+					//grid배열 처리 
+					GridArray grid = new GridArray();
+					Object result = grid.getArray(paging.getPage(), productService.productcount(dto), productService.getProductlist(dto));
+					return result;
+				
+				}
 }
+
 	

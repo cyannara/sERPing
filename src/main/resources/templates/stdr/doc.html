@@ -9,9 +9,110 @@
 >
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>결재문서</title>
+
+    <link rel="stylesheet" href="/css/stdr/doc.css"/>
+
+    <!-- TOAST UI Editor CSS -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor-plugin-table-merged-cell/latest/toastui-editor-plugin-table-merged-cell.min.css" />
+
+    <!-- TOAST UI Editor JS -->
+    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+    <script src="https://uicdn.toast.com/editor-plugin-table-merged-cell/latest/toastui-editor-plugin-table-merged-cell.min.js"></script>
+
+    <!-- TOAST UI Editor 안정화 버전 (3.2.2) -->
+<!--    <link rel="stylesheet" href="https://uicdn.toast.com/editor/3.2.2/toastui-editor.min.css" />-->
+<!--    <link rel="stylesheet" href="https://uicdn.toast.com/editor-plugin-table-merged-cell/3.2.2/toastui-editor-plugin-table-merged-cell.min.css" />-->
+
+<!--    <script defer src="https://uicdn.toast.com/editor/3.2.2/toastui-editor-all.min.js"></script>-->
+<!--    <script defer src="https://uicdn.toast.com/editor-plugin-table-merged-cell/3.2.2/toastui-editor-plugin-table-merged-cell.min.js"></script>-->
+    <script src="/js/stdr/doc.js"></script>
 </head>
 <body layout:fragment="content">
-doc
+    <h3 class="mb-4">문서 조회</h3>
+    <div id="table-container">
+        <div id="grid"></div>
+        <div id="pagination" class="tui-pagination"></div>
+    </div>
+    <h3 class="mb-4">문서 등록</h3>
+    <div id="custom-container">
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <label class="form-label">요청구분</label>
+            <input type="text" class="form-control" name="documentType" id="documentType">
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">문서제목</label>
+            <input type="text" class="form-control" name="documentName"  id="documentName">
+        </div>
+        <div class="col-md-4 dropdown-container">
+            <label class="form-label">결재부서</label>
+            <input type="text" class="form-control" name="deptName" id="deptName" placeholder="부서를 선택하세요" readonly>
+            <ul class="dropdown-menu" id="dropdownMenu">
+            </ul>
+        </div>
+    </div>
+    <div id="editor"></div>
+
+<!--<div id="viewer"></div>-->
+
+    <button id="addBtn">등록</button>
+    <script>
+        getHqDeptList()
+
+        let Grid = tui.Grid;
+
+        const grid = new Grid({
+            el: document.querySelector('#grid'),
+            scrollX: false,
+            scrollY: false,
+            pageOptions: {
+                useClient: false,
+                perPage: 10,
+            },
+            columns: [
+                {header: "번호", name: "documentId", sortable: true},
+                {header: "요청구분", name: "documentType", sortable: true},
+                {header: "문서", name: "documentName", sortable: true},
+                {header: "결재부서", name: "deptName", sortable: true}
+            ],
+            data : dataSource,
+        });
+
+        const Editor = toastui.Editor;
+        const { tableMergedCell } = Editor.plugin;
+
+        const editor = new Editor({
+            el: document.querySelector('#editor'),
+            previewStyle: 'vertical',
+            height: '500px',
+            initialValue: tableContent,
+            plugins: [tableMergedCell],
+        });
+
+        const addBtn = document.getElementById('addBtn')
+        addBtn.addEventListener('click', () => {
+            addDocTemplate()
+        })
+
+        const input = document.getElementById("deptName");
+        const dropdown = document.getElementById("dropdownMenu");
+
+        // Input 클릭 시 드롭다운 표시
+        input.addEventListener("click", function () {
+            dropdown.classList.toggle("show");
+        });
+
+
+        // 다른 곳 클릭 시 드롭다운 숨김
+        document.addEventListener("click", function (event) {
+            if (!input.closest(".dropdown-container").contains(event.target)) {
+                dropdown.classList.remove("show");
+            }
+        });
+    </script>
+
+    </div>
 </body>
 </html>

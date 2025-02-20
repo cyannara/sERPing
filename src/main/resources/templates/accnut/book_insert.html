@@ -31,7 +31,7 @@
           <div class="col-1"></div>
           <button type="button" class="btn btn-secondary col-4" onclick="resetBtn()">초기화</button>
           <div class="col-2"></div>
-          <button type="button" class="btn btn-success col-4">등록</button>
+          <button type="button" class="btn btn-success col-4" onclick="insertBtn()">등록</button>
           <div class="col-1"></div>
         </div>
         <div class="col-4"></div>
@@ -46,12 +46,21 @@
     })
     var Grid = tui.Grid;
     
+    const header = document.querySelector('meta[name="_csrf_header"]').content;
+    const token = document.querySelector('meta[name="_csrf"]').content;
+    
     const dataSource = {
       api: {
-          createData: { url: '/api/createData', method: 'POST' },
+    	  readData: { url: 'http://localhost:81/accnut/rest/book/list', method: 'GET', initParams: { page: 1 }},
+          createData: { url: 'http://localhost:81/accnut/rest/book/insert', method: 'POST', headers: {  
+        	  																							"header": header,
+              																							[header]: token,
+              } },
       },
-      contentType: 'application/json'
-        
+      contentType: 'application/json',
+      //headers: { 'x-custom-header': 'custom-header' },
+      initialRequest: false, // 자동으로 데이터 요청하지 않음
+    
     };
     
     const grid = new Grid({
@@ -99,28 +108,16 @@
         													  		  timepicker : false
   		}}},
   		{ header : "삭제", name : "del", formatter : () => '<button class="btn btn-danger btn-sm btnDel"><i class="mdi mdi-delete" style="line-height: 15px;"></i></button>', align: 'center', width: '40'},
+  		{ header : "회사번호", name : "companyNum", formatter : () => '0', hidden: '1'},
+  		{ header : "부서", name : "department", formatter : "DT003", hidden: '2'},
       ],
-      data : [
-			{},{},{},{},{}        
-        /*
-        {"section" : "", "typesOfTransaction" : "", "amount" : "", "vatAlternative" : "", "dealingsContents" : "", "dealDate" : "", "amount" : "" },
-        {"section" : "", "typesOfTransaction" : "", "amount" : "", "vatAlternative" : "", "dealingsContents" : "", "dealDate" : "", "amount" : "" },
-        {"section" : "", "typesOfTransaction" : "", "amount" : "", "vatAlternative" : "", "dealingsContents" : "", "dealDate" : "", "amount" : "" },
-        {"section" : "", "typesOfTransaction" : "", "amount" : "", "vatAlternative" : "", "dealingsContents" : "", "dealDate" : "", "amount" : "" },
-        {"section" : "", "typesOfTransaction" : "", "amount" : "", "vatAlternative" : "", "dealingsContents" : "", "dealDate" : "", "amount" : "" },
-        {"section" : "", "typesOfTransaction" : "", "amount" : "", "vatAlternative" : "", "dealingsContents" : "", "dealDate" : "", "amount" : "" },
-        {"section" : "", "typesOfTransaction" : "", "amount" : "", "vatAlternative" : "", "dealingsContents" : "", "dealDate" : "", "amount" : "" },
-        {"section" : "", "typesOfTransaction" : "", "amount" : "", "vatAlternative" : "", "dealingsContents" : "", "dealDate" : "", "amount" : "" },
-        {"section" : "", "typesOfTransaction" : "", "amount" : "", "vatAlternative" : "", "dealingsContents" : "", "dealDate" : "", "amount" : "" },
-        {"section" : "", "typesOfTransaction" : "", "amount" : "", "vatAlternative" : "", "dealingsContents" : "", "dealDate" : "", "amount" : "" },
-        */
-      ],
+      data : dataSource,
     });
   	
     function addRow() {
       document.querySelector('#addBtn').addEventListener('click', ()=> {
-        grid.appendRow({})
-        delRow();
+        grid.appendRow({ department: "DT003" })
+        //delRow();
       })
 
     }
@@ -134,7 +131,13 @@
     }
     
     function resetBtn() {
-    	grid.resetData([{},{},{},{},{}]);
+    	grid.resetData([]);
+    }
+    
+    function insertBtn() {
+    	grid.blur();
+    	grid.request('createData');
+    	
     }
     
     

@@ -14,6 +14,7 @@
 	*  ======    =======    ==============================
 	*  2025.02.17  표하연          최초생성
 	*  2025.02.18  표하연          기간결제에 따른 추가처리
+	*  2025.02.20  표하연          사용계약서 정보를 CR 한다
 	*
 	*  </pre>
 ======================================================== -->
@@ -32,6 +33,18 @@
 	</select>
 	
 	<!-- 
+     * 회사 계약 상태 여부를 내보냄
+     *
+     * @param int
+     * @return erpSubscriptionInfoListDTO
+	-->
+	<select id="subcontact">
+		select count(*)
+		from erp_contract_document
+		where company_num = #{companyNum}
+	</select>
+	
+	<!-- 
      * 회사 회원 인원수를 내보냄
      *
      * @param int
@@ -44,7 +57,7 @@
 	</select>
 	
 	<!-- 
-     * 구독목록(결제헤더)를 등록한다
+     * 구독목록(결제헤더)를 등록한다 [ 최초등록 ]
      *
      * @param map
      * @return int
@@ -53,6 +66,7 @@
 		INSERT INTO erp_subscription_list VALUES
 		(erp_subscrpt_seq.nextval, #{companyNum}, #{employeeNum}, DEFAULT, #{paymethod}, null, #{price}, 'ES04', sysdate)
 	</insert>
+	
 	
 	<!-- 
      * 구독목록(결제헤더)의 마지막 결제 기본키를 가져온다
@@ -113,7 +127,101 @@
 		select *
 		from erp_subscription_info_list
 		where company_num = #{companyNum}
-		and subscription_name_num in ( #{subnamenum1}, #{subnamenum2} );
+		and subscription_name_num in ( #{subnamenum1}, #{subnamenum2} )
+	</select>
+	
+	<!-- 
+     * 구독정보를 업데이트 한다 (기간구독)
+     *
+     * @param erpSubscriptionInfoListDTO
+     * @return int
+	-->
+	<update id="prosubupdate" parameterType="erpSubscriptionInfoListDTO">
+		update erp_subscription_info_list
+		<set>
+	    	subscription_update_date = sysdate,
+	        subscription_end_date = #{subscriptionEndDate},
+	        subscription_option_num = #{subscriptionOptionNum},
+	        subscription_name_num = #{subscriptionNameNum},
+	        subscription_form = #{subscriptionForm},
+	    </set>
+	    WHERE subscription_num = #{subscriptionNum}
+	</update>
+	
+	<!-- 
+     * 구독정보를 인서트 한다 (기간구독)
+     *
+     * @param erpSubscriptionInfoListDTO
+     * @return int
+	-->
+	<insert id="prosubinsert" parameterType="erpSubscriptionInfoListDTO">
+		INSERT INTO erp_subscription_info_list VALUES
+		( 
+			erp_subscrpt_info_seq.nextval, 
+			#{companyNum}, 
+			DEFAULT, 
+			#{subscriptionNameNum}, 
+			#{subscriptionOptionNum}, 
+			#{subscriptionEndDate}, 
+			sysdate
+		)
+	</insert>
+	
+	<!-- 
+     * 그룹웨어 옵션 정보를 불러온다
+     *
+     * @param int
+     * @return int
+	-->
+	<select id="gpoptioninfo">
+		SELECT CASE 
+		           WHEN COUNT(*) = 0 THEN 50
+		           ELSE MAX(subscription_period)
+		       END AS subscription_period
+		FROM erp_subscription_info_list s
+		LEFT JOIN erp_subscription_option o
+		    ON s.subscription_option_num = o.subscription_option_num
+		WHERE s.subscription_name_num IN (2,7)
+		AND s.company_num = #{companyNum}
+	</select>
+	
+	<!-- 
+     * 사용계약서를 등록한다
+     *
+     * @param ContractDTO
+     * @return int
+	-->
+	<insert id="insertcontract" parameterType="ContractDTO">
+		INSERT INTO erp_contract_document
+        (
+            contract_num, company_num, erp_contract_document, erp_register_date,
+			contract1, contract2, contract3, contract4, contract5, contract6, contract7,
+			contract8, contract9, contract10, contract11, contract12, contract13, contract14, 
+			contract15, contract16, contract17, contract18, contract19, contract20, contract21,
+			contract22, contract23, contract24, contract25, contract26, contract27, contract28,
+			contract29, contract30
+        )
+        VALUES
+        (
+            erp_ctrtc_seq.nextval, #{companyNum}, #{erpContractDocument}, DEFAULT,
+            #{contract1}, #{contract2}, #{contract3}, #{contract4}, #{contract5}, #{contract6}, #{contract7},
+            #{contract8}, #{contract9}, #{contract10}, #{contract11}, #{contract12}, #{contract13}, #{contract14}, 
+            #{contract15}, #{contract16}, #{contract17}, #{contract18}, #{contract19}, #{contract20}, #{contract21},
+            #{contract22}, #{contract23}, #{contract24}, #{contract25}, #{contract26}, #{contract27}, #{contract28},
+            #{contract29}, #{contract30}
+        )
+	</insert>
+	
+	<!-- 
+     * 사용계약서 정보를 불러온다
+     *
+     * @param int
+     * @return ContractDTO
+	-->
+	<select id="readcontract" resultType="ContractDTO">
+		select *
+		from erp_contract_document
+		where COMPANY_NUM = #{compnayNum}
 	</select>
 
 </mapper>

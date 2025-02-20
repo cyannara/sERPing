@@ -3,6 +3,7 @@ package com.beauty1nside.erp.service;
 import java.util.List;
 import java.util.Map;
 
+import com.beauty1nside.erp.dto.ContractDTO;
 import com.beauty1nside.erp.dto.erpSubscriptionInfoListDTO;
 
 /**
@@ -19,6 +20,7 @@ import com.beauty1nside.erp.dto.erpSubscriptionInfoListDTO;
  *  -------    --------    ---------------------------
  *  2025.02.17  표하연          최초 생성
  *  2025.02.18  표하연          기간 구독 결제 서비스 생성
+ *  2025.02.20  표하연          사용계약서 정보를 CR 한다
  *
  *  </pre>
 */
@@ -31,6 +33,14 @@ public interface ErpUserService {
      * @return List<erpSubscriptionInfoListDTO>
      */
 	public List<erpSubscriptionInfoListDTO> sublist(int comapnyNum); 
+	
+	/**
+     * 회사 계약 상태 여부를 내보냄
+     *
+     * @param int
+     * @return int
+     */
+	public int subcontact(int comapnyNum);
 	
 	/**
      * 회사 인사인원 확인
@@ -47,5 +57,29 @@ public interface ErpUserService {
      * @return int
      */
 	public int periodservicepay(Map<String, Object> requestData);
+	
+	/**
+     * 그룹웨어 옵션 정보를 불러온다
+     *
+     * @param int
+     * @return int
+     */
+	public int gpoptioninfo(int comapnyNum);
+	
+	/**
+     * 사용계약서를 등록한다
+     *
+     * @param ContractDTO
+     * @return int
+     */
+	public boolean insertcontract(ContractDTO dto);
+	
+	/**
+     * 사용계약서 정보를 불러온다
+     *
+     * @param int
+     * @return ContractDTO
+     */
+	public ContractDTO readcontract(int companyNum);
 
 }

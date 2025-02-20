@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beauty1nside.bhf.mapper.BhfOrderListMapper">
+	
+	<!-- 발주서 조회 -->
+	<select id="orderList" resultType="BhfOrdListDTO" parameterType="BhfOrdListSearchDTO">
+		select order_code, 
+		       branch_office_id, 
+		       order_date, 
+		       due_date, 
+		       progress_status, 
+		       remark,
+		       order_cancel_reason
+		from (  select /*+INDEX_DESC(bhf_order pk_bhf_order)*/
+					   rownum rn,
+					   order_code, 
+				       branch_office_id, 
+				       order_date, 
+				       due_date, 
+				       progress_status, 
+				       remark,
+				       order_cancel_reason
+				from   bhf_order
+		<![CDATA[
+			where rownum <= #{end}
+		]]>
+			and <include refid="searchInfo"></include>
+			)
+		where rn >= #{start}
+	</select>
+	
+	<!-- 페이징에 전체숫자 알려주기 위해서 -->
+	<select id="count" parameterType="BhfOrdListSearchDTO">
+		SELECT COUNT(order_code)
+		FROM bhf_order
+		<where>
+			<include refid="searchInfo"></include>
+		</where>
+	</select>
+	
+	<!-- 검색조건(검색을 안하면 그냥 조회가 되게) -->
+	<sql id="searchInfo">
+		company_num = 1<!-- #{companyNum}  -->
+		<if test="branchOfficeId != null and ! branchOfficeId.equals('')">
+			AND branch_office_id LIKE '%' || #{branchOfficeId} || '%'
+		</if>
+		<if test="progressStatus != null and ! progressStatus.equals('')">
+			AND progress_status = #{progressStatus}
+		</if>
+		<if test="orderDate != null and ! orderDate.equals('')">
+			AND TO_CHAR(order_date, 'yyyy-mm-dd') = #{orderDate}
+		</if>
+		<if test="dueDate != null and ! dueDate.equals('')">
+			AND TO_CHAR(due_date, 'yyyy-mm-dd') = #{dueDate}
+		</if>
+	</sql>
+	
+	<!-- 발주서 상세 조회 -->
+	<select id="orderDetailList" resultType="BhfOrdListDTO" parameterType="BhfOrdListSearchDTO">
+		select order_code,
+		       goods_code,
+		       goods_name,
+		       option_code,
+		       option_name,
+		       goods_standard,
+		       quantity
+		from (select /*+INDEX_DESC(bhf_order_detail pk_bhf_order_detail)*/
+					 rownum rn, 
+					 order_code,
+		       		 goods_code,
+		      		 goods_name,
+		       		 option_code,
+		       		 option_name,
+		       		 goods_standard,
+		       		 quantity
+			 from    bhf_order_detail
+		<![CDATA[
+			where rownum <= #{end}
+		]]>
+			and order_code = #{orderCode} 
+			)
+		where rn >= #{start}
+	</select>
+	
+	<!-- 발주서 취소 -->
+	<update id="orderCancel" parameterType="BhfOrdCancelDTO">
+		update bhf_order
+		set    progress_status = '취소', 
+			   order_cancel_reason = #{orderCancelReason}
+		where  order_code = #{orderCode}
+	</update>
+	
+</mapper>

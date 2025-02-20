@@ -1,5 +1,7 @@
 package com.beauty1nside.purchs.dto;
 
+import org.springframework.beans.factory.annotation.Value;
+
 import groovy.transform.builder.Builder;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,6 +14,7 @@ import lombok.NoArgsConstructor;
 
 public class ProductDTO {
 	//상품
+	private int goodsNum;
 	private String goodsName;
 	private int goodsCost;
 	private String goodsCode;
@@ -36,13 +39,20 @@ public class ProductDTO {
 	private String vendorName;
 	
 	
+	private int companyNum;
+	
 	//옵션
+	private int optionNum;
 	private String optionCode;
 	private String optionName;
 	private int optionSafetyInvoice;
 	
 	private Long warehouseId;
 	private String warehouseName;
+	
+	//파일 이미지 업로드
+	@Value("${img.upload}")
+	private String imgUpload;
 	
 
 	

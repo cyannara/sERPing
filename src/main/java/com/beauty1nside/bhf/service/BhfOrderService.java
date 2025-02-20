@@ -14,6 +14,6 @@ public interface BhfOrderService {
 	
 	int count(BhfOrdSearchDTO dto);
 	
-	public List<BhfGoodsOpDTO> optionList(String goodsCode);
+	public List<BhfGoodsOpDTO> optionList(BhfOrdSearchDTO dto);
 	
 }

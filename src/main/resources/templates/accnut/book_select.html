@@ -88,7 +88,7 @@
     <!-- 하부 버튼 -->
 		<div class="button-bar row">
 			<div class="col-1"></div>
-			<button type="button" class="btn btn-primary col-1">Excel</button>
+			<button type="button" class="btn btn-primary col-1 btnExcel">Excel</button>
 			<button type="button" class="btn btn-secondary col-1">PDF</button>
 			<div class="col-7"></div>
 		</div>
@@ -96,7 +96,7 @@
 
 <script>
 	document.addEventListener("DOMContentLoaded",()=>{
-
+		downExcel();
 	})
 	var Grid = tui.Grid;
 	
@@ -153,6 +153,18 @@
 		let dealDate = document.querySelector('#dealDate').value = '';
 		grid.setRequestParams({"dealingsContents" : dealingsContents, "section" : section, "typesOfTransaction" : typesOfTransaction });
 		grid.readData();
+	}
+	
+	function downExcel(){
+		let btnExcel = document.querySelector('.btnExcel');
+		btnExcel.addEventListener("click", function () {
+		       const options = {
+		         				includeHiddenColumns: true,
+		         				//onlySelected: true,
+		         				fileName: 'dealings_book',
+		       					};
+		       grid.export('xlsx', options);
+	     })
 	}
 
 </script>

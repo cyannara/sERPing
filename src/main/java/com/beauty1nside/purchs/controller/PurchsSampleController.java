@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.beauty1nside.purchs.dto.ProductDTO;
+import com.beauty1nside.purchs.dto.PurchaseDTO;
 import com.beauty1nside.purchs.service.productService;
 
 import lombok.AllArgsConstructor;
@@ -32,15 +33,25 @@ public class PurchsSampleController {
 	};
 	
 
-	//등록 페이지 이동
+	//제품 등록 페이지 이동
 	@GetMapping("/goodsRegister")
 	public void showRegister(Model model) {
 		model.addAttribute("ProductDTO", new ProductDTO());
 	    model.addAttribute("catelist", productService.getCatelist()); // 빈 객체라도 전달
 	}
 	
+	//발주서 등록 페이지 이동 
+	@GetMapping("/purchaseRegister")
+	public void purchseRegister(Model model) {
+		model.addAttribute("PurchaseDTO" , new PurchaseDTO());
+	}
 	
 	
+	//발주서 등록 페이지 이동 
+	@GetMapping("/goodslist")
+	public String goodslist() {
+		return "/purchs/goodslist";
+	}
 	
 
 

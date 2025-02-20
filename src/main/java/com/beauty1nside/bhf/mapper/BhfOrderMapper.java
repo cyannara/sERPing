@@ -17,7 +17,7 @@ public interface BhfOrderMapper {
 	int count(BhfOrdSearchDTO dto);
 	
 	//옵션 조회
-	public List<BhfGoodsOpDTO> optionList(String goodsCode);
+	public List<BhfGoodsOpDTO> optionList(BhfOrdSearchDTO dto);
 
 	
 }

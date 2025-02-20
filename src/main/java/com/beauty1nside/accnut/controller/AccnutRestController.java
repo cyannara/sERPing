@@ -1,5 +1,6 @@
 package com.beauty1nside.accnut.controller;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,7 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.beauty1nside.accnut.dto.AssetDTO;
 import com.beauty1nside.accnut.dto.AssetSearchDTO;
+import com.beauty1nside.accnut.dto.DealBookDTO;
 import com.beauty1nside.accnut.dto.DealBookSearchDTO;
+import com.beauty1nside.accnut.dto.DebtDTO;
 import com.beauty1nside.accnut.dto.DebtSearchDTO;
 import com.beauty1nside.accnut.dto.EtcBookSearchDTO;
 import com.beauty1nside.accnut.dto.IncidentalCostSearchDTO;
@@ -26,6 +29,7 @@ import com.beauty1nside.accnut.service.EtcBookService;
 import com.beauty1nside.accnut.service.IncidentalCostService;
 import com.beauty1nside.accnut.service.SalaryBookService;
 import com.beauty1nside.common.GridArray;
+import com.beauty1nside.common.GridData;
 import com.beauty1nside.common.Paging;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -46,6 +50,7 @@ public class AccnutRestController {
 	final EtcBookService etcBookService;
 	final IncidentalCostService incidentalCostService;
 	
+	// 목록 조회 ------------------------------------------------------------------------------------------
 	
 	@GetMapping("/asset/list")
 	public Object assetList(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage, 
@@ -185,7 +190,8 @@ public class AccnutRestController {
 		return result;
 	}
 	
-	// 삽입
+	// 삽입 ----------------------------------------------------------------------------------------------
+	
 	
 	@PostMapping("/asset/insert")
 	public ResponseEntity<Map<String, Object>> assetsInsert(@RequestBody AssetDTO dto) {
@@ -202,6 +208,38 @@ public class AccnutRestController {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 	    }
 	}
+	
+	@PostMapping("/debt/insert")
+	public ResponseEntity<Map<String, Object>> debtInsert(@RequestBody DebtDTO dto) {
+	    Map<String, Object> response = new HashMap<>();
+	    try {
+	    	debtService.insert(dto);
+	        response.put("status", "success");
+	        response.put("message", "등록 성공");
+	        return ResponseEntity.ok(response); // JSON 형태 응답
+	    } catch (Exception e) {
+	        log.error("등록 실패", e);
+	        response.put("status", "error");
+	        response.put("message", "등록 실패");
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+	    }
+	}
+	
+	@PostMapping("/book/insert")
+	public Map register(@RequestBody GridData<DealBookDTO> dto) {
+		dto.getCreatedRows().forEach(dtos -> {
+			log.info("list: " + dtos);
+			if(dtos.getSection() != null) {
+				dealBookService.insert(dtos);
+			}
+		});
+		
+		return Collections.singletonMap("result", true);
+	}
+	
+	
+	
+	
 	
 	
 }

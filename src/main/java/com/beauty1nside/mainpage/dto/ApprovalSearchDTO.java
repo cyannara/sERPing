@@ -4,7 +4,9 @@ import lombok.Data;
 
 @Data
 public class ApprovalSearchDTO extends ApprovalDTO {
-  int start;
-  int end;
-  int pageUnit;
+  private int start;
+  private int end;
+  private int pageUnit;
+  private String inApprovalRequestDateStart;
+  private String inApprovalRequestDateEnd;
 }

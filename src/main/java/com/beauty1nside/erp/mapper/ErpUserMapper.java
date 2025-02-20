@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.beauty1nside.erp.dto.ContractDTO;
 import com.beauty1nside.erp.dto.ErpSubOptionDTO;
 import com.beauty1nside.erp.dto.erpSubscriptionInfoListDTO;
 
@@ -21,6 +22,8 @@ import com.beauty1nside.erp.dto.erpSubscriptionInfoListDTO;
  *   수정일      수정자          수정내용
  *  -------    --------    ---------------------------
  *  2025.02.17  표하연          최초 생성
+ *  2025.02.18  표하연          기간 구독 결제 서비스 생성
+ *  2025.02.20  표하연          사용계약서 정보를 CR 한다
  *
  *  </pre>
 */
@@ -33,6 +36,14 @@ public interface ErpUserMapper {
      * @return List<erpSubscriptionInfoListDTO>
      */
 	public List<erpSubscriptionInfoListDTO> sublist(int comapnyNum);
+	
+	/**
+     * 회사 계약 상태 여부를 내보냄
+     *
+     * @param int
+     * @return int
+     */
+	public int subcontact(int comapnyNum);
 	
 	/**
      * 회사 인사인원 확인
@@ -84,5 +95,45 @@ public interface ErpUserMapper {
      * @return erpSubscriptionInfoListDTO
      */
 	public erpSubscriptionInfoListDTO subinfo(@Param("companyNum") int companyNum, @Param("subnamenum1") int subnamenum1, @Param("subnamenum2") int subnamenum2);
+	
+	/**
+     * 구독정보를 업데이트 한다 (기간구독)
+     *
+     * @param erpSubscriptionInfoListDTO
+     * @return void
+     */
+	public void prosubupdate(erpSubscriptionInfoListDTO dto);
+	
+	/**
+     * 구독정보를 인서트 한다 (기간구독)
+     *
+     * @param erpSubscriptionInfoListDTO
+     * @return void
+     */
+	public void prosubinsert(erpSubscriptionInfoListDTO dto);
+	
+	/**
+     * 그룹웨어 옵션 정보를 불러온다
+     *
+     * @param int
+     * @return int
+     */
+	public int gpoptioninfo(int comapnyNum);
+	
+	/**
+     * 사용계약서를 등록한다
+     *
+     * @param ContractDTO
+     * @return int
+     */
+	public int insertcontract(ContractDTO dto);
+	
+	/**
+     * 사용계약서 정보를 불러온다
+     *
+     * @param int
+     * @return ContractDTO
+     */
+	public ContractDTO readcontract(int companyNum);
 	
 }
