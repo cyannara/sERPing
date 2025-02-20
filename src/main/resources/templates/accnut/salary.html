@@ -66,15 +66,29 @@
     <!-- 하부 버튼 -->
 		<div class="button-bar row">
 			<div class="col-1"></div>
-			<button type="button" class="btn btn-secondary col-2">일괄처리</button>
+			<button type="button" class="btn btn-secondary col-2" data-bs-toggle="modal" data-bs-target="#salaryModal">일괄처리</button>
 			<div class="col-7"></div>
 		</div>
+		
+		
+		<!-- 자산 등록 -->
+		<div th:replace="purchs/ModalTemplate :: ModalTemplate (
+						    	'salaryModal', 
+						    	'modal-xl', 
+						    	'일괄 처리', 
+						    	'accnut/salaryBody',
+						    	'accnut/salaryFooter'
+						    )"></div>
+		
+		
 	</div>
 
 <script>
 	document.addEventListener("DOMContentLoaded",()=>{
 		
 	})
+	
+	var checkArray = [];
 	
 	var Grid = tui.Grid;
 	
@@ -110,6 +124,7 @@
 	function changeDisplay() {
 		let gap = parseInt(document.querySelector('#display_amount').value);
 		grid.setPerPage(gap, dataSource);
+		checkArray = [];
 	}
 	
 	function search(){
@@ -117,6 +132,7 @@
 		let department = document.querySelector('#department').value.toString();
 		grid.setRequestParams({"employeeName" : employeeName, "department" : department });
 		grid.readData();
+		checkArray = [];
 	}
 	
 	function reset(){
@@ -124,16 +140,17 @@
 		let department = document.querySelector('#department').value = '';
 		grid.setRequestParams({"employeeName" : employeeName, "department" : department });
 		grid.readData();
+		checkArray = [];
 
 	}
 	
 // grid 체크 박스 함수로 데이터 제어
 	
-	let checkArray = [];
+	
 	
 	grid.on('check', (ev)=> {
 		checkArray.push(grid.getRow(ev.rowKey));
-		console.log(checkArray);
+		//console.log(checkArray);
 	})
 	
 	grid.on('uncheck', (ev)=>{
@@ -142,17 +159,17 @@
 				checkArray.splice(i, 1);
 			}
 		}
-		console.log(checkArray);
+		//console.log(checkArray);
 	})
 	
 	grid.on('checkAll', (ev) => {
 		checkArray = grid.getData();
-		console.log(checkArray);
+		//console.log(checkArray);
 	})
 	
 	grid.on('uncheckAll', (ev) => {
 		checkArray = [];
-		console.log(checkArray);
+		//console.log(checkArray);
 	})
 
 </script>

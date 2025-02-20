@@ -67,43 +67,66 @@
     <!-- 하부 버튼 -->
 		<div class="button-bar row">
 			<div class="col-1"></div>
-			<button type="button" class="btn btn-primary col-1">Excel</button>
+			<button type="button" class="btn btn-primary col-1 btnExcel">Excel</button>
 			<button type="button" class="btn btn-secondary col-1">PDF</button>
 			<div class="col-7"></div>
 			<div class="btn-group dropup col-2">
-				<button type="button" class="btn btn-success unpay">미지급금등록</button>
+				<button type="button" class="btn btn-success unpay" data-bs-toggle="modal" data-bs-target="#debtaddModal">미지급금등록</button>
 				<button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split" id="dropupMenuSplitButton3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 					<span class="sr-only"></span>
 				</button>
 				<div class="dropdown-menu" aria-labelledby="dropupMenuSplitButton3">
 					<h6 class="dropdown-header">채무 등록</h6>
-					<a class="dropdown-item" href="#">외상매입금 등록</a>
-					<a class="dropdown-item" href="#">대출금 등록</a>
+					<a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#debtaddModal">외상매입금 등록</a>
+					<a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#debtaddModal">대출금 등록</a>
 					<div class="dropdown-divider"></div>
-					<a class="dropdown-item" href="#">미지급금 등록</a>
+					<a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#debtaddModal">미지급금 등록</a>
 				</div>
 			</div>
 		</div>
+		
+		<!-- 채무 등록 -->
+		<div th:replace="purchs/ModalTemplate :: ModalTemplate (
+						    	'debtaddModal', 
+						    	'modal-xl', 
+						    	'채무 등록', 
+						    	'accnut/debtForm',
+						    	'accnut/debtFooter'
+						    )"></div>
+						    
+		<!-- 상세 보기 -->
+		<div th:replace="purchs/ModalTemplate :: ModalTemplate (
+						    	'debtdetailModal', 
+						    	'modal-xl', 
+						    	'상세 보기', 
+						    	'accnut/debtDetail', 
+						    	'accnut/debtFooter'
+						    )"></div>
+		
 	</div>
 <script>
 	document.addEventListener("DOMContentLoaded",()=>{
 		gotobtn();
 		getInfo();
+		downExcel();
 	})
+	
+	var typeOfSection = "";
+	
 	function gotobtn(){
 		document.querySelector(".dropup").addEventListener("click", ()=>{
 			if(event.target.className.includes("unpay")){
-				console.log("미지급금");
+				typeOfSection = "미지급금";
 			} else if(event.target.className.includes("dropdown-item")){
 				switch (event.target.innerHTML) {
 					case "외상매입금 등록":
-						console.log("외상매입금")
+						typeOfSection = "외상매입금";
 						break;
 					case "대출금 등록":
-						console.log("대출금")
+						typeOfSection = "대출금";
 						break;
 					case "미지급금 등록":
-						console.log("미지급금")
+						typeOfSection = "미지급금";
 						break;
 					default:
 						break;
@@ -138,7 +161,7 @@
 			{ header : "금액", name : "amount",  sortable : true},
 			{ header : "이자", name : "interest",  sortable : true},
 			{ header : "등록일", name : "registerDate",  sortable : true},
-			{ header : "상세보기", name : "detail", formatter : () => '<button class="btn btn-warning btn-sm btnInfo">상세보기</button>', align: 'center'},
+			{ header : "상세보기", name : "detail", formatter : () => '<button class="btn btn-warning btn-sm btnInfo" data-bs-toggle="modal" data-bs-target="#debtdetailModal">상세보기</button>', align: 'center'},
 			
 		],
 		data : dataSource,
@@ -175,13 +198,27 @@
 		})
 	}
 	
+	var rowData = {};
+	
 	function clickFn() {
 		document.querySelectorAll('.btnInfo').forEach((btn, idx) => {
 			btn.addEventListener("click", () => {
-				let rowData = grid.getRow(idx);
+				rowData = grid.getRow(idx);
 				console.log(rowData);
 			})
 		})
+	}
+	
+	function downExcel(){
+		let btnExcel = document.querySelector('.btnExcel');
+		btnExcel.addEventListener("click", function () {
+		       const options = {
+		         				includeHiddenColumns: true,
+		         				//onlySelected: true,
+		         				fileName: 'debt',
+		       					};
+		       grid.export('xlsx', options);
+	     })
 	}
 
 </script>
