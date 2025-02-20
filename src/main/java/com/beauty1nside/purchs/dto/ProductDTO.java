@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 
 public class ProductDTO {
 	//상품
+	private int goodsNum;
 	private String goodsName;
 	private int goodsCost;
 	private String goodsCode;
@@ -38,7 +39,10 @@ public class ProductDTO {
 	private String vendorName;
 	
 	
+	private int companyNum;
+	
 	//옵션
+	private int optionNum;
 	private String optionCode;
 	private String optionName;
 	private int optionSafetyInvoice;

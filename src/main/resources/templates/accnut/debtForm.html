@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"></head>
+<body>
+    <div class="container">
+        <div class="row">
+            <span class="col-2">채무 코드</span>
+            <input type="text" class="col-8" id="debtCode" disabled>
+        </div>
+
+        <div class="row">
+            <span class="col-2">구분</span>
+            <select type="text" class="col-8" id="section" disabled>
+                <option value="">구분</option>
+                <option value="AC07">대출금</option>
+                <option value="AC08">미지급금</option>
+                <option value="AC09">외상매입금</option>
+            </select>
+        </div>
+
+        <div class="row">
+            <span class="col-2">채무명</span>
+            <input type="text" class="col-8" id="debtName">
+        </div>
+
+        <div class="row">
+            <span class="col-2">채권자</span>
+            <input type="text" class="col-8" id="creditor">
+        </div>
+
+        <div class="row">
+            <span class="col-2">금액</span>
+            <input type="number" class="col-8" id="amount">
+        </div>
+
+        <div class="row">
+            <span class="col-2">등록일</span>
+            <input type="date" class="col-8" id="registerDate" >
+        </div>
+        
+    </div>
+<script type="text/javascript">
+        
+	//등록 모달이 보여질때
+	document.querySelector('#debtaddModal').addEventListener('shown.bs.modal', (e) => {
+		// 모달 접근
+		let con = document.querySelector('#debtaddModal').querySelector('.modal-body .container');
+
+        let debtCode =  con.querySelector('#debtCode');
+        let section = con.querySelector('#section');
+        let debtName = con.querySelector('#debtName');
+        let creditor = con.querySelector('#creditor');
+        let amount = con.querySelector('#amount');
+        let registerDate = con.querySelector('#registerDate');
+
+        debtName.value = '';
+        creditor.value = '';
+        
+        // 금액 0으로 기본 설정
+        amount.value = 0;
+
+        // 날짜 오늘 날짜로 기본 설정
+        let today = `${new Date().getFullYear()}-${('0'+(new Date().getMonth()+1)).slice(-2)}-${('0'+(new Date().getDate())).slice(-2)}`;
+        registerDate.value = today;
+
+        // 모달 추가할 인풋
+        let html = "";
+        switch(typeOfSection){
+            case '대출금' :   
+            				html += `<div class="row removeRow">
+            							<span class="col-2">이자율</span>
+            							<input type="number" class="col-8" id="interest">
+            						</div>
+            						
+            						<div class="row removeRow">
+	        							<span class="col-2">예정납기일</span>
+	        							<input type="date" class="col-8" id="prearrangementDueDate">
+	        						</div>
+            				`;
+            				amount.closest("div.row").insertAdjacentHTML("afterend", html);
+            				section.value = "AC07";
+                            break;
+            case '미지급금' :   
+                            html += `<div class="row removeRow">
+		    							<span class="col-2">예정납기일</span>
+		    							<input type="date" class="col-8" id="prearrangementDueDate">
+		    						</div>
+                            `;
+                            amount.closest("div.row").insertAdjacentHTML("afterend", html);
+                            
+                            section.value = "AC08";
+                            break;
+            case '외상매입금' :   
+            				 html += `<div class="row removeRow">
+		     							<span class="col-2">이자율</span>
+		     							<input type="number" class="col-8" id="interest">
+		     						</div>
+            				 
+            				 		<div class="row removeRow">
+										<span class="col-2">기한</span>
+										<input type="date" class="col-8" id="timeLimit">
+									</div>
+					         `;
+        					 amount.closest("div.row").insertAdjacentHTML("afterend", html);
+                            section.value = "AC09";
+                            break;
+            default     :   break;
+            
+
+        } // switch(typeOfSection)
+
+	})
+
+    // 등록 모달이 닫힐 때
+    document.querySelector('#debtaddModal').addEventListener('hidden.bs.modal', () => {
+        document.querySelectorAll('.removeRow').forEach(div => {
+            div.remove();
+        })
+    });
+	
+	
+	
+		
+
+</script>
+</body>
+</html>

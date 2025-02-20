@@ -24,49 +24,36 @@ document.addEventListener("DOMContentLoaded", function () {
         console.error("❌ empRegisterModal을 찾을 수 없습니다.");
     }
     
+    
+    // ✅ 등록 버튼 이벤트 리스너 추가
+/*    let registerBtn = document.getElementById("registerEmployeeBtn");
+    if (registerBtn) {
+        registerBtn.addEventListener("click", function (event) {
+            event.preventDefault(); // 기본 동작 방지
+
+            Swal.fire({
+                title: "📌 사원 등록",
+                text: "정말 등록하시겠습니까?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "네, 등록합니다",
+                cancelButtonText: "아니요, 취소",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    registerEmployee(); // ✅ 사원 등록 처리 함수 호출
+                    Swal.fire("✅ 등록 완료!", "사원이 성공적으로 등록되었습니다.", "success");
+                } else {
+                    Swal.fire("🚫 등록 취소", "사원 등록이 취소되었습니다.", "error");
+                }
+            });
+        });
+        console.log("✅ 등록 버튼 이벤트 리스너 연결 완료");
+    } else {
+        console.error("❌ registerEmployeeBtn 요소를 찾을 수 없습니다.");
+    }*/
+    
 });
 
-// ✅ 공통 코드 데이터를 모달에 적용하는 함수
-function applyCommonCodesToModal() {
-    console.log("📥 공통 코드 데이터를 모달에 적용 중...");
-
-    // ✅ 부서 선택 적용
-    const departmentSelect = document.getElementById("modalDepartment");
-    departmentSelect.innerHTML = '<option value="">선택</option>';
-    departments.forEach(dept => {
-        departmentSelect.innerHTML += `<option value="${dept.DEPARTMENT_NUM}">${dept.DEPARTMENT_NAME}</option>`;
-    });
-
-    // ✅ 직급 선택 적용
-    const positionSelect = document.getElementById("modalPosition");
-    positionSelect.innerHTML = '<option value="">선택</option>';
-    positions.forEach(pos => {
-        positionSelect.innerHTML += `<option value="${pos.CMMNCODE}">${pos.CMMNNAME}</option>`;
-    });
-
-    // ✅ 재직 상태 버튼 적용
-    populateStatusButtons("modalStatusGroup", statuses);
-
-    // ✅ 근무 유형 버튼 적용
-    populateEmploymentButtons("modalEmploymentTypeGroup", employmentTypes);
-}
-
-// ✅ 모달 초기화 함수
-function initEmployeeRegisterModal() {
-    console.log("✅ 사원 등록 모달 초기화...");
-    
-    applyCommonCodesToModal();
-    
-    // 모달이 열릴 때마다 실행될 이벤트 추가
-    let empRegisterModal = document.getElementById("empRegisterModal");
-    empRegisterModal.addEventListener("shown.bs.modal", resetEmployeeForm);
-    
-    // 기본 데이터 로드
-    fetchNewEmployeeId();  // 사원번호 자동 생성
-
-    // 버튼 이벤트 리스너 추가
-    document.getElementById("registerEmployeeBtn").addEventListener("click", registerEmployee);
-}
 
 // ✅ 예금주 조회 기능
 function checkAccountOwner() {
@@ -126,39 +113,6 @@ function resetEmployeeForm() {
     console.log("✅ 초기화 완료");
 }
 
-// ✅ 사원 등록
-function registerEmployee() {
-    let employeeData = {
-        employeeName: document.getElementById("employeeName").value,
-        email: document.getElementById("emailInput").value + "@" + document.getElementById("emailDomainSelect").value,
-        phone: document.getElementById("phoneNumber").value,
-        hireDate: document.getElementById("hireDate").value,
-        departmentNum: document.getElementById("modalDepartment").value,
-        position: document.getElementById("modalPosition").value,
-        employmentStatus: document.querySelector("input[name='employmentStatus']:checked")?.value || "",
-        employmentType: document.querySelector("input[name='modalEmploymentType']:checked")?.value || "",
-        salary: document.getElementById("salaryInput").value,
-        bankName: document.getElementById("bankSelect").value,
-        accountNum: document.getElementById("accountNumber").value,
-        zipcode: document.getElementById("zipcode").value,
-        address: document.getElementById("address").value,
-        memo: document.getElementById("memo").value
-    };
-
-    console.log("📥 사원 등록 요청 데이터:", employeeData);
-
-    fetch("/hr/rest/emp/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(employeeData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        alert("✅ 사원 등록 완료!");
-        location.reload();
-    })
-    .catch(error => console.error("❌ 서버 오류:", error));
-}
 
 
 // ✅ 이메일 입력 방식 초기화 함수
@@ -192,4 +146,6 @@ function initializeEmailInput() {
     });
     
 }
+
+
 

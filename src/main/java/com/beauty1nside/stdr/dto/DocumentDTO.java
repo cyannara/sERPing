@@ -1,4 +1,4 @@
-package com.beauty1nside.mainpage.dto;
+package com.beauty1nside.stdr.dto;
 
 import lombok.Data;
 
@@ -10,5 +10,5 @@ public class DocumentDTO {
   private String documentTemplate;
   private String deptName;
   private String approvalType;
-  private String companyNum;
+  private Long companyNum;
 }
