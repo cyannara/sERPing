@@ -1,12 +1,20 @@
-.dropdown-container {
-    position: relative;
-}
+
 .dropdown-menu {
     display: none; /* 기본적으로 숨김 */
     position: absolute;
-    width: 100%;
+    width: 94%;
+    left: 12px;
+    top: 80px;
     z-index: 1000;
 }
 .dropdown-menu.show {
     display: block; /* show 클래스가 추가되면 나타남 */
+}
+
+.move-btn {
+    border: none;
+    > i{
+        font-size: 20px;
+        padding-left: 10px;
+    }
 }

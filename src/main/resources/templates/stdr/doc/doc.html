@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html
+        layout:decorate="~{layouts/layout}"
+        lang="en"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        xmlns="http://www.w3.org/1999/xhtml"
+>
+<head>
+    <meta charset="UTF-8">
+    <title>결재문서</title>
+
+    <link rel="stylesheet" href="/css/stdr/doc.css"/>
+</head>
+<body layout:fragment="content">
+    <h3 class="mb-4">문서 조회</h3>
+    <div id="table-container">
+        <div id="grid"></div>
+        <div id="pagination" class="tui-pagination"></div>
+    </div>
+    <h3 class="mb-4">문서 등록</h3>
+    <div id="custom-container">
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <label class="form-label">요청구분</label>
+            <input type="text" class="form-control" name="documentType" id="documentType">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">문서제목</label>
+            <input type="text" class="form-control" name="documentName"  id="documentName">
+        </div>
+        <div class="col-md-3 dropdown-dept">
+            <label class="form-label">결재부서</label>
+            <input type="text" class="form-control" name="deptName" id="deptName" placeholder="부서를 선택하세요" readonly>
+            <ul class="dropdown-menu" id="dropdownMenu"></ul>
+        </div>
+        <div class="col-md-3 dropdown-type">
+            <label class="form-label">결재종류</label>
+            <input type="text" class="form-control" name="approvalType" id="approvalType" placeholder="결재종류를 선택하세요" readonly>
+            <ul class="dropdown-menu" id="dropdownType">
+                <li><a class="dropdown-item" data-type="IN">내부 결재</a></li>
+                <li><a class="dropdown-item" data-type="OUT">외부(거래처) 결재</a></li>
+            </ul>
+        </div>
+    </div>
+    <div id="editor"></div>
+    <button id="addBtn">등록</button>
+
+    <script src="/js/stdr/doc.js"></script>
+    <script>
+        let Grid = tui.Grid;
+
+        const dataSource = {
+            api: {
+                readData: { url: 'http://localhost:81/stdr/rest/document', method: 'GET', initParams: { page: 1 } },
+                contentType: 'application/json'
+            },
+        };
+
+        const grid = new Grid({
+            el: document.querySelector('#grid'),
+            scrollX: false,
+            scrollY: false,
+            pageOptions: {
+                useClient: false,
+                perPage: 10,
+            },
+            columns: [
+                {header: "번호", name: "documentId", sortable: true},
+                {header: "요청구분", name: "documentType", sortable: true},
+                {header: "문서제목", name: "documentName", sortable: true},
+                {
+                    header: "문서 템플릿",
+                    name: "moveToPage",
+                    sortable: true,
+                    formatter: ({ row }) => {
+                        return `<button class="move-btn" data-id="${row.documentId}">
+                          <i class="mdi mdi-arrow-right-bold"></i>
+                        </button>`;
+                    }
+                },
+                {header: "결재부서", name: "deptName", sortable: true}
+            ],
+            data : dataSource,
+        });
+
+        const Editor = toastui.Editor;
+        const { tableMergedCell } = Editor.plugin;
+
+        const tableContent = `
+# 근태 수정 요청서
+
+| 항목       |         |
+|-------------|--------|
+| **사원번호** | [사원번호 입력] |
+| **사원명**  | [사원명 입력] |
+| **부서**    | [부서 입력] |
+| **수정 요청일** | [YYYY-MM-DD] |
+| **기존 출근 시간** | [기존 출근 시간 입력] |
+| **기존 퇴근 시간** | [기존 퇴근 시간 입력] |
+| **실제 출근 시간** | [실제 출근 시간 입력] |
+| **실제 퇴근 시간** | [실제 퇴근 시간 입력] |
+| **수정 사유** | [수정 사유 입력] |
+
+---
+
+### 📌 요청 내용
+근태 수정 요청 사유를 작성해 주세요.
+
+\`\`\`
+[사유 입력]
+\`\`\`
+
+---
+
+**📅 작성일:** [YYYY-MM-DD]
+`;
+
+        const editor = new Editor({
+            el: document.querySelector('#editor'),
+            previewStyle: 'vertical',
+            height: '500px',
+            initialValue: tableContent,
+            initialEditType: 'wysiwyg',
+            plugins: [tableMergedCell],
+        });
+
+        const addBtn = document.getElementById('addBtn')
+        addBtn.addEventListener('click', () => {
+            addDocTemplate()
+        })
+
+        const deptName = document.getElementById("deptName");
+        const dropdownMenu = document.getElementById("dropdownMenu");
+        const approvalType = document.getElementById("approvalType");
+        const dropdownType = document.getElementById("dropdownType");
+
+        // Input 클릭 시 드롭다운 표시
+        deptName.addEventListener("click", function () {
+            dropdownMenu.classList.toggle("show");
+        });
+        approvalType.addEventListener("click", function () {
+            dropdownType.classList.toggle("show");
+        });
+
+        // 다른 곳 클릭 시 드롭다운 숨김
+        document.addEventListener("click", function (event) {
+            if (!deptName.closest(".dropdown-dept").contains(event.target)) {
+                dropdownMenu.classList.remove("show");
+            }
+            if (!approvalType.closest(".dropdown-type").contains(event.target)) {
+                dropdownType.classList.remove("show");
+            }
+        });
+
+        getHqDeptList()
+
+        document.addEventListener("click", function (event) {
+            const button = event.target.closest(".move-btn");
+            if (button) {
+                const dataset = button.dataset; // 버튼에서 data-id 값 가져오기
+                window.location.href = `/standard/doc/template?documentId=${dataset.id}`;
+            }
+        });
+    </script>
+    </div>
+</body>
+</html>
