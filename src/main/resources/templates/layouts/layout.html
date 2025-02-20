@@ -10,6 +10,7 @@
 
 
     <!-- ERP 구독 권한 관리 스크립트 시작 [하연 2025-02-17] -->
+    <!-- 
     <script th:inline="javascript">
 		const sessionData = /*[[${session}]]*/ {};
 		document.addEventListener("DOMContentLoaded", function () {
@@ -22,8 +23,10 @@
 	    });
 	</script>
 	<script src="/js/erp/erpsubscription.js"></script>
+	 -->
     <!-- ERP 구독 권한 관리 스크립트 끝 [하연 2025-02-17] -->
 
+	 
     <link rel="stylesheet" href="/vendors/mdi/css/materialdesignicons.min.css">
     <link rel="stylesheet" href="/common/_navbar.css">
     
@@ -70,6 +73,8 @@
     <link rel="stylesheet" href="/css/mainpage/mainpage.css">
 </head>
 <body>
+
+	
 <div class="container-scroller">
     <div th:replace="~{partials/_navbar :: navbar}"></div>
 

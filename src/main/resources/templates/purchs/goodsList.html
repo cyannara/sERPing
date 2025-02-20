@@ -1,16 +1,11 @@
-<!DOCTYPE html>
 <html layout:decorate="~{layouts/layout}"
       lang="en"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
       
- 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>제품 재고 / 제품 조회</title>
 
-    <!-- CSS 라이브러리 -->
+<body layout:fragment="content">
+ <!-- CSS 라이브러리 -->
     <link rel="stylesheet" href="https://uicdn.toast.com/tui.time-picker/latest/tui-time-picker.css" />
     <link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
     <link rel="stylesheet" href="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.css" />
@@ -51,9 +46,6 @@
 
         
     </style>
-</head>
-<body layout:fragment="content">
-
 <div class="container">
     <!-- 검색 영역 -->
     <div class="header-box">
@@ -69,11 +61,11 @@
             <div class="col-auto">
                 <span class="label-search col-4">표시수량</span>
                 <select id="product_display_amount" class="form-control" onchange="changeProductDisplay()">
-                    <option value="5" selected>5</option>
-                    <option value="10">10</option>
+                    <option value="10" selected>10</option>
                     <option value="20">20</option>
                     <option value="50">50</option>
                     <option value="100">100</option>
+                  
                 </select> 
             </div>
             <div class="col-auto d-flex">
@@ -131,7 +123,7 @@ function initProductGrid() {
                     },
                     initParams:{ 
                         page: 1,
-                        perPage: 5,
+                        perPage: 10,
                         companyNum: companyNum
                     },
                     beforeRequest: function(request) {
@@ -205,7 +197,7 @@ function productSearch() {
 function resetFilters() {
     document.querySelector('#searchGoodsName').value = '';
     document.querySelector('#searchBrandName').value = '';
-    document.querySelector('#product_display_amount').value = '5';
+    document.querySelector('#product_display_amount').value = '10';
 
     productGrid.setRequestParams({
         "companyNum": companyNum,
@@ -221,4 +213,3 @@ function resetFilters() {
 
 
 
-</html>

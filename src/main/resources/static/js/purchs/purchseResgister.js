@@ -1,16 +1,73 @@
-// ✅ Thymeleaf 데이터를 JavaScript 변수로 변환
-document.addEventListener("DOMContentLoaded", function(event){
-	var csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content || '';
-var csrfToken = document.querySelector('meta[name="_csrf"]')?.content || '';
 
-// ✅ 발주서 등록 Toast Grid 설정
-let purchaseGrid;
+/*function waitForProductGrid() {
+    const observer = new MutationObserver(() => {
+        const productGridElement = document.getElementById('productGrid');
+        if (productGridElement) {
+            console.log("✅ productGrid 요소가 동적으로 생성됨. 초기화 시작.");
+            initProductGrid();
+            observer.disconnect(); // 더 이상 감지할 필요 없음
+        }
+    });
 
+    observer.observe(document.body, { childList: true, subtree: true });
+}
 
+document.addEventListener("DOMContentLoaded", function () {
+const header = document.querySelector('meta[name="_csrf_header"]').content;
+const token = document.querySelector('meta[name="_csrf"]').content;
+const companyNum = document.getElementById("companyNum").value;
     console.log("✅ 발주서 등록 페이지 스크립트 실행됨");
+	console.log("✅ 현재 companyNum 값:", companyNum);
+  
+    if (!window.purchaseGrid) {
+        initPurchaseGrid();
+    } else {
+        console.warn("⚠️ purchaseGrid가 이미 선언되었습니다.");
+    }
 
-    purchaseGrid = new tui.Grid({
-        el: document.getElementById('purchaseGrid'),
+    waitForProductGrid(); // productGrid 동적 감지 시작
+});*/
+
+
+
+document.addEventListener("DOMContentLoaded", function () {
+const header = document.querySelector('meta[name="_csrf_header"]').content;
+const token = document.querySelector('meta[name="_csrf"]').content;
+const companyNum = document.getElementById("companyNum").value;
+    console.log("✅ 발주서 등록 페이지 스크립트 실행됨");
+	console.log("✅ 현재 companyNum 값:", companyNum);
+	
+    // ✅ Toast Grid가 렌더링된 후 모달이 실행되도록 순서 조정
+    if (!window.purchaseGrid) {
+        initPurchaseGrid();
+    }else {
+        console.warn("⚠️ purchaseGrid가 이미 선언되었습니다.");
+    }
+    
+    // ✅ 일정 시간 후 productGrid 초기화 시도
+    /*setTimeout(function () {
+        if (!window.productGrid) {
+            initProductGrid();
+        } else {
+            console.warn("⚠️ productGrid가 이미 선언되었습니다.");
+        }
+    }, 500);*/ // 0.5초 지연
+
+  /*if (!window.productGrid) {
+        initProductGrid();
+    }else {
+        console.warn("⚠️ productGrid가 이미 선언되었습니다.");
+    }*/
+});
+
+// ✅ 발주서 등록 Toast Grid 초기화
+
+
+function initPurchaseGrid() {
+    console.log("✅ 발주서 Grid 초기화");
+
+    window.purchaseGrid = new tui.Grid({
+        el: document.getElementById('grid'),
         columns: [
             { header: '상품코드', name: 'goodsCode' },
             { header: '상품명', name: 'goodsName' },
@@ -25,82 +82,47 @@ let purchaseGrid;
         ],
         rowHeaders: ['checkbox'],
         data: [],
-        //userClient: true,
         scrollX: true,
         scrollY: 300
     });
 
-/*    document.getElementById("bttAdd").addEventListener("click", function () {
+    document.getElementById("bttAdd").addEventListener("click", function () {
         purchaseGrid.appendRow({}, { at: 0 });
     });
-
-    // ✅ 상품 선택 시 적용될 데이터 처리
-    purchaseGrid.on("click", (ev) => {
-        if (['goodsName', 'goodsCode', 'optionName', 'optionCode'].includes(ev.columnName)) {
-            openProductModal(ev.rowKey);
-        }
-    });
-
-    // ✅ 상품 데이터 불러오기 (창고 모달)
-    initProductGrid();*/
+}
 
 
-// ✅ 모달 열기 및 데이터 설정
-/*function openProductModal(rowKey) {
-    sessionStorage.setItem("selectedRowKey", rowKey);
+// ✅ 제품 목록 Toast Grid 설정
 
-    const modalElement = document.getElementById('goodsModal');
-    if (!modalElement) {
-        console.error("❌ goodsModal 요소를 찾을 수 없습니다.");
+/*function initProductGrid() {
+    // ✅ 모달이 존재할 때만 초기화
+    const productGridElement = document.getElementById('productGrid');
+    if (!productGridElement) {
+        console.warn("⚠️ productGrid 요소를 찾을 수 없습니다. 초기화 중단.");
         return;
     }
 
-    if (typeof productGrid !== 'undefined' && productGrid !== null) {
-        console.log("📢 제품 모달: 데이터 초기화 및 새로고침 시작");
-
-        productGrid.readData();
-        setTimeout(() => {
-            productGrid.refreshLayout();
-        }, 500);
-
-        productGrid.on("onGridUpdated", function () {
-            console.log("✅ 제품 모달: 데이터 새로고침 완료");
-            new bootstrap.Modal(modalElement).show();
-        });
-    } else {
-        console.warn("⚠️ productGrid가 정의되지 않았습니다.");
-    }
-}*/
-
-// ✅ 제품 목록 Toast Grid 설정
-/*let productGrid;
-
-function initProductGrid() {
-    console.log("✅ 제품 목록 그리드 초기화");
-
-    const productDataSource = {
-        api: {
-            readData: {
-                url: 'http://localhost:81/purchs/rest/product/list',
-                method: 'GET',
-                requestOptions: {
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'same-origin'
-                },
-                initParams: {
-                    page: 1,
-                    perPage: 5,
-                    companyNum: [[${session.companyNum}]]
+    window.productGrid = new tui.Grid({
+        el: productGridElement,
+        data: {
+            api: {
+                readData: {
+                    url: 'http://localhost:81/purchs/rest/product/list',
+                    method: 'GET',
+                    requestOptions: {
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'same-origin'
+                    },
+                    initParams: {
+                        page: 1,
+                        perPage: 5,
+                        companyNum: companyNum
+                    }
                 }
-            }
+            },
+            contentType: 'application/json',
+            serverSidePagination: true
         },
-        contentType: 'application/json',
-        serverSidePagination: true
-    };
-
-    productGrid = new tui.Grid({
-        el: document.getElementById('productGrid'),
-        data: productDataSource,
         pageOptions: { useClient: false, perPage: 5 },
         bodyHeight: 'auto',
         columns: [
@@ -116,42 +138,6 @@ function initProductGrid() {
 
     console.log("✅ 제품 목록 Toast Grid 설정 완료");
 }
+*/
 
-// ✅ 표시 수량 변경
-function changeProductDisplay() {
-    let perPage = parseInt(document.querySelector('#product_display_amount').value);
-    productGrid.setPerPage(perPage);
-    productGrid.reloadData();
-}
-
-// ✅ 검색 실행
-function productSearch() {
-    let goodsName = document.querySelector('#searchGoodsName').value;
-    let brandName = document.querySelector('#searchBrandName').value;
-
-    productGrid.setRequestParams({
-        "companyNum": [[${session.companyNum}]],
-        "goodsName": goodsName,
-        "brandName": brandName
-    });
-
-    productGrid.reloadData();
-}
-
-// ✅ 필터 초기화
-function resetFilters() {
-    document.querySelector('#searchGoodsName').value = '';
-    document.querySelector('#searchBrandName').value = '';
-    document.querySelector('#product_display_amount').value = '5';
-
-    productGrid.setRequestParams({
-        "companyNum": companyNum,
-        "goodsName": '',
-        "brandName": ''
-    });
-
-    productGrid.reloadData();
-
-}*/
-})
 

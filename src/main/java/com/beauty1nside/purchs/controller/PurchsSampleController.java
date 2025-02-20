@@ -1,5 +1,6 @@
 package com.beauty1nside.purchs.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
@@ -42,9 +43,18 @@ public class PurchsSampleController {
 	
 	//발주서 등록 페이지 이동 
 	@GetMapping("/purchaseRegister")
-	public void purchseRegister(Model model) {
-		model.addAttribute("PurchaseDTO" , new PurchaseDTO());
+	public void purchaseRegister(Model model) {
+	    PurchaseDTO purchaseDTO = new PurchaseDTO();
+	    model.addAttribute("PurchaseDTO", purchaseDTO);
+	   
 	}
+//	@GetMapping("/purchs/purchaseRegister")
+//	public String purchaseRegister(Model model) {
+//	    System.out.println("✅ purchaseRegister 컨트롤러 실행됨");
+//	    return "purchs/purchaseRegister";
+//	}
+//
+
 	
 	
 	//발주서 등록 페이지 이동 

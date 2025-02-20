@@ -1,23 +1,9 @@
-<!DOCTYPE html>
 <html layout:decorate="~{layouts/layout}"
       lang="ko"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>발주서 / 발주서 등록</title>
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Toast Grid CSS -->
-    <link rel="stylesheet" href="https://uicdn.toast.com/tui.grid/latest/tui-grid.css">
-    
-    <!-- jQuery & Toast Grid JS -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://uicdn.toast.com/tui.grid/latest/tui-grid.js"></script>
 
+<body layout:fragment="content">
     <style>
         .form-control { width: 100%; }
         
@@ -32,10 +18,12 @@
 		}
         #grid { height: 300px; }
     </style>
-</head>
-<body layout:fragment="content">
+    
+
+    
 <div class="container mt-4" >
 <h2 class="mb-4">발주서 등록</h2>
+<!-- <p id="companyNum" data-company-num="${session.companyNum}"></p> -->
 	<div class="container">
 	    <!-- 🔹 발주서 정보 -->
 	    <div id="custom-container">
@@ -46,6 +34,7 @@
 	            </div>
 	            <div class="col-md-3">
 	                <label class="form-label">담당자</label>
+	                <input type="hidden" class="form-control" id="companyNum" th:value="${session.companyNum}" readonly>
 	                <input type="text" class="form-control" th:value="${session.employeeName}" readonly>
 	            </div>
 	            <div class="col-md-3">
@@ -78,7 +67,7 @@
 	    </div>
 	
 	    <!-- 🔹 Toast Grid -->
-	    <div id="grid"></div>
+	    <div id="grid" class="tui-grid-container" style="height: 200px;"></div>
 	    <div id="pagination" class="tui-pagination"></div>
         
 	 
@@ -92,130 +81,29 @@
 </div>
 
 
+<
+
+
+<!-- ✅ JS 파일 로드 순서 조정 (defer 적용) -->
+	 <script src="/js/purchs/purchseResgister.js"></script>
+	 
+<!-- 상품 모달 -->
+ <div th:include="purchs/ModalTemplate :: ModalTemplate (
+  'productGrid', 
+  'modal-xl', 
+  '상품 조회', 
+  'purchs/goodsTable', 
+  'purchs/brandFooter'
+  )"></div> 
+
 <script>
 
-let grid;
-const header = document.querySelector('meta[name="_csrf_header"]').content;
-const token = document.querySelector('meta[name="_csrf"]').content;
-
-document.addEventListener("DOMContentLoaded", function(){
+	console.log(hello);
 	
-	var Grid = tui.Grid;
-	const dataSource = [];
-	  // Toast Grid 데이터 설정
-  	grid = new Grid({
-        el: document.getElementById('grid'),
-       
-        columns: [
-       
-            { header: '상품코드', name: 'goodsCode' },
-            { header: '상품명', name: 'goodsName' },
-            { header: '옵션코드', name: 'optionCode'},
-            { header: '옵션명', name: 'optionName'},
-            { header: '거래처명', name: 'vendorName'},
-            { header: '규격', name: 'goodsStandard'},
-            { header: '수량', name: 'puchaseQuantity'},
-            { header: '단가', name: 'puchaseUnitPrice'},
-            { header: '공급가격', name: 'puchaseSupplyPrice'},
-            { header: '부가세', name: 'puchaseVat'}
-        ],
-        rowHeaders: ['checkbox'],
-        data : dataSource,
-        scrollX: true,
-        scrollY: 300
-    });
-    
-    const bttAdd = document.getElementById("bttAdd");
-    
-    bttAdd.addEventListener("click", function () {
-       grid.appendRow({}, { at: 0 }); // 빈 행 추가
-    });
-    
- 	/* //상품 선택 시 적용될 데이터 예시
-    function onProductSelect(selectedProduct) {
-        // 현재 선택된 rowKey 가져오기
-        const rowKey = grid.getFocusedCell().rowKey;
-        
-        if (rowKey === null) {
-            alert("행을 먼저 선택하세요!");
-            return;
-        }
-
-        // 선택된 상품 정보를 여러 칸(column)에 적용
-        grid.setValue(rowKey, "goodsCode", selectedProduct.goodsCode);
-        grid.setValue(rowKey, "goodsName", selectedProduct.goodsName);
-        grid.setValue(rowKey, "optionCode", selectedProduct.optionCode);
-        grid.setValue(rowKey, "optionName", selectedProduct.optionName);
-        grid.setValue(rowKey, "vendorName", selectedProduct.vendorName);
-        grid.setValue(rowKey, "goodsStandard", selectedProduct.goodsStandard);
-        grid.setValue(rowKey, "goodsPrice", selectedProduct.goodsPrice);
-        grid.setValue(rowKey, "goodsSupplyPrice", selectedProduct.goodsSupplyPrice);
-    }
- 	
-    //상품 및 옵션 칸 클릭 하면 정보리스트 모달 출력 
-    grid.on("click", (ev) => {
-    if (ev.columnName === "goodsName" || ev.columnName === "goodsCode" || ev.columnName === "optionName" || ev.columnName === "optionCode") {
-        openProductModal(ev.rowKey);
-	    }
-	});
-	
-    //모달이 열린 후 작업 
-    function openProductModal(rowKey){
-    	 sessionStorage.setItem("selectedRowKey", rowKey);
-    	 let selectedRowKey = parseInt(sessionStorage.getItem("selectedRowKey"), 10);
-    	 
-    	 
-
-    	    // 모달 요소 가져오기
-    	    const modalElement = document.getElementById('goodsModal');
-    	    if (!modalElement) {
-    	        console.error("warehouseModal 요소를 찾을 수 없습니다.");
-    	        return;
-    	    }
-    	    
-
-    	    // 창고 그리드가 정의되어 있는지 확인 후 데이터 갱신
-    	    if (typeof productGrid !== 'undefined' && productGrid !== null) {
-    	        console.log("📢 창고 모달: 데이터 초기화 및 새로고침 시작");
-    	
-    	        // 기존 데이터 초기화
-    	    
-    	        let Data = productGrid.getData();
-    	        console.log("그리드데이터",Data)
-    	        console.log(bootstrap.Version);
-
-    	        
-    	        productGrid.readData();
-    	        
-    	        setTimeout(() => {
-    	        	productGrid.refreshLayout();  // 기존 데이터 초기화
-    	        	
-    			}, 500);
-   
-
-    	        // 데이터를 다 불러온 후 모달 열기 (onGridUpdated 이벤트 활용)
-    	         productGrid.on("onGridUpdated", function () {
-    	            console.log("창고 모달: 데이터 새로고침 완료");
-    	            
-
-    	            // 데이터 로드 완료 후 모달 열기
-    	            const modalInstance = new bootstrap.Modal(modalElement);
-    	            modalInstance.show(); // 모달 열기
-    	            
-    	            
-    	            console.log("창고 모달 열림:", rowKey);
-    	        }); 
-    	    } else {
-    	        console.warn("warehouseGrid가 정의되지 않았습니다.");
-    	    } 
-    }
-    
-  */
-    
-})
-
-  
+    console.log("✅ purchaseRegister.js 확인");
 </script>
-
+	
+	
 </body>
+
 </html>
