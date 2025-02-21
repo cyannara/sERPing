@@ -1,5 +1,5 @@
 const getHqDeptList = () => {
-    const url = `/stdr/rest/dept`;
+    const url = `/api/stdr/dept`;
     fetch(url, {
         method: "GET",
         headers: {
@@ -63,7 +63,7 @@ const addDocTemplate = () => {
         return false
     }
 
-    const url = `/stdr/rest/document`;
+    const url = `/api/stdr/document`;
     fetch(url, {
         method: "POST",
         headers: {

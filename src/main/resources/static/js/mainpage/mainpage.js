@@ -1,5 +1,5 @@
 const getApprovalType = () => {
-    const url = `/mainpage/rest/approval/type`;
+    const url = `/api/mainpage/approval/type`;
     fetch(url, {
         method: "GET",
         headers: {
@@ -90,7 +90,7 @@ async function downloadPDF(dataset) {
 
 const processApproval = (inApprovalId, processStr) => {
     const reason = document.getElementById('rejectReason').value
-    const url = `/mainpage/rest/approval/process`;
+    const url = `/api/mainpage/approval/process`;
 
     fetch(url, {
         method: "POST",

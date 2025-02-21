@@ -51,7 +51,7 @@
 
         const dataSource = {
             api: {
-                readData: { url: 'http://localhost:81/stdr/rest/document', method: 'GET', initParams: { page: 1 } },
+                readData: { url: 'http://localhost:81/api/stdr/document', method: 'GET', initParams: { page: 1 } },
                 contentType: 'application/json'
             },
         };
@@ -74,8 +74,8 @@
                     sortable: true,
                     formatter: ({ row }) => {
                         return `<button class="move-btn" data-id="${row.documentId}">
-                          <i class="mdi mdi-arrow-right-bold"></i>
-                        </button>`;
+                                  <i class="mdi mdi-arrow-right-bold"></i>
+                                </button>`;
                     }
                 },
                 {header: "결재부서", name: "deptName", sortable: true}
@@ -122,6 +122,36 @@
             initialValue: tableContent,
             initialEditType: 'wysiwyg',
             plugins: [tableMergedCell],
+            hooks: {
+                // 사용자가 이미지를 추가하면 addImageBlobHook이 실행됨.
+                addImageBlobHook: async (blob, callback) => {
+                    try {
+                        const formData = new FormData();
+                        formData.append("image", blob);
+
+                        // 서버에 이미지 업로드 요청
+                        const response = await fetch('/api/stdr/document/img', {
+                            method: "POST",
+                            headers: {
+                                'header': header_csrf,
+                                'X-CSRF-Token': token_csrf
+                            },
+                            body: formData
+                        });
+
+                        const result = await response.json(); // JSON 응답 받기
+                        const imageUrl = result.imageUrl; // 서버에서 받은 이미지 URL
+
+                        console.log('imageUrl', imageUrl)
+
+                        // 서버에서 업로드된 이미지의 URL을 반환하면, 해당 URL을 에디터에 자동 삽입.
+                        callback(imageUrl, "이미지 설명"); // 에디터에 이미지 추가
+                    } catch (error) {
+                        console.error("이미지 업로드 실패:", error);
+                        alert("이미지 업로드에 실패했습니다.");
+                    }
+                }
+            }
         });
 
         const addBtn = document.getElementById('addBtn')

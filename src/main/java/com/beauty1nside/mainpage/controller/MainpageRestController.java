@@ -24,7 +24,7 @@ import java.util.Map;
 @Log4j2
 @RestController
 @AllArgsConstructor
-@RequestMapping("/mainpage/rest/*")
+@RequestMapping("/api/mainpage/*")
 public class MainpageRestController {
   final ApprovalService approvalService;
   
