@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html
+        layout:decorate="~{layouts/layout}"
+        lang="en"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        xmlns="http://www.w3.org/1999/xhtml"
+>
+<head>
+    <link rel="stylesheet" href="/css/mypage/mypage.css">
+</head>
+<body layout:fragment="content">
+<div class="container mt-4">
+    <!-- 결재 조회 -->
+    <div class="card p-4 shadow-sm">
+        <h5 class="mb-3">결재 조회</h5>
+
+        <div class="row g-2 mb-3">
+            <div class="col-md-4">
+                <label class="form-label">결재 요청 부서</label>
+                <select class="form-select" id="deptFilter">
+                    <option value="전체">전체</option>
+                    <option value="인사">인사</option>
+                    <option value="회계">회계</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">상태</label>
+                <div class="d-flex">
+                    <button class="btn btn-outline-primary me-2 filter-btn" data-status="대기중">대기중</button>
+                    <button class="btn btn-outline-danger me-2 filter-btn" data-status="반려">반려</button>
+                    <button class="btn btn-outline-success filter-btn" data-status="승인">승인</button>
+                </div>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button class="btn btn-primary w-100" id="searchBtn">조회</button>
+            </div>
+        </div>
+
+        <!-- 그리드 -->
+        <div id="table-container">
+            <div id="grid"></div>
+            <div id="pagination" class="tui-pagination"></div>
+        </div>
+    </div>
+
+    <!-- 결재 요청 -->
+    <div class="card p-4 shadow-sm mt-4">
+        <h5 class="mb-3">결재 요청</h5>
+        <div class="row">
+            <div class="col-md-6">
+                <select class="form-select" id="requestType">
+                    <option selected>요청 구분</option>
+                    <option value="근태 수정">근태 수정</option>
+                    <option value="경력증명서 요청">경력증명서 요청</option>
+                    <option value="부대 비용 요청">부대 비용 요청</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <button class="btn btn-outline-primary w-100" id="requestApproval">결재서 작성</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="/js/mypage/mypage.js"></script>
+<script>
+    getMyApprovalList()
+</script>
+</html>
+

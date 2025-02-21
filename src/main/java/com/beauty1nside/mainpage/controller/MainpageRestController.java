@@ -7,16 +7,13 @@ import com.beauty1nside.mainpage.dto.ApprovalSearchDTO;
 import com.beauty1nside.stdr.dto.DocumentDTO;
 import com.beauty1nside.mainpage.service.ApprovalService;
 import com.beauty1nside.security.service.CustomerUser;
+import com.beauty1nside.utils.DateTimeUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,20 +38,42 @@ public class MainpageRestController {
     dto.setStart(paging.getFirst());
     dto.setEnd(paging.getLast());
     
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    
     if(dto.getInApprovalRequestDateStart() != null && !dto.getInApprovalRequestDateStart().isEmpty()) {
-      LocalDate startDate = LocalDate.parse(dto.getInApprovalRequestDateStart());
-      LocalDateTime startOfDay = startDate.atStartOfDay();
-      String formattedStartDate = startOfDay.format(formatter);
-      dto.setInApprovalRequestDateStart(formattedStartDate);
+      dto.setInApprovalRequestDateStart(DateTimeUtils.formatStartOfDay(dto.getInApprovalRequestDateStart()));
     }
     
     if(dto.getInApprovalRequestDateEnd() != null && !dto.getInApprovalRequestDateEnd().isEmpty()) {
-      LocalDate endDate = LocalDate.parse(dto.getInApprovalRequestDateEnd());
-      LocalDateTime endOfDay = endDate.atTime(23, 59, 59);
-      String formattedEndDate = endOfDay.format(formatter);
-      dto.setInApprovalRequestDateEnd(formattedEndDate);
+      dto.setInApprovalRequestDateEnd(DateTimeUtils.formatEndOfDay(dto.getInApprovalRequestDateEnd()));
+    }
+    
+    Long companyNum = user.getUserDTO().getCompanyNum();
+    paging.setTotalRecord(approvalService.count(dto, companyNum));
+    
+    GridArray grid = new GridArray();
+    
+    return grid.getArray(paging.getPage(), approvalService.count(dto, companyNum), approvalService.waitingList(dto, companyNum));
+  }
+  
+  @GetMapping("/approval/list/{employeeNum}")
+  public Object approvalMyList(@PathVariable("employeeNum") Long employeeNum,
+                              @RequestParam(name = "perPage", defaultValue = "20", required = false) int perPage,
+                             @RequestParam(name = "page", defaultValue = "1", required = false) int page,
+                             ApprovalSearchDTO dto,
+                             Paging paging,
+                             @AuthenticationPrincipal CustomerUser user) throws JsonProcessingException {
+    
+    paging.setPageUnit(perPage);
+    paging.setPage(page);
+    
+    dto.setStart(paging.getFirst());
+    dto.setEnd(paging.getLast());
+    
+    if(dto.getInApprovalRequestDateStart() != null && !dto.getInApprovalRequestDateStart().isEmpty()) {
+      dto.setInApprovalRequestDateStart(DateTimeUtils.formatStartOfDay(dto.getInApprovalRequestDateStart()));
+    }
+    
+    if(dto.getInApprovalRequestDateEnd() != null && !dto.getInApprovalRequestDateEnd().isEmpty()) {
+      dto.setInApprovalRequestDateEnd(DateTimeUtils.formatEndOfDay(dto.getInApprovalRequestDateEnd()));
     }
     
     Long companyNum = user.getUserDTO().getCompanyNum();
