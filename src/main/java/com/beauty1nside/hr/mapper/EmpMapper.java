@@ -13,7 +13,9 @@ public interface EmpMapper {
 	
 	EmpDTO info(Long employeeNum);
 	List<EmpDTO> list(EmpSearchDTO dto);
+	List<EmpDTO> listWithSubDept(EmpSearchDTO dto); // 하위 부서 포함 사원 전체 조회
 	int count(EmpSearchDTO dto);
+	int countForSubDept(EmpSearchDTO dto); // 하위부서 포함 카운트
 	
     List<String> getDepartments(); // 부서 목록
     List<Map<String, Object>> getDepartmentList(); // ✅ 새로 추가 (부서번호 + 부서이름 포함)

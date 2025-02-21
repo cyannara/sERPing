@@ -16,6 +16,8 @@ public class EmpSearchDTO {
     private String position;        // 직급
     private String status;          // 재직 상태
     private String employmentType;  // 근무 유형
+    private boolean includeSubDepartments; // ✅ 하위 부서 포함 여부
+    private Long companyNum; //회사번호
     
     public void setDepartmentNum(Long departmentNum) {
         this.departmentNum = (departmentNum != null) ? departmentNum : null;

@@ -16,6 +16,7 @@ import lombok.ToString;
 @ToString
 @Alias("EmployeeDTO")  // 별칭 추가
 public class EmpDTO {
+    
     private Long employeeNum; // 사원번호
     private String employeeId; // 로그인 ID
     private String employeePw; // 비밀번호

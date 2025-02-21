@@ -147,6 +147,53 @@ public class HrRestController {
         
         return empService.listByDept(searchDTO);	
     }
+    
+    
+    @GetMapping("/emp/organization")
+    public Object getEmployeesForOrganization(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "5") int perPage,
+            @ModelAttribute EmpSearchDTO dto,
+            Paging paging
+    ) throws JsonMappingException, JsonProcessingException {
+        
+        paging.setPageUnit(perPage);
+        paging.setPage(page);
+        
+        // 페이징 조건
+        dto.setStart(paging.getFirst());
+        dto.setEnd(paging.getLast());
+        
+        //페이징처리
+        paging.setTotalRecord(empService.countForSubDept(dto));
+        
+        log.info("dto::::::::::::::{}",dto);
+        log.info("paging:::::::::::::{}",paging);
+        
+        //grid 배열 처리
+        GridArray grid = new GridArray();
+        Object result = grid.getArray(paging.getPage(), paging.getTotalRecord(), empService.listWithSubDept(dto));
+        return result;
+
+
+        // ✅ 1) DTO 세팅
+		/*
+		 * EmpSearchDTO dto = new EmpSearchDTO(); dto.setCompanyNum(companyNum);
+		 * dto.setDepartmentNum(departmentNum);
+		 * 
+		 * // ✅ 2) start, end 계산 (기존과 동일) int start = (page - 1) * perPage + 1; int end
+		 * = page * perPage; dto.setStart(start); dto.setEnd(end);
+		 * 
+		 * // ✅ 3) 총 건수 조회 int totalRecords = empService.count(dto);
+		 * 
+		 * // ✅ 4) 직원 목록 조회 List<EmpDTO> empList = empService.list(dto);
+		 * 
+		 * // ✅ 5) TUI GridArray 포맷으로 변환 GridArray grid = new GridArray(); return
+		 * grid.getArray(page, totalRecords, empList);
+		 */
+    }
+
+
 
 
 }

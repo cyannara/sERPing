@@ -19,6 +19,12 @@ public interface EmpService {
 	//사원 조회 페이지 건수
 	int count(EmpSearchDTO dto);
 	
+	//하위부서 포함 사원 수
+	int countForSubDept(EmpSearchDTO dto); 
+	
+	//하위부서 포함 사원 전체조회
+	List<EmpDTO> listWithSubDept(EmpSearchDTO dto);
+	
 	//공통코드 가져오기
 	Map<String, Object> getCommonCodes();
 	

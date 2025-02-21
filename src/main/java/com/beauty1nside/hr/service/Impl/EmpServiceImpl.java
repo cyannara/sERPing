@@ -35,15 +35,31 @@ public class EmpServiceImpl implements EmpService {
 
 	@Override
 	public List<EmpDTO> list(EmpSearchDTO dto) {
-		// TODO Auto-generated method stub
-		return empMapper.list(dto);
+	    return empMapper.list(dto);
 	}
+	
+	// 하위부서 포함 사원 전체조회
+	@Override
+	public List<EmpDTO> listWithSubDept(EmpSearchDTO dto) {
+	        return empMapper.listWithSubDept(dto);
 
+	}
+	
 	@Override
 	public int count(EmpSearchDTO dto) {
 		// TODO Auto-generated method stub
 		return empMapper.count(dto);
 	}
+	
+	// 하위부서 포함 카운트
+	@Override
+	public int countForSubDept(EmpSearchDTO dto) {
+		// TODO Auto-generated method stub
+		return empMapper.countForSubDept(dto);
+	}
+	
+
+	
 
 	@Override
 	public Map<String, Object> getCommonCodes() {
