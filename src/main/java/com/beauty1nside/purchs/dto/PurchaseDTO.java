@@ -21,7 +21,7 @@ public class PurchaseDTO {
 	private int orderPlanTotalAmount;
 	private int companyNum;
 	
-	
+	//기타
 	private String goodsCode;
 	private String goodsName;
 	private String optionCode;

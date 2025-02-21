@@ -1,157 +1,377 @@
-// ✅ Thymeleaf 데이터를 JavaScript 변수로 변환
-document.addEventListener("DOMContentLoaded", function(event){
-	var csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content || '';
-var csrfToken = document.querySelector('meta[name="_csrf"]')?.content || '';
+// ✅ 삭제 버튼 렌더러 (전역으로 이동)
+class DeleteRenderer {
+    constructor(props) {
+        const el = document.createElement("button");
+        el.textContent = "삭제";
+        el.className = "btnDelete btn btn-danger btn-sm";
+        el.addEventListener("click", () => {
+            // ✅ 올바른 그리드 객체에서 해당 행 삭제
+            purchaseGrid.removeRow(props.rowKey);
+        });
+        this.el = el;
+    }
+    getElement() {
+        return this.el;
+    }
+}
 
-// ✅ 발주서 등록 Toast Grid 설정
-let purchaseGrid;
 
-
+document.addEventListener("DOMContentLoaded", function () {
+const header = document.querySelector('meta[name="_csrf_header"]').content;
+const token = document.querySelector('meta[name="_csrf"]').content;
+const companyNum = document.getElementById("companyNum").value;
     console.log("✅ 발주서 등록 페이지 스크립트 실행됨");
+	console.log("✅ 현재 companyNum 값:", companyNum);
+	
 
-    purchaseGrid = new tui.Grid({
-        el: document.getElementById('purchaseGrid'),
+	
+    // ✅ Toast Grid가 렌더링된 후 모달이 실행되도록 순서 조정
+    if (!window.purchaseGrid) {
+        initPurchaseGrid();
+    }
+	
+	//모달 닫기 작업 
+	const modalElement = document.getElementById("goodsModal");
+	const closeButton = modalElement.querySelector('[data-bs-dismiss="modal"]');
+
+	if (closeButton) {
+	    closeButton.addEventListener("click", function () {
+	        console.log("✅ 창고 모달 닫기 버튼 클릭됨!");
+
+	        try {
+	        	let modalInstance = bootstrap.Modal.getInstance("#goodsModal") || new bootstrap.Modal("#goodsModal");
+	            modalInstance.hide(); // ✅ Bootstrap 방식으로 모달 닫기
+	            
+	        } catch (error) {
+	            console.warn("❌ Bootstrap 5가 로드되지 않았음. 대체 방식 사용");
+	            modalElement.classList.remove("show");
+	            modalElement.style.display = "none";
+	            document.body.classList.remove("modal-open");
+
+	            setTimeout(() => {
+	                document.querySelectorAll(".modal-backdrop").forEach((element) => element.remove()); // 백그라운드 제거
+	            }, 300);
+				
+	// ✅ 모달 닫힐 때 sessionStorage 값 가져와서 그리드에 저장
+		    setupModalCloseEvent();
+    
+	          
+	        }
+	    });
+	} else {
+	    console.warn("❌ 창고 모달 닫기 버튼을 찾을 수 없습니다.");
+	} 
+	
+	
+    
+});
+
+// ✅ 발주서 등록 Toast Grid 초기화
+
+
+function initPurchaseGrid() {
+    console.log("✅ 발주서 Grid 초기화");
+    
+    window.purchaseGrid = new tui.Grid({
+        el: document.getElementById('grid'),
+        scrollX :false,
+        scrollY : true,
+        bodyHeight: 500, // ✅ 자동 높이 조정
+        minBodyHeight: 600, // ✅ 최소 높이 지정 (필요에 따라 조정)
         columns: [
             { header: '상품코드', name: 'goodsCode' },
             { header: '상품명', name: 'goodsName' },
             { header: '옵션코드', name: 'optionCode' },
             { header: '옵션명', name: 'optionName' },
+			{ header: '옵션번호', name: 'optionNum' , hidden: true},
             { header: '거래처명', name: 'vendorName' },
+			{ header: '거래처번호', name: 'vendorId' , hidden: true},
             { header: '규격', name: 'goodsStandard' },
-            { header: '수량', name: 'puchaseQuantity' },
-            { header: '단가', name: 'puchaseUnitPrice' },
-            { header: '공급가격', name: 'puchaseSupplyPrice' },
-            { header: '부가세', name: 'puchaseVat' }
+            { header: '수량', name: 'puchaseQuantity',editor: { type: "text", useFormatter: false } },
+            { header: '단가', name: 'puchaseUnitPrice',editor: { type: "text", useFormatter: false }},
+            { header: '공급가격', name: 'purchaseSupplyPrice' },
+            { header: '부가세', name: 'puchaseVat' },
+            { header: '발주계획바디번호', name: 'orderPlanBodyNum' , hidden: true},
+            {
+                    header : "삭제"
+                    ,name: "delete"
+                    ,renderer: {
+                    type: DeleteRenderer // 삭제버튼 정의 렌더러
+                    }  
+                    ,cellStyle: { textAlign: "center" }
+                    ,className: "tui-grid-cell-readonly"
+                }
         ],
         rowHeaders: ['checkbox'],
         data: [],
-        //userClient: true,
-        scrollX: true,
-        scrollY: 300
+       
     });
+	
 
-/*    document.getElementById("bttAdd").addEventListener("click", function () {
-        purchaseGrid.appendRow({}, { at: 0 });
-    });
+	//상품 및 옵션 칸 클릭 하면 정보리스트 모달 출력 
+	  window.purchaseGrid.on("click", (ev) => {
+	    if (ev.columnName === "goodsName" || ev.columnName === "goodsCode" || ev.columnName === "optionName" || ev.columnName === "optionCode") {
+	        openGoodsModal(ev.rowKey);
+		    }
+	});
+	
+	// ✅ 추가 버튼 기능 (새로운 행 추가)
+	    document.getElementById("bttAdd").addEventListener("click", function () {
+	        purchaseGrid.appendRow({}, { at: 0 });
+	    });
+	    
+	    
+	
+	// ✅ 수량 또는 단가 변경 시 공급가격 자동 계산
+	    purchaseGrid.on("afterChange", function (ev) {
+	        ev.changes.forEach(change => {
+	            if (change.columnName === "puchaseQuantity" || change.columnName === "puchaseUnitPrice") {
+            let formattedValue = formatNumberWithCommas(change.value);
+            purchaseGrid.setValue(change.rowKey, change.columnName, formattedValue);
+            calculateSupplyPrice(change.rowKey);
+	        }
+	    });
+	});
+	    // ✅ 부가세 체크박스 이벤트
+	    document.getElementById("vatUnchecked").addEventListener("change", updateVat);
+	    document.getElementById("vatChecked").addEventListener("change", updateVat);
+		
+		// ✅ 부가세 체크박스 이벤트 핸들러 (하나만 선택 가능)
+		document.getElementById("vatUnchecked").addEventListener("click", function () {
+		    if (this.checked) {
+		        document.getElementById("vatChecked").checked = false; // 다른 체크박스 해제
+		        setTimeout(() => updateVat(), 10); // DOM 업데이트 반영 후 부가세 업데이트 실행
+		    }
+		});
 
-    // ✅ 상품 선택 시 적용될 데이터 처리
-    purchaseGrid.on("click", (ev) => {
-        if (['goodsName', 'goodsCode', 'optionName', 'optionCode'].includes(ev.columnName)) {
-            openProductModal(ev.rowKey);
+		document.getElementById("vatChecked").addEventListener("click", function () {
+		    if (this.checked) {
+		        document.getElementById("vatUnchecked").checked = false; // 다른 체크박스 해제
+		        setTimeout(() => updateVat(), 10); // DOM 업데이트 반영 후 부가세 업데이트 실행
+		    }
+		});
+		
+		
+		document.getElementById("purchaseInsert").addEventListener("click",function(){
+			purchaseRegister();
+		})
+
+	
+}
+
+
+
+//모달 열기 함수 
+// ✅ 모달 열기 함수
+	function openGoodsModal(rowKey) {
+	    console.log("📢 선택한 행(rowKey):", rowKey);
+	
+	    const modalElement = document.getElementById('goodsModal');
+	    if (!modalElement) {
+	        console.error("❌ 모달 요소를 찾을 수 없습니다.");
+	        return;
+	    }
+	
+	    if (typeof productGrid !== 'undefined' && productGrid !== null) {
+	        console.log("📢 상품 조회 그리드 데이터 갱신 시작");
+	
+	        // 데이터를 먼저 불러온 후, 모달을 표시
+	        productGrid.readData();
+	        
+	        // ✅ 데이터 갱신 후 모달을 표시하도록 이벤트 리스너 추가
+	        productGrid.on("onGridUpdated", function () {
+	            console.log("📢 상품 조회 그리드 데이터 갱신 완료");
+	            
+	            // ✅ 모달 표시
+	            const modalInstance = new bootstrap.Modal(modalElement);
+	            modalInstance.show();
+	            console.log("📢 상품 조회 모달 열림:", rowKey);
+	
+	            // ✅ 데이터 반영 후 레이아웃 새로고침 (지연 실행)
+	            setTimeout(() => {
+	                productGrid.refreshLayout();
+	                console.log("📢 상품 조회 그리드 리프레시 완료");
+	            }, 500);
+	        });
+	    } else {
+	        console.warn("❌ productGrid가 정의되지 않았습니다.");
+	    }
+	}
+	// ✅ 모달이 완전히 열린 후 동작
+	document.getElementById('goodsModal').addEventListener('shown.bs.modal', function () {
+	    console.log("📢 상품 조회 모달이 완전히 열림");
+
+	    if (typeof productGrid !== 'undefined' && productGrid !== null) {
+	        setTimeout(() => {
+	            productGrid.refreshLayout();
+	            console.log("📢 상품 조회 그리드 리프레시 실행됨");
+	        }, 500);
+	    } else {
+	        console.warn("❌ productGrid가 정의되지 않았습니다.");
+	    }
+	});
+ 	
+
+
+
+//모달 검은 화면 모두 제거 
+ 
+   document.querySelectorAll('[data-bs-toggle="modal"]').forEach(function (modalTrigger) {
+	    modalTrigger.addEventListener("click", function () {
+	        document.querySelectorAll('.modal-backdrop').forEach(function (element) {
+	            element.remove(); // 중복 생성 방지
+	        });
+	    });
+	});
+
+		
+		
+
+
+// ✅ 모달 닫힐 때 sessionStorage 값 가져와서 그리드에 저장
+function setupModalCloseEvent() {
+  
+
+        const rowKey = purchaseGrid.getFocusedCell()?.rowKey;
+        if (rowKey === null || rowKey === undefined) {
+            console.warn("❌ 먼저 행을 선택해야 합니다.");
+            return;
         }
+		
+		
+		// ✅ sessionStorage의 key와 그리드의 name을 매칭
+		        const dataMap = {
+		            selectedGoodsCode: "goodsCode",
+		            selectedGoodsName: "goodsName",
+		            selectedOptionCode: "optionCode",
+		            selectedOptionName: "optionName",
+					selectedOptionNum : "optionNum",
+		            selectedVendorName: "vendorName",
+					selectedVendorId: "vendorId",
+		            selectedGoodsStandard: "goodsStandard",
+		            selectedGoodsSupplyPrice: "puchaseUnitPrice"
+		        };
+
+		        Object.keys(dataMap).forEach(storageKey => {
+		            const gridColumn = dataMap[storageKey];
+		            const value = sessionStorage.getItem(storageKey);
+		            if (value) {
+		                purchaseGrid.setValue(rowKey, gridColumn, value);
+		                sessionStorage.removeItem(storageKey); // ✅ 사용한 데이터 삭제
+		            }
+		        });
+		
+		
+
+        console.log("✅ 발주 그리드에 데이터 저장 완료");
+  
+}
+//수량과 단가 변경 시 공급가격 자동 계산
+function calculateSupplyPrice(rowKey) {
+    let quantity = purchaseGrid.getValue(rowKey, "puchaseQuantity") || "0";
+    let unitPrice = purchaseGrid.getValue(rowKey, "puchaseUnitPrice") || "0";
+
+    // ✅ 문자열에 포함된 콤마(,) 제거 후 숫자로 변환
+    quantity = parseFloat(quantity.toString().replace(/,/g, '')) || 0;
+    unitPrice = parseFloat(unitPrice.toString().replace(/,/g, '')) || 0;
+
+    let supplyPrice = quantity * unitPrice;
+
+    // ✅ 계산된 공급가격을 Grid에 업데이트 (실제 값은 숫자, 화면에 표시할 때만 `,` 추가)
+    purchaseGrid.setValue(rowKey, "purchaseSupplyPrice", formatNumberWithCommas(supplyPrice.toFixed(2)));
+
+    updateVat(); // ✅ 부가세 즉시 업데이트
+}
+
+
+
+// ✅ 부가세 체크박스 적용 기능 (모든 행을 업데이트)
+function updateVat() {
+    const applyVat = document.getElementById("vatChecked").checked; // ✅ 부가세 적용 여부
+
+    purchaseGrid.getData().forEach((row, rowIndex) => {
+        let supplyPrice = purchaseGrid.getValue(rowIndex, "purchaseSupplyPrice") || "0";
+
+        // ✅ `,` 제거 후 숫자로 변환
+        supplyPrice = parseFloat(supplyPrice.toString().replace(/,/g, '')) || 0;
+
+        let vat = applyVat ? supplyPrice * 0.1 : 0; // ✅ 부가세 계산
+
+        // ✅ 부가세 업데이트 (화면에 표시할 때 `,` 추가)
+        purchaseGrid.setValue(rowIndex, "puchaseVat", formatNumberWithCommas(vat.toFixed(2)));
     });
 
-    // ✅ 상품 데이터 불러오기 (창고 모달)
-    initProductGrid();*/
+    console.log("✅ 부가세 적용 여부:", applyVat ? "적용됨" : "미적용");
+}
 
 
-// ✅ 모달 열기 및 데이터 설정
-/*function openProductModal(rowKey) {
-    sessionStorage.setItem("selectedRowKey", rowKey);
 
-    const modalElement = document.getElementById('goodsModal');
-    if (!modalElement) {
-        console.error("❌ goodsModal 요소를 찾을 수 없습니다.");
+// ✅ 3자리마다 콤마 추가하는 함수
+function formatNumberWithCommas(value) {
+    if (!value) return "0";
+    let num = value.toString().replace(/,/g, ''); // 기존 콤마 제거 후 숫자로 변환
+    return num.replace(/\B(?=(\d{3})+(?!\d))/g, ","); // 3자리마다 콤마 추가
+}
+
+
+
+// ✅ 발주 등록 함수
+function purchaseRegister() {
+    // ✅ 체크된 행의 그리드 값만 가져오기
+    const gridData = purchaseGrid.getCheckedRows();
+
+    if (gridData.length === 0) {
+        alert("발주할 상품이 없습니다.");
         return;
     }
 
-    if (typeof productGrid !== 'undefined' && productGrid !== null) {
-        console.log("📢 제품 모달: 데이터 초기화 및 새로고침 시작");
+    // ✅ VAT 체크박스 상태에 따라 플래그 설정
+    const vatFlag = document.getElementById("vatChecked").checked ? 1 : 0;
 
-        productGrid.readData();
-        setTimeout(() => {
-            productGrid.refreshLayout();
-        }, 500);
+    // ✅ 거래처 ID 기준으로 그룹화
+    const groupedData = {};
+    gridData.forEach((item) => {
+        const vendorId = parseInt(item.vendorId) || 0;
 
-        productGrid.on("onGridUpdated", function () {
-            console.log("✅ 제품 모달: 데이터 새로고침 완료");
-            new bootstrap.Modal(modalElement).show();
-        });
-    } else {
-        console.warn("⚠️ productGrid가 정의되지 않았습니다.");
-    }
-}*/
+        if (!groupedData[vendorId]) {
+            groupedData[vendorId] = {
+                vendorId: vendorId,
+                purchaseDate: document.getElementById("purchaseDate").value,
+                purchaseDueDate: document.getElementById("puchaseDueDate").value,
+                employeeNum: parseInt(document.getElementById("employeeNum").value) || 0,
+                companyNum: parseInt(document.getElementById("companyNum").value) || 0,
+                purchaseVatFlag: vatFlag,
+                purchaseDetails: []
+            };
+        }
 
-// ✅ 제품 목록 Toast Grid 설정
-/*let productGrid;
+        // ✅ orderPlanBodyNum이 없으면 null 처리
+        const orderPlanBodyNum = item.orderPlanBodyNum ? parseInt(item.orderPlanBodyNum) : null;
 
-function initProductGrid() {
-    console.log("✅ 제품 목록 그리드 초기화");
+        // ✅ 발주서 바디 추가 (숫자로 변환)
+        groupedData[vendorId].purchaseDetails.push({
+		    puchaseQuantity: parseInt(item.puchaseQuantity.replace(/,/g, '')) || 0,  // ✅ 정수 변환
+		    puchaseUnitPrice: parseFloat(item.puchaseUnitPrice.replace(/,/g, '')) || 0,  // ✅ 실수 변환
+		    puchaseSupplyPrice: parseFloat(item.purchaseSupplyPrice.replace(/,/g, '')) || 0,  // ✅ 실수 변환 (문자열 제거)
+		    puchaseVat: parseFloat(item.puchaseVat.replace(/,/g, '')) || 0,  // ✅ 실수 변환 (문자열 제거)
+		    optionNum: parseInt(item.optionNum.replace(/,/g, '')) || 0,  // ✅ 정수 변환
+		    companyNum: parseInt(document.getElementById("companyNum").value.replace(/,/g, '')) || 0,  // ✅ 정수 변환
+		    goodsStandard: item.goodsStandard,
+		    orderPlanBodyNum: orderPlanBodyNum ? parseInt(orderPlanBodyNum.replace(/,/g, '')) : null  // ✅ 정수 변환 (nullable)
+		});
 
-    const productDataSource = {
-        api: {
-            readData: {
-                url: 'http://localhost:81/purchs/rest/product/list',
-                method: 'GET',
-                requestOptions: {
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'same-origin'
-                },
-                initParams: {
-                    page: 1,
-                    perPage: 5,
-                    companyNum: [[${session.companyNum}]]
-                }
-            }
-        },
-        contentType: 'application/json',
-        serverSidePagination: true
-    };
 
-    productGrid = new tui.Grid({
-        el: document.getElementById('productGrid'),
-        data: productDataSource,
-        pageOptions: { useClient: false, perPage: 5 },
-        bodyHeight: 'auto',
-        columns: [
-            { header: "상품명", name: "goodsName", rowSpan: true },
-            { header: "상품코드", name: "goodsCode", rowSpan: true },
-            { header: "옵션명", name: "optionName" },
-            { header: "옵션번호", name: "optionCode" },
-            { header: "브랜드", name: "brandName" },
-            { header: "규격", name: "goodsStandard" },
-            { header: "대표이미지", name: "goodsImage", align: "center", rowSpan: true }
-        ]
     });
 
-    console.log("✅ 제품 목록 Toast Grid 설정 완료");
+    console.log("📢 서버로 전송할 데이터:", Object.values(groupedData));
 }
 
-// ✅ 표시 수량 변경
-function changeProductDisplay() {
-    let perPage = parseInt(document.querySelector('#product_display_amount').value);
-    productGrid.setPerPage(perPage);
-    productGrid.reloadData();
-}
 
-// ✅ 검색 실행
-function productSearch() {
-    let goodsName = document.querySelector('#searchGoodsName').value;
-    let brandName = document.querySelector('#searchBrandName').value;
 
-    productGrid.setRequestParams({
-        "companyNum": [[${session.companyNum}]],
-        "goodsName": goodsName,
-        "brandName": brandName
-    });
 
-    productGrid.reloadData();
-}
+	
 
-// ✅ 필터 초기화
-function resetFilters() {
-    document.querySelector('#searchGoodsName').value = '';
-    document.querySelector('#searchBrandName').value = '';
-    document.querySelector('#product_display_amount').value = '5';
 
-    productGrid.setRequestParams({
-        "companyNum": companyNum,
-        "goodsName": '',
-        "brandName": ''
-    });
 
-    productGrid.reloadData();
 
-}*/
-})
 

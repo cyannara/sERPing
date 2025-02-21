@@ -215,6 +215,8 @@ const token = document.querySelector('meta[name="_csrf"]').content;
 
         	 grid = new Grid({
             el: document.getElementById('myGrid'), // 컨테이너 엘리먼트
+            scrollX :false,
+            scrollY : false,
             rowHeaders: ['checkbox'], 
             columns: [ 
                 {header : "옵션코드" , name:"optionCode",className: "tui-grid-cell-readonly"},
@@ -672,83 +674,83 @@ document.getElementById('warehouseModal').addEventListener('shown.bs.modal', fun
 	        });
 	    });
 	    
-	    //제품 정보 등록 기능
-	    
-	    document.getElementById("registerBtn").addEventListener("click", productInsert);
-	
+   //제품 정보 등록 기능
+   
+   document.getElementById("registerBtn").addEventListener("click", productInsert);
 
-	    function productInsert(event){
-	    	event.preventDefault();
-	    	
-	    	//토스트 그리드 데이터 불러오기 
-	    	const gridData = grid.getData();
-	    	console.log("그리드데이터=",gridData);
-	    	
-	    	let gridInfo = [];
-	    	for (let i of gridData) {
-	    	    console.log("옵션이름=", i.optionName, "창고이름=", i.warehouseId);
 
-	    	    gridInfo.push({
-	    	        optionName: i.optionName,
-	    	        warehouseId: parseInt(i.warehouseId, 10)
-	    	    });
-	    	}
-	    	
-	    	console.log(gridInfo);
+   function productInsert(event){
+   	event.preventDefault();
+   	
+   	//토스트 그리드 데이터 불러오기 
+   	const gridData = grid.getData();
+   	console.log("그리드데이터=",gridData);
+   	
+   	let gridInfo = [];
+   	for (let i of gridData) {
+   	    console.log("옵션이름=", i.optionName, "창고이름=", i.warehouseId);
 
-	    	
-	    	//상품 데이터 불러오기 
-	    	
-	    	  let prodInfo = {
-	    		    goodsName: document.querySelector('#goodsName').value, //유효성 체크 
-	    		    goodsCost: parseInt(document.querySelector('#goodsCost')?.value, 10) || 0,
-	    		    goodsPrice: parseInt(document.querySelector('#goodsPrice')?.value, 10) || 0,
-	    		    goodsSupplyPrice: parseInt(document.querySelector('#goodsSupplyPrice')?.value, 10) || 0,
-	    		    goodsStandard: document.querySelector('#goodsStandard').value, //유효성 체크 
-	    		    goodsDescription : document.querySelector('#goodsDescription')?.value || "",
-	    		    goodsImage : document.querySelector('#uploadedImageName')?.value || "",
-	    		    classificationId: parseInt(document.querySelector('#classificationId').value, 10),//유효성체크
-	    		    brandId: parseInt(document.querySelector('#brandId').value, 10), //유효성체크
-	    		    employeeNum: parseInt(document.querySelector('#employeeNum').value, 10), //유효성체크
-	    		    vendorId: parseInt(document.querySelector('#vendorId')?.value, 10) || 0,
-	    		    companyNum: parseInt(document.querySelector('#companyNum')?.value, 10) || 0,
-	    		    files : gridInfo
-	    		};  
-	    	
-	    	
-	    	console.log("데이터",prodInfo)
-	    	
-	    	fetch("http://localhost:81/purchs/rest/product/insert",{
-	    		method: "POST",
-	    		headers: {
-                    "Content-Type": "application/json",
-                    'X-CSRF-Token': token
-                },
-                body : JSON.stringify(prodInfo) // orderInfo 객체를 JSON 형식으로 변환(JSON.parse는 JSON을 객체로 변환)
-	    	})
-	    	.then(response => response.json())
-	    	.then(data => {
-	    	    if (data.status === "success") {
-	    	        showAlert('상품등록 완료 되었습니다.', 'success');
-	    	        
-	    	        // ✅ 1초 후 페이지 리로딩
-	    	        setTimeout(() => {
-	    	            location.reload();
-	    	        }, 1000);
-	    	        
-	    	    } else {
-	    	        showAlert('상품등록 실패 하였습니다.', 'danger');
-	    	    }
-	    	})
+   	    gridInfo.push({
+   	        optionName: i.optionName,
+   	        warehouseId: parseInt(i.warehouseId, 10)
+   	    });
+   	}
+   	
+   	console.log(gridInfo);
 
-	    	
-	    	
-	    	
-	    }
+   	
+   	//상품 데이터 불러오기 
+   	
+   	  let prodInfo = {
+   		    goodsName: document.querySelector('#goodsName').value, //유효성 체크 
+   		    goodsCost: parseInt(document.querySelector('#goodsCost')?.value, 10) || 0,
+   		    goodsPrice: parseInt(document.querySelector('#goodsPrice')?.value, 10) || 0,
+   		    goodsSupplyPrice: parseInt(document.querySelector('#goodsSupplyPrice')?.value, 10) || 0,
+   		    goodsStandard: document.querySelector('#goodsStandard').value, //유효성 체크 
+   		    goodsDescription : document.querySelector('#goodsDescription')?.value || "",
+   		    goodsImage : document.querySelector('#uploadedImageName')?.value || "",
+   		    classificationId: parseInt(document.querySelector('#classificationId').value, 10),//유효성체크
+   		    brandId: parseInt(document.querySelector('#brandId').value, 10), //유효성체크
+   		    employeeNum: parseInt(document.querySelector('#employeeNum').value, 10), //유효성체크
+   		    vendorId: parseInt(document.querySelector('#vendorId')?.value, 10) || 0,
+   		    companyNum: parseInt(document.querySelector('#companyNum')?.value, 10) || 0,
+   		    files : gridInfo
+   		};  
+   	
+   	
+   	console.log("데이터",prodInfo)
+   	
+   	fetch("http://localhost:81/purchs/rest/product/insert",{
+   		method: "POST",
+   		headers: {
+                  "Content-Type": "application/json",
+                  'X-CSRF-Token': token
+              },
+              body : JSON.stringify(prodInfo) // orderInfo 객체를 JSON 형식으로 변환(JSON.parse는 JSON을 객체로 변환)
+   	})
+   	.then(response => response.json())
+   	.then(data => {
+   	    if (data.status === "success") {
+   	        showAlert('상품등록 완료 되었습니다.', 'success');
+   	        
+   	        // ✅ 1초 후 페이지 리로딩
+   	        setTimeout(() => {
+   	            location.reload();
+   	        }, 1000);
+   	        
+   	    } else {
+   	        showAlert('상품등록 실패 하였습니다.', 'danger');
+   	    }
+   	})
 
-        
-    });
- 
+   	
+   	
+   	
+   }
+
+      
+  });
+
  
 
     

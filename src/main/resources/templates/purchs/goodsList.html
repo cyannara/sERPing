@@ -1,31 +1,21 @@
-<!DOCTYPE html>
 <html layout:decorate="~{layouts/layout}"
       lang="en"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
       
- 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>제품 재고 / 제품 조회</title>
 
-    <!-- CSS 라이브러리 -->
-    <link rel="stylesheet" href="https://uicdn.toast.com/tui.time-picker/latest/tui-time-picker.css" />
-    <link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
-    <link rel="stylesheet" href="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.css" />
-    <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-	<!-- JavaScript 라이브러리 -->
-	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	<script src="https://uicdn.toast.com/tui.time-picker/latest/tui-time-picker.js"></script>
-	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
-	<script src="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.js"></script>
-	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-	
+<body layout:fragment="content">
+ 
     <style>
-        .container { max-width: 1200px; margin: 20px auto; }
+	    #custom-container{
+			background-color: #f8f9fa; /* 연한 회색 배경 */
+			padding: 20px;
+			border-radius: 10px;
+			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 박스 그림자 */
+			margin-bottom: 20px;
+		
+		}
+        .container { max-width: 100%; margin: 20px auto; }
         .header-box { background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 10px; }
         .search-container { margin-bottom: 15px; }
         .pagination-container { text-align: center; margin-top: 10px; }
@@ -35,9 +25,11 @@
         
        /* ✅ 전체 그리드의 스크롤 제거 */
 		#productGrid {
-		    overflow: hidden !important; /* ✅ 스크롤 제거 */
-		    height: auto !important; /* ✅ 높이 자동 조정 */
+		    width: 100% !important;
+		    min-width: 1200px;  /* 최소 너비 설정 */
+		    height: auto !important;
 		}
+
 		
 		/* ✅ 내부 요소에서 강제 스크롤 제거 */
 		.tui-grid-body-area {
@@ -46,48 +38,104 @@
 		
 		/* ✅ 세로 스크롤 없애기 */
 		.tui-grid-container {
-		    max-height: none !important;
+		    max-width: 100% !important;
+		    overflow-x: auto !important;  /* 가로 스크롤 가능하도록 변경 */
 		}
 
-        
-    </style>
-</head>
-<body layout:fragment="content">
+		
+		/* 상품명 & 상품코드 병합된 셀 스타일 */
+		.merged-cell {
+		    background-color: #f8f9fa !important; /* 연한 회색 */
+		    font-weight: bold;
+		    text-align: left !important;
+		    vertical-align: middle !important;  /* 수직 중앙 정렬 */
+		    line-height: normal !important;
+		    padding: 15px !important;
+		   
+		}
+	
+		
+		/* ✅ 그리드 전체 테두리 추가 */
+		.tui-grid-container {
+		    border: 1px solid #ddd !important; /* 전체 그리드 박스 테두리 */
+		    border-radius: 5px; /* 둥근 테두리 */
+		    overflow: hidden; /* 모서리 깔끔하게 정리 */
+		}
+		
+		/* ✅ 헤더(컬럼명) 부분 테두리 */
+		.tui-grid-header-area {
+		    border-bottom: 2px solid #ccc !important; /* 헤더와 바디 구분 */
+		}
+		
+		/* ✅ 셀(Cell) 테두리 설정 */
+		.tui-grid-cell {
+		    border-right: 1px solid #ddd !important;
+		    border-bottom: 1px solid #ddd !important;
+		}
+		
+		/* ✅ 마지막 컬럼의 테두리 없애기 (디자인 개선) */
+		.tui-grid-cell:last-child {
+		    border-right: none !important;
+		}
+		
+		/* ✅ 마지막 행의 테두리 없애기 (디자인 개선) */
+		.tui-grid-body-area .tui-grid-cell:last-child {
+		    border-bottom: none !important;
+		}
+		
+		/* ✅ 헤더(컬럼명) 배경색 & 글씨 스타일 */
+		.tui-grid-header-cell {
+		    background-color: #f1f1f1 !important; /* 헤더 배경색 */
+		    font-weight: bold;
+		    text-align: center;
+		    border-right: 1px solid #ddd !important;
+		}
+		
+		/* ✅ 줄 간격 스타일 조정 */
+		.tui-grid-row {
+		    border-bottom: 1px solid #ddd !important;
+		}
+		
+		/* ✅ hover(마우스 오버) 시 강조 효과 */
+		.tui-grid-cell:hover {
+		    background-color: #f9f9f9 !important;
+	}
 
-<div class="container">
-    <!-- 검색 영역 -->
-    <div class="header-box">
-        <div class="row d-flex align-items-end gap-3">
-            <div class="col-auto">
-                <label class="form-label">상품명</label>
-                <input type="text" class="form-control" id="searchGoodsName">
-            </div>
-            <div class="col-auto">
-                <label class="form-label">브랜드</label>
-                <input type="text" class="form-control" id="searchBrandName">
-            </div>
-            <div class="col-auto">
-                <span class="label-search col-4">표시수량</span>
-                <select id="product_display_amount" class="form-control" onchange="changeProductDisplay()">
-                    <option value="5" selected>5</option>
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                </select> 
-            </div>
-            <div class="col-auto d-flex">
-                <button class="btn btn-search w-50" onclick="productSearch()">검색</button>
-                <button class="btn btn-reset w-50 ms-2" onclick="resetFilters()">초기화</button>
-            </div>
-        </div>
-    </div>
+</style>
 
-    <!-- Toast Grid -->
-    <div id="table-container">
-        <div id="productGrid"></div>
-        <div id="pagination" class="tui-pagination"></div>
-    </div>
+
+<div class="container mt-4">
+	<h2 class="mb-4">상품 조회</h2>
+	   <!-- 검색창 -->
+	<div class="search-grid" id="custom-container">
+	    <div class="d-flex flex-wrap align-items-center gap-3">
+	        <div class="d-flex align-items-center">
+	            <span class="label-search me-2">상품명</span>
+	            <input type="text" name="goodsName" id="searchGoodsName" class="form-control w-auto">
+	        </div>
+	        <div class="d-flex align-items-center">
+	            <span class="label-search me-2">브랜드명</span>
+	            <input type="text" name="brandName" id="searchBrandName" class="form-control w-auto">
+	        </div>
+	        <div class="d-flex align-items-center">
+	            <span class="label-search me-2">표시수량</span>
+	            <select name="display_amount" id="product_display_amount" class="form-control w-auto" onchange="changeProductDisplay()">
+	                <option value="10" selected>10</option>
+	                <option value="20">20</option>
+	                <option value="50">50</option>
+	                <option value="100">100</option>
+	            </select>
+	        </div>
+	        <button type="button" class="btn btn-primary ms-auto" onclick="productSearch()">검색</button>
+	        <button type="button" class="btn btn-secondary" onclick="resetFilters()">초기화</button>
+	    </div>
+	</div>
+	
+	<!-- 그리드 -->
+	<div id="table-container" class="mt-3">
+	    <div id="productGrid"></div>
+	    <div id="pagination" class="tui-pagination"></div>
+	</div>
 
     <!-- 제품 등록 버튼 -->
     <div class="text-end">
@@ -131,7 +179,7 @@ function initProductGrid() {
                     },
                     initParams:{ 
                         page: 1,
-                        perPage: 5,
+                        perPage: 10,
                         companyNum: companyNum
                     },
                     beforeRequest: function(request) {
@@ -166,14 +214,41 @@ function initProductGrid() {
             },
             bodyHeight: 'auto', 
             columns: [
-                { header: "상품명", name: "goodsName", rowSpan: true },
-                { header: "상품코드", name: "goodsCode", rowSpan: true }, 
+                { header: "상품명",
+                  name: "goodsName", 
+                  rowSpan: true,
+                  
+                  scrollX :false,
+                  scrollY : false,
+                  renderer: {
+                      type: CustomTextRenderer
+                  },
+                  className: "merged-cell"
+                  },
+                { header: "상품코드", 
+                  name: "goodsCode",
+                  rowSpan: true,
+                  renderer: {
+                      type: CustomTextRenderer
+                  },
+                  className: "merged-cell"
+                  }, 
                 { header: "옵션명", name: "optionName" },
                 { header: "옵션번호", name: "optionCode" },
                 { header: "브랜드", name: "brandName" },
                 { header: "규격", name: "goodsStandard"},
-                { header: "대표이미지", name: "goodsImage", align: "center", rowSpan: true }
-            ]
+                { header: "대표이미지", 
+                  name: "goodsImage", 
+                  align: "center", 
+                  rowSpan: true,
+                  renderer: {
+                      type: ImageRenderer
+                  }
+                }
+            ],
+            rowClassName: function(row) {
+                return getRowColorClass(row);
+            }
         });
         
         console.log("✅ Toast Grid 초기화 완료");
@@ -205,7 +280,7 @@ function productSearch() {
 function resetFilters() {
     document.querySelector('#searchGoodsName').value = '';
     document.querySelector('#searchBrandName').value = '';
-    document.querySelector('#product_display_amount').value = '5';
+    document.querySelector('#product_display_amount').value = '10';
 
     productGrid.setRequestParams({
         "companyNum": companyNum,
@@ -215,10 +290,41 @@ function resetFilters() {
 
     productGrid.reloadData();
 }
+
+//✅ 텍스트를 굵게하고 정렬하는 렌더러
+class CustomTextRenderer {
+    constructor(props) {
+        const el = document.createElement('div');
+        el.innerText = props.value;
+        el.style.padding = '10px';
+        el.style.fontWeight = 'bold';
+        el.style.textAlign = 'left';
+        this.el = el;
+    }
+    getElement() {
+        return this.el;
+    }
+}
+
+//✅ 대표이미지를 표시하는 렌더러
+ class ImageRenderer {
+    constructor(props) {
+        const el = document.createElement('div');
+        el.style.textAlign = 'center';
+        if (props.value) {
+            el.innerHTML = `<img src="http://localhost:81/images/${props.value}" alt="상품 이미지" width="50" height="50" style="border-radius: 5px;">`;
+        } else {
+            el.innerText = "이미지 없음";
+        }
+        this.el = el;
+    }
+    getElement() {
+        return this.el;
+    }
+}
 </script>
 
 </body>
 
 
 
-</html>
