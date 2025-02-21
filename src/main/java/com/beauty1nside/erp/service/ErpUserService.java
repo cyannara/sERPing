@@ -6,6 +6,7 @@ import java.util.Map;
 import com.beauty1nside.erp.dto.ContractDTO;
 import com.beauty1nside.erp.dto.ErpSearchDTO;
 import com.beauty1nside.erp.dto.SubScriptionDTO;
+import com.beauty1nside.erp.dto.SubscriptionDetailDTO;
 import com.beauty1nside.erp.dto.erpSubscriptionInfoListDTO;
 
 /**
@@ -100,5 +101,13 @@ public interface ErpUserService {
      * @return int
      */
 	public int subscriptioncount(ErpSearchDTO searchDTO);
+	
+	/**
+     * 구독리스트의 상세 구독내역을 가져온다
+     *
+     * @param int
+     * @return List<SubscriptionDetailDTO>
+     */
+	public List<SubscriptionDetailDTO> subscriptionDetail(int subscriptionNum);
 
 }

@@ -98,7 +98,7 @@
 	-->
 	<insert id="prosubscriptiontail">
 		INSERT INTO erp_subscription_tail VALUES
-		(erp_subscrpt_tail_seq.nextval, #{subscriptionNum}, #{subscriptionOptionNum})
+		(erp_subscrpt_tail_seq.nextval, #{subscriptionNum}, #{subscriptionOptionNum}, #{subscriptionPeriod}, #{subscriptionOptionPrice})
 	</insert>
 	
 	<!-- 
@@ -280,6 +280,31 @@
 		select count(*)
 		from erp_subscription_list
 		where company_num = #{companyNum}
+	</select>
+	
+	<!-- 
+     * 구독리스트의 상세 구독내역을 가져온다
+     *
+     * @param int
+     * @return SubscriptionDetailDTO
+	-->
+	<select id="subscriptionDetail" resultType="SubscriptionDetailDTO">
+		select 
+		    e.subscription_tail_num,
+		    e.subscription_num,
+		    o.subscription_option_num,
+		    o.subscription_name_num,
+		    o.subscription_option,
+		    e.subscription_option_price,
+		    o.subscription_discount,
+		    e.subscription_period,
+		    n.subscription_name
+		from erp_subscription_tail e
+		left join erp_subscription_option o
+		    on e.subscription_option_num = o.subscription_option_num
+		left join erp_subscription_name n
+		    on o.subscription_name_num = n.subscription_name_num
+		where subscription_num = #{subscriptionNum}
 	</select>
 
 </mapper>

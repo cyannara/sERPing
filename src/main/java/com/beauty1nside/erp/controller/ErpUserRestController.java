@@ -18,6 +18,7 @@ import com.beauty1nside.common.GridArray;
 import com.beauty1nside.common.Paging;
 import com.beauty1nside.erp.dto.ContractDTO;
 import com.beauty1nside.erp.dto.ErpSearchDTO;
+import com.beauty1nside.erp.dto.SubscriptionDetailDTO;
 import com.beauty1nside.erp.dto.erpSubscriptionInfoListDTO;
 import com.beauty1nside.erp.service.ErpUserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -209,6 +210,17 @@ public class ErpUserRestController {
 		GridArray grid = new GridArray();
 		Object result = grid.getArray( paging.getPage(), paging.getTotalRecord(), erpUserService.subscriptionlist(dto) );
 		return result;
+	}
+	
+	/**
+     * 구독리스트의 상세 구독내역을 가져온다
+     *
+     * @param int
+     * @return List<SubscriptionDetailDTO>
+     */
+	@GetMapping("/subscriptionDetail/{subscriptionNum}")
+	public List<SubscriptionDetailDTO> subscriptionDetail(@PathVariable(name="subscriptionNum") int subscriptionNum) {
+		return erpUserService.subscriptionDetail(subscriptionNum);
 	}
 	
 }
