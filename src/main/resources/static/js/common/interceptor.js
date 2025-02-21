@@ -20,19 +20,65 @@
         return response;
     };
 
-    // XMLHttpRequest 감지
-    window.XMLHttpRequest = function () {
-        const xhr = new originalXHR();
+    class CustomXHR extends originalXHR {
+        constructor() {
+            super();
+            console.log("[XHR Intercept] Created");
 
-        xhr.addEventListener("readystatechange", function () {
-            if (xhr.readyState === 4 && xhr.status === 401) {
-                showAlert("세션이 만료되었습니다. 로그인 페이지로 이동합니다.", 'danger');
-                setTimeout(() => {
-                    window.location.href = "/login";
-                }, 3000)
+            this.addEventListener("readystatechange", function () {
+                if (this.readyState === 4 && this.status === 401) {
+                    showAlert("세션이 만료되었습니다. 로그인 페이지로 이동합니다.", 'danger');
+                    setTimeout(() => {
+                        window.location.href = "/login";
+                    }, 3000);
+                }
+            });
+        }
+
+        open(method, url, async, user, password) {
+            console.log("[XHR Intercept] Open:", method, url);
+            super.open(method, url, async, user, password);
+        }
+
+        send(body) {
+            console.log("[XHR Intercept] Sending Request...");
+            console.log("[XHR Intercept] Body:", body || "(No Body - GET/DELETE request)");
+
+            // 기존 onreadystatechange 유지
+            const originalOnReadyStateChange = this.onreadystatechange;
+
+            this.addEventListener("readystatechange", function () {
+                console.log("[XHR Intercept] readyState:", this.readyState);
+                console.log("[XHR Intercept] readyState:", this.readyState);
+                if (this.readyState === 4) {
+                    console.log("[XHR Intercept] Response Text:", this.responseText);
+                    try {
+                        // 기존 핸들러가 존재하면 실행
+                        if (originalOnReadyStateChange && typeof originalOnReadyStateChange === "function") {
+                            try {
+                                originalOnReadyStateChange.apply(this);
+                            } catch (e) {
+                                console.log('originalOnReadyStateChange.apply(this); error')
+                            }
+                        }
+                    } catch (error) {
+                        console.error("[XHR Intercept] Error in onreadystatechange:", error);
+                    }
+                }
+            });
+            try {
+                if (body === null) {
+                    console.log("[XHR Intercept] Executing GET Request...");
+                    super.send();
+                } else {
+                    console.log("[XHR Intercept] Executing POST Request...");
+                    super.send(body);
+                }
+            } catch (error) {
+                console.error("[XHR Intercept] super.send() error:", error);
             }
-        });
+        }
+    }
 
-        return xhr;
-    };
+    window.XMLHttpRequest = CustomXHR;
 })();
