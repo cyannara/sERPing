@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beauty1nside.bsn.mapper.BsnOrderMapper">
+
+
+<select id="selectGoodsWarehouseLot">
+SELECT goods_lot_num,
+       goods_consumption_date,
+       warehousing_standard_quantity,
+       warehousing_total_quantity,
+       warehousing_remaining_quantity,
+       pwb.warehouse_id AS warehouse_id,
+       pwb.company_num,
+       pwb.option_num,
+       po.option_code,
+       po.option_name
+
+       
+FROM purchs_warehousing_body pwb 
+LEFT JOIN purchse_option po ON po.option_num = pwb.option_num
+WHERE pwb.company_num = 1
+-- AND po.option_code = 'LH0011'
+AND warehousing_remaining_quantity != 0
+ORDER by goods_consumption_date
+
+</select>
+
+</mapper>

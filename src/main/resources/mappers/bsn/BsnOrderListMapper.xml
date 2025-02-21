@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beauty1nside.bsn.mapper.BsnOrderMapper">
+
+<!-- 주문조회- 페이징 -->
+<select id="selectBsnOrder" resultType="BsnOrderDTO">
+SELECT 
+       order_id,
+       order_code,
+       branch_office_id,
+       order_name,
+       total_amount,
+       purchase_vat,
+       order_date,
+       register_date,
+       due_date,
+       order_status,
+       employee_num,
+       company_num
+FROM
+(SELECT 
+       ROW_NUMBER() OVER (
+              ORDER BY TO_NUMBER(REGEXP_SUBSTR(order_id, '\d+')) desc
+       ) AS RN, 
+       order_id,
+       order_code,
+       branch_office_id,
+       order_name,
+       total_amount,
+       purchase_vat,
+       order_date,
+       register_date,
+       due_date,
+       order_status,
+       employee_num,
+       company_num
+FROM bsn_order
+WHERE company_num = 1
+<include refid="searchInfoBsnOrder"></include>
+<![CDATA[
+AND ROWNUM <= #{end}
+]]>
+)
+WHERE RN >= #{start}
+</select>
+
+<!-- 주문조회- 카운팅 -->
+<select id="getCountOfBsnOrder" resultType="int">
+SELECT COUNT(*) FROM BSN_ORDER
+WHERE   company_num = 1
+<include refid="searchInfoBsnOrder"></include>
+</select>
+
+<sql id="searchInfoBsnOrder">
+	 
+	<if test="deteOption != null and deteOption == 'orderDate' and  startDate != null">
+		AND order_date >= #{startDate}
+	</if>
+	<if test="deteOption != null and deteOption == 'orderDate' and  endDate != null">
+		<![CDATA[
+		AND order_date < #{endDate}
+		]]>
+	</if>
+	
+	<if test="deteOption != null and deteOption =='dueDate' and  startDate != null">
+		AND due_date >= #{startDate}
+	</if>
+	<if test="deteOption != null and deteOption == 'dueDate' and  endDate != null">
+		<![CDATA[
+		AND due_date <= #{endDate}
+		]]>
+	</if>
+	
+	
+	
+	
+	<if test="branch != null and ! branch.equals('all')">
+			AND branch_office_id Like '%' || #{branch} || '%'
+	</if>
+</sql>
+
+<select id="selectBsnOrderDetail" resultType="BsnOrderDetailDTO">
+SELECT order_detail_id,
+       order_id,
+       goods_code,
+       goods_name,
+       option_code,
+       option_name,
+       quantity,
+       goods_standard,
+       unit_price,
+       summation_amt
+FROM (
+SELECT /*+ INDEX_ASC(bsn_order_detail PK_BSN_ORDER_DETAIL) */
+       ROWNUM rn,
+       order_detail_id,
+       order_id,
+       goods_code,
+       goods_name,
+       option_code,
+       option_name,
+       quantity,
+       goods_standard,
+       unit_price,
+       summation_amt
+FROM bsn_order_detail
+WHERE order_id = #{orderId}
+<![CDATA[
+AND ROWNUM <= #{end}
+]]>
+)
+WHERE RN >= #{start}
+
+</select>
+
+<select id="getCountOfBsnOrderDetail" resultType="int">
+SELECT COUNT(*)
+FROM bsn_order_detail
+WHERE order_id = #{orderId}
+</select>
+
+</mapper>

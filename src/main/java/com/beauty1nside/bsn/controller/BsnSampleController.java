@@ -19,7 +19,7 @@ import lombok.extern.log4j.Log4j2;
 @RequestMapping("/bsn/*")
 public class BsnSampleController {
 	
-	final private BsnOrderService bsnOrderService;
+	//final private BsnOrderService bsnOrderService;
 
 	//샘플 페이지
 	@GetMapping("/")
@@ -51,39 +51,36 @@ public class BsnSampleController {
 	
 	
 	@GetMapping("/orderRegist")
-	public String orderRegist(
-			OrderSearchDTO searchDTO, Paging paging, Model model
-			) {
+	public String orderRegist() {
 		
-//		//페이징을 위해 검색결과 수 구하기
-//		paging.setTotalRecord(bsnOrderService.getCountOfBhfOrder(searchDTO));
-		
-//		//첫 페이지, 마지막 페이지
-//		searchDTO.setStart(paging.getFirst());
-//		searchDTO.setEnd(paging.getLast());
-		
-//		
-//		
-//		//검색결과 - 해당 페이지 내용
-//		model.addAttribute("bhfOrder", bsnOrderService.getBhfOrder(searchDTO));
+
 		return "/bsn/orderRegist";
 	};
 	
 	@GetMapping("/orderList")
 	public String orderList() {
 		
-//		//페이징을 위해 검색결과 수 구하기
-//		paging.setTotalRecord(bsnOrderService.getCountOfBhfOrder(searchDTO));
-		
-//		//첫 페이지, 마지막 페이지
-//		searchDTO.setStart(paging.getFirst());
-//		searchDTO.setEnd(paging.getLast());
-		
-//		
-//		
-//		//검색결과 - 해당 페이지 내용
-//		model.addAttribute("bhfOrder", bsnOrderService.getBhfOrder(searchDTO));
 		return "/bsn/orderList";
 	};
+	
+	
+	
+	@GetMapping("/delivery")
+	public String delivery() {
+		
+		return "/bsn/orderDelivery";
+	};
+	
+	@GetMapping("/orderCS")
+	public String orderCS() {
+		
+		return "redirect:/bsn/orderCS/Returning";
+	};
+	@GetMapping("/orderCS/Returning")
+	public String returning() {
+		
+		return "/bsn/orderReturning";
+	};
+	
 	
 }

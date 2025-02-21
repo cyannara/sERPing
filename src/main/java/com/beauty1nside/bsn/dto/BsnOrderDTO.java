@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BsnOrderDTO {
+public class BsnOrderDTO extends OrderSearchDTO {
 	private String orderId;			//bsnOrder의 PK
 	private String orderCode;		//bhfOrder의 PK
 	private String branchOfficeId;
@@ -28,6 +28,8 @@ public class BsnOrderDTO {
 	private int employeeNum;
 	private String remark;
 	private int companyNum;
+	private String  goodsName;
+	private String  optionName;
 	
 	private List<BsnOrderDetailDTO> orderDetails;
 
