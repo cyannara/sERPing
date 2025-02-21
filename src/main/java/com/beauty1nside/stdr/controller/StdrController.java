@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Log4j2
 @Controller
@@ -31,7 +32,14 @@ public class StdrController {
   
   @GetMapping("/doc")
   public String doc() {
-    return "stdr/doc";
+    return "stdr/doc/doc";
+  };
+  
+  @GetMapping("/doc/template")
+  public String getDocTemplate(@RequestParam("documentId") Long documentId,
+                               Model model) {
+    model.addAttribute("documentId", documentId);
+    return "stdr/doc/template";
   };
   
 }

@@ -1,0 +1,42 @@
+
+.card {
+    background-color: white;
+    border-radius: 10px;
+}
+
+.table {
+    margin-top: 10px;
+}
+
+.page-link {
+    color: white;
+    background-color: #002d72;
+    border-color: #002d72;
+}
+
+.page-item.active .page-link {
+    background-color: #0047ab;
+    border-color: #0047ab;
+}
+
+.filter-btn.active {
+    background-color: #0047ab;
+    color: white;
+}
+.status-label {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 5px;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.move-btn {
+    border: none;
+    > i{
+        font-size: 20px;
+        padding-left: 10px;
+    }
+}

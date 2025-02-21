@@ -26,4 +26,14 @@ public class DocumentServiceImpl implements DocumentService {
 	public int count(DocumentSearchDTO dto) {
 		return documentMapper.count(dto);
 	}
+	
+	@Override
+	public int insert(DocumentDTO dto) {
+		return documentMapper.insert(dto);
+	}
+	
+	@Override
+	public DocumentDTO info(DocumentDTO dto) {
+		return documentMapper.info(dto);
+	}
 }

@@ -14,12 +14,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/mainpage/*")
 public class MainpageController {
   @GetMapping("/approval")
-  public String mainpage(
-    @RequestParam("inApprovalId") String inApprovalId,
-    Model model
-  ) {
+  public String mainpage(@RequestParam("inApprovalId") Long inApprovalId,
+                         Model model) {
     model.addAttribute("inApprovalId", inApprovalId);
-    
     return "mainpage/mainpage";
   }
 }

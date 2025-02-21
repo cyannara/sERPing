@@ -71,7 +71,11 @@
 
   const dataSource = {
     api: {
-      readData: { url: 'http://localhost:81/mainpage/rest/approval/list', method: 'GET', initParams: { page: 1 } },
+      readData: {
+        url: 'http://localhost:81/api/mainpage/approval/list',
+        method: 'GET',
+        initParams: { page: 1 }
+      },
       contentType: 'application/json'
     },
   };
@@ -139,8 +143,8 @@
             sortable: true,
         formatter: ({ row }) => {
           return `<button class="download-btn" data-content="${row.inApprovalRequestContent}">
-              <i class="mdi mdi-folder-download"></i>
-            </button>`;
+                    <i class="mdi mdi-folder-download"></i>
+                  </button>`;
         }
       }  ],
     data : dataSource,
@@ -173,6 +177,8 @@
       downloadPDF(dataset);
     }
   });
+
+
 
 </script>
 <script src="/js/mainpage/mainpage.js"></script>

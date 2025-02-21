@@ -9,4 +9,6 @@ import java.util.List;
 public interface DocumentMapper {
 	List<DocumentDTO> documentList(@Param("dto") DocumentSearchDTO dto);
 	int count(@Param("dto") DocumentSearchDTO dto);
+	int insert(DocumentDTO dto);
+	DocumentDTO info(DocumentDTO dto);
 }

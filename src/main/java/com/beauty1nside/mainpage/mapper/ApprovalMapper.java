@@ -10,7 +10,9 @@ import java.util.List;
 public interface ApprovalMapper {
 	ApprovalDTO info(@Param("inApprovalId") Long inApprovalId, @Param("companyNum") Long companyNum);
 	List<ApprovalDTO> waitingList(@Param("dto") ApprovalSearchDTO dto, @Param("companyNum") Long companyNum);
+	List<ApprovalDTO> myList(ApprovalSearchDTO dto);
 	int count(@Param("dto") ApprovalSearchDTO dto, @Param("companyNum") Long companyNum);
+	int myCount(ApprovalSearchDTO dto);
 	int update(ApprovalDTO dto);
 	
 	List<DocumentDTO> documentList(Long companyNum);

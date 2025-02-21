@@ -8,4 +8,6 @@ import java.util.List;
 public interface DocumentService {
   List<DocumentDTO> documentList(DocumentSearchDTO dto);
   int count(DocumentSearchDTO dto);
+  int insert(DocumentDTO dto);
+  DocumentDTO info(DocumentDTO dto);
 }

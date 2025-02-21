@@ -77,25 +77,105 @@
 
 	</select>
 
+	<select id="myList" resultType="com.beauty1nside.mainpage.dto.ApprovalDTO" parameterType="com.beauty1nside.mainpage.dto.ApprovalSearchDTO">
+		SELECT g.in_approval_id,
+		g.document_id,
+		g.employee_num,
+		h.employee_name,
+		g.in_approval_request_date,
+		g.in_approval_status,
+		g.in_approval_request_content,
+		g.in_approval_rejected_content,
+		g.in_approval_file_path,
+		g.company_num,
+		s.document_type
+		FROM (
+		SELECT /*+ INDEX_DESC(grpwr_in_approval pk_grpwr_in_approval) */
+		rownum rn,
+		g.in_approval_id,
+		g.document_id,
+		g.employee_num,
+		g.in_approval_request_date,
+		g.in_approval_status,
+		g.in_approval_request_content,
+		g.in_approval_rejected_content,
+		g.in_approval_file_path,
+		g.company_num
+		FROM grpwr_in_approval g
+		<![CDATA[
+            WHERE rownum <= #{end} and g.employee_num = #{employeeNum}
+            AND
+        ]]>
+		<!--		<include refid="searchInfo"></include>-->
+		company_num LIKE '%' || #{companyNum} || '%'
+		<if test="inApprovalRequestDateStart != null and ! inApprovalRequestDateStart.equals('')">
+			AND g.in_approval_request_date >= TO_DATE(#{inApprovalRequestDateStart}, 'YYYY-MM-DD HH24:MI:SS')
+		</if>
+		<if test="inApprovalRequestDateEnd != null and ! inApprovalRequestDateEnd.equals('')">
+			<![CDATA[
+				AND g.in_approval_request_date <= TO_DATE(#{inApprovalRequestDateEnd}, 'YYYY-MM-DD HH24:MI:SS')
+		   ]]>
+		</if>
+        <if test="inApprovalStatus != null and ! inApprovalStatus.equals('')">
+			and g.in_approval_status = #{inApprovalStatus}
+		</if>
+		) g
+		JOIN hr_employee h ON g.employee_num = h.employee_num
+		join stdr_document s on g.document_id = s.document_id
+		WHERE rn >= #{start}
+		<if test="documentType != null and ! documentType.equals('')">
+			AND s.document_type Like '%' || #{documentType} || '%'
+		</if>
+	</select>
+
+
 	<select id="documentList" resultType="com.beauty1nside.stdr.dto.DocumentDTO">
 		select * from stdr_document
 	</select>
 
 
 	<select id="count">
-		SELECT COUNT(in_approval_id)
-		FROM grpwr_in_approval
+		SELECT COUNT(g.in_approval_id)
+		FROM grpwr_in_approval g
+		join stdr_document s on g.document_id = s.document_id
 		<where>
-			company_num LIKE '%' || #{companyNum} || '%'
-				AND in_approval_status = 'WAITING'
+			g.company_num LIKE '%' || #{companyNum} || '%'
+				AND g.in_approval_status = 'WAITING'
 		</where>
+		<if test="dto.documentType != null and ! dto.documentType.equals('')">
+			AND s.document_type = #{dto.documentType}
+		</if>
 		<if test="dto.inApprovalRequestDateStart != null and ! dto.inApprovalRequestDateStart.equals('')">
-			AND in_approval_request_date >= TO_DATE(#{dto.inApprovalRequestDateStart}, 'YYYY-MM-DD HH24:MI:SS')
+			AND g.in_approval_request_date >= TO_DATE(#{dto.inApprovalRequestDateStart}, 'YYYY-MM-DD HH24:MI:SS')
 		</if>
 		<if test="dto.inApprovalRequestDateEnd != null and ! dto.inApprovalRequestDateEnd.equals('')">
 			<![CDATA[
-				AND in_approval_request_date <= TO_DATE(#{dto.inApprovalRequestDateEnd}, 'YYYY-MM-DD HH24:MI:SS')
+				AND g.in_approval_request_date <= TO_DATE(#{dto.inApprovalRequestDateEnd}, 'YYYY-MM-DD HH24:MI:SS')
 		   ]]>
+		</if>
+	</select>
+
+	<select id="myCount">
+		SELECT COUNT(g.in_approval_id)
+		FROM grpwr_in_approval g
+		join stdr_document s on g.document_id = s.document_id
+		<where>
+			g.company_num LIKE '%' || #{companyNum} || '%'
+			AND g.employee_num = #{employeeNum}
+		</where>
+		<if test="documentType != null and ! documentType.equals('')">
+			AND s.document_type = #{documentType}
+		</if>
+		<if test="inApprovalRequestDateStart != null and ! inApprovalRequestDateStart.equals('')">
+			AND g.in_approval_request_date >= TO_DATE(#{inApprovalRequestDateStart}, 'YYYY-MM-DD HH24:MI:SS')
+		</if>
+		<if test="inApprovalRequestDateEnd != null and ! inApprovalRequestDateEnd.equals('')">
+			<![CDATA[
+				AND g.in_approval_request_date <= TO_DATE(#{inApprovalRequestDateEnd}, 'YYYY-MM-DD HH24:MI:SS')
+		   ]]>
+		</if>
+		<if test="inApprovalStatus != null and ! inApprovalStatus.equals('')">
+			and g.in_approval_status = #{inApprovalStatus}
 		</if>
 	</select>
 
