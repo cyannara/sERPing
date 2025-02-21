@@ -36,7 +36,7 @@ public class WebSecurityConfig {
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
       .authorizeHttpRequests((requests) -> requests
-        .requestMatchers("/", "/common/**", "/css/**", "/docs/**", "/file/**", "/fonts/**", "/images/**", "/js/**", "/scss/**", "/templates/**", "/vendors/**", "/gulpfile.js", "/erp/**").permitAll()
+        .requestMatchers("/", "/common/**", "/css/**", "/docs/**", "/file/**", "/fonts/**", "/images/**", "/js/**", "/scss/**", "/templates/**", "/vendors/**", "/gulpfile.js", "/erp/**", "/login/**").permitAll()
         .requestMatchers("/api/**").authenticated() // API 요청은 인증된 사용자만 가능
         .anyRequest().authenticated()
       )
