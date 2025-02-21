@@ -175,7 +175,21 @@
 		        if(check){
 		        	alert("이미 추가된 옵션입니다.")
 		        }else{	        	
-		        	grid3.resetData([...currentData, rowData]); // 기존 데이터에 새로운 행 추가하여 발주테이블 업데이트
+		        	// 기존 데이터에서 가장 큰 rowKey 찾기 (없으면 0부터 시작) 그 다음 1씩 추가해서 rowkey 만들기
+	                const newRowKey = currentData.length > 0
+	                    ? Math.max(...currentData.map(item => item.rowKey)) + 1
+	                    : 0;
+
+	                // 새로운 행에 rowKey 추가
+	                const newRow = { ...rowData, rowKey: newRowKey };
+
+	                // resetData 사용 시 기존 데이터의 rowKey도 재설정
+	                const updatedData = [...currentData, newRow].map((item, index) => ({
+	                    ...item,
+	                    rowKey: index // 고유한 rowKey 부여
+	                }));
+
+	                grid3.resetData(updatedData);
 		        }
 		    }
 		});
