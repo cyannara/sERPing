@@ -6,6 +6,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.beauty1nside.accnut.dto.AssetDTO;
 import com.beauty1nside.accnut.service.AssetService;
@@ -105,17 +107,47 @@ public class AccnutSampleController {
 		return "accnut/selling_status";
 	};
 	
+	
+	// 여기서 부터는 테스트 페이징
 	@GetMapping("test")
 	public String test(Model model) {
 //		model.addAttribute("list", assetService.list());
 		return "accnut/test";
 	}
 	
-	@GetMapping("assetTest")
-	public String assetTest(Model model) {
+	
+	// 결제 테스트
+	@GetMapping("checkout")
+	public String accTest(Model model) {
 //		model.addAttribute("list", assetService.list());
-		return "accnut/asset2";
+		return "accnut/checkout";
 	}
+	
+	@GetMapping("success")
+	public ModelAndView successTest(@RequestParam String paymentType, @RequestParam String orderId, @RequestParam String paymentKey, @RequestParam int amount) {
+		ModelAndView modelAndView = new ModelAndView("accnut/success");
+		modelAndView.addObject("paymentType", paymentType);
+        modelAndView.addObject("orderId", orderId);
+        modelAndView.addObject("paymentKey", paymentKey);
+        modelAndView.addObject("amount", amount);
+        return modelAndView;
+	}
+	
+	@GetMapping("fail")
+	public ModelAndView failTest(@RequestParam String message, @RequestParam String code) {
+		ModelAndView modelAndView = new ModelAndView("accnut/fail");
+		modelAndView.addObject("message", message);
+        modelAndView.addObject("code", code);
+        return modelAndView;
+	}
+	
+	// 계좌 조회 할 페이지 => 실패함 accessToken이 없음
+	@GetMapping("accTest")
+	public String acc1Test(Model model) {
+//		model.addAttribute("list", assetService.list());
+		return "accnut/accTest";
+	}
+	
 	
 	
 }

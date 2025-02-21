@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>계좌 조회</title>
+    <script>
+        async function fetchAccountBalance() {
+            const fintechUseNum = "123456789012345678901234"; // 테스트용 핀테크 번호
+            const accessToken = "YOUR_ACCESS_TOKEN"; // API 호출을 위한 액세스 토큰
+            const bankTranId = "F123456789U123456789"; // 고유 거래 ID
+            const tranDtime = new Date().toISOString().replace(/[-:T.]/g, '').substring(0, 14); // YYYYMMDDHHMMSS
+            
+            // CORS 문제 해결을 위해 프록시 서버 사용
+            const proxyUrl = "https://your-proxy-server.com/proxy?url="; // 프록시 서버 URL 설정
+            const apiUrl = `https://openapi.openbanking.or.kr/v2.0/account/balance/fin_num?bank_tran_id=${bankTranId}&fintech_use_num=${fintechUseNum}&tran_dtime=${tranDtime}`;
+            
+            const response = await fetch(proxyUrl + encodeURIComponent(apiUrl), {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${accessToken}`,
+                    "Content-Type": "application/json"
+                }
+            });
+            
+            if (!response.ok) {
+                alert("계좌 조회 중 오류 발생");
+                return;
+            }
+            
+            const data = await response.json();
+            document.getElementById("balance").innerText = data.balance_amt ? data.balance_amt + " 원" : "조회 실패";
+            document.getElementById("account_name").innerText = data.product_name || "알 수 없음";
+            document.getElementById("bank_name").innerText = data.bank_name || "알 수 없음";
+        }
+    </script>
+</head>
+<body>
+    <h2>계좌 조회</h2>
+    <button onclick="fetchAccountBalance()">잔액 조회</button>
+    <p><strong>은행명:</strong> <span id="bank_name">-</span></p>
+    <p><strong>계좌명:</strong> <span id="account_name">-</span></p>
+    <p><strong>잔액:</strong> <span id="balance">-</span></p>
+</body>
+</html>

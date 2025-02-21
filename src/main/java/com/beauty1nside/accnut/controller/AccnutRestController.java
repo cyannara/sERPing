@@ -2,6 +2,7 @@ package com.beauty1nside.accnut.controller;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpEntity;
@@ -34,12 +35,14 @@ import com.beauty1nside.accnut.service.DealBookService;
 import com.beauty1nside.accnut.service.DebtService;
 import com.beauty1nside.accnut.service.EtcBookService;
 import com.beauty1nside.accnut.service.IncidentalCostService;
+import com.beauty1nside.accnut.service.JsonQueryService;
 import com.beauty1nside.accnut.service.SalaryBookService;
 import com.beauty1nside.common.GridArray;
 import com.beauty1nside.common.GridData;
 import com.beauty1nside.common.Paging;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -56,6 +59,7 @@ public class AccnutRestController {
 	final SalaryBookService salaryBookService;
 	final EtcBookService etcBookService;
 	final IncidentalCostService incidentalCostService;
+	JsonQueryService jsonQueryService;
 	
 	// 목록 조회 ------------------------------------------------------------------------------------------
 	
@@ -196,6 +200,25 @@ public class AccnutRestController {
 		Object result = grid.getArray( paging.getPage(), incidentalCostService.count(dto), incidentalCostService.list(dto) );
 		return result;
 	}
+	
+	
+	// String => json으로 출력
+    @GetMapping("/json/test")
+    public Object jsonTest() throws JsonMappingException, JsonProcessingException{
+    	
+            String jsonString = jsonQueryService.jsonTest();
+            GridArray grid = new GridArray();
+            
+            JsonNode jsonNode = grid.getJson(jsonString);
+            log.info(jsonNode.get("bhf_order").isArray());
+            log.info(jsonNode.fieldNames());
+            
+            
+            
+            
+            
+            return jsonNode;
+    }
 	
 	// 삽입 ----------------------------------------------------------------------------------------------
 	

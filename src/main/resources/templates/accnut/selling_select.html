@@ -1,10 +1,195 @@
 <!DOCTYPE html>
-<html>
+<html layout:decorate="~{layouts/layout}"
+      lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
 <meta charset="UTF-8">
-<title>매출 조회</title>
+<title>매출 조회</title>    
 </head>
-<body>
+<body layout:fragment="content">
+	<div class="container">
+		<!-- 메뉴이름 -->
+		 <div>
+			 <h2>매출 조회</h3>
+		 </div>
 
+		<!-- 검색창 -->
+		<div class="search-grid">
+			<!-- 검색창 첫줄 -->
+			<div class="row 1row">
+				<div class="col-1"></div>
+				<!-- 자산명 인풋 -->
+				<div class="col-5 row ">
+					<span class="label-search col-4">지점</span>
+					<select name="section" id="section" class="col-8 input-box">
+						<option value="" selected>전체</option>
+
+					</select>
+				</div>
+				<div class="col-1"></div>
+				<!-- 구분 인풋 -->
+				<div class="col-5 row ">
+					<span class="label-search col-4">주기</span>
+					<select name="section" id="section" class="col-8 input-box">
+						<option value="" selected>일별</option>
+
+					</select>
+				</div>
+			</div>
+			<!-- 검색창 두번째 줄 -->
+			<div class="row 2row">
+				<div class="col-1"></div>
+				<!-- 금융기관 인풋 -->
+				<div class="col-5 row ">
+					<span class="label-search col-4">상품</span>
+					<input type="text" name="financialInstitution" id="financialInstitution" class="col-8 input-box">
+				</div>
+				<div class="col-1"></div>
+				<!-- 그리드 표시 수량 인풋 -->
+				<div class="col-5 row ">
+					<span class="label-search col-4">날짜</span>
+					<input type="date" name="perdate" id="perdate" class="col-8 input-box">
+				</div>
+			</div>
+			<div class="row 4row">
+				<div class="col-1"></div>
+				<div class="col-5 row ">
+					<span class="label-search col-4">표시수량</span>
+					<select name="display_amount" id="display_amount" class="col-8 input-box" onchange="changeDisplay()">
+						<option value="5" selected>5</option>
+						<option value="10">10</option>
+						<option value="20">20</option>
+						<option value="50">50</option>
+						<option value="100">100</option>
+					</select>
+				</div>
+			</div>
+			<!-- 검색 버튼 줄 -->
+			<div class="row 3row">
+				<div class="col-4"></div>
+				<button type="button" class="btn btn-primary col-1" onclick="search()">검색</button>
+				<div class="col-1"></div>
+				<button type="button" class="btn btn-secondary col-1" onclick="reset()">초기화</button>
+			</div>
+
+		</div>
+		<!-- 그리드 -->
+		<div id="table-container">
+			<div id="grid"></div>
+			<div id="pagination" class="tui-pagination"></div>
+		</div>
+		<!-- 하부 버튼 -->
+		<div class="button-bar row">
+			<div class="col-1"></div>
+			<button type="button" class="btn btn-primary col-1 btnExcel">Excel</button>
+			<button type="button" class="btn btn-secondary col-1">PDF</button>
+			<div class="col-7"></div>
+		</div>
+		<!-- 상품 검색 모달 -->
+		<div th:replace="purchs/ModalTemplate :: ModalTemplate (
+						    	'goodsSearchModal', 
+						    	'modal-xl', 
+						    	'상품 검색', 
+						    	'accnut/assetDetail', 
+						    	'accnut/assetFooter'
+						    )"></div>
+		
+	</div>
+<script>
+	document.addEventListener("DOMContentLoaded",()=>{
+		getInfo();
+		downExcel();
+	});
+
+	var Grid = tui.Grid;
+	
+	const dataSource = {
+		api: {
+			readData: { url: 'http://localhost:81/accnut/rest/asset/list', method: 'GET', initParams: { page: 1 }},
+			
+		},
+		contentType: 'application/json'
+			
+	};
+	const grid = new Grid({
+		el : document.querySelector('#grid'),
+		pageOptions: {
+			useClient : false,
+			perPage: parseInt(document.querySelector('#display_amount').value) ,
+		},
+		columns: [
+			{ header : "코드", name : "assetsCode",  sortable : true, hidden: 1},
+			{ header : "지점명", name : "assetsName",  sortable : true},
+			{ header : "일자", name : "registerDate",  sortable : true},
+			{ header : "매출액", name : "amount",  sortable : true},
+			{ header : "실수익", name : "amount",  sortable : true},
+			{ header : "총판매량", name : "amount",  sortable : true},
+			{ header : "금액", name : "amount",  sortable : true},
+			{ header : "상세보기", name : "detail", formatter : () => '<button class="btn btn-warning btn-sm btnInfo" data-bs-toggle="modal" data-bs-target="#assetdetailModal">상세보기</button>', align: 'center'},
+			
+		],
+		data : dataSource,
+	});
+
+	function changeDisplay() {
+		let gap = parseInt(document.querySelector('#display_amount').value);
+		grid.setPerPage(gap,dataSource);
+	}
+
+	function search(){
+		let assetName = document.querySelector('#assetsName').value;
+		let section = document.querySelector('#section').value.toString();
+		let institution = document.querySelector('#financialInstitution').value.toString();
+		grid.setRequestParams({"assetsName" : assetName, "section" : section, "financialInstitution" : institution });
+		grid.readData();
+	}
+	
+	function reset(){
+		let assetName = document.querySelector('#assetsName').value = '';
+		let section = document.querySelector('#section').value = '';
+		let institution = document.querySelector('#financialInstitution').value = '';
+		grid.setRequestParams({"assetsName" : assetName, "section" : section, "financialInstitution" : institution });
+		grid.readData();
+	}
+	
+
+	function getInfo(){
+		// 처음에 가져왔을때 실행
+		clickFn()
+		// 검색 진행 했을 때 => 그리드 업데이트 되었을 때
+		grid.on("onGridUpdated", () =>{
+			clickFn()
+		})
+	}
+	
+	var rowData = [];
+	
+	function clickFn() {
+		document.querySelectorAll('.btnInfo').forEach((btn, idx) => {
+			btn.addEventListener("click", () => {
+				rowData = grid.getRow(idx);
+			})
+		})
+	}
+	
+	function downExcel(){
+		let btnExcel = document.querySelector('.btnExcel');
+		btnExcel.addEventListener("click", function () {
+		       const options = {
+		         				includeHiddenColumns: true,
+		         				//onlySelected: true,
+		         				fileName: 'asset',
+		       					};
+		       grid.export('xlsx', options);
+	     })
+	}
+	
+	
+	
+
+</script>
+	
 </body>
+
 </html>
