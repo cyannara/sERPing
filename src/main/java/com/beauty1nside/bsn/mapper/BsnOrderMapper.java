@@ -46,6 +46,9 @@ public interface BsnOrderMapper {
 	
 	
 	
+	//임시
+	List<BsnOrderDTO> selectBsnDelivery(OrderSearchDTO orderSearchDTO);
+	
 	//상품 재고 LOT별 조회(임시)
 	List<BsnGoodsLOTDTO> selectGoodsWarehouseLot(BsnOrderDetailDTO bsnOrderDetailDTO);
 }

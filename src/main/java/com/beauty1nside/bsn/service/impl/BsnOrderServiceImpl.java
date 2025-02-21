@@ -76,7 +76,10 @@ public class BsnOrderServiceImpl implements BsnOrderService {
 		return bsnOrderMapper.getCountOfBsnOrderDetail(bsnOrderDTO);
 	}
 	
-	
+	@Override
+	public List<BsnOrderDTO> getBsnDelivery(OrderSearchDTO orderSearchDTO) {
+		return bsnOrderMapper.selectBsnDelivery(orderSearchDTO);
+	}
 	
 	
 	//(임시) 상품 재고 LOT별 조회
@@ -84,5 +87,6 @@ public class BsnOrderServiceImpl implements BsnOrderService {
 	public List<BsnGoodsLOTDTO> getGoodsWarehouseLot(BsnOrderDetailDTO bsnOrderDetailDTO) {
 		return bsnOrderMapper.selectGoodsWarehouseLot(bsnOrderDetailDTO);
 	}
+	
 
 }

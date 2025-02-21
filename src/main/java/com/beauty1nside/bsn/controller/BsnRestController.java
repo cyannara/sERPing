@@ -181,10 +181,31 @@ public class BsnRestController {
 
 	};
 	
+	//임시 
+	@GetMapping("/deli")
+	public Object goodsLot(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
+			@RequestParam(name ="page", defaultValue = "1", required = false) int page,
+			OrderSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException  {
+	
+		//한 페이지에 출력할 수 : 기본값: 5
+				paging.setPageUnit(perPage);
+				//현재 페이지(기본값: 1)
+				paging.setPage(page);
+				
+				//첫 페이지, 마지막 페이지
+				dto.setStart(paging.getFirst());
+				dto.setEnd(paging.getLast());
+
+				
+				GridArray grid = new GridArray();
+				Object result = grid.getArray(paging.getPage(), 10, bsnOrderService.getBsnDelivery(dto));
+
+				return result;	
+	}
 	
 	
 	
-	
+	//임시 창고
 	@GetMapping("/goods/lot")
 	public Object goodsLot(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
 			@RequestParam(name ="page", defaultValue = "1", required = false) int page,
@@ -202,7 +223,7 @@ public class BsnRestController {
 				dto.setOrderId(optionCode);
 				
 				GridArray grid = new GridArray();
-				Object result = grid.getArray(paging.getPage(), 2, bsnOrderService.getGoodsWarehouseLot(dto) );
+				Object result = grid.getArray(paging.getPage(), 10, bsnOrderService.getGoodsWarehouseLot(dto) );
 
 				return result;	
 	}

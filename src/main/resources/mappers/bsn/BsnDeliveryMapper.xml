@@ -3,6 +3,26 @@
 <mapper namespace="com.beauty1nside.bsn.mapper.BsnOrderMapper">
 
 
+<select id="selectBsnDelivery">
+SELECT ROW_NUMBER() OVER (
+              ORDER BY TO_NUMBER(REGEXP_SUBSTR(bd.delivery_id, '\d+')) desc
+       ) AS RN,
+       bd.delivery_id, 
+       bd.order_id,
+       bd.delivery_date,
+       bd.employee_num,
+       bd.delivery_status,
+       bd.remark,
+       bd.company_num,
+       bo.order_code,
+       bo.branch_office_id,
+       bo.order_date,
+       bo.due_date
+
+FROM bsn_delivery bd
+JOIN bsn_order bo ON bo.order_id = bd.order_id
+</select>
+
 <select id="selectGoodsWarehouseLot">
 SELECT goods_lot_num,
        goods_consumption_date,
