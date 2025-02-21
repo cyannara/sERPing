@@ -80,27 +80,22 @@
           <img src="/images/faces/face28.jpg" alt="profile"/>
         </a>
         <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
-          <a class="dropdown-item">
-            <i class="ti-settings text-primary"></i>
-            Settings
-          </a>
-          <a
-                  class="dropdown-item"
-                  th:classappend="${#authorization.expression('isAuthenticated()')} ? 'hide'" href="/login"
-          >
-            <i class="ti-power-off text-primary"></i>로그인
+          <span th:inline="text" sec:authentication="name" class="empId"></span>
+          <a class="dropdown-item mymenu mypage" href="/mypage">
+            <i class="mdi mdi-account-circle"></i>
+            마이페이지
           </a>
           <form th:action="@{/logout}" method="post">
-            <span th:inline="text">
-              Hello
-              <span th:remove="tag" sec:authentication="name"></span>
-              !
-            </span>
-            <a class="dropdown-item">
-              <i class="ti-power-off text-primary"></i>
+            <a class="dropdown-item mymenu">
+              <i class="mdi mdi-logout"></i>
               <input type="submit" value="로그아웃"/>
             </a>
           </form>
+          <a th:classappend="${#authorization.expression('isAuthenticated()')} ? 'hide'" href="/login">
+            <i class="ti-power-off text-primary"></i>
+            로그인
+          </a>
+
         </div>
       </li>
       <li class="nav-item nav-settings d-none d-lg-flex">

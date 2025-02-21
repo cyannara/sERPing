@@ -38,6 +38,45 @@ nav a:hover {
  }
 
  .hide {
-     display: none;
+     display: none !important;
+ }
+
+ .mymenu {
+     margin: 0;
+     &:hover {
+         transform: none;
+     }
+ }
+
+ .mypage {
+     margin: 20px 0 0 0;
+ }
+
+ .empId {
+     background-color: #4747A1;
+     color: white;
+     border-radius: 8px;
+     padding: 6px 10px;
+     margin: 20px 0 0 20px;
+ }
+
+ .navbar-dropdown {
+     padding: 20px 0 0 0;
+ }
+
+ form {
+     a > input {
+         outline: none;
+         border: none;
+         background-color: transparent;
+         padding: 0;
+
+     }
+     &:hover {
+         a > input {
+             font-weight: 800;
+         }
+     }
+
  }
 
