@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.beauty1nside.bsn.dto.BhfOrderDTO;
 import com.beauty1nside.bsn.dto.BsnOrderDTO;
+import com.beauty1nside.bsn.dto.BsnOrderDetailDTO;
 import com.beauty1nside.bsn.dto.OrderSearchDTO;
 import com.beauty1nside.bsn.service.BsnOrderService;
 import com.beauty1nside.common.GridArray;
@@ -154,8 +155,55 @@ public class BsnRestController {
 
 		//검색결과 - 해당 페이지 내용
 		return result;		
-				
-		
 	};
 	
+	@GetMapping("/orderList/detail")
+	public Object bsnOrderDetail(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
+			@RequestParam(name ="page", defaultValue = "1", required = false) int page,
+			@RequestParam(name = "orderId", defaultValue = "bsn_order12") String orderId,
+			BsnOrderDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException  {
+		
+		
+		//한 페이지에 출력할 수 : 기본값: 5
+		paging.setPageUnit(perPage);
+		//현재 페이지(기본값: 1)
+		paging.setPage(page);
+		
+		//첫 페이지, 마지막 페이지
+		dto.setStart(paging.getFirst());
+		dto.setEnd(paging.getLast());
+		dto.setOrderId(orderId);
+		
+		GridArray grid = new GridArray();
+		Object result = grid.getArray(paging.getPage(), bsnOrderService.getCountOfBsnOrderDetail(dto), bsnOrderService.getBsnOrderDetail(dto) );
+
+		return result;		
+
+	};
+	
+	
+	
+	
+	
+	@GetMapping("/goods/lot")
+	public Object goodsLot(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
+			@RequestParam(name ="page", defaultValue = "1", required = false) int page,
+			@RequestParam(name = "optionCode", defaultValue = "LH0011") String optionCode,
+			BsnOrderDetailDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException  {
+	
+		//한 페이지에 출력할 수 : 기본값: 5
+				paging.setPageUnit(perPage);
+				//현재 페이지(기본값: 1)
+				paging.setPage(page);
+				
+				//첫 페이지, 마지막 페이지
+				dto.setStart(paging.getFirst());
+				dto.setEnd(paging.getLast());
+				dto.setOrderId(optionCode);
+				
+				GridArray grid = new GridArray();
+				Object result = grid.getArray(paging.getPage(), 2, bsnOrderService.getGoodsWarehouseLot(dto) );
+
+				return result;	
+	}
 }

@@ -6,7 +6,9 @@ import org.springframework.stereotype.Service;
 
 import com.beauty1nside.bsn.dto.BhfOrderDTO;
 import com.beauty1nside.bsn.dto.BhfOrderDetailDTO;
+import com.beauty1nside.bsn.dto.BsnGoodsLOTDTO;
 import com.beauty1nside.bsn.dto.BsnOrderDTO;
+import com.beauty1nside.bsn.dto.BsnOrderDetailDTO;
 import com.beauty1nside.bsn.dto.OrderSearchDTO;
 import com.beauty1nside.bsn.mapper.BsnOrderMapper;
 import com.beauty1nside.bsn.service.BsnOrderService;
@@ -44,8 +46,8 @@ public class BsnOrderServiceImpl implements BsnOrderService {
 
 	//주문등록
 	@Override
-	public void registerOrder(BsnOrderDTO bsnOrederDTO) {
-		bsnOrderMapper.insertBsnOrder(bsnOrederDTO);
+	public void registerOrder(BsnOrderDTO bsnOrderDTO) {
+		bsnOrderMapper.insertBsnOrder(bsnOrderDTO);
 		
 	}
 	//발주요청 취소
@@ -64,6 +66,23 @@ public class BsnOrderServiceImpl implements BsnOrderService {
 	@Override
 	public int getCountOfBsnOrder(OrderSearchDTO orderSearchDTO) {
 		return bsnOrderMapper.getCountOfBsnOrder(orderSearchDTO);
+	}
+	@Override
+	public List<BsnOrderDetailDTO> getBsnOrderDetail(BsnOrderDTO bsnOrderDTO) {
+		return bsnOrderMapper.selectBsnOrderDetail(bsnOrderDTO);
+	}
+	@Override
+	public int getCountOfBsnOrderDetail(BsnOrderDTO bsnOrderDTO) {
+		return bsnOrderMapper.getCountOfBsnOrderDetail(bsnOrderDTO);
+	}
+	
+	
+	
+	
+	//(임시) 상품 재고 LOT별 조회
+	@Override
+	public List<BsnGoodsLOTDTO> getGoodsWarehouseLot(BsnOrderDetailDTO bsnOrderDetailDTO) {
+		return bsnOrderMapper.selectGoodsWarehouseLot(bsnOrderDetailDTO);
 	}
 
 }

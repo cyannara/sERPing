@@ -4,7 +4,9 @@ import java.util.List;
 
 import com.beauty1nside.bsn.dto.BhfOrderDTO;
 import com.beauty1nside.bsn.dto.BhfOrderDetailDTO;
+import com.beauty1nside.bsn.dto.BsnGoodsLOTDTO;
 import com.beauty1nside.bsn.dto.BsnOrderDTO;
+import com.beauty1nside.bsn.dto.BsnOrderDetailDTO;
 import com.beauty1nside.bsn.dto.OrderSearchDTO;
 
 public interface BsnOrderService {
@@ -31,4 +33,16 @@ public interface BsnOrderService {
 	public List<BsnOrderDTO> getBsnOrder(OrderSearchDTO orderSearchDTO);
 	//주문 수 구하기
 	public int getCountOfBsnOrder(OrderSearchDTO orderSearchDTO);
+	
+	//주문상세조회
+	public List<BsnOrderDetailDTO> getBsnOrderDetail(BsnOrderDTO bsnOrederDTO);
+	//주문상세 수 구하기
+	public int getCountOfBsnOrderDetail(BsnOrderDTO bsnOrederDTO);
+	
+	
+	
+	//본사 창고 재고(LOT별)조회 임시
+	public List<BsnGoodsLOTDTO> getGoodsWarehouseLot(BsnOrderDetailDTO bsnOrderDetailDTO);
+	
+	
 }

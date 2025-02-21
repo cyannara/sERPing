@@ -96,8 +96,9 @@ SELECT order_detail_code,
        goods_standard,
        quantity
 FROM (
-SELECT /*+ INDEX_ASC(bhf_order_detail order_detail_code) */ 
-      ROWNUM RN
+SELECT ROW_NUMBER() OVER (
+              ORDER BY TO_NUMBER(REGEXP_SUBSTR(order_detail_code, '\d+')) ASC
+       ) AS RN
       ,order_detail_code,
        order_code,
        goods_code,
@@ -113,8 +114,6 @@ WHERE  order_code = #{orderCode}
 AND ROWNUM <= #{end}
 ]]>
 ) WHERE RN >= #{start}
-
-ORDER BY order_detail_code
 </select>
 
 <select id="getCountOfBhfOrderDetail" parameterType="BhfOrderDTO" resultType="int">

@@ -79,4 +79,44 @@ WHERE   company_num = 1
 	</if>
 </sql>
 
+<select id="selectBsnOrderDetail" resultType="BsnOrderDetailDTO">
+SELECT order_detail_id,
+       order_id,
+       goods_code,
+       goods_name,
+       option_code,
+       option_name,
+       quantity,
+       goods_standard,
+       unit_price,
+       summation_amt
+FROM (
+SELECT /*+ INDEX_ASC(bsn_order_detail PK_BSN_ORDER_DETAIL) */
+       ROWNUM rn,
+       order_detail_id,
+       order_id,
+       goods_code,
+       goods_name,
+       option_code,
+       option_name,
+       quantity,
+       goods_standard,
+       unit_price,
+       summation_amt
+FROM bsn_order_detail
+WHERE order_id = #{orderId}
+<![CDATA[
+AND ROWNUM <= #{end}
+]]>
+)
+WHERE RN >= #{start}
+
+</select>
+
+<select id="getCountOfBsnOrderDetail" resultType="int">
+SELECT COUNT(*)
+FROM bsn_order_detail
+WHERE order_id = #{orderId}
+</select>
+
 </mapper>

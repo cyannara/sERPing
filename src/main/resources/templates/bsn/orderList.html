@@ -25,7 +25,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
   <!-- 페이지 내용 시작 -->
 
       <div class="container">
-		<h3>주문 등록</h3>
+		<h3>주문 목록</h3>
         <div class="row mb-3">
 	        <div class="col-12">
 	            <div class="card">
@@ -90,17 +90,31 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         
         <div class="row">
         	<div class="col-md-12  grid-margin stretch-card">
-            <div class="card">
-              <div class="card-body">
-                <h4 class="card-title">검색 조건</h4>
-                <p class="card-description">그리드 - 검색한 지점측 발주 신청 리스트 출력</p>
-                <div id="orderList"></div>
-                <div id="pagination" class="tui-pagination"></div>
+            	<div class="card">
+              		<div class="card-body">
+                		<h4 class="card-title">주문 목록</h4>
+                		<p class="card-description">그리드 - 검색한 주문 리스트 출력</p>
+                		<div id="orderList"></div>
+               		 	<div id="pagination" class="tui-pagination"></div>
+              		</div>
+            	</div>
+          	</div>
 
-              </div>
-            </div>
-          </div>
         </div>
+        <div class="row">
+          	<div class="col-md-12  grid-margin stretch-card">
+            	<div class="card">
+              		<div class="card-body">
+                		<h4 class="card-title">주문 상세</h4>
+                		<p class="card-description"></p>
+                		<div id="orderDetail"></div>
+               		 	<div id="pagination" class="tui-pagination"></div>
+              		</div>
+            	</div>
+          	</div>
+        </div>
+        
+        
         
         
         
@@ -120,13 +134,14 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
     }
     
 	var Grid = tui.Grid;
-
-	const dataSource = {
+	const OrderListDataSource = {
 			api: {
 				readData: { url: 'http://localhost:81/bsn/rest/orderList', method: 'GET', initParams: { page: 1 }},
 			},
 			contentType: 'application/json'
-		};
+	};
+	
+	
 	//상품 테이블
 	const orderList = new Grid({
 			el: document.getElementById('orderList'), // 컨테이너 엘리먼트
@@ -144,7 +159,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 			{ header : "납기일", name : "dueDate", formatter: ({ value }) => formatDate(value, 'due'), width: 'auto', sortable : true},
 			{ header : "비고", name : "remark", width: 'auto'},
 		],
-		data: dataSource
+		data: OrderListDataSource
 	});
 	
 	//그리드 날짜 형식 변경(데이터 수정X, 표기만)
@@ -178,6 +193,83 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	    
 	    orderList.readData(1, params, true);
 	}
+	
+	//주문 클릭 시 상세 불러오기
+	orderList.on('click', (ev) => {
+		
+		
+	    const rowKey = ev.rowKey; // 클릭한 행의 키
+	    if (!rowKey) {
+	        return;
+	    }
+	    
+	    //console.log(rowKey);
+	    const rowData = orderList.getRow(rowKey); // 클릭한 행 데이터 가져오기
+	    console.log(rowData.orderId);
+	    if (rowData && rowData.orderId) {
+	        loadOrderDetail(rowData.orderId); // 상세 정보 불러오기
+	    }
+	});
+	
+	//불러오는 함수
+	function loadOrderDetail(orderId) {
+		if (!orderId) {
+	        console.warn("유효하지 않은 주문 Id입니다.");
+	        return;
+	    }
+		
+	    fetch(`http://localhost:81/bsn/rest/orderList/detail?orderId=${orderId}`)
+	    	
+	        .then(response => {
+		            if (!response.ok) throw new Error(`HTTP 오류! 상태: ${response.status}`);
+		            return response.json();
+		     })
+		     
+	        .then(data => {
+	            if (data && data.data && data.data.contents) {
+	            	const detailData = data.data.contents; // 상세 데이터 저장
+	            	
+	            	//총액 계산
+	            	detailData.forEach(item => {
+	                    if (item.unitPrice && item.quantity) {
+	                        item.totalPrice = item.unitPrice * item.quantity;
+	                    } else {
+	                        item.totalPrice = 0; // 단가나 수량이 없으면 0으로 설정
+	                    }
+	                });
+	            	//
+	                orderDetailGrid.resetData(detailData);
+	            } else {
+	                console.warn("상세 데이터가 없습니다.");
+	                orderDetailGrid.resetData([]); // 빈 배열로 초기화
+	            }
+	        })
+	        .catch(error => console.error('Error fetching order detail:', error));
+	}
+	
+	//상세 그리드 형식
+	const orderDetailGrid = new Grid({
+    el: document.getElementById('orderDetail'),
+    columns: [
+        { header: "상품명", name: "goodsName", 
+        //	width: 'auto' ,	
+        },
+        { header: "옵션명", name: "optionName", },
+        { header: "상품코드", name: "goodsCode",  },
+        { header: "옵션코드", name: "optionCode",  },
+        { header: "수량", name: "quantity",  },
+        { header: "단가", name: "unitPrice",  },
+        { header: "총액", name: "totalPrice",  }
+    ],
+    pageOptions: {
+        useClient: false,
+        perPage: 5
+    }
+	
+	
+});
+	
+
 </script>
 
 
