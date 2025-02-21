@@ -242,3 +242,23 @@ UPDATE (SELECT a.quantity as asd, b.quantity as def, a.warehouse_code, b.returni
         FROM bhf_warehouse a
         JOIN bhf_returning_detail b ON a.option_code = b.option_code)
 SET asd = (asd - def);
+
+-- 2025-02-20
+
+select * from accnut_assets order by 1;
+select * from cmmn where upper_cmmn_code like '%AC%';
+
+select * from accnut_dealings_account_book order by 1;
+
+select b.*
+from (select a.*, rownum rn
+     from (select * 
+            from cmmn 
+            order by 1) a)b
+where b.rn <= 20
+and b.rn >= 16;
+
+select * from hr_employee;
+
+select * from cmmn;
+select * from hr_department;

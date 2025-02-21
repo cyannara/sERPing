@@ -46,9 +46,11 @@
 			],
 			data : checkArray
 		});
+		//console.log(checkArray);
+		if(checkArray.length > 0) {
+			document.querySelector('#payString').insertAdjacentText("beforeend", `${checkArray[0].employeeName} 외 ${checkArray.length - 1}명, ${total}원`);		
+		}
 		
-		document.querySelector('#payString').insertAdjacentText("beforeend", `${checkArray[0].employeeName} 외 ${checkArray.length - 1}명, ${total}원`);
-
 		
 	});
 	
@@ -57,6 +59,7 @@
 		document.querySelector('#salaryModal').querySelector('.container').querySelector('#salgrid').remove();
 		document.querySelector('#payString').innerHTML = '다음과 같이 지급하시겠습니까? <br>';
 		html = "";
+		//checkArray = [];
 	});
 	
 	
