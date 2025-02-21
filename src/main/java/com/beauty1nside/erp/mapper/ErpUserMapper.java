@@ -6,7 +6,10 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Param;
 
 import com.beauty1nside.erp.dto.ContractDTO;
+import com.beauty1nside.erp.dto.ErpSearchDTO;
 import com.beauty1nside.erp.dto.ErpSubOptionDTO;
+import com.beauty1nside.erp.dto.SubScriptionDTO;
+import com.beauty1nside.erp.dto.SubscriptionDetailDTO;
 import com.beauty1nside.erp.dto.erpSubscriptionInfoListDTO;
 
 /**
@@ -24,6 +27,7 @@ import com.beauty1nside.erp.dto.erpSubscriptionInfoListDTO;
  *  2025.02.17  표하연          최초 생성
  *  2025.02.18  표하연          기간 구독 결제 서비스 생성
  *  2025.02.20  표하연          사용계약서 정보를 CR 한다
+ *  2025.02.21  표하연          결제 목록을 리드한다
  *
  *  </pre>
 */
@@ -76,7 +80,11 @@ public interface ErpUserMapper {
      * @param int
      * @return int
      */
-	public int prosubscriptiontail(@Param("subscriptionNum") int subscriptionNum, @Param("subscriptionOptionNum") int subscriptionOptionNum);
+	public int prosubscriptiontail(@Param("subscriptionNum") int subscriptionNum, 
+									@Param("subscriptionOptionNum") int subscriptionOptionNum,
+									@Param("subscriptionPeriod") int subscriptionPeriod,
+									@Param("subscriptionOptionPrice") String subscriptionOptionPrice
+									);
 	
 	/**
      * 구독 옵션 정보를 가져온다 단일 레코드
@@ -135,5 +143,29 @@ public interface ErpUserMapper {
      * @return ContractDTO
      */
 	public ContractDTO readcontract(int companyNum);
+	
+	/**
+     * 결제 정보 리스트를 조회
+     *
+     * @param ErpSearchDTO
+     * @return List<subscriptioncount>
+     */
+	public List<SubScriptionDTO> subscriptionlist(ErpSearchDTO searchDTO);
+	
+	/**
+     * 결제 정보 리스트의 갯수를 조회
+     *
+     * @param ErpSearchDTO
+     * @return int
+     */
+	public int subscriptioncount(ErpSearchDTO searchDTO);
+	
+	/**
+     * 구독리스트의 상세 구독내역을 가져온다
+     *
+     * @param int
+     * @return List<SubscriptionDetailDTO>
+     */
+	public List<SubscriptionDetailDTO> subscriptionDetail(int subscriptionNum);
 	
 }

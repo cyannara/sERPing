@@ -11,11 +11,18 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.beauty1nside.common.GridArray;
+import com.beauty1nside.common.Paging;
 import com.beauty1nside.erp.dto.ContractDTO;
+import com.beauty1nside.erp.dto.ErpSearchDTO;
+import com.beauty1nside.erp.dto.SubscriptionDetailDTO;
 import com.beauty1nside.erp.dto.erpSubscriptionInfoListDTO;
 import com.beauty1nside.erp.service.ErpUserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.log4j.Log4j2;
@@ -34,7 +41,7 @@ import lombok.extern.log4j.Log4j2;
  *  -------    --------    ---------------------------
  *  2025.02.17  표하연          최초 생성
  *  2025.02.18  표하연          결제 모듈 등록
- *  2025.02.20  표하연          전자계약 모듈 등록
+ *  2025.02.20  표하연          전자계약 모듈 등록 / 구독내역 리스트 전달
  *
  *  </pre>
 */
@@ -165,4 +172,55 @@ public class ErpUserRestController {
 	public ContractDTO contactread(@PathVariable(name="compnayNum") int compnayNum) {
 		return erpUserService.readcontract(compnayNum);
 	}
+	
+	/**
+     * 회사의 지금까지 구독한 리스트를 가져온다
+     *
+     * @param int
+     * @param int
+     * @param int
+     * @param ErpSearchDTO
+     * @param Paging
+     * @return Object
+     * @throws JsonMappingException
+     * @throws JsonProcessingException
+     */
+	//@GetMapping("/subscriptionlist/{compnayNum}")
+	@GetMapping("/subscriptionlist")
+	public Object subscriptionlist(
+			@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
+			@RequestParam(name = "page", defaultValue = "1", required = false) int page,
+			//@PathVariable(name="compnayNum") int compnayNum,
+			ErpSearchDTO dto,
+			Paging paging
+			) throws JsonMappingException, JsonProcessingException{
+		
+		//한페이지에 몇개 나오게 할껀지
+		paging.setPageUnit(perPage);
+		// 현재 페이지 셋팅
+		paging.setPage(page);
+		log.info("★★★"+dto);
+		// 페이징 조건
+		dto.setStart(paging.getFirst());
+		dto.setEnd(paging.getLast());
+		// 페이징처리
+		paging.setTotalRecord(erpUserService.subscriptioncount(dto));
+				
+		// grid 배열 처리
+		GridArray grid = new GridArray();
+		Object result = grid.getArray( paging.getPage(), paging.getTotalRecord(), erpUserService.subscriptionlist(dto) );
+		return result;
+	}
+	
+	/**
+     * 구독리스트의 상세 구독내역을 가져온다
+     *
+     * @param int
+     * @return List<SubscriptionDetailDTO>
+     */
+	@GetMapping("/subscriptionDetail/{subscriptionNum}")
+	public List<SubscriptionDetailDTO> subscriptionDetail(@PathVariable(name="subscriptionNum") int subscriptionNum) {
+		return erpUserService.subscriptionDetail(subscriptionNum);
+	}
+	
 }
