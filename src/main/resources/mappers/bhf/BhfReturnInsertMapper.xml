@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beauty1nside.bhf.mapper.BhfReturnInsertMapper">
+
+	<!-- 바코드 입력시 나오는 조회 -->
+	<select id="barcodeSearch" resultType="BhfBarcodeDTO" parameterType="BhfBarcodeSearchDTO">
+		select  branch_office_id,
+				goods_code,
+        		goods_name,
+		        option_code,
+		        option_name,
+		        goods_barcode,
+		        goods_lot_num,
+		        goods_consumption_date
+		from (	select  rownum rn,
+						w.branch_office_id,
+						w.goods_code,
+		        		w.goods_name,
+				        w.option_code,
+				        w.option_name,
+				        i.goods_barcode,
+				        i.goods_lot_num,
+				        i.goods_consumption_date
+				from    bhf_warehouse w join bhf_in_list i on w.warehouse_code = i.warehouse_code
+		<![CDATA[
+			where rownum <= #{end}
+		]]>
+			and i.goods_barcode = #{goodsBarcode} and w.company_num = 1 and w.branch_office_id = 'yedam'
+			)
+		where rn >= #{start}
+	</select>
+	
+	<!-- 페이징에 전체숫자 알려주기 위해서 -->
+	<select id="count" parameterType="BhfBarcodeSearchDTO">
+		SELECT COUNT(w.warehouse_code)
+		FROM   bhf_warehouse w
+	</select>
+
+</mapper>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layouts/layout}"
+      lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<title>교환 및 반품 요청</title>
+</head>
+<body layout:fragment="content">
+	<div class="container">
+		<div class="row">
+			<h3 class="mt-2 mb-2">교환 및 반품 요청</h3>
+			<hr>
+			<div class="col-md-12 stretch-card mt-3 mb-5">
+				<div class="card">
+					<div class="card-body">
+						<h5 class="mb-4">상품 바코드</h5>
+						<hr>
+						<div class="row">
+							<div class="col-sm-1"></div>
+							<input type="text"class="col-sm-10" id="searchInput" style="text-align:center;  height:50px;" placeholder="바코드 숫자를 입력 후 엔터를 눌러주세요.">
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-12 stretch-card mt-3 mb-5">
+				<div class="card">
+					<div class="card-body">
+						<h5 class="mb-4">상품 정보</h5>
+						<div id="barcode"></div>
+						<div id="pagination" class="tui-pagination"></div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-12 stretch-card mt-3 mb-5">
+				<div class="card">
+					<div class="card-body">
+						<h5 class="mb-4">반품 요청서</h5>
+						<div id="returns"></div>
+						<div id="pagination" class="tui-pagination"></div>
+						<div style="text-align : center">
+							<button onclick="returnInsert()">등록</button>
+							<button onclick="reset()">초기화</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script>
+		var Grid = tui.Grid;
+		
+        function search() {
+            let goodsBarcode = document.getElementById("searchInput").value.trim(); //.trim() 공백을 없애준다
+            if (goodsBarcode !== "") {
+                // 여기서 검색 기능을 실행 (예: 서버 요청)
+	            console.log(goodsBarcode)
+	         	
+	            fetch('http://localhost:81/bhf/rest/barcode/list?goodsBarcode=' + goodsBarcode, {
+			        method: 'GET',
+			        headers: {
+			            'Content-Type': 'application/json'
+			        }
+			    })
+			    .then(response => response.json())
+			    .then(data => {
+			        grid.resetData(data.data.contents);  // 옵션 테이블 데이터 업데이트
+			    })
+			    .catch(error => console.error("데이터 요청 실패:", error));
+                
+            } else {
+                alert("검색어를 입력하세요.");
+            }
+        }
+
+        // 엔터 키 이벤트 감지
+        document.getElementById("searchInput").addEventListener("keydown", function(event) {
+            if (event.key === "Enter") { // Enter 키 감지
+                //event.preventDefault(); // 폼 제출 방지 (필요시)
+                search(); // 검색 실행
+            }
+        });
+        
+     	// 바코드 조회 테이블
+		const grid = new Grid({
+			el: document.getElementById('barcode'), // 컨테이너 엘리먼트
+			pageOptions: {
+				useClient: false,
+				perPage: 5,
+			},
+			columns: [ 
+				{ header : "지점명", name : "branchOfficeId"},
+				{ header : "상품코드", name : "goodsCode"},
+				{ header : "상품명", name : "goodsName"},
+				{ header : "옵션코드", name : "optionCode"},
+				{ header : "옵션명", name : "optionName"},
+				{ header : "바코드", name : "goodsBarcode"},
+				{ header : "상품LOT", name : "goodsLotNum"},
+				{ header : "유통기한", name : "goodsConsumptionDate"}
+			],
+			data: ""
+		});
+		// 바코드 조회 테이블 행 선택
+	    grid.on('click', (ev) => {
+	        const rowData = grid.getRow(ev.rowKey); // 해당 행의 데이터 가져오기
+	        if (rowData) {
+	            const currentData = grid2.getData(); // 기존 데이터 가져오기
+
+	            // 중복 체크(옵션코드가 동일한 행이 이미 있으면 추가하지 않음)
+	            const check = currentData.find(item => item.optionCode === rowData.optionCode);
+	            if (check) {
+	                alert("이미 추가된 상품 입니다.");
+	            } else {
+	                // 기존 데이터에서 가장 큰 rowKey 찾기 (없으면 0부터 시작) 그 다음 1씩 추가
+	                const newRowKey = currentData.length > 0
+	                    ? Math.max(...currentData.map(item => item.rowKey)) + 1
+	                    : 0;
+
+	                // 새로운 행에 rowKey 추가
+	                const newRow = { ...rowData, rowKey: newRowKey };
+
+	                // resetData 사용 시 기존 데이터의 rowKey도 재설정
+	                const updatedData = [...currentData, newRow].map((item, index) => ({
+	                    ...item,
+	                    rowKey: index // 고유한 rowKey 부여
+	                }));
+
+	                grid2.resetData(updatedData);
+	            }
+	        }
+	    });
+		// 바코드 조회 테이블
+		const grid2 = new Grid({
+			el: document.getElementById('returns'), // 컨테이너 엘리먼트
+			pageOptions: {
+				useClient: false,
+				perPage: 5,
+			},
+			columns: [ 
+				{ header : "지점명", name : "branchOfficeId", hidden: 1},
+				{ header : "상품코드", name : "goodsCode", hidden: 1},
+				{ header : "상품명", name : "goodsName"},
+				{ header : "옵션코드", name : "optionCode", hidden: 1},
+				{ header : "옵션명", name : "optionName"},
+				{ header : "바코드", name : "goodsBarcode", hidden: 1},
+				{ header : "상품LOT", name : "goodsLotNum"},
+				{ header : "유통기한", name : "goodsConsumptionDate"},
+				{ 
+					header : "수량", 
+					name : "quantity", 
+					editor: 'text',
+					onAfterChange: function(ev) { // onAfterChange는 해당 열에 변경이 있을때마다 호출되는 이벤트
+		                // ev.value:사용자가 입력한 값, ev.rowkey:변경된 셀이 어떤 행인지 알려주는 키
+		                // 값이 숫자만 포함하고 있는지 확인
+		                const value = /^[0-9]*$/.test(ev.value); // 숫자만 허용하는 정규식
+		                // 숫자가 아닌 값이 들어왔을 때 
+		                if (!value) {
+		                    grid2.setValue(ev.rowKey, ev.columnName, '');  // 해당 셀을 비웁니다
+		                    alert("수량은 숫자만 입력할 수 있습니다.");
+		                }
+		            }
+				},
+				{ header : "교환 및 반품", name : "exchangeReturningChoice", editor: 'text'},
+				{ header : "사유", name : "returningReason", editor: 'text'}
+			],
+			data: ""
+		});
+
+    </script>
+	
+</body>
+</html>
