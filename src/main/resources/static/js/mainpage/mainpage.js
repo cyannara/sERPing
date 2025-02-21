@@ -6,8 +6,15 @@ const getApprovalType = () => {
             "Content-Type": "application/json",
         }
     })
-        .then(result => result.json())
+        .then(result => {
+            if(result.ok) {
+                result.json()
+            } else {
+                return
+            }
+        })
         .then(data => {
+            if(!data) return
             const docType = data.map((doc) => {
                 return doc.documentType
             })

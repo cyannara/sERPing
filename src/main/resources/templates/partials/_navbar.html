@@ -84,16 +84,21 @@
             <i class="ti-settings text-primary"></i>
             Settings
           </a>
-          <a class="dropdown-item" href="/login">
-            <i class="ti-power-off text-primary"></i>
-            로그인
-            <span th:inline="text">Hello <span th:remove="tag" sec:authentication="name">thymeleaf</span>!</span>
+          <a
+                  class="dropdown-item"
+                  th:classappend="${#authorization.expression('isAuthenticated()')} ? 'hide'" href="/login"
+          >
+            <i class="ti-power-off text-primary"></i>로그인
           </a>
           <form th:action="@{/logout}" method="post">
+            <span th:inline="text">
+              Hello
+              <span th:remove="tag" sec:authentication="name"></span>
+              !
+            </span>
             <a class="dropdown-item">
-<!--              <i class="ti-power-off text-primary"></i>-->
-<!--              로그아웃-->
-              <input class="ti-power-off text-primary" type="submit" value="로그아웃"/>
+              <i class="ti-power-off text-primary"></i>
+              <input type="submit" value="로그아웃"/>
             </a>
           </form>
         </div>
