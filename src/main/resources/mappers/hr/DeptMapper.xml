@@ -20,19 +20,19 @@
 	        d.department_name AS departmentName,
 	        d.parent_department_num AS parentDepartmentNum,
 	        d.department_type AS departmentType,
-	        dt.cmmn_name AS departmentTypeName,  -- 공통코드에서 부서 유형명 가져옴
+	        dt.cmmn_name AS departmentTypeName,  
 	        d.manager_num AS managerNum,
-	        e.employee_name AS managerName, -- 부서장 이름 가져오기
+	        e.employee_name AS managerName, 
 	        d.department_status AS departmentStatus,
-	        ds.cmmn_name AS departmentStatusName, -- 공통코드에서 부서 상태명 가져옴
+	        ds.cmmn_name AS departmentStatusName, 
 	        d.register_date AS registerDate,
 	        d.update_date AS updateDate,
 	        d.company_num AS companyNum,
-	        (SELECT COUNT(*) FROM hr_employee he WHERE he.department_num = d.department_num) AS employeeCount  -- 직원 수 추가
+	        (SELECT COUNT(*) FROM hr_employee he WHERE he.department_num = d.department_num) AS employeeCount  
 	     FROM HR_DEPARTMENT d
-		    LEFT JOIN CMMN dt on d.department_type = dt.cmmn_code  -- 부서 유형 조인
-		    LEFT JOIN CMMN ds on d.department_status = ds.cmmn_code  -- 부서 상태 조인
-		    LEFT JOIN hr_employee e on d.manager_num = e.employee_num and e.authority = 'au002' -- 부서장 조인
+		    LEFT JOIN CMMN dt on d.department_type = dt.cmmn_code  
+		    LEFT JOIN CMMN ds on d.department_status = ds.cmmn_code  
+		    LEFT JOIN hr_employee e on d.manager_num = e.employee_num and e.authority = 'au002' 
 	    WHERE d.company_num = #{companyNum}
 	    ORDER BY d.department_num
     </select>

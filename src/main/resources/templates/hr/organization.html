@@ -151,7 +151,7 @@
           // ✅ Toast Grid 초기화 (데이터 없이)
           const grid = new tui.Grid({
               el: document.getElementById("grid"),
-              pageOptions: { useClient: false, perPage: 2 }, // ✅ 클라이언트 모드
+              pageOptions: { useClient: false, perPage: 1 }, // ✅ 클라이언트 모드
               data: dataSource,
               columns: [
                   { header: "사원 ID", name: "employeeId" },
@@ -172,9 +172,41 @@
         	    let departmentId = $(this).data('dept-id'); // `data-dept-id` 값 가져오기
 
         	    if (companyId !== undefined) {
-        	        alert(`회사 ID: ${companyId} 클릭됨!`);
+        	        
+        	        departmentNumSJ=0;
+        	        fetch(`/hr/rest/emp/organization?perPage=5&companyNum=${companyNumSJ}&departmentNum=${departmentNumSJ}&page=1`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        grid.resetData(data.data.contents);  // 옵션 테이블 데이터 업데이트
+                        console.log(data);
+                    })
+                    .catch(error => console.error("데이터 요청 실패:", error));
+        	        
+        	        
+        	        
         	    } else if (departmentId !== undefined) {
-        	        alert(`부서 ID: ${departmentId} 클릭됨!`);
+        	        departmentNumSJ = departmentId;
+                 //http://localhost:81/hr/rest/emp/organization?perPage=5&companyNum=1&departmentNum=0&page=1
+                //http://localhost:81/hr/rest/emp/organization??perPage=5&companyNum=${companyNumSJ}&departmentNum=${departmentNumSJ}&page=1
+        	     // 옵션조회 쿼리 호출(goodsCode)
+                    fetch(`/hr/rest/emp/organization?perPage=5&companyNum=${companyNumSJ}&departmentNum=${departmentNumSJ}&page=1`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        grid.resetData(data.data.contents);  // 옵션 테이블 데이터 업데이트
+                        console.log(data);
+                    })
+                    .catch(error => console.error("데이터 요청 실패:", error));
+        	        
         	    }
         	});
       });
