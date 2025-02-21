@@ -16,7 +16,33 @@
 		margin-bottom: 20px;
 	
 		}
-        #grid { height: 300px; }
+       /* ✅ Toast Grid의 기본 높이를 크게 설정 */
+		#grid {
+		    height: 700px !important; /* 원하는 크기로 늘리기 */
+		    min-height: 600px; /* 최소 크기 */
+		    max-height: 900px; /* 너무 커지지 않도록 설정 */
+		    overflow: auto; /* 스크롤 추가 */
+		}
+		
+		/* ✅ Toast Grid의 가로 스크롤 제거 */
+		.tui-grid-container {
+		    width: 100% !important; /* 전체 너비를 부모 요소에 맞춤 */
+		    max-width: none !important;
+		    overflow-x: hidden !important; /* ✅ 가로 스크롤 강제 제거 */
+		}
+		
+		/* ✅ 내부 요소에서 스크롤 제거 */
+		.tui-grid-body-area {
+		    overflow-x: hidden !important;
+		}
+		
+		/* ✅ 컬럼 자동 크기 조정 */
+		.tui-grid-cell {
+		    white-space: nowrap !important; /* ✅ 줄바꿈 방지 */
+		    overflow: hidden !important;
+		    text-overflow: ellipsis !important; /* 긴 내용은 "..." 처리 */
+		}
+		
     </style>
     
 
@@ -30,16 +56,17 @@
 	        <div class="row g-3">
 	            <div class="col-md-3">
 	                <label class="form-label">일자</label>
-	               <input type="date" class="form-control" th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" readonly>
+	               <input type="date" class="form-control" id="purchaseDate" th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" readonly>
 	            </div>
 	            <div class="col-md-3">
 	                <label class="form-label">담당자</label>
 	                <input type="hidden" class="form-control" id="companyNum" th:value="${session.companyNum}" readonly>
 	                <input type="text" class="form-control" th:value="${session.employeeName}" readonly>
+	                <input type="hidden" class="form-control" id="employeeNum" th:value="${session.employeeNum}" readonly>
 	            </div>
 	            <div class="col-md-3">
 	                <label class="form-label">납기일자</label>
-	                <input type="date" class="form-control" th:value="${PurchaseDTO.puchaseDueDate}">
+	                <input type="date" class="form-control" id="puchaseDueDate" th:value="${PurchaseDTO.puchaseDueDate}">
 	            </div>
 	        </div>
 	
@@ -73,7 +100,7 @@
 	 
 	    <!-- 🔹 저장 및 초기화 버튼 -->
 	    <div class="button-container text-center mt-3">
-	        <button class="btn btn-success">저장</button>
+	        <button class="btn btn-success" id="purchaseInsert">등록</button>
 	        <button class="btn btn-secondary">초기화</button>
 	    </div>
 	</div>

@@ -235,15 +235,8 @@ function initProductGrid() {
                 { header: "옵션명", name: "optionName" },
                 { header: "옵션번호", name: "optionCode" },
                 { header: "브랜드", name: "brandName" },
-                { header: "규격", name: "goodsStandard"},
-                { header: "대표이미지", 
-                  name: "goodsImage", 
-                  align: "center", 
-                  rowSpan: true,
-                 /*  renderer: {
-                      type: ImageRenderer
-                  } */
-                }
+                { header: "규격", name: "goodsStandard"}
+               
             ],
             rowClassName: function(row) {
                 return getRowColorClass(row);
@@ -313,44 +306,7 @@ class CustomTextRenderer {
     }
 }
 
-//✅ 대표이미지를 표시하는 렌더러
- /* class ImageRenderer {
-    constructor(props) {
-        const el = document.createElement('div');
-        el.style.textAlign = 'center';
-        if (props.value) {
-            el.innerHTML = `<img src="http://localhost:81/images/${props.value}" alt="상품 이미지" width="50" height="50" style="border-radius: 5px;">`;
-        } else {
-            el.innerText = "이미지 없음";
-        }
-        this.el = el;
-    }
-    getElement() {
-        return this.el;
-    }
-} */
 
-//선택한 내용을 세션에 잠시 저장하고 다른 html  파일로 넘어갈때 정보를 저장
-	/* productGrid.on('click',(ev)=>{
-		const { rowKey } = ev; // ✅ 클릭한 행(rowKey) 가져오기
-	    const rowData = productGrid.getRow(rowKey); 
-		
-	    console.log("선택된 행 데이터:", rowData);
-	    
-	    //세션 스토리지에 데이터  저장
-	    sessionStorage.setItem("selectedGoodsCode", rowData.goodsCode);
-	    sessionStorage.setItem("selectedGoodsName", rowData.goodsName);
-	    sessionStorage.setItem("selectedOptionCode", rowData.optionCode);
-	    sessionStorage.setItem("selectedOptionName", rowData.optionName);
-	    sessionStorage.setItem("selectedoptionNum", rowData.optionNum);
-	    sessionStorage.setItem("selectedVendorName", rowData.vendorName);
-	    sessionStorage.setItem("selectedGoodsStandard", rowData.goodsStandard);
-	    sessionStorage.setItem("selectedGoodsSupplyPrice", rowData.goodsSupplyPrice);
-	    
-	    console.log("보낼 데이터 ==", rowData.goodsCode, rowData.goodsName,rowData.optionCode,rowData.optionName,rowData.optionNum,rowData.vendorName,rowData.goodsStandard,rowData.goodsSupplyPrice);
-	}); */
-
-	
 
 </script>
 

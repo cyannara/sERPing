@@ -1,3 +1,20 @@
+// ✅ 삭제 버튼 렌더러 (전역으로 이동)
+class DeleteRenderer {
+    constructor(props) {
+        const el = document.createElement("button");
+        el.textContent = "삭제";
+        el.className = "btnDelete btn btn-danger btn-sm";
+        el.addEventListener("click", () => {
+            // ✅ 올바른 그리드 객체에서 해당 행 삭제
+            purchaseGrid.removeRow(props.rowKey);
+        });
+        this.el = el;
+    }
+    getElement() {
+        return this.el;
+    }
+}
+
 
 document.addEventListener("DOMContentLoaded", function () {
 const header = document.querySelector('meta[name="_csrf_header"]').content;
@@ -5,6 +22,8 @@ const token = document.querySelector('meta[name="_csrf"]').content;
 const companyNum = document.getElementById("companyNum").value;
     console.log("✅ 발주서 등록 페이지 스크립트 실행됨");
 	console.log("✅ 현재 companyNum 값:", companyNum);
+	
+
 	
     // ✅ Toast Grid가 렌더링된 후 모달이 실행되도록 순서 조정
     if (!window.purchaseGrid) {
@@ -33,9 +52,9 @@ const companyNum = document.getElementById("companyNum").value;
 	                document.querySelectorAll(".modal-backdrop").forEach((element) => element.remove()); // 백그라운드 제거
 	            }, 300);
 				
-				// ✅ 모달 닫힐 때 sessionStorage 값 가져와서 그리드에 저장
-					    setupModalCloseEvent();
-	            
+	// ✅ 모달 닫힐 때 sessionStorage 값 가져와서 그리드에 저장
+		    setupModalCloseEvent();
+    
 	          
 	        }
 	    });
@@ -52,9 +71,13 @@ const companyNum = document.getElementById("companyNum").value;
 
 function initPurchaseGrid() {
     console.log("✅ 발주서 Grid 초기화");
-
+    
     window.purchaseGrid = new tui.Grid({
         el: document.getElementById('grid'),
+        scrollX :false,
+        scrollY : true,
+        bodyHeight: 500, // ✅ 자동 높이 조정
+        minBodyHeight: 600, // ✅ 최소 높이 지정 (필요에 따라 조정)
         columns: [
             { header: '상품코드', name: 'goodsCode' },
             { header: '상품명', name: 'goodsName' },
@@ -64,22 +87,27 @@ function initPurchaseGrid() {
             { header: '거래처명', name: 'vendorName' },
 			{ header: '거래처번호', name: 'vendorId' , hidden: true},
             { header: '규격', name: 'goodsStandard' },
-            { header: '수량', name: 'puchaseQuantity',editor: "text" },
-            { header: '단가', name: 'puchaseUnitPrice',editor: "text" },
+            { header: '수량', name: 'puchaseQuantity',editor: { type: "text", useFormatter: false } },
+            { header: '단가', name: 'puchaseUnitPrice',editor: { type: "text", useFormatter: false }},
             { header: '공급가격', name: 'purchaseSupplyPrice' },
-            { header: '부가세', name: 'puchaseVat' }
+            { header: '부가세', name: 'puchaseVat' },
+            { header: '발주계획바디번호', name: 'orderPlanBodyNum' , hidden: true},
+            {
+                    header : "삭제"
+                    ,name: "delete"
+                    ,renderer: {
+                    type: DeleteRenderer // 삭제버튼 정의 렌더러
+                    }  
+                    ,cellStyle: { textAlign: "center" }
+                    ,className: "tui-grid-cell-readonly"
+                }
         ],
         rowHeaders: ['checkbox'],
         data: [],
-        scrollX: true,
-        scrollY: 300
+       
     });
 	
-	//추가 버튼 기능 (새로운 행 추가) 
-    document.getElementById("bttAdd").addEventListener("click", function () {
-        purchaseGrid.appendRow({}, { at: 0 });
-    });
-	
+
 	//상품 및 옵션 칸 클릭 하면 정보리스트 모달 출력 
 	  window.purchaseGrid.on("click", (ev) => {
 	    if (ev.columnName === "goodsName" || ev.columnName === "goodsCode" || ev.columnName === "optionName" || ev.columnName === "optionCode") {
@@ -91,17 +119,19 @@ function initPurchaseGrid() {
 	    document.getElementById("bttAdd").addEventListener("click", function () {
 	        purchaseGrid.appendRow({}, { at: 0 });
 	    });
+	    
+	    
 	
 	// ✅ 수량 또는 단가 변경 시 공급가격 자동 계산
 	    purchaseGrid.on("afterChange", function (ev) {
 	        ev.changes.forEach(change => {
 	            if (change.columnName === "puchaseQuantity" || change.columnName === "puchaseUnitPrice") {
-					purchaseGrid.setValue(change.rowKey, change.columnName, formatNumber(change.value));
-					calculateSupplyPrice(change.rowKey);
-	            }
-	        });
+            let formattedValue = formatNumberWithCommas(change.value);
+            purchaseGrid.setValue(change.rowKey, change.columnName, formattedValue);
+            calculateSupplyPrice(change.rowKey);
+	        }
 	    });
-
+	});
 	    // ✅ 부가세 체크박스 이벤트
 	    document.getElementById("vatUnchecked").addEventListener("change", updateVat);
 	    document.getElementById("vatChecked").addEventListener("change", updateVat);
@@ -120,10 +150,17 @@ function initPurchaseGrid() {
 		        setTimeout(() => updateVat(), 10); // DOM 업데이트 반영 후 부가세 업데이트 실행
 		    }
 		});
+		
+		
+		document.getElementById("purchaseInsert").addEventListener("click",function(){
+			purchaseRegister();
+		})
 
 	
 }
-	
+
+
+
 //모달 열기 함수 
 // ✅ 모달 열기 함수
 	function openGoodsModal(rowKey) {
@@ -235,13 +272,13 @@ function calculateSupplyPrice(rowKey) {
     let unitPrice = purchaseGrid.getValue(rowKey, "puchaseUnitPrice") || "0";
 
     // ✅ 문자열에 포함된 콤마(,) 제거 후 숫자로 변환
-    quantity = parseFloat(quantity.replace(/,/g, '')) || 0;
-    unitPrice = parseFloat(unitPrice.replace(/,/g, '')) || 0;
+    quantity = parseFloat(quantity.toString().replace(/,/g, '')) || 0;
+    unitPrice = parseFloat(unitPrice.toString().replace(/,/g, '')) || 0;
 
     let supplyPrice = quantity * unitPrice;
 
     // ✅ 계산된 공급가격을 Grid에 업데이트 (실제 값은 숫자, 화면에 표시할 때만 `,` 추가)
-    purchaseGrid.setValue(rowKey, "purchaseSupplyPrice", formatNumber(supplyPrice));
+    purchaseGrid.setValue(rowKey, "purchaseSupplyPrice", formatNumberWithCommas(supplyPrice.toFixed(2)));
 
     updateVat(); // ✅ 부가세 즉시 업데이트
 }
@@ -261,18 +298,74 @@ function updateVat() {
         let vat = applyVat ? supplyPrice * 0.1 : 0; // ✅ 부가세 계산
 
         // ✅ 부가세 업데이트 (화면에 표시할 때 `,` 추가)
-        purchaseGrid.setValue(rowIndex, "puchaseVat", formatNumber(vat.toFixed(2)));
+        purchaseGrid.setValue(rowIndex, "puchaseVat", formatNumberWithCommas(vat.toFixed(2)));
     });
 
     console.log("✅ 부가세 적용 여부:", applyVat ? "적용됨" : "미적용");
 }
 
 
-// 숫자를 3자리마다 , 로 구분하는 함수
-function formatNumber(value) {
-    if (!value) return "0"; 
-    return parseFloat(value).toLocaleString('ko-KR'); 
+
+// ✅ 3자리마다 콤마 추가하는 함수
+function formatNumberWithCommas(value) {
+    if (!value) return "0";
+    let num = value.toString().replace(/,/g, ''); // 기존 콤마 제거 후 숫자로 변환
+    return num.replace(/\B(?=(\d{3})+(?!\d))/g, ","); // 3자리마다 콤마 추가
 }
+
+
+
+// ✅ 발주 등록 함수
+function purchaseRegister() {
+    // ✅ 체크된 행의 그리드 값만 가져오기
+    const gridData = purchaseGrid.getCheckedRows();
+
+    if (gridData.length === 0) {
+        alert("발주할 상품이 없습니다.");
+        return;
+    }
+
+    // ✅ VAT 체크박스 상태에 따라 플래그 설정
+    const vatFlag = document.getElementById("vatChecked").checked ? 1 : 0;
+
+    // ✅ 거래처 ID 기준으로 그룹화
+    const groupedData = {};
+    gridData.forEach((item) => {
+        const vendorId = parseInt(item.vendorId) || 0;
+
+        if (!groupedData[vendorId]) {
+            groupedData[vendorId] = {
+                vendorId: vendorId,
+                purchaseDate: document.getElementById("purchaseDate").value,
+                purchaseDueDate: document.getElementById("puchaseDueDate").value,
+                employeeNum: parseInt(document.getElementById("employeeNum").value) || 0,
+                companyNum: parseInt(document.getElementById("companyNum").value) || 0,
+                purchaseVatFlag: vatFlag,
+                purchaseDetails: []
+            };
+        }
+
+        // ✅ orderPlanBodyNum이 없으면 null 처리
+        const orderPlanBodyNum = item.orderPlanBodyNum ? parseInt(item.orderPlanBodyNum) : null;
+
+        // ✅ 발주서 바디 추가 (숫자로 변환)
+        groupedData[vendorId].purchaseDetails.push({
+		    puchaseQuantity: parseInt(item.puchaseQuantity.replace(/,/g, '')) || 0,  // ✅ 정수 변환
+		    puchaseUnitPrice: parseFloat(item.puchaseUnitPrice.replace(/,/g, '')) || 0,  // ✅ 실수 변환
+		    puchaseSupplyPrice: parseFloat(item.purchaseSupplyPrice.replace(/,/g, '')) || 0,  // ✅ 실수 변환 (문자열 제거)
+		    puchaseVat: parseFloat(item.puchaseVat.replace(/,/g, '')) || 0,  // ✅ 실수 변환 (문자열 제거)
+		    optionNum: parseInt(item.optionNum.replace(/,/g, '')) || 0,  // ✅ 정수 변환
+		    companyNum: parseInt(document.getElementById("companyNum").value.replace(/,/g, '')) || 0,  // ✅ 정수 변환
+		    goodsStandard: item.goodsStandard,
+		    orderPlanBodyNum: orderPlanBodyNum ? parseInt(orderPlanBodyNum.replace(/,/g, '')) : null  // ✅ 정수 변환 (nullable)
+		});
+
+
+    });
+
+    console.log("📢 서버로 전송할 데이터:", Object.values(groupedData));
+}
+
 
 
 
