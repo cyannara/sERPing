@@ -1,4 +1,4 @@
-
+/*
 (function () {
     const originalFetch = window.fetch;
     const originalXHR = window.XMLHttpRequest;
@@ -82,3 +82,4 @@
 
     window.XMLHttpRequest = CustomXHR;
 })();
+*/
