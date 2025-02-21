@@ -1,12 +1,9 @@
 
-
-let Grid = tui.Grid;
-let dataSource = {}
-
+let mypageDataSource = {}
 let employeeNum = document.getElementById("sessionEmployeeNum").value;
-let grid = {}
+let mypageGrid = {}
 if(employeeNum) {
-    dataSource = {
+    mypageDataSource = {
         api: {
             readData: {
                 url: `http://localhost:81/api/mainpage/approval/list/${employeeNum}`,
@@ -17,7 +14,7 @@ if(employeeNum) {
         },
     };
 
-    grid = new Grid({
+    mypageGrid = new tui.Grid({
         el: document.querySelector('#grid'),
         scrollX: false,
         scrollY: false,
@@ -58,7 +55,7 @@ if(employeeNum) {
                     const statusMap = {
                         WAITING: {text: "대기중", color: "gray"},
                         APPROVED: {text: "승인", color: "green"},
-                        REJECTED: {text: "거절", color: "red"}
+                        REJECTED: {text: "반려", color: "red"}
                     };
                     const status = statusMap[value] || {text: "알 수 없음", color: "black"};
                     return `<span class="status-label"
@@ -84,16 +81,19 @@ if(employeeNum) {
                   </button>`;
                 }
             }  ],
-        data : dataSource,
+        data : mypageDataSource,
     });
 } else {
-    showAlert("세션이 만료되었습니다. 로그인 페이지로 이동합니다.", 'danger');
+    setTimeout(() => {
+        showAlert("세션이 만료되었습니다. 로그인 페이지로 이동합니다.", 'danger');
+    }, 100)
+
     setTimeout(() => {
         window.location.href = "/login";
     }, 3000);
 }
 
-const getApprovalType = () => {
+const getMyApprovalType = () => {
     const url = `/api/mainpage/approval/type`;
     fetch(url, {
         method: "GET",
@@ -125,7 +125,7 @@ const getApprovalType = () => {
         .catch(error => console.error("Error fetching data:", error));
 }
 
-getApprovalType()
+getMyApprovalType()
 
 function reset(){
     let documentType = document.querySelector('#documentType');
@@ -135,28 +135,40 @@ function reset(){
     documentType.value = '';
     inApprovalRequestDateStart.value = '';
     inApprovalRequestDateEnd.value = '';
+    inApprovalStatus = ''
 
-    grid.setRequestParams({
+    mypageGrid.setRequestParams({
         "documentType" : documentType.value,
+        "inApprovalStatus" : inApprovalStatus,
         "inApprovalRequestDateStart" : inApprovalRequestDateStart.value,
         "inApprovalRequestDateEnd" : inApprovalRequestDateEnd.value
     })
-    grid.readData();
+    mypageGrid.readData();
 }
 
 function search(){
     let documentType = document.querySelector('#documentType').value.toString();
     let inApprovalRequestDateStart = document.querySelector('#inApprovalRequestDateStart').value.toString();
     let inApprovalRequestDateEnd = document.querySelector('#inApprovalRequestDateEnd').value.toString();
-    grid.setRequestParams({
+    mypageGrid.setRequestParams({
         "documentType" : documentType,
+        "inApprovalStatus" : inApprovalStatus,
         "inApprovalRequestDateStart" : inApprovalRequestDateStart,
         "inApprovalRequestDateEnd" : inApprovalRequestDateEnd
     })
-    grid.readData();
+    mypageGrid.readData();
 }
 
 function changeDisplay() {
     let gap = parseInt(document.querySelector('#display_amount').value);
-    grid.setPerPage(gap, dataSource)
+    mypageGrid.setPerPage(gap, mypageDataSource)
 }
+
+let inApprovalStatus = ''
+let filterBtns = document.getElementsByClassName('filter-btn')
+filterBtns = Array.from(filterBtns)
+filterBtns.forEach((btn) => {
+    btn.addEventListener('click', (event) => {
+        inApprovalStatus = event.target.dataset.status
+    })
+})
