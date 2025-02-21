@@ -1,52 +1,162 @@
 
-const deptFilter = document.getElementById("deptFilter");
-const searchBtn = document.getElementById("searchBtn");
-const filterButtons = document.querySelectorAll(".filter-btn");
-
-// 더미 데이터
-const approvals = [
-    { id: 1, document: "근태_수정_요청", dept: "인사", status: "대기중" },
-    { id: 2, document: "경력증명서_요청", dept: "인사", status: "반려" },
-    { id: 3, document: "경력증명서_요청", dept: "인사", status: "승인" },
-    { id: 4, document: "근태_수정_요청", dept: "인사", status: "승인" },
-    { id: 5, document: "부대_비용_요청", dept: "회계", status: "승인" }
-];
-
-// 필터 및 조회
-function filterData() {
-    const selectedDept = deptFilter.value;
-    const selectedStatus = document.querySelector(".filter-btn.active")?.dataset.status || "전체";
-
-    const filteredData = approvals.filter(approval =>
-        (selectedDept === "전체" || approval.dept === selectedDept) &&
-        (selectedStatus === "전체" || approval.status === selectedStatus)
-    );
-}
-
-// 상태 필터 버튼 클릭 이벤트
-filterButtons.forEach(button => {
-    button.addEventListener("click", function () {
-        filterButtons.forEach(btn => btn.classList.remove("active"));
-        this.classList.add("active");
-        filterData();
-    });
-});
-
-// 조회 버튼 클릭
-searchBtn.addEventListener("click", filterData);
 
 let Grid = tui.Grid;
-let employeeNum = /*[[${session.employeeNum}]]*/ "default";
-const dataSource = {
-    api: {
-        readData: {
-            url: `http://localhost:81/api/mainpage/approval/list/${employeeNum}`,
-            method: 'GET',
-            initParams: { page: 1 }
-        },
-        contentType: 'application/json'
-    },
-};
-const getMyApprovalList = () => {
+let dataSource = {}
 
+let employeeNum = document.getElementById("sessionEmployeeNum").value;
+let grid = {}
+if(employeeNum) {
+    dataSource = {
+        api: {
+            readData: {
+                url: `http://localhost:81/api/mainpage/approval/list/${employeeNum}`,
+                method: 'GET',
+                initParams: { page: 1 }
+            },
+            contentType: 'application/json'
+        },
+    };
+
+    grid = new Grid({
+        el: document.querySelector('#grid'),
+        scrollX: false,
+        scrollY: false,
+        pageOptions: {
+            useClient: false,
+            perPage: 10,
+        },
+        columns: [
+            {header: "번호", name: "inApprovalId", sortable: true},
+            {header: "요청 구분", name: "documentType", sortable: true},
+            {
+                header: "결재요청 날짜",
+                name: "inApprovalRequestDate",
+                sortable: true,
+                width: 150,
+                formatter: ({value}) => {
+                    return formatDateTime(value)
+                }
+            },
+            {
+                header: "처리",
+                name: "process",
+                hidden: true,
+                formatter: ({row}) => {
+                    return `
+                    <button class="btn btn-approve" data-bs-toggle="modal" data-bs-target="#commonModal" data-in-approval-id="${row.inApprovalId}">승인</button>
+                    <button class="btn btn-reject" data-bs-toggle="modal" data-bs-target="#commonModal" data-in-approval-id="${row.inApprovalId}">반려</button>`
+                }
+            },
+            {
+                header: "상태",
+                name: "inApprovalStatus",
+                sortable: true,
+                rowClassName: 'center',
+                width: 80,
+                // hidden: true,
+                formatter: ({value}) => {
+                    const statusMap = {
+                        WAITING: {text: "대기중", color: "gray"},
+                        APPROVED: {text: "승인", color: "green"},
+                        REJECTED: {text: "거절", color: "red"}
+                    };
+                    const status = statusMap[value] || {text: "알 수 없음", color: "black"};
+                    return `<span class="status-label"
+                                style="background-color: ${status.color};
+                            ">${status.text}</span>`;
+                }
+            },
+            {header: "요청 내용", name: "inApprovalRequestContent", sortable: true, hidden: true},
+            {header: "요청 내용 확인", name: "moveToPage", sortable: true,
+                formatter: ({ row }) => {
+                    return `<button class="move-btn" data-id="${row.inApprovalId}">
+                          <i class="mdi mdi-arrow-right-bold"></i>
+                        </button>`;
+                }
+            },
+            {
+                header: "다운로드",
+                name: "download",
+                sortable: true,
+                formatter: ({ row }) => {
+                    return `<button class="download-btn" data-content="${row.inApprovalRequestContent}">
+                    <i class="mdi mdi-folder-download"></i>
+                  </button>`;
+                }
+            }  ],
+        data : dataSource,
+    });
+} else {
+    showAlert("세션이 만료되었습니다. 로그인 페이지로 이동합니다.", 'danger');
+    setTimeout(() => {
+        window.location.href = "/login";
+    }, 3000);
+}
+
+const getApprovalType = () => {
+    const url = `/api/mainpage/approval/type`;
+    fetch(url, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+        }
+    })
+        .then(data => {
+            return data.json()
+        })
+        .then(data => {
+            const docType = data.map((doc) => {
+                return doc.documentType
+            })
+
+            const selectElement = document.getElementById("documentType");
+
+            function populateSelect(options, select) {
+                options.forEach(optionText => {
+                    const option = document.createElement("option");
+                    option.value = optionText;  // value 값 설정
+                    option.textContent = optionText; // 표시할 텍스트
+                    select.appendChild(option); // select 요소에 추가
+                });
+            }
+
+            populateSelect(docType, selectElement);
+        })
+        .catch(error => console.error("Error fetching data:", error));
+}
+
+getApprovalType()
+
+function reset(){
+    let documentType = document.querySelector('#documentType');
+    let inApprovalRequestDateStart = document.querySelector('#inApprovalRequestDateStart');
+    let inApprovalRequestDateEnd = document.querySelector('#inApprovalRequestDateEnd');
+
+    documentType.value = '';
+    inApprovalRequestDateStart.value = '';
+    inApprovalRequestDateEnd.value = '';
+
+    grid.setRequestParams({
+        "documentType" : documentType.value,
+        "inApprovalRequestDateStart" : inApprovalRequestDateStart.value,
+        "inApprovalRequestDateEnd" : inApprovalRequestDateEnd.value
+    })
+    grid.readData();
+}
+
+function search(){
+    let documentType = document.querySelector('#documentType').value.toString();
+    let inApprovalRequestDateStart = document.querySelector('#inApprovalRequestDateStart').value.toString();
+    let inApprovalRequestDateEnd = document.querySelector('#inApprovalRequestDateEnd').value.toString();
+    grid.setRequestParams({
+        "documentType" : documentType,
+        "inApprovalRequestDateStart" : inApprovalRequestDateStart,
+        "inApprovalRequestDateEnd" : inApprovalRequestDateEnd
+    })
+    grid.readData();
+}
+
+function changeDisplay() {
+    let gap = parseInt(document.querySelector('#display_amount').value);
+    grid.setPerPage(gap, dataSource)
 }

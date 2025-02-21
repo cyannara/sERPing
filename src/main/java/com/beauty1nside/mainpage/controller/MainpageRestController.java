@@ -77,11 +77,13 @@ public class MainpageRestController {
     }
     
     Long companyNum = user.getUserDTO().getCompanyNum();
-    paging.setTotalRecord(approvalService.count(dto, companyNum));
+    dto.setCompanyNum(companyNum);
+    dto.setEmployeeNum(employeeNum);
+    
+    paging.setTotalRecord(approvalService.myCount(dto));
     
     GridArray grid = new GridArray();
-    
-    return grid.getArray(paging.getPage(), approvalService.count(dto, companyNum), approvalService.waitingList(dto, companyNum));
+    return grid.getArray(paging.getPage(), approvalService.myCount(dto), approvalService.myList(dto));
   }
   
   @GetMapping("/approval/{id}")

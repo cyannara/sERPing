@@ -23,3 +23,20 @@
     background-color: #0047ab;
     color: white;
 }
+.status-label {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 5px;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.move-btn {
+    border: none;
+    > i{
+        font-size: 20px;
+        padding-left: 10px;
+    }
+}

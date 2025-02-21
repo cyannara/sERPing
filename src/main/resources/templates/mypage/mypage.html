@@ -5,25 +5,36 @@
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         xmlns="http://www.w3.org/1999/xhtml"
 >
-<head>
-    <link rel="stylesheet" href="/css/mypage/mypage.css">
-</head>
 <body layout:fragment="content">
+<input type="hidden" id="sessionEmployeeNum" th:value="${session.employeeNum}"/>
+
 <div class="container mt-4">
     <!-- 결재 조회 -->
     <div class="card p-4 shadow-sm">
         <h5 class="mb-3">결재 조회</h5>
-
         <div class="row g-2 mb-3">
-            <div class="col-md-4">
-                <label class="form-label">결재 요청 부서</label>
-                <select class="form-select" id="deptFilter">
-                    <option value="전체">전체</option>
-                    <option value="인사">인사</option>
-                    <option value="회계">회계</option>
+            <div class="col-md-3">
+                <label class="label-search col-4" for="documentType">요청 구분</label>
+                <select name="documentType" id="documentType" class="col-8 input-box">
+                    <option value="" selected>선택</option>
                 </select>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
+                <span class="label-search col-4">요청 날짜</span>
+                <input type="date" id="inApprovalRequestDateStart" class="col-8 input-box"/>~
+                <input type="date" id="inApprovalRequestDateEnd" class="col-8 input-box"/>
+            </div>
+            <div class="col-md-3">
+                <label class="label-search col-4" for="display_amount">표시수량</label>
+                <select name="display_amount" id="display_amount" class="col-8 input-box" onchange="changeDisplay()">
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+            <div class="col-md-3">
                 <label class="form-label">상태</label>
                 <div class="d-flex">
                     <button class="btn btn-outline-primary me-2 filter-btn" data-status="대기중">대기중</button>
@@ -31,8 +42,9 @@
                     <button class="btn btn-outline-success filter-btn" data-status="승인">승인</button>
                 </div>
             </div>
-            <div class="col-md-2 d-flex align-items-end">
-                <button class="btn btn-primary w-100" id="searchBtn">조회</button>
+            <div class="row btn-box">
+                <button type="button" class="btn btn-primary col-1" onclick="search()">검색</button>
+                <button type="button" class="btn btn-secondary col-1" onclick="reset()">초기화</button>
             </div>
         </div>
 
@@ -61,10 +73,10 @@
         </div>
     </div>
 </div>
-</body>
-<script src="/js/mypage/mypage.js"></script>
+
 <script>
-    getMyApprovalList()
+
 </script>
+</body>
 </html>
 

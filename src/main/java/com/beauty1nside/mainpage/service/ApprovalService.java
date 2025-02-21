@@ -9,7 +9,9 @@ import java.util.List;
 public interface ApprovalService {
   ApprovalDTO info(Long inApprovalId, Long companyNum);
   List<ApprovalDTO> waitingList(ApprovalSearchDTO dto, Long companyNum);
+  List<ApprovalDTO> myList(ApprovalSearchDTO dto);
   int count(ApprovalSearchDTO dto, Long companyNum);
+  int myCount(ApprovalSearchDTO dto);
   int update(ApprovalDTO dto);
   List<DocumentDTO> documentList(Long companyNum);
 }
