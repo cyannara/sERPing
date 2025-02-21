@@ -14,6 +14,7 @@ public interface BhfGoodsInMapper {
     // 발송완료인 주문서 조회
     List<BhfGoodsOrdDTO> goodsOrdList(BhfGoodsOrdSearchDTO dto);
     
+    // 페이징 카운트
     int count(BhfGoodsOrdSearchDTO dto);
     
     // 주문서 상세 조회

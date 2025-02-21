@@ -44,6 +44,11 @@ public class BhfVueController {
 	public String returning() {
 		return "/bhf/returnRequest";
 	}
+	// 교환 및 반품 요청 페이지(바코드)
+	@GetMapping("/returning")
+	public String returnInsert() {
+		return "bhf/returnInsert";
+	}
 	
 	// 교환 및 반품 조회 페이지
 	@GetMapping("/returnList")
