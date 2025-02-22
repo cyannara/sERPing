@@ -37,6 +37,13 @@
 				<div class="card">
 					<div class="card-body">
 						<h5 class="mb-4">반품 요청서</h5>
+						<div class="row mb-3">
+							<label class="col-sm-1">지점명</label> 
+							<input type="text" class="col-sm-2" id="branchOfficeId">
+							<div class="col-sm-1"></div>
+							<label class="col-sm-1">비고</label> 
+							<input type="text" class="col-sm-6" id="returnRemark">
+						</div>
 						<div id="returns"></div>
 						<div id="pagination" class="tui-pagination"></div>
 						<div style="text-align : center">
@@ -50,7 +57,16 @@
 	</div>
 	
 	<script>
+		const header = document.querySelector('meta[name="_csrf_header"]').content; //서버에서 요구하는 CSRF 헤더이름
+	    const token = document.querySelector('meta[name="_csrf"]').content; //서버에서 생성한 CSRF 토큰 값
+	
 		var Grid = tui.Grid;
+		
+		//페이지가 로드되면 테이블에 데이터가 없을때 뜨는 문구 함수 실행
+		document.addEventListener("DOMContentLoaded",()=>{
+			nodata();
+			RTnodata();
+		})
 		
         function search() {
             let goodsBarcode = document.getElementById("searchInput").value.trim(); //.trim() 공백을 없애준다
@@ -167,6 +183,95 @@
 			],
 			data: ""
 		});
+		
+		// 교환,반품 등록 함수
+		function returnInsert(){
+			let returnData = grid2.getData();
+			
+			// 교환,반품 테이블에 데이터가 있는지 확인
+			if (returnData.length === 0) {
+		        alert("교환 및 반품할 상품을 추가해주세요.");
+		        return;
+		    }
+			// 발주 수량을 적었는지 확인
+			for (let i = 0; i < returnData.length; i++) {
+				const quantity = Number(returnData[i].quantity); // 문자열을 숫자로 변환(0도 비교하기 위해서)
+				const choice = returnData[i].exchangeReturningChoice;
+				const reason = returnData[i].returningReason;
+				
+			    if (quantity === 0 || quantity === "" || quantity === null) {  // 수량이 비어있는지 확인
+		            alert("수량을 입력해주세요.");
+		            return;  // 수량이 없으면 더 이상 진행하지 않음
+		        }
+			    if (choice !== "교환" && choice !== "반품"){
+			    	alert("교환,반품 둘중 하나를 적어주세요.");
+			    	return;
+			    }
+			    if (reason === "" || reason === null){
+			    	alert("사유를 작성 해주세요.");
+			    	return
+			    }
+		    }
+	
+		     let returnInfo = {
+		        files: returnData,  // 상세 내역 (상품 정보)
+		        branchOfficeId: document.querySelector('#branchOfficeId').value, //주문 지점
+		        returnRemark: document.querySelector('#returnRemark').value,  // 비고
+		        companyNum: 1 // 아직 회사번호를 가져올떄가 없어서 1로 넣었놨음
+		    };
+	 	    fetch("http://localhost:81/bhf/rest/returning/insert", {
+		        method: "POST",
+		        headers: {
+		            "Content-Type": "application/json",
+		            //위에 변수로 저장한 헤더이름,토큰값 넣어주기
+		        	'header': header, 
+		            'X-CSRF-Token': token
+		        },
+		        body: JSON.stringify(returnInfo) // returnInfo 객체를 JSON 형식으로 변환(JSON.parse는 JSON을 객체로 변환)
+		    })
+		    .then(response => response.json())
+		    .then(data => {
+		        if (data.status === "success") {
+		            alert("교환 및 반품 등록 성공");
+		         	// 등록 후 초기화
+		         	document.getElementById('branchOfficeId').value = "";
+					document.getElementById('returnRemark').value = "";
+					document.getElementById('searchInput').value = "";
+		            grid.resetData([]);
+		            grid2.resetData([]);  
+		           
+		        } else {
+		            alert("교환 및 반품 등록 실패: " + data.message);
+		        }
+		        //테이블 데이터 없을떄 나오는 문구 다시 실행
+		        nodata();
+		        RTnodata();
+		    })  
+		}
+		// 초기화 버튼 함수
+		function reset(){
+			document.getElementById('searchInput').value = "";
+			grid2.resetData([]);
+	        grid.resetData([]);
+	     	//테이블 데이터 없을떄 나오는 문구 다시 실행
+	        nodata();
+	        RTnodata();
+		}
+		
+		// 옵션 테이블 데이터 없을때 나오는 문구
+		function nodata(){
+			setTimeout( () => {
+				let nodata = document.querySelectorAll('.tui-grid-layer-state-content p')[0];
+				nodata.innerHTML = '정확한 바코드를 입려해주세요.';
+			}, 10)
+		}
+		// 교환 및 반품 테이블 데이터 없을때 나오는 문구
+		function RTnodata(){
+			setTimeout( () => {
+				let nodata = document.querySelectorAll('.tui-grid-layer-state-content p')[1];
+				nodata.innerHTML = '상품 정보를 선택 해주세요';
+			}, 10)
+		}
 
     </script>
 	
