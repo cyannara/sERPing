@@ -151,7 +151,7 @@
           // ✅ Toast Grid 초기화 (데이터 없이)
           const grid = new tui.Grid({
               el: document.getElementById("grid"),
-              pageOptions: { useClient: false, perPage: 1 }, // ✅ 클라이언트 모드
+              pageOptions: { useClient: false, perPage: 5 },
               data: dataSource,
               columns: [
                   { header: "사원 ID", name: "employeeId" },

@@ -14,7 +14,7 @@
 	</select>
 
     <!-- 부서 전체 목록 조회 -->
-    <select id="list" resultType="com.beauty1nside.hr.dto.DeptDTO">
+	<select id="list" resultType="com.beauty1nside.hr.dto.DeptDTO">
 	    SELECT
 	        d.department_num AS departmentNum,
 	        d.department_name AS departmentName,
@@ -28,14 +28,19 @@
 	        d.register_date AS registerDate,
 	        d.update_date AS updateDate,
 	        d.company_num AS companyNum,
-	        (SELECT COUNT(*) FROM hr_employee he WHERE he.department_num = d.department_num) AS employeeCount  
+	        (
+	            SELECT COUNT(*) 
+	            FROM hr_employee he 
+	            WHERE he.department_num = d.department_num 
+	            AND he.company_num = #{companyNum}  <!-- ✅ 회사 필터 추가 -->
+	        ) AS employeeCount  
 	     FROM HR_DEPARTMENT d
-		    LEFT JOIN CMMN dt on d.department_type = dt.cmmn_code  
-		    LEFT JOIN CMMN ds on d.department_status = ds.cmmn_code  
-		    LEFT JOIN hr_employee e on d.manager_num = e.employee_num and e.authority = 'au002' 
-	    WHERE d.company_num = #{companyNum}
+	        LEFT JOIN CMMN dt on d.department_type = dt.cmmn_code  
+	        LEFT JOIN CMMN ds on d.department_status = ds.cmmn_code  
+	        LEFT JOIN hr_employee e on d.manager_num = e.employee_num and e.authority = 'au002' 
+	    WHERE d.company_num = #{companyNum}  <!-- ✅ 회사 필터 추가 -->
 	    ORDER BY d.department_num
-    </select>
+	</select>
 
 
 </mapper>
