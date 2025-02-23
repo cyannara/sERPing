@@ -2,12 +2,14 @@ package com.beauty1nside.bsn.mapper;
 
 import java.util.List;
 
-import com.beauty1nside.bsn.dto.BhfOrderDTO;
-import com.beauty1nside.bsn.dto.BhfOrderDetailDTO;
 import com.beauty1nside.bsn.dto.BsnGoodsLOTDTO;
-import com.beauty1nside.bsn.dto.BsnOrderDTO;
-import com.beauty1nside.bsn.dto.BsnOrderDetailDTO;
 import com.beauty1nside.bsn.dto.OrderSearchDTO;
+import com.beauty1nside.bsn.dto.delivery.BsnDeliveryDTO;
+import com.beauty1nside.bsn.dto.delivery.BsnDeliveryDetailDTO;
+import com.beauty1nside.bsn.dto.order.BhfOrderDTO;
+import com.beauty1nside.bsn.dto.order.BhfOrderDetailDTO;
+import com.beauty1nside.bsn.dto.order.BsnOrderDTO;
+import com.beauty1nside.bsn.dto.order.BsnOrderDetailDTO;
 
 
 public interface BsnOrderMapper {
@@ -46,8 +48,11 @@ public interface BsnOrderMapper {
 	
 	
 	
-	//임시
-	List<BsnOrderDTO> selectBsnDelivery(OrderSearchDTO orderSearchDTO);
+	//출고 조회
+	List<BsnDeliveryDTO> selectBsnDelivery(OrderSearchDTO orderSearchDTO);
+	
+	//출고 상세조회
+	List<BsnDeliveryDetailDTO> selectBsnDeliveryDetail(BsnDeliveryDTO bsnDeliveryDTO);
 	
 	//상품 재고 LOT별 조회(임시)
 	List<BsnGoodsLOTDTO> selectGoodsWarehouseLot(BsnOrderDetailDTO bsnOrderDetailDTO);

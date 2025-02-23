@@ -12,10 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.beauty1nside.bsn.dto.BhfOrderDTO;
-import com.beauty1nside.bsn.dto.BsnOrderDTO;
-import com.beauty1nside.bsn.dto.BsnOrderDetailDTO;
 import com.beauty1nside.bsn.dto.OrderSearchDTO;
+import com.beauty1nside.bsn.dto.delivery.BsnDeliveryDTO;
+import com.beauty1nside.bsn.dto.order.BhfOrderDTO;
+import com.beauty1nside.bsn.dto.order.BsnOrderDTO;
+import com.beauty1nside.bsn.dto.order.BsnOrderDetailDTO;
 import com.beauty1nside.bsn.service.BsnOrderService;
 import com.beauty1nside.common.GridArray;
 import com.beauty1nside.common.Paging;
@@ -181,9 +182,9 @@ public class BsnRestController {
 
 	};
 	
-	//임시 
+	//출고 조회
 	@GetMapping("/deli")
-	public Object goodsLot(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
+	public Object delivery(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
 			@RequestParam(name ="page", defaultValue = "1", required = false) int page,
 			OrderSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException  {
 	
@@ -202,6 +203,30 @@ public class BsnRestController {
 
 				return result;	
 	}
+	
+	@GetMapping("/deli/detail")
+	public Object deliveryDetail(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
+			@RequestParam(name ="page", defaultValue = "1", required = false) int page,
+			@RequestParam(name = "deliveryId", defaultValue = "bsn_dlivy_4") String deliveryId,
+			BsnDeliveryDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException  {
+		
+		
+		//한 페이지에 출력할 수 : 기본값: 5
+		paging.setPageUnit(perPage);
+		//현재 페이지(기본값: 1)
+		paging.setPage(page);
+		
+		//첫 페이지, 마지막 페이지
+		dto.setStart(paging.getFirst());
+		dto.setEnd(paging.getLast());
+		dto.setDeliveryId(deliveryId);
+		
+		GridArray grid = new GridArray();
+		Object result = grid.getArray(paging.getPage(), 10, bsnOrderService.getBsnDeliveryDetail(dto) );
+
+		return result;		
+
+	};
 	
 	
 	

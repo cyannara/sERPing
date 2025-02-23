@@ -1,7 +1,9 @@
-package com.beauty1nside.bsn.dto;
+package com.beauty1nside.bsn.dto.order;
 
 import java.util.Date;
 import java.util.List;
+
+import com.beauty1nside.bsn.dto.OrderSearchDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,8 +30,7 @@ public class BsnOrderDTO extends OrderSearchDTO {
 	private int employeeNum;
 	private String remark;
 	private int companyNum;
-	private String  goodsName;
-	private String  optionName;
+
 	
 	private List<BsnOrderDetailDTO> orderDetails;
 

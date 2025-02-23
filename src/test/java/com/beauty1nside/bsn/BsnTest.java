@@ -13,11 +13,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.beauty1nside.bsn.dto.BhfOrderDTO;
-import com.beauty1nside.bsn.dto.BhfOrderDetailDTO;
-import com.beauty1nside.bsn.dto.BsnOrderDTO;
-import com.beauty1nside.bsn.dto.BsnOrderDetailDTO;
 import com.beauty1nside.bsn.dto.OrderSearchDTO;
+import com.beauty1nside.bsn.dto.order.BhfOrderDTO;
+import com.beauty1nside.bsn.dto.order.BhfOrderDetailDTO;
+import com.beauty1nside.bsn.dto.order.BsnOrderDTO;
+import com.beauty1nside.bsn.dto.order.BsnOrderDetailDTO;
 import com.beauty1nside.bsn.mapper.BsnOrderMapper;
 import com.beauty1nside.bsn.service.BsnOrderService;
 

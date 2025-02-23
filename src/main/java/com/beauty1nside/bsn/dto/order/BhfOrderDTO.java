@@ -1,6 +1,8 @@
-package com.beauty1nside.bsn.dto;
+package com.beauty1nside.bsn.dto.order;
 
 import java.util.Date;
+
+import com.beauty1nside.bsn.dto.OrderSearchDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

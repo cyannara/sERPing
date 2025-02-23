@@ -28,7 +28,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         	<div class="col-md-8  grid-margin stretch-card">
             	<div class="card">
               		<div class="card-body">
-                		<h4 class="card-title">주문 목록</h4>
+                		<h4 class="card-title">출고 목록</h4>
                 		<p class="card-description">그리드 - 검색한 주문 리스트 출력</p>
                 		<div id="orderList"></div>
                		 	<div id="pagination" class="tui-pagination"></div>
@@ -42,7 +42,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
               		<div class="card-body">
                 		<h4 class="card-title">주문 목록</h4>
                 		<p class="card-description">그리드 - 검색한 주문 리스트 출력</p>
-                		<div id="orderList"></div>
+                		<div id="deliDetail"></div>
                		 	<div id="pagination" class="tui-pagination"></div>
               		</div>
             	</div>
@@ -55,7 +55,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 var Grid = tui.Grid;
 const OrderListDataSource = {
 		api: {
-			readData: { url: 'http://localhost:81/bsn/rest/orderList', method: 'GET', initParams: { page: 1 }},
+			readData: { url: 'http://localhost:81/bsn/rest/deli', method: 'GET', initParams: { page: 1 }},
 		},
 		contentType: 'application/json'
 };
@@ -69,13 +69,16 @@ const orderList = new Grid({
 		perPage: 10,
 	},
 	columns: [ 
+		{ header : "출고ID", name : "deliveryId", sortable : true},
 		{ header : "주문ID", name : "orderId", sortable : true},
 		{ header : "주문명", name : "orderName", width: 'auto',  sortable : true},
-		{ header : "발주코드", name : "orderCode"},
 		{ header : "지점코드", name : "branchOfficeId"},
+		{ header : "담당자번호", name : "employeeNum"},
 		// { header : "회사번호", name : "companyNum"},
 		{ header : "주문일", name : "orderDate", formatter: ({ value }) => formatDate(value, 'order'), width: 'auto', sortable : true},
 		{ header : "납기일", name : "dueDate", formatter: ({ value }) => formatDate(value, 'due'), width: 'auto', sortable : true},
+		{ header : "출고일", name : "delivaryDate", formatter: ({ value }) => formatDate(value, 'due'), width: 'auto', sortable : true},
+		{ header : "출고상태", name : "deliveryStatus", sortable : true},
 		{ header : "비고", name : "remark", width: 'auto'},
 	],
 	data: OrderListDataSource
@@ -92,6 +95,70 @@ function formatDate(dateString, type) {
         : date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }); // "02/17 (월)"
 }
 
+
+
+//출고 클릭 시 상세 불러오기
+orderList.on('click', (ev) => {
+	
+    const rowKey = ev.rowKey; // 클릭한 행의 키
+    if (rowKey === null || rowKey === undefined) {
+        return;
+    }
+    
+    //console.log(rowKey);
+    const rowData = orderList.getRow(rowKey); // 클릭한 행 데이터 가져오기
+    console.log(rowData.deliveryId);
+    if (rowData && rowData.deliveryId) {
+    	loadDeliveryDetail(rowData.deliveryId); // 상세 정보 불러오기
+    }
+});
+
+//불러오는 함수
+function loadDeliveryDetail(deliveryId) {
+	if (!deliveryId) {
+        console.warn("유효하지 않은 주문 Id입니다.");
+        return;
+    }
+	
+    fetch(`http://localhost:81/bsn/rest/deli/detail?deliveryId=${deliveryId}`)
+    	
+        .then(response => {
+	            if (!response.ok) throw new Error(`HTTP 오류! 상태: ${response.status}`);
+	            return response.json();
+	     })
+	     
+        .then(data => {
+            if (data && data.data && data.data.contents) {
+            	const detailData = data.data.contents; // 상세 데이터 저장
+            	
+            	
+            	//
+                deliveryDetailGrid.resetData(detailData);
+            } else {
+                console.warn("상세 데이터가 없습니다.");
+                orderDetailGrid.resetData([]); // 빈 배열로 초기화
+            }
+        })
+        .catch(error => console.error('Error fetching order detail:', error));
+}
+
+//상세 그리드 형식
+const deliveryDetailGrid = new Grid({
+el: document.getElementById('deliDetail'),
+columns: [
+    { header: "상품명", name: "goodsName", 
+    //	width: 'auto' ,	
+    },
+    { header: "옵션명", name: "optionName", },
+    { header: "옵션코드", name: "optionCode",  },
+    { header: "수량", name: "quantity",  },
+
+],
+pageOptions: {
+    useClient: false,
+    perPage: 5
+}
+});
 </script>
 </body>
 </html>
