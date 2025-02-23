@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -23,7 +24,10 @@ import com.beauty1nside.common.Paging;
 import com.beauty1nside.purchs.dto.ProdInsertVO;
 import com.beauty1nside.purchs.dto.ProductDTO;
 import com.beauty1nside.purchs.dto.ProductSearchDTO;
+import com.beauty1nside.purchs.dto.PurchInsertVO;
+import com.beauty1nside.purchs.dto.PurchaseSearchDTO;
 import com.beauty1nside.purchs.service.productService;
+import com.beauty1nside.purchs.service.purchaseService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
@@ -37,6 +41,7 @@ import lombok.extern.log4j.Log4j2;
 @RequestMapping("/purchs/rest/*")
 public class ProductRestController {
 	final productService productService;
+	final purchaseService purchaseService;
 	
 	//브랜드 모달 데이터 조회 
 	@GetMapping("/brand/list")
@@ -44,7 +49,7 @@ public class ProductRestController {
 							@RequestParam(name="page", defaultValue = "1" ,required = false) int page,
 							@ModelAttribute ProductSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
 		
-		log.info("정보==",dto.getBrandName());
+	
 		
 		//페이징 유닛 수 
 		paging.setPageUnit(perPage);
@@ -210,6 +215,54 @@ public class ProductRestController {
 					return result;
 				
 				}
+				
+		//발주서등록
+		@PostMapping("/purchase/insert")
+		public ResponseEntity<Map<String, Object>> purchaseInsert(@RequestBody List<PurchInsertVO> purchInsertVOList) {
+		    log.info("컨트롤러====={}", purchInsertVOList);
+		    Map<String, Object> response = new HashMap<>();
+		    try {
+		        purchaseService.purchaseInsert(purchInsertVOList);
+		        response.put("status", "success");
+		        response.put("message", "발주 등록 성공");
+		        return ResponseEntity.ok(response);
+		    } catch(Exception e) {
+		        e.printStackTrace();
+		        log.error("등록 실패", e);
+		        response.put("status", "error");
+		        response.put("message", "서버 오류 발생: " + e.getMessage());
+		        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+		    }
+		}
+		
+		//발주서 조회 
+		@GetMapping("/purchase/list")
+		public Object purchaseList(@RequestParam(name="perPage",defaultValue="2", required = false) int perPage,
+								@RequestParam(name="page", defaultValue = "1" ,required = false) int page,
+								 @RequestParam(name="companyNum", required=true) int companyNum,  // ✅ 회사번호 필수
+								@ModelAttribute PurchaseSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
+			// 회사 번호를 DTO에 설정 (필수)
+		    dto.setCompanyNum(companyNum); 
+			
+			//페이징 유닛 수 
+			paging.setPageUnit(perPage);
+			paging.setPage(page);
+			
+			//페이징 조건
+			dto.setStart(paging.getFirst());
+			dto.setEnd(paging.getLast());
+			
+			//페이징 처리 
+			paging.setTotalRecord(purchaseService.purchaseCount(dto));
+			
+			//grid배열 처리 
+			GridArray grid = new GridArray();
+			Object result = grid.getArray(paging.getPage(), purchaseService.purchaseCount(dto),purchaseService.getPurchaselist(dto));
+			return result;
+		
+		}
+
+
 }
 
 	

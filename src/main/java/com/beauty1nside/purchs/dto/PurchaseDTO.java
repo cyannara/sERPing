@@ -13,13 +13,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PurchaseDTO {
 	//발주서 헤드
-	private int puchaseNum;
-	private Date puchaseDate;
-	private Date puchaseDueDate;
-	private int puchaseVatFlag;
+	private Long purchaseNum;
+	private Date purchaseDate;
+	private Date purchaseDueDate;
+	private int purchaseVatFlag;
 	private int employeeNum;
-	private int orderPlanTotalAmount;
+	private String employeeName;
 	private int companyNum;
+	private int purchaseTotalAmount;
+	private String purchaseStatus;
+	private String businessNum;
+	private String representationName;
 	
 	//기타
 	private String goodsCode;
@@ -28,16 +32,30 @@ public class PurchaseDTO {
 	private String optionName;
 	private String classificationName;
 	private String goodsStandard;
+	private String employeePhone;
+	private String employeeEmail;
+	
+	private Date startDate;
+	private Date endDate;
+	
+	
+	
+	
 	
 	//발주서 바디
 	private int purchaseBodyNum;
-	private int puchaseQuantity;
-	private int puchaseUnitPrice;
-	private int puchaseSupplyPrice;
-	private int puchaseVat;
+	private int purchaseQuantity;
+	private int purchaseUnitPrice;
+	private int purchaseSupplyPrice;
+	private int purchaseVat;
 	private int orderPlanBodyNum;
-	private int optionNum;
 	private int vendorId;
 	private String vendorName;
+	private String vendorEmail; 
+	private String vendorPhone;
+	private int optionNum;
+
+	
+	
 	
 }

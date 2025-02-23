@@ -43,6 +43,19 @@
 		    text-overflow: ellipsis !important; /* 긴 내용은 "..." 처리 */
 		}
 		
+		/* ✅ 동일한 행 강조 효과 */
+		.highlight-row {
+		    animation: flash 1.5s ease-in-out;
+		}
+		
+		@keyframes flash {
+		    0% { background-color: #ffeb3b; }
+		    50% { background-color: #ffffff; }
+		    100% { background-color: #ffeb3b; }
+		}
+		
+		
+	
     </style>
     
 

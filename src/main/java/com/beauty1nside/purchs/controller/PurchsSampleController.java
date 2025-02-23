@@ -63,8 +63,21 @@ public class PurchsSampleController {
 		return "/purchs/goodslist";
 	}
 	
+	
+	// 메일 페이지 이동
+	@GetMapping("/mailsender")
+	public String mailtest() {
+		return "/purchs/mailsender"; // 페이지 출력 
+	};
+	
+	// 메일 페이지 이동
+	@GetMapping("/purchaselist")
+	public String purchslist() {
+		return "/purchs/purchslist"; // 페이지 출력 
+	};
 
-
+	
+	
 	
 	
 	

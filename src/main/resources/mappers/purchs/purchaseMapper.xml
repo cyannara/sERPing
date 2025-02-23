@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beauty1nside.purchs.mapper.purchaseMapper">
+
+<!-- 발주서 등록 프로시저 호출-->
+<insert id="purchaseInsert" statementType="CALLABLE" parameterType="com.beauty1nside.purchs.dto.PurchInsertVO">
+    {CALL purchs_order_register(
+        #{employeeNum, mode=IN, jdbcType=NUMERIC},
+        #{companyNum, mode=IN, jdbcType=NUMERIC},
+        #{purchaseDate, mode=IN, jdbcType=DATE},
+        #{purchaseDueDate, mode=IN, jdbcType=DATE},
+        #{purchaseVatFlag, mode=IN, jdbcType=NUMERIC},
+        #{vendorId, mode=IN, jdbcType=NUMERIC},
+        #{files, mode=IN, jdbcType=ARRAY, typeHandler=com.beauty1nside.purchs.OracleArrayPurchaseHandler}
+    )}
+</insert>
+
+<!-- 발주서 조회 purchaselist -->
+<!-- 발주서 조회 -->
+<select id="purchaseList" resultType="PurchaseDTO">
+    SELECT * FROM (
+        SELECT /*+index_desc(purchs_purchase_header PK_PURCHS_PURCHASE_HEADER)*/
+               ROWNUM RN, 
+               h.purchase_num,
+               h.purchase_due_date,
+               h.PUCHASE_TOTAL_AMOUNT,
+               h.purchase_status,
+               h.purchase_vat_flag,
+               b.purchase_quantity,
+               b.purchase_supply_price,
+               b.purchase_vat,
+               b.goods_standard,
+               v.vendor_name,
+               v.email AS vendor_email,
+               v.phone AS vendor_phone,
+               c.business_num,
+               c.company_num,
+               c.REPRESENTATION_NAME,
+               erp_employee_name(h.employee_num),
+               e.phone AS employee_phone,
+               e.email AS employee_email,
+               g.goods_name,
+               g.goods_code,
+               o.option_name,
+               o.option_code
+        FROM purchs_purchase_header h
+        JOIN purchs_purchase_body b ON h.purchase_num = b.purchase_num
+        JOIN grpwr_vendor v ON h.vendor_id = v.vendor_id
+        JOIN erp_company c ON h.company_num = c.company_num
+        JOIN hr_employee e ON h.employee_num = e.employee_num
+        JOIN purchse_option o ON o.option_num = b.option_num 
+        JOIN purchse_goods g ON o.goods_num = g.goods_num
+        WHERE h.company_num = #{companyNum}  <!-- ✅ 기본 WHERE 조건 -->
+        <include refid="searchPurchaseListInfo"/>  <!-- ✅ 추가 검색 조건 -->
+        ORDER BY h.purchase_num DESC
+    ) 
+    WHERE RN BETWEEN #{start} AND #{end}  <!-- ✅ 페이징 조건 추가 -->
+</select>
+<!-- 발주서 수 카운트 -->
+<select id="purchaseCount" resultType="int">
+    SELECT COUNT(*) 
+    FROM purchs_purchase_header h
+    JOIN purchs_purchase_body b ON h.purchase_num = b.purchase_num
+    JOIN grpwr_vendor v ON h.vendor_id = v.vendor_id
+    JOIN erp_company c ON h.company_num = c.company_num
+    JOIN hr_employee e ON h.employee_num = e.employee_num
+    JOIN purchse_option o ON o.option_num = b.option_num 
+    JOIN purchse_goods g ON o.goods_num = g.goods_num
+    WHERE h.company_num = #{companyNum}  <!-- ✅ 기본 WHERE 조건 -->
+    <include refid="searchPurchaseListInfo"/>  <!-- ✅ 추가 검색 조건 -->
+</select>
+<!-- 검색 조건 추가 -->
+<sql id="searchPurchaseListInfo">
+    <if test="goodsName != null and goodsName != ''">
+        AND g.goods_name LIKE '%' || #{goodsName} || '%'
+    </if>
+    <if test="purchaseNum != null and purchaseNum != ''">
+        AND h.purchase_num = #{purchaseNum}
+    </if>
+    <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+        AND h.purchase_due_date BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+    </if>
+</sql>
+
+
+
+
+
+
+</mapper>
