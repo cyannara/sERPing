@@ -20,6 +20,12 @@ public class BhfVueController {
 	  public void setAttributes(Model model) {
 	    model.addAttribute("menu", "branch");
 	  }
+	
+	//샘플 페이지
+	@GetMapping("/barcodeCreate")
+	public String barcodeCreate() {
+		return "/bhf/barcodeCreate";
+	};
 
 	//샘플 페이지
 	@GetMapping("/")
@@ -60,6 +66,18 @@ public class BhfVueController {
 	@GetMapping("/goodsIn")
 	public String goodsIn() {
 		return "/bhf/goodsIn";
+	}
+	
+	// 재고 관리 페이지
+	@GetMapping("/inventory")
+	public String inventory() {
+		return "/bhf/inventory";
+	}
+	
+	// 상품 입고 페이지
+	@GetMapping("/invenHistory")
+	public String invenHistory() {
+		return "/bhf/invenHistory";
 	}
 	
 }

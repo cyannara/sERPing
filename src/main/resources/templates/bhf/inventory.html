@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layouts/layout}"
+      lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<title>재고 조회</title>
+</head>
+<body layout:fragment="content">
+	<div class="container">
+		<div class="row">
+			<h3 class="mt-2 mb-2">재고 관리</h3>
+			<hr>
+			<div class="col-md-6 mt-2 mb-5">
+				<div class="row">
+					<label class="col-sm-4">상품명</label> 
+					<input type="text"class="col-sm-5" id="goodsName"> 
+					<button type="button" class="col-sm-2" onclick="search()">검색</button>
+				</div>
+			</div>
+			<div class="col-md-6 mt-2 mb-5">
+				<div class="row">
+					<label class="col-sm-4">지점명</label> 
+					<input type="text"class="col-sm-7" id="branchOfficeId">
+				</div>
+			</div>
+			<div class="col-md-12 stretch-card mt-2 mb-5">
+				<div class="card">
+					<div class="card-body">
+						<h6 class="mb-4">상품 재고 조회</h6>
+						<div id="inventory"></div>
+						<div id="pagination" class="tui-pagination"></div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-12 stretch-card mt-2 mb-2">
+				<div class="card">
+					<div class="card-body">
+						<h6 class="mb-4">재고 조정 등록</h6>
+						<div id="mediation"></div>
+						<div id="pagination" class="tui-pagination"></div>
+						<div style="text-align : center">
+							<button onclick="insert()">등록</button>
+							<button onclick="reset()">초기화</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script>
+		var Grid = tui.Grid;
+		
+		const header = document.querySelector('meta[name="_csrf_header"]').content; //서버에서 요구하는 CSRF 헤더이름
+	    const token = document.querySelector('meta[name="_csrf"]').content; //서버에서 생성한 CSRF 토큰 값
+		
+		//페이지가 로드되면 테이블에 데이터가 없을때 뜨는 문구 함수 실행
+		document.addEventListener("DOMContentLoaded",()=>{
+			MDnodata();
+		})
+		
+		// 상품 조회 쿼리 호출
+		const dataSource = {
+			api: {
+				readData: { url: 'http://localhost:81/bhf/rest/inventory/list', method: 'GET', initParams: { page: 1 }},
+			},
+			contentType: 'application/json'
+			
+		};
+		// 재고 테이블
+		const grid = new Grid({
+			el: document.getElementById('inventory'), 
+			pageOptions: {
+				useClient: false,
+				perPage: 5,
+			},
+			columns: [ 
+				{ header : "상품코드", name : "goodsCode"},
+				{ header : "상품명", name : "goodsName"},
+				{ header : "옵션코드", name : "optionCode"},
+				{ header : "옵션명", name : "optionName"},
+				{ header : "규격", name : "goodsStandard"},
+				{ header : "수량", name : "stockQuantity"}
+			],
+			data: dataSource
+		});
+		// 재고 테이블 행 선택
+		grid.on('click', (ev) => {
+		    const rowData = grid.getRow(ev.rowKey); // 해당 행의 데이터 가져오기
+	        if (rowData) {
+		        const currentData = grid2.getData(); // 기존 데이터 가져오기
+		        
+		        // 중복 체크(옵션코드가 동일한 행에 이미 있으면 추가하지 않음)
+		        const check = currentData.find(item => item.optionCode === rowData.optionCode );
+		        if(check){
+		        	alert("이미 추가된 재고입니다.")
+		        }else{	        	
+		        	// 기존 데이터에서 가장 큰 rowKey 찾기 (없으면 0부터 시작) 그 다음 1씩 추가해서 rowkey 만들기
+	                const newRowKey = currentData.length > 0
+	                    ? Math.max(...currentData.map(item => item.rowKey)) + 1
+	                    : 0;
+
+	                // 새로운 행에 rowKey 추가
+	                const newRow = { ...rowData, rowKey: newRowKey };
+
+	                // resetData 사용 시 기존 데이터의 rowKey도 재설정
+	                const updatedData = [...currentData, newRow].map((item, index) => ({
+	                    ...item,
+	                    rowKey: index // 고유한 rowKey 부여
+	                }));
+
+	                grid2.resetData(updatedData);
+		        }
+		    }
+		});
+		
+		// 주문 상세 테이블
+		const grid2 = new Grid({
+			el: document.getElementById('mediation'), 
+			pageOptions: {
+				useClient: false,
+				perPage: 5,
+			},
+			columns: [ 
+				{ header : "상품코드", name : "goodsCode", hidden : 1},
+				{ header : "옵션코드", name : "optionCode", hidden : 1},
+				{ header : "상품명", name : "goodsName"},
+				{ header : "옵션명", name : "optionName"},
+				{ header : "규격", name : "goodsStandard"},
+				{ header : "수량", name : "stockQuantity"},
+				{ 
+					header : "조정수량", 
+					name : "mediationQuantity", 
+					editor: 'text',
+					onAfterChange: function(ev) { // onAfterChange는 해당 열에 변경이 있을때마다 호출되는 이벤트
+		                // ev.value:사용자가 입력한 값, ev.rowkey:변경된 셀이 어떤 행인지 알려주는 키
+		                // 값이 숫자만 포함하고 있는지 확인
+		                const value = /^[0-9]*$/.test(ev.value); // 숫자만 허용하는 정규식
+		                // 숫자가 아닌 값이 들어왔을 때 
+		                if (!value) {
+		                    grid2.setValue(ev.rowKey, ev.columnName, '');  // 해당 셀을 비웁니다
+		                    alert("조정수량은 숫자만 입력할 수 있습니다.");
+		                }
+		            }
+				},
+				{ header : "조정사유",  name : "mediationReason", editor: 'text'}
+			],
+			data: ""
+		});
+		
+		// 조정 등록
+		function insert() {
+			
+		    let mediationData = grid2.getData(); 
+		    let branchOfficeId = document.querySelector("#branchOfficeId").value; // 지점 ID
+		    let companyNum = 1; // 나중에 세션값 가져와야함
+		
+		    if (mediationData.length === 0) {
+		        alert("등록할 상품을 선택해주세요.");
+		        return;
+		    }
+			// 조정 수량 및 사유 작성 했는지 확인
+			for (let i = 0; i < mediationData.length; i++) {
+				
+				const mediationQuantity = Number(mediationData[i].mediationQuantity); // 문자열을 숫자로 변환(0도 비교하기 위해서)
+				const mediationReason = mediationData[i].mediationReason;
+				
+			    if (mediationQuantity === 0 || mediationQuantity === "" || mediationQuantity === null) {  // 수량이 비어있는지 확인
+		            alert("조정수량을 입력해주세요.");
+		            return;  // 수량이 없으면 더 이상 진행하지 않음
+		        }
+			    if (mediationReason === "" || mediationReason === null){
+			    	alert("조정사유를 입력해주세요.");
+		            return;
+			    }
+		    }
+			
+		    // map으로 필요한 데이터 추가하여 새로운 배열 생성하고 객체로 담는다
+		    let requestData = {
+		    	mediationList: mediationData.map(item => ({
+			        goodsCode: item.goodsCode,
+			        goodsName: item.goodsName,
+			        optionCode: item.optionCode,
+			        optionName: item.optionName,
+			        goodsStandard: item.goodsStandard,
+			        mediationQuantity: item.mediationQuantity,
+			        mediationReason: item.mediationReason,
+			        branchOfficeId: branchOfficeId,
+			        companyNum: companyNum
+		    	}))
+		    };
+		
+		    // 서버에 요청 보내기
+		    fetch("http://localhost:81/bhf/rest/insert/update", {
+		        method: "POST",
+		        headers: {
+		            "Content-Type": "application/json",
+		          	//위에 변수로 저장한 헤더이름,토큰값 넣어주기
+		        	'header': header, 
+		            'X-CSRF-Token': token
+		        },
+		        body: JSON.stringify(requestData) // 가공한 데이터 JSON으로 전송
+		    })
+		    .then(response => response.json())
+		    .then(result => {
+		        if (result) {
+		            alert("조정 등록이 완료되었습니다.");
+		            grid2.resetData([]); // 등록 후 그리드 초기화
+		            MDnodata(); // 데이터 없을떄 나오는 문구
+		            grid.readData(); //변경된값 볼수있게 테이블 새로고침
+		        } else {
+		            alert("조정 등록에 실패했습니다.");
+		        }
+		    })
+		    .catch(error => {
+		        console.error("Error:", error);
+		        alert("서버 오류가 발생했습니다.");
+		    });
+		}
+		
+		// 검색 함수
+		function search(){
+			let goodsName = document.querySelector('#goodsName').value;
+			grid.setRequestParams({"goodsName" : goodsName})
+			grid.readData();
+			nodata();
+		}
+		
+		// 재고 테이블 데이터 없을때 나오는 문구
+		function nodata(){
+			setTimeout( () => {
+				let nodata = document.querySelectorAll('.tui-grid-layer-state-content p')[0];
+				nodata.innerHTML = '해당하는 상품이 없습니다.';
+			}, 100)
+		}
+		// 조정 등록 테이블 데이터 없을때 나오는 문구
+		function MDnodata(){
+			setTimeout( () => {
+				let nodata = document.querySelectorAll('.tui-grid-layer-state-content p')[1];
+				nodata.innerHTML = '재고를 선택 해주세요';
+			}, 100)
+		}
+	</script>
+	
+</body>
+</html>

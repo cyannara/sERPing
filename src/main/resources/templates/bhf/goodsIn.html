@@ -134,6 +134,7 @@
 					let inQuantity = ev.value; // 입고수량 값 가져오기
 			        let rowData = grid2.getRow(rowKey); // 해당 행 데이터 가져오기
 			        let goodsStandard = rowData.goodsStandard; // 데이터에서 규격 가져오기
+			        let quantity = rowData.quantity; // 발주수량 가져오기
 			        
 			        // 규격에서 숫자만 추출(앞에 숫자는 뺴고)
 			        let standardValue = goodsStandard.replace(/^[0-9]|[^0-9]/g, ""); 
@@ -142,13 +143,18 @@
 			        // 그리드 값 업데이트
 			        grid2.setValue(rowKey, "stockQuantity", stockQuantity); // 계산된 값 적용
 			        
+			        // 발주수량이랑 입고수량 비교
+			        let num = Math.abs(quantity - inQuantity); // Math.abs() 음수를 양수로 변경
+			        grid2.setValue(rowKey, "num", num);
+			        
 			        // 입고수량에 숫자를 제외한 값들이 들어오면
 			        if (!/^[0-9]*$/.test(ev.value)) {
 	                    grid2.setValue(ev.rowKey, ev.columnName, '');  // 해당 셀을 비웁니다
 	                    alert("수량은 숫자만 입력할 수 있습니다.");
 	                }
 				}
-			}
+			},
+			{ header : "재발주OR반품수량",  name : "num", hidden : 1}
 		],
 		data: ""
 	});
@@ -160,19 +166,17 @@
 		
 		let returnData = grid2.getData();
 		
-		// 교환,반품 테이블에 데이터가 있는지 확인
+		// 테이블에 데이터가 있는지 확인
 		if (returnData.length === 0) {
-	        alert("교환 및 반품할 상품을 추가해주세요.");
+	        alert("입고할 상품을 추가해주세요.");
 	        return;
 	    }
 		// 발주 수량을 적었는지 확인
 		for (let i = 0; i < returnData.length; i++) {
 			
-			console.log("TEST",returnData[i].stockQuantity);
+			const stockQuantity = Number(returnData[i].stockQuantity); // 문자열을 숫자로 변환(0도 비교하기 위해서)
 			
-			const quantity = Number(returnData[i].quantity); // 문자열을 숫자로 변환(0도 비교하기 위해서)
-			
-		    if (quantity === 0 || quantity === "" || quantity === null) {  // 수량이 비어있는지 확인
+		    if (stockQuantity === 0 || stockQuantity === "" || stockQuantity === null) {  // 수량이 비어있는지 확인
 	            alert("수량을 입력해주세요.");
 	            return;  // 수량이 없으면 더 이상 진행하지 않음
 	        }
@@ -240,7 +244,6 @@
 	
 	// 주문 테이블 데이터 없을때 나오는 문구
 	function ORnodata(){
-		console.log("nodata실행")
 		setTimeout( () => {
 			let nodata = document.querySelectorAll('.tui-grid-layer-state-content p')[0];
 			nodata.innerHTML = '해당하는 데이터가 없습니다.';
