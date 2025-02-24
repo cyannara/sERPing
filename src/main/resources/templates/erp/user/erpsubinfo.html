@@ -30,7 +30,7 @@
 	        margin-bottom: 20px;
 			font-weight: bold;
 			text-align: center;
-			font-size: 26px;
+			font-size: 20px;
 	    }
 	    /* 그리드 선택하면 생기는 색상 */
 		.tui-grid-row-highlight {
@@ -134,7 +134,7 @@
 			<div class="col-md-6 stretch-card mt-2 mb-2">
 				<div class="card">
 					<div class="card-body">
-						<h6 class="mb-4">구독상세</h6>
+						<h6 class="mb-4">구독정보</h6>
 						<div id="subDetailgrid"></div>
 					</div>
 				</div>
@@ -142,18 +142,55 @@
 			<div class="col-md-6 stretch-card mt-2 mb-2">
 				<div class="card">
 					<div class="card-body">
-						<h6 class="mb-4">처리상세</h6>
+						<h6 class="mb-4">나의구독</h6>
+						
+							<div id="custom-container">
+								<div class="d-flex">
+									<div class="p-1 flex-fill">
+										<div class="d-flex">
+											<div class="p-1 flex-fill bg-primary-subtle">
+												구독형태
+											</div>
+											<div class="p-1 flex-fill border border-primary-subtle border-2">
+												<span id=subObj></span>
+											</div>
+										</div>
+									</div>
+									<div class="p-1 flex-fill">
+										<div class="d-flex">
+											<div class="p-1 flex-fill bg-primary-subtle">
+												남은기간
+											</div>
+											<div class="p-1 flex-fill border border-primary-subtle border-2">
+												<span id="subObjdate"></span>
+											</div>
+										</div>
+									</div>
+									<div class="p-1 flex-fill">
+										<div class="d-flex">
+											<div class="p-1 flex-fill bg-primary-subtle">
+												만료일
+											</div>
+											<div class="p-1 flex-fill border border-primary-subtle border-2">
+												<span id="subObjdateDay"></span>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
 							<div class="d-flex justify-content-center" style="font-size: 20px;">
 								<div class="d-flex flex-column mb-3">
-									<div class="p-1 bg-primary-subtle">구독형태</div>
+									<div class="p-1 bg-primary-subtle">부가서비스</div>
 									<div class="p-1 bg-primary-subtle border border-primary-subtle border-2 border-bottom-0">남은기간</div>
 									<div class="p-1 bg-primary-subtle border border-primary-subtle border-2">만료일</div>
 								</div>
+								<!-- 
 								<div class="d-flex flex-column mb-3">
 									<div class="p-1 bg-primary-subtle"><span id=subObj></span></div>
 									<div class="p-1 border border-primary-subtle border-2 border-bottom-0"><span id="subObjdate"></span></div>
 									<div class="p-1 border border-primary-subtle border-2"><span id="subObjdateDay"></span></div>
 								</div>
+								 -->
 								<div class="d-flex flex-column mb-3">
 									<div class="p-1 bg-primary-subtle">그룹웨어</div>
 									<div class="p-1 border border-primary-subtle border-2 border-bottom-0"><span id="gpOption"></span></div>
@@ -405,10 +442,12 @@
 		//명세서버튼 클릭
 		document.getElementById('sublist').addEventListener('click', function(event) {
 		    if (event.target.classList.contains('sub-bill')) {
+		       	//거래명세서 발행
 		        const subscriptionNum = event.target.getAttribute('data-id');
-		       	alert(subscriptionNum+"거래번호의 명세서를 PDF로 발행하기");
-		        //handleTransactionStatement(subscriptionNum);
+		       	const url = `/erp/report/report?companynum=[[${session.companyNum}]]&subscriptionnum=${subscriptionNum}`;
+		        window.open(url, '_blank');
 		    }else if(event.target.classList.contains('sub-tax')){
+		    	//세금계산서 발행
 		    	const subscriptionNum = event.target.getAttribute('data-id');
 		    	let tax = subscriptionNum.split("_");
 		    	if(tax[1] == 2){
@@ -417,6 +456,7 @@
 		    		alert(subscriptionNum+"세금계산서 DB에 있는 계산서 보여주기");
 		    	}
 		    }else if(event.target.classList.contains('sub-cash')){
+		    	//현금영수증 발행
 		    	const subscriptionNum = event.target.getAttribute('data-id');
 		    	let cash = subscriptionNum.split("_");
 		    	if(cash[1] == 2){

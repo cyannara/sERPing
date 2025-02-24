@@ -121,8 +121,26 @@
 		    <artifactId>commons-net</artifactId>
 		    <version>3.8.0</version>
 		</dependency>
+		<!-- =======================바코드 생성 디펜더시============================= -->
+        <!-- ZXing Core 라이브러리 -->
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>3.5.2</version>
+        </dependency>
+        <!-- ZXing을 이용해 이미지 변환을 지원하는 JavaSE 라이브러리 -->
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>javase</artifactId>
+            <version>3.5.2</version>
+        </dependency>
+        <!-- 제스퍼사용 -->
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports</artifactId>
+			<version>6.4.0</version>
+		</dependency>
 	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>
