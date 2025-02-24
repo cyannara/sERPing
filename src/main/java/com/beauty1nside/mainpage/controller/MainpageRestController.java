@@ -7,6 +7,8 @@ import com.beauty1nside.mainpage.dto.ApprovalSearchDTO;
 import com.beauty1nside.stdr.dto.DocumentDTO;
 import com.beauty1nside.mainpage.service.ApprovalService;
 import com.beauty1nside.security.service.CustomerUser;
+import com.beauty1nside.stdr.dto.StdrDeptDTO;
+import com.beauty1nside.stdr.service.StdrDeptService;
 import com.beauty1nside.utils.DateTimeUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
@@ -24,6 +26,7 @@ import java.util.Map;
 @RequestMapping("/api/mainpage/*")
 public class MainpageRestController {
   final ApprovalService approvalService;
+  final StdrDeptService stdrDeptService;
   
   @GetMapping("/approval/list")
   public Object approvalList(@RequestParam(name = "perPage", defaultValue = "20", required = false) int perPage,
@@ -109,6 +112,12 @@ public class MainpageRestController {
   public List<DocumentDTO> getApprovalType(@AuthenticationPrincipal CustomerUser user) {
     Long companyNum = user.getUserDTO().getCompanyNum();
     return approvalService.documentList(companyNum);
+  }
+  
+  @GetMapping("/dept")
+  public List<StdrDeptDTO> getDeptList(@AuthenticationPrincipal CustomerUser user) {
+    Long companyNum = user.getUserDTO().getCompanyNum();
+    return stdrDeptService.deptList(companyNum);
   }
   
 }

@@ -3,12 +3,36 @@
 
 // calendar
 const Calendar = tui.Calendar;
-
 const container = document.getElementById('calendar');
+let scheduleType = []
 
-// const deptList = ''
-// fetch()
+const deptListUrl = '/api/mainpage/dept'
+fetch(deptListUrl, {
+    method: 'GET',
+    headers: {
+        "Content-Type": "application/json",
+    }
+}).then(data => {
+    return data.json()
+}).then((data) => {
+    console.log('data', data)
 
+    const color = [
+        '#03bd9e', '#00a9ff', '#02735E', '#6A0DAD', '#8B0000', '#FF4500', '#1B1F3B', '#2C2C2C',
+        '#03bd9e', '#00a9ff', '#02735E', '#6A0DAD', '#8B0000', '#FF4500', '#1B1F3B', '#2C2C2C',
+        '#03bd9e', '#00a9ff', '#02735E', '#6A0DAD', '#8B0000', '#FF4500', '#1B1F3B', '#2C2C2C'
+    ]
+
+    scheduleType = data.map((dept, idx) => {
+        return {
+            id: dept.deptNo,
+            name: `${dept.deptName}-${dept.branch}`,
+            backgroundColor: color[idx]
+        }
+    })
+    console.log(scheduleType)
+    calendar.render();
+})
 const options = {
     defaultView: 'month',
     isReadOnly: false,
@@ -23,24 +47,19 @@ const options = {
     theme: {
         // ...
     },
-    calendars: [
-        {
-            id: 'cal1',
-            name: '개인',
-            backgroundColor: '#03bd9e',
-        },
-        {
-            id: 'cal2',
-            name: '부서',
-            backgroundColor: '#00a9ff',
-        },
-    ],
+    calendars: scheduleType,
     template: {
         // ...
     },
 };
-
 const calendar = new Calendar(container, options);
+
+
+
+
+
+
+
 
 calendar.createEvents([
     {

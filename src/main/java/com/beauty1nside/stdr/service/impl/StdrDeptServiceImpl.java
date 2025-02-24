@@ -1,6 +1,6 @@
 package com.beauty1nside.stdr.service.impl;
 
-import com.beauty1nside.stdr.dto.DocumentDTO;
+import com.beauty1nside.stdr.dto.StdrDeptDTO;
 import com.beauty1nside.stdr.mapper.StdrDeptMapper;
 import com.beauty1nside.stdr.service.StdrDeptService;
 import lombok.RequiredArgsConstructor;
@@ -12,12 +12,17 @@ import java.util.List;
 @Log4j2
 @Service
 @RequiredArgsConstructor
-public class StdrStdrDeptServiceImpl implements StdrDeptService {
+public class StdrDeptServiceImpl implements StdrDeptService {
 	
 	private final StdrDeptMapper stdrDeptMapper;
 	
 	@Override
-	public List<DocumentDTO> hqDeptList(DocumentDTO dto) {
-		return stdrDeptMapper.hqDeptList(dto);
+	public List<StdrDeptDTO> hqDeptList(Long companyNum) {
+		return stdrDeptMapper.hqDeptList(companyNum);
+	}
+	
+	@Override
+	public List<StdrDeptDTO> deptList(Long companyNum) {
+		return stdrDeptMapper.deptList(companyNum);
 	}
 }
