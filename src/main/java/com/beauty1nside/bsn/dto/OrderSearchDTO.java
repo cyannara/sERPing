@@ -14,8 +14,6 @@ public class OrderSearchDTO {
 	int end;
 	int pageUnit;
 	
-	String type;
-	String keyword;
 	
 	//발주 요청 검색용
 	String deteOption;

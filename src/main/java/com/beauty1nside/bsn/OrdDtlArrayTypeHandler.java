@@ -13,8 +13,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 import org.springframework.util.StringUtils;
 
-
-import com.beauty1nside.bsn.dto.BsnOrderDetailDTO;
+import com.beauty1nside.bsn.dto.order.BsnOrderDetailDTO;
 
 public class OrdDtlArrayTypeHandler implements TypeHandler<Object> {
 

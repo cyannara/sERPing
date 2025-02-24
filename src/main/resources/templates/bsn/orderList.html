@@ -199,7 +199,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		
 		
 	    const rowKey = ev.rowKey; // 클릭한 행의 키
-	    if (!rowKey) {
+	    if (rowKey === null || rowKey === undefined) {
 	        return;
 	    }
 	    

@@ -1,4 +1,4 @@
-package com.beauty1nside.bsn.dto;
+package com.beauty1nside.bsn.dto.order;
 
 
 import lombok.AllArgsConstructor;
