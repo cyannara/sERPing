@@ -10,7 +10,7 @@ public class BhfReturnListDTO {
 	private String returningCode;
 	private Date requestDate;
 	private String progressStatus;
-	private String remark;
+	private String returnRemark;
 	private int companyNum;
 	private String branchOfficeId;
 	

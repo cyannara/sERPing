@@ -4,8 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +31,7 @@ import lombok.extern.log4j.Log4j2;
 @RequestMapping("/hr/rest")
 public class HrRestController {
 	final EmpService empService;
+	final PasswordEncoder passwordEncoder;
 	
 	@GetMapping("/emp/list")
 	public Object empList(@RequestParam(name = "perPage", defaultValue = "2", required = false) int perPage, 
@@ -76,6 +79,27 @@ public class HrRestController {
     // 🔹 사원 등록 API
     @PostMapping("/emp/register")
     public ResponseEntity<String> registerEmployee(@RequestBody EmpDTO empDTO) {
+    	
+    	log.info("empDTO={}",empDTO);
+    	log.info("ssnFirstPart={}",empDTO.getSsn());
+    	
+    	//ssn 합치기
+    	String newSsn = empDTO.getFirstSsn()+"-"+empDTO.getSecondSsn();
+    	newSsn = passwordEncoder.encode(newSsn);
+    	empDTO.setSsn(newSsn);
+    	
+    	//비밀번호: 생년월일 8자리
+    	String ssnFirstPart = empDTO.getFirstSsn();
+    	log.info("ssnFirstPart={}",ssnFirstPart);
+    	ssnFirstPart = passwordEncoder.encode(ssnFirstPart);
+    	log.info("암호화한 ssnFirstPart={}",ssnFirstPart);
+    	empDTO.setEmployeePw(ssnFirstPart);
+    	
+    	//주소 합치기
+    	String newAddress = empDTO.getAddress()+"("+empDTO.getAddressDetail()+")";
+    	empDTO.setAddress(newAddress);
+    	
+    	log.info("변경된 empDTO={}",empDTO);
         try {
             empService.registerEmployee(empDTO);
             return ResponseEntity.ok("사원 등록 성공! 사번: " + empDTO.getEmployeeId());
@@ -108,6 +132,68 @@ public class HrRestController {
     public ResponseEntity<List<Map<String, Object>>> getSubDepartments(@RequestParam("departmentNum") String departmentNum) {
         return ResponseEntity.ok(empService.getSubDepartments(departmentNum));
     }
+    
+    // ✅ 특정 부서의 사원 목록 조회 API
+    @GetMapping("/emp/{departmentNum}")
+    public List<EmpDTO> getEmployeesByDept(
+            @PathVariable Long departmentNum,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "5") int size
+    ) {
+        EmpSearchDTO searchDTO = new EmpSearchDTO();
+        searchDTO.setDepartmentNum(departmentNum);
+        searchDTO.setStart((page - 1) * size + 1);
+        searchDTO.setEnd(page * size);
+        
+        return empService.listByDept(searchDTO);	
+    }
+    
+    
+    @GetMapping("/emp/organization")
+    public Object getEmployeesForOrganization(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "5") int perPage,
+            @ModelAttribute EmpSearchDTO dto,
+            Paging paging
+    ) throws JsonMappingException, JsonProcessingException {
+        
+        paging.setPageUnit(perPage);
+        paging.setPage(page);
+        
+        // 페이징 조건
+        dto.setStart(paging.getFirst());
+        dto.setEnd(paging.getLast());
+        
+        //페이징처리
+        paging.setTotalRecord(empService.countForSubDept(dto));
+        
+        log.info("dto::::::::::::::{}",dto);
+        log.info("paging:::::::::::::{}",paging);
+        
+        //grid 배열 처리
+        GridArray grid = new GridArray();
+        Object result = grid.getArray(paging.getPage(), paging.getTotalRecord(), empService.listWithSubDept(dto));
+        return result;
+
+
+        // ✅ 1) DTO 세팅
+		/*
+		 * EmpSearchDTO dto = new EmpSearchDTO(); dto.setCompanyNum(companyNum);
+		 * dto.setDepartmentNum(departmentNum);
+		 * 
+		 * // ✅ 2) start, end 계산 (기존과 동일) int start = (page - 1) * perPage + 1; int end
+		 * = page * perPage; dto.setStart(start); dto.setEnd(end);
+		 * 
+		 * // ✅ 3) 총 건수 조회 int totalRecords = empService.count(dto);
+		 * 
+		 * // ✅ 4) 직원 목록 조회 List<EmpDTO> empList = empService.list(dto);
+		 * 
+		 * // ✅ 5) TUI GridArray 포맷으로 변환 GridArray grid = new GridArray(); return
+		 * grid.getArray(page, totalRecords, empList);
+		 */
+    }
+
+
 
 
 }

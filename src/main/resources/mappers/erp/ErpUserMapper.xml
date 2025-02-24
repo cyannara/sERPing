@@ -14,7 +14,7 @@
 	*  ======    =======    ==============================
 	*  2025.02.17  표하연          최초생성
 	*  2025.02.18  표하연          기간결제에 따른 추가처리
-	*  2025.02.20  표하연          사용계약서 정보를 CR 한다
+	*  2025.02.20  표하연          사용계약서 정보를 CR 한다 // 구독정보 및 상세정보를 read 한다
 	*
 	*  </pre>
 ======================================================== -->
@@ -98,7 +98,7 @@
 	-->
 	<insert id="prosubscriptiontail">
 		INSERT INTO erp_subscription_tail VALUES
-		(erp_subscrpt_tail_seq.nextval, #{subscriptionNum}, #{subscriptionOptionNum})
+		(erp_subscrpt_tail_seq.nextval, #{subscriptionNum}, #{subscriptionOptionNum}, #{subscriptionPeriod}, #{subscriptionOptionPrice})
 	</insert>
 	
 	<!-- 
@@ -222,6 +222,89 @@
 		select *
 		from erp_contract_document
 		where COMPANY_NUM = #{compnayNum}
+	</select>
+	
+	<!-- 
+     * 구독내역을 조회한다
+     *
+     * @param int
+     * @return SubScriptionDTO
+	-->
+	<select id="subscriptionlist" resultType="SubScriptionDTO">
+		SELECT *
+		FROM (
+		    SELECT A.*, ROWNUM RN
+		    FROM (
+				select 
+				    e.subscription_num,
+				    e.company_num,
+				    erp_employee_name(e.company_num) as company_name,
+				    e.employee_num,
+				    e.subscription_form,
+				    fn_get_cmmn_name(e.subscription_form) as subscription_form_name,
+				    e.subscription_mean,
+				    fn_get_cmmn_name(e.subscription_mean) as subscription_mean_name,
+				    e.subscription_amount,
+				    e.state,
+				    fn_get_cmmn_name(e.state) as state_name,
+				    e.subscription_date,
+                    b.bill_num,
+                    b.bill_form,
+                    fn_get_cmmn_name(b.bill_form) as bill_form_name,
+                    b.pdf_address,
+                    b.issue_company,
+                    fn_get_cmmn_name(b.issue_company) as issue_company_name,
+                    b.issue_date
+				from erp_subscription_list e
+                left join erp_bill b
+                    on e.subscription_num = b.subscription_num
+				where company_num = #{companyNum}
+				order by subscription_date DESC
+		) A
+			<![CDATA[
+		     WHERE ROWNUM <= #{end}
+		    ]]>
+	    )
+	    <![CDATA[
+			WHERE RN >= #{start}
+		]]>
+	</select>
+	
+	<!-- 
+     * 구독내역의 갯수를 조회한다
+     *
+     * @param int
+     * @return int
+	-->
+	<select id="subscriptioncount" resultType="int">
+		select count(*)
+		from erp_subscription_list
+		where company_num = #{companyNum}
+	</select>
+	
+	<!-- 
+     * 구독리스트의 상세 구독내역을 가져온다
+     *
+     * @param int
+     * @return SubscriptionDetailDTO
+	-->
+	<select id="subscriptionDetail" resultType="SubscriptionDetailDTO">
+		select 
+		    e.subscription_tail_num,
+		    e.subscription_num,
+		    o.subscription_option_num,
+		    o.subscription_name_num,
+		    o.subscription_option,
+		    e.subscription_option_price,
+		    o.subscription_discount,
+		    e.subscription_period,
+		    n.subscription_name
+		from erp_subscription_tail e
+		left join erp_subscription_option o
+		    on e.subscription_option_num = o.subscription_option_num
+		left join erp_subscription_name n
+		    on o.subscription_name_num = n.subscription_name_num
+		where subscription_num = #{subscriptionNum}
 	</select>
 
 </mapper>

@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import com.beauty1nside.hr.dto.EmpDTO;
@@ -34,21 +35,38 @@ public class EmpServiceImpl implements EmpService {
 
 	@Override
 	public List<EmpDTO> list(EmpSearchDTO dto) {
-		// TODO Auto-generated method stub
-		return empMapper.list(dto);
+	    return empMapper.list(dto);
 	}
+	
+	// 하위부서 포함 사원 전체조회
+	@Override
+	public List<EmpDTO> listWithSubDept(EmpSearchDTO dto) {
+	        return empMapper.listWithSubDept(dto);
 
+	}
+	
 	@Override
 	public int count(EmpSearchDTO dto) {
 		// TODO Auto-generated method stub
 		return empMapper.count(dto);
 	}
+	
+	// 하위부서 포함 카운트
+	@Override
+	public int countForSubDept(EmpSearchDTO dto) {
+		// TODO Auto-generated method stub
+		return empMapper.countForSubDept(dto);
+	}
+	
+
+	
 
 	@Override
 	public Map<String, Object> getCommonCodes() {
 	    Map<String, Object> codes = new HashMap<>();
 	    codes.put("departments", empMapper.getDepartments());
 	    codes.put("positions", empMapper.getPositions());
+
 
 	    // ✅ 근무 유형을 리스트로 변환하여 반환
 	    List<Map<String, String>> employmentTypeList = empMapper.getEmploymentTypes();
@@ -58,6 +76,7 @@ public class EmpServiceImpl implements EmpService {
 	    codes.put("employmentTypes", employmentTypeList);
 
 	    codes.put("statuses", empMapper.getStatuses());
+	    codes.put("auths", empMapper.getAuths());
 	    return codes;
 	}
 	
@@ -73,34 +92,43 @@ public class EmpServiceImpl implements EmpService {
 	    // 새 employee_id 생성 (6자리 날짜 + 3자리 증가값)
 	    return today + String.format("%03d", newSeq);
 	}
+	
+	@Override
+	public boolean checkEmailExists(String email) {
+	    return empMapper.checkEmailExists(email) > 0;
+	}
+
 
     @Override
     public void registerEmployee(EmpDTO empDTO) {
-        // 오늘 날짜 기준 (YYMMDD)
-        String today = new SimpleDateFormat("yyMMdd").format(new Date());
+		/*
+		 * // 오늘 날짜 기준 (YYMMDD) String today = new SimpleDateFormat("yyMMdd").format(new
+		 * Date());
+		 * 
+		 * // 현재 가장 큰 employee_id 가져오기 String maxEmployeeId = getNewEmployeeId(); int
+		 * newSeq = 1;
+		 * 
+		 * if (maxEmployeeId != null && maxEmployeeId.startsWith(today)) { // 오늘 날짜와 같은
+		 * ID가 있다면 마지막 3자리 증가 String lastSeq = maxEmployeeId.substring(6); newSeq =
+		 * Integer.parseInt(lastSeq) + 1; }
+		 * 
+		 * // 새 employee_id 생성 String newEmployeeId = today + String.format("%03d",
+		 * newSeq); empDTO.setEmployeeId(newEmployeeId);
+		 * 
+		 * // ✅ 비밀번호 암호화 (예제: "beauty1nside"를 기본 비밀번호로 설정) if (empDTO.getPosition() ==
+		 * null) empDTO.setEmployeePw("0000"); // 기본 비밀번호
+		 * 
+		 * // ✅ 기본값 설정 (공통 코드 적용) if (empDTO.getPosition() == null)
+		 * empDTO.setPosition("PO001"); // 기본 직급 if (empDTO.getAuthority() == null)
+		 * empDTO.setAuthority("AU004"); // 기본 권한 if (empDTO.getStatus() == null)
+		 * empDTO.setStatus("ST001"); // 재직 상태 if (empDTO.getEmploymentType() == null)
+		 * empDTO.setEmploymentType("ET001");
+		 */
 
-        // 현재 가장 큰 employee_id 가져오기
-        String maxEmployeeId = getNewEmployeeId();
-        int newSeq = 1;
-        
-        if (maxEmployeeId != null && maxEmployeeId.startsWith(today)) {
-            // 오늘 날짜와 같은 ID가 있다면 마지막 3자리 증가
-            String lastSeq = maxEmployeeId.substring(6);
-            newSeq = Integer.parseInt(lastSeq) + 1;
+        // ✅ 중복 이메일 확인
+        if (checkEmailExists(empDTO.getEmail())) {
+            throw new DuplicateKeyException("이미 등록된 이메일입니다.");
         }
-
-        // 새 employee_id 생성
-        String newEmployeeId = today + String.format("%03d", newSeq);
-        empDTO.setEmployeeId(newEmployeeId);
-
-        // ✅ 비밀번호 암호화 (예제: "beauty1nside"를 기본 비밀번호로 설정)
-        if (empDTO.getPosition() == null) empDTO.setEmployeePw("0000");  // 기본 비밀번호
-
-        // ✅ 기본값 설정 (공통 코드 적용)
-        if (empDTO.getPosition() == null) empDTO.setPosition("PO001");  // 기본 직급
-        if (empDTO.getAuthority() == null) empDTO.setAuthority("AU004"); // 기본 권한
-        if (empDTO.getStatus() == null) empDTO.setStatus("ST001");       // 재직 상태
-        if (empDTO.getEmploymentType() == null) empDTO.setEmploymentType("ET001");
 
         // ✅ 데이터 저장
         empMapper.insertEmployee(empDTO);
@@ -125,6 +153,11 @@ public class EmpServiceImpl implements EmpService {
 		// TODO Auto-generated method stub
 		return empMapper.getSubDepartments(departmentNum); // ✅ 하위 부서 조회 추가
 	}
+	
+    @Override
+    public List<EmpDTO> listByDept(EmpSearchDTO searchDTO) {
+        return empMapper.listByDept(searchDTO);
+    }
     
     
     

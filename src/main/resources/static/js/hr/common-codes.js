@@ -11,6 +11,7 @@ let departments = []; // 부서 목록 저장
 let positions = [];   // 직급 목록 저장
 let statuses = [];    // 재직 상태 저장
 let employmentTypes = []; // 근무 유형 저장
+let authos = []; // 권한 저장
 
 // 공통 코드 데이터 불러오는 함수
 function loadCommonCodes() {
@@ -28,18 +29,21 @@ function loadCommonCodes() {
             positions = data.positions || [];
             statuses = data.statuses || [];
             employmentTypes = data.employmentTypes || [];
+            auths = data.auths || [];
 
             // ✅ 공통 코드 객체에도 저장 (기존 코드 유지)
             commonCodes.departments = departments;
             commonCodes.positions = positions;
             commonCodes.statuses = statuses;
             commonCodes.employmentTypes = employmentTypes;
+            commonCodes.auths = auths;
 
             // ✅ 필터 & 모달 UI 업데이트
             populateDepartmentSelect(departments);
             populatePositionSelect(positions);
             populateStatusButtons(statuses);
             populateEmploymentButtons(employmentTypes);
+            populateAuthoritySelect(auths);
             
             populateFilters();
 
@@ -93,7 +97,7 @@ function populateSubDepartments(parentCode) {
     
     let lowDepartmentSelect = "";
     subDepartments.forEach(ele => {
-		lowDepartmentSelect += ` <option value="${ele.DEPARTMENT_CODE}">${ele.DEPARTMENT_NAME}</option>`;
+		lowDepartmentSelect += ` <option value="${ele.DEPARTMENT_NUM}">${ele.DEPARTMENT_NAME}</option>`;
 	});
 	console.log("lowDepartmentSelect:::",lowDepartmentSelect);
     document.getElementById("modalSubDepartment").innerHTML = lowDepartmentSelect;
@@ -228,4 +232,26 @@ function populateEmploymentButtons(employmentTypes) {
         });
     }, 100);
 }
+
+// 권한 목록 동적으로 추가
+function populateAuthoritySelect(authorities) {
+    const authoritySelect = document.getElementById("modalAutority");
+    authoritySelect.innerHTML = '<option value="">선택</option>'; // 초기화
+
+    if (!authorities || authorities.length === 0) {
+        console.error("⚠ 권한 데이터가 없습니다.");
+        return;
+    }
+
+    authorities.forEach(auth => {
+        let optionTag = `<option value="${auth.CMMNCODE}">${auth.CMMNNAME}</option>`;
+        authoritySelect.innerHTML += optionTag;
+    });
+
+    console.log("📌 권한 목록 로드 완료:", authorities);
+    
+    
+    
+}
+
 

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layouts/layout}"
+      lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<title>거래대장 등록</title>
+<link rel="stylesheet" href="/vendors/mdi/css/materialdesignicons.min.css">
+</head>
+<body layout:fragment="content">
+  <div class="container">
+    <!-- 메뉴이름 -->
+		<div>
+			<h2>거래대장 등록</h2>
+		</div>
+
+    <!-- 등록 grid -->
+     <div class="grid-content">
+      <div class="row">
+        <div class="col-11"></div>
+        <button type="button" class="btn btn-primary col-1" id="addBtn">행추가</button>
+      </div>
+      <div id="grid"></div>
+     </div>
+     <hr>
+     <!-- 하단 버튼 -->
+      <div class="underBtn row">
+        <div class="col-4"></div>
+        <div class="col-4 row">
+          <div class="col-1"></div>
+          <button type="button" class="btn btn-secondary col-4" onclick="resetBtn()">초기화</button>
+          <div class="col-2"></div>
+          <button type="button" class="btn btn-success col-4" onclick="insertBtn()">등록</button>
+          <div class="col-1"></div>
+        </div>
+        <div class="col-4"></div>
+      </div>
+      
+      	<!-- 자산 등록 -->
+		<div th:replace="purchs/ModalTemplate :: ModalTemplate (
+						    	'testModal', 
+						    	'modal-xl', 
+						    	'테스트', 
+						    	'accnut/dbtest',
+						    	'accnut/testFooter'
+						    )"></div>
+
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded",()=>{
+      addRow();
+      delRow();
+    })
+    var Grid = tui.Grid;
+    
+    const header = document.querySelector('meta[name="_csrf_header"]').content;
+    const token = document.querySelector('meta[name="_csrf"]').content;
+    
+    const dataSource = {
+      api: {
+    	  readData: { url: 'http://localhost:81/accnut/rest/book/list', method: 'GET', initParams: { page: 1 }},
+          createData: { url: 'http://localhost:81/accnut/rest/book/insert', method: 'POST', headers: {  
+        	  																							"header": header,
+              																							[header]: token,
+              } },
+      },
+      contentType: 'application/json',
+      //headers: { 'x-custom-header': 'custom-header' },
+      initialRequest: false, // 자동으로 데이터 요청하지 않음
+    
+    };
+    
+    const departmentList = [
+        { text: '인사팀', value: 'HR' },
+        { text: '영업팀', value: 'SALES' },
+        { text: '개발팀', value: 'DEV' },
+        { text: '회계팀', value: 'ACCOUNT' },
+        { text: '마케팅팀', value: 'MARKETING' }
+    ];
+    
+ // "부서" 컬럼의 formatter 직접 정의
+    function departmentFormatter({ value }) {
+        const department = departmentList.find(item => item.value === value);
+        return department ? department.text : value; // 화면에는 text 표시
+    }
+    
+    class SearchableSelectEditor {
+   	    constructor(props) {
+   	        this.el = document.createElement('div');
+   	        this.el.classList.add('custom-dropdown-container');
+
+   	        // 입력 필드 생성
+   	        this.input = document.createElement('input');
+   	        this.input.type = 'text';
+   	        this.input.classList.add('tui-grid-content', 'custom-dropdown-input');
+
+   	        // 드롭다운 리스트 컨테이너
+   	        this.dropdown = document.createElement('ul');
+   	        this.dropdown.classList.add('custom-dropdown-list');
+   	        this.dropdown.style.display = 'none'; // 기본적으로 숨김
+
+   	        // 데이터 초기화
+   	        this.props = props;
+   	        this.items = props.columnInfo.editor.options.listItems || [];
+   	        this.filteredItems = [...this.items];
+
+   	        // 입력 필드 이벤트 추가 (입력 시 필터링)
+   	        this.input.addEventListener('input', (event) => {
+   	            const value = event.target.value.toLowerCase();
+   	            this.filteredItems = this.items.filter(item =>
+   	                item.text.toLowerCase().includes(value)
+   	            );
+   	            this.updateDropdown();
+   	        });
+
+   	        // 입력 필드 클릭 시 드롭다운 표시
+   	        this.input.addEventListener('focus', () => {
+   	            this.filteredItems = [...this.items]; // 모든 옵션 보이기
+   	            this.updateDropdown();
+   	        });
+
+   	        // 드롭다운 아이템 클릭 시 값 설정
+   	        this.dropdown.addEventListener('click', (event) => {
+   	            if (event.target.tagName === 'LI') {
+   	            	let idx = departmentList.findIndex(dp => dp.text == event.target.innerText)
+   	                this.input.value = departmentList[idx].value;
+   	                this.dropdown.style.display = 'none'; // 선택 후 드롭다운 숨김
+   	            }
+   	        });
+
+   	        // 외부 클릭 시 드롭다운 닫기
+   	        document.addEventListener('click', (event) => {
+   	            if (!this.el.contains(event.target)) {
+   	                this.dropdown.style.display = 'none';
+   	            }
+   	        });
+
+   	        // 컨테이너에 요소 추가
+   	        this.el.appendChild(this.input);
+   	        this.el.appendChild(this.dropdown);
+   	    }
+
+   	    getElement() {
+   	        return this.el;
+   	    }
+
+   	    getValue() {
+   	        return this.input.value;
+   	    }
+
+   	    mounted() {
+   	        this.input.focus();
+   	    }
+
+   	    updateDropdown() {
+   	        // 기존 목록 초기화
+   	        this.dropdown.innerHTML = '';
+
+   	        if (this.filteredItems.length > 0) {
+   	            this.filteredItems.forEach(item => {
+   	                const li = document.createElement('li');
+   	                li.innerText = item.text;
+   	                //li.value = item.value;
+   	                li.classList.add('custom-dropdown-item');
+   	                this.dropdown.appendChild(li);
+   	            });
+   	            this.dropdown.style.display = 'block'; // 목록이 있으면 보이게 함
+   	        } else {
+   	            this.dropdown.style.display = 'none'; // 필터 결과가 없으면 숨김
+   	        }
+   	    }
+   	}
+    
+    
+    
+    const grid = new Grid({
+      el : document.querySelector('#grid'),
+      /*pageOptions: {
+        useClient : true,
+        perPage: 20,
+      },*/
+      columns: [
+        { header : "구분", name : "section", formatter: 'listItemText', align: 'center', editor: { type : "select",
+        											   options : { listItems : [ 
+        												   				   	{ text : "구분", value : "" },
+        												   					{ text : "수익", value : "EE01" },
+        												   				   	{ text : "지출", value : "EE02" },
+        												   				   	{ text : "자산", value : "EE03" },
+        												   				   	{ text : "부채", value : "EE04" }
+        												   
+        												   
+	   	] }}},
+        { header : "거래방법", name : "typesOfTransaction", formatter: 'listItemText', align: 'center', editor: { type : "select",
+			   											   			 options : 	{ listItems : [ 	
+			   											   				 					{ text : "거래방법", value : "" },
+			   											   				 					{ text : "현금", value : "AC01" },
+   				   															  				{ text : "이체", value : "AC02" },
+   				   																			{ text : "카드", value : "AC03" },
+   				  																			{ text : "미지급", value : "AC08" }
+   
+   
+   		] }}},
+        { header : "금액", name : "amount", align: 'center', editor: "text", onAfterChange: (ev)=> {
+        																							let newValue = ev.value.replace(/[^0-9]/g, "");
+        																							if(ev.value != newValue){
+        																								grid.setValue(ev.rowKey, "amount", newValue, false);
+        																							}
+        	}},
+        { header : "부가세여부", name : "vatAlternative", align: 'center',  editor: { type : "radio",
+	   			 												   options : 	{ listItems : [ 	
+		 																						{ text : "없음", value : "N" },
+																			 					{ text : "있음", value : "Y" },
+		] }}},
+        { header : "거래내용", name : "dealingsContents", align: 'center',  editor: "text"},
+        { header : "거래일", name : "dealDate", align: 'center',  editor: { type : "datePicker",
+        												  options : { format : "yyyy-MM-dd",
+        													  		  type : "date",
+        													  		  timepicker : false
+  		}}},
+  		
+  		{ header : "회사번호", name : "companyNum", formatter : () => '0', hidden: '1'},
+  		{ header : "부서", name : "department", formatter: departmentFormatter, align: 'center', editor: {
+  			type: SearchableSelectEditor,
+  			options: { listItems: departmentList }
+  		}},
+  		{ header : "모달", name : "asd", formatter : () => '<input type="text" id="textinput" data-bs-toggle="modal" data-bs-target="#testModal">', editor: "text"},
+  		{ header : "삭제", name : "del", formatter : () => '<button class="btn btn-danger btn-sm btnDel"><i class="mdi mdi-delete" style="line-height: 15px;"></i></button>', align: 'center', width: '40'},
+      ],
+      data : dataSource,
+    });
+  	
+    function addRow() {
+      document.querySelector('#addBtn').addEventListener('click', ()=> {
+        grid.appendRow({ department: "DT003" })
+        //delRow();
+      })
+
+    }
+    
+    function delRow() {
+      grid.on("click", (ev)=>{
+        if(ev.columnName == 'del'){
+        	grid.removeRow(ev.rowKey);
+        }
+      })
+    }
+    
+    function resetBtn() {
+    	grid.resetData([]);
+    }
+    
+    function insertBtn() {
+    	grid.blur();
+    	grid.request('createData');
+    	
+    }
+    
+    grid.on("click", (ev) => {
+    /*
+        if (ev.columnName === 'asd') { // "모달" 컬럼 클릭 시
+            let modalEl = document.getElementById('testModal');
+
+            // ✅ Bootstrap 5 방식으로 모달 열기
+            let modal = new bootstrap.Modal(modalEl);
+            modal.show();
+        }
+    */
+    console.log(grid.getRow(ev.rowKey));
+    });
+
+    
+    
+  </script>
+</body>
+</html>

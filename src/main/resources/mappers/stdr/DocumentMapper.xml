@@ -36,4 +36,36 @@
 			company_num LIKE '%' || #{dto.companyNum} || '%'
 		</where>
 	</select>
+	
+	<insert id="insert" parameterType="com.beauty1nside.stdr.dto.DocumentSearchDTO">
+		INSERT INTO stdr_document (
+			DOCUMENT_ID,
+			DOCUMENT_TYPE,
+			DOCUMENT_NAME,
+			DOCUMENT_TEMPLATE,
+			DEPT_NAME,
+			APPROVAL_TYPE,
+			COMPANY_NUM)
+		VALUES (
+		        stdr_doc_seq.NEXTVAL,
+		        #{documentType},
+		        #{documentName},
+		        #{documentTemplate},
+		        #{deptName},
+				#{approvalType},
+				#{companyNum}
+			   )
+	</insert>
+
+	<select id="info" parameterType="com.beauty1nside.stdr.dto.DocumentDTO">
+		select document_id,
+			   document_type,
+			   document_name,
+			   document_template,
+			   dept_name,
+			   approval_type,
+			   company_num
+		from stdr_document
+		where company_num = #{companyNum} and document_id = #{documentId}
+	</select>
 </mapper>

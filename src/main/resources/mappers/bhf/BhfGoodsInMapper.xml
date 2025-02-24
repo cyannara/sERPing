@@ -87,12 +87,14 @@
 	<!-- 주문서 상세조회 -->
 	<select id="goodsOrdDtlList" resultType="BhfGoodsOrdDTO" parameterType="BhfGoodsOrdSearchDTO">
 		select  goods_name, 
+				goods_code,
 				option_code, 
 				option_name, 
 				goods_standard, 
 				quantity
 		from(	select 	rownum rn,
 						goods_name, 
+						goods_code,
 						option_code, 
 						option_name, 
 						goods_standard, 

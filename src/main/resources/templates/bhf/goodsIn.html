@@ -43,6 +43,14 @@
 					</div>
 				</div>
 			</div>
+			<div class="col-md-12 mt-2 mb-2">
+				<div class="row">
+					<div class="col-sm-8"></div>
+					<button class="col-sm-1" onclick="goodsInsert()">등록</button>
+					<button class="col-sm-1" onclick="reset()">초기화</button>
+					<div class="col-sm-2"></div>
+				</div>
+			</div>
 		</div>
 	</div>
 	
@@ -109,16 +117,107 @@
 			perPage: 5,
 		},
 		columns: [ 
+			{ header : "상품코드", name : "goodsCode", hidden : 1},
+			{ header : "옵션코드", name : "optionCode", hidden : 1},
 			{ header : "상품명", name : "goodsName"},
 			{ header : "옵션명", name : "optionName"},
-			{ header : "옵션코드", name : "optionCode", hidden : 1},
 			{ header : "규격", name : "goodsStandard"},
 			{ header : "발주수량", name : "quantity"},
 			{ header : "낱개수량", name : "stockQuantity"}, //창고에 들어갈 수량
-			{ header : "입고수량", name : ""}
+			{ 
+				header : "입고수량", 
+				name : "inQuantity", 
+				editor: 'text',
+				onAfterChange: function(ev) {
+					
+					let rowKey = ev.rowKey;
+					let inQuantity = ev.value; // 입고수량 값 가져오기
+			        let rowData = grid2.getRow(rowKey); // 해당 행 데이터 가져오기
+			        let goodsStandard = rowData.goodsStandard; // 데이터에서 규격 가져오기
+			        
+			        // 규격에서 숫자만 추출(앞에 숫자는 뺴고)
+			        let standardValue = goodsStandard.replace(/^[0-9]|[^0-9]/g, ""); 
+			        // 낱개수량 계산
+			        let stockQuantity = inQuantity * standardValue;
+			        // 그리드 값 업데이트
+			        grid2.setValue(rowKey, "stockQuantity", stockQuantity); // 계산된 값 적용
+			        
+			        // 입고수량에 숫자를 제외한 값들이 들어오면
+			        if (!/^[0-9]*$/.test(ev.value)) {
+	                    grid2.setValue(ev.rowKey, ev.columnName, '');  // 해당 셀을 비웁니다
+	                    alert("수량은 숫자만 입력할 수 있습니다.");
+	                }
+				}
+			}
 		],
 		data: ""
 	});
+	
+	// 상품입고 등록 함수
+	function goodsInsert(){
+		
+		//프로시저로 처리하면 여기서 값 다 보내줘야된다 발주수량이랑 입고수량 차이나는 수량 변수에 담아서
+		
+		let returnData = grid2.getData();
+		
+		// 교환,반품 테이블에 데이터가 있는지 확인
+		if (returnData.length === 0) {
+	        alert("교환 및 반품할 상품을 추가해주세요.");
+	        return;
+	    }
+		// 발주 수량을 적었는지 확인
+		for (let i = 0; i < returnData.length; i++) {
+			
+			console.log("TEST",returnData[i].stockQuantity);
+			
+			const quantity = Number(returnData[i].quantity); // 문자열을 숫자로 변환(0도 비교하기 위해서)
+			
+		    if (quantity === 0 || quantity === "" || quantity === null) {  // 수량이 비어있는지 확인
+	            alert("수량을 입력해주세요.");
+	            return;  // 수량이 없으면 더 이상 진행하지 않음
+	        }
+	    }
+
+	     let returnInfo = {
+	        files: returnData,  // 상세 내역 (상품 정보)
+	        branchOfficeId: document.querySelector('#branchOfficeId').value, //주문 지점
+	        remark: document.querySelector('#remark').value,  // 비고
+	        companyNum: 1 // 아직 회사번호를 가져올떄가 없어서 1로 넣었놨음
+	    };
+ 	    fetch("http://localhost:81/bhf/rest/", {
+	        method: "POST",
+	        headers: {
+	            "Content-Type": "application/json",
+	            //위에 변수로 저장한 헤더이름,토큰값 넣어주기
+	        	'header': header, 
+	            'X-CSRF-Token': token
+	        },
+	        body: JSON.stringify(returnInfo) // returnInfo 객체를 JSON 형식으로 변환(JSON.parse는 JSON을 객체로 변환)
+	    })
+	    .then(response => response.json())
+	    .then(data => {
+	        if (data.status === "success") {
+	            alert("교환 및 반품 등록 성공");
+	         	// 등록 후 초기화
+	         	document.getElementById('branchOfficeId').value = "";
+				document.getElementById('remark').value = "";
+	            grid2.resetData([]);
+	           
+	        } else {
+	            alert("교환 및 반품 등록 실패: " + data.message);
+	        }
+	        //테이블 데이터 없을떄 나오는 문구 다시 실행
+	        OPnodata();
+	        RTnodata();
+	    })  
+	}
+	
+	// 초기화 버튼 함수
+	function reset(){
+		grid2.resetData([]);
+     	//테이블 데이터 없을떄 나오는 문구 다시 실행
+        ORDnodata();
+	}
 	
 	// 검색 함수
 	function search(){

@@ -91,6 +91,7 @@
 
 <body>
 	<form id="empRegisterForm">
+	
 		<!--  사원 등록 모달 -->
 		<div th:fragment="empRegisterModal" class="modal fade"
 			id="empRegisterModal" tabindex="-1"
@@ -101,6 +102,7 @@
 					<!-- 모달 헤더 -->
 					<div class="modal-header bg-light">
 						<h5 class="modal-title fw-bold text-primary">사원 등록</h5>
+						<input type="hidden" id="companyNumSJ" th:value="${session.companyNum}">
 						<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 					</div>
 
@@ -130,19 +132,31 @@
 
 									<!-- 사원 정보 입력 -->
 									<div class="col-md-9">
-										<div class="mb-2">
-											<label class="fw-bold">사원번호</label>
-											<div class="d-flex align-items-center">
-												<input type="text" class="form-control me-2"
-													id="employeeIdInput" disabled>
-
+										<div class="row mb-2 align-items-center">
+											<div class="col-md-6">
+												<label class="fw-bold">사원번호</label>
+												<div class="d-flex align-items-center">
+													<input type="text" class="form-control me-2"
+														id="employeeIdInput" disabled>
+												</div>
+											</div>
+											<div class="col-md-6">
+												<label class="fw-bold" >사원명</label> <input type="text"
+													class="form-control" id="employeeName">
 											</div>
 										</div>
-										<div class="mb-2">
-											<label class="fw-bold" >사원명</label> <input type="text"
-												class="form-control" id="employeeName">
+										
+										<div class="row mb-2 align-items-center">
+											<div class="mb-2">
+											    <label class="fw-bold">주민번호</label>
+											    <div class="input-group">
+											        <input type="text" class="form-control text-center" id="firstSsn" maxlength="6" placeholder="앞 6자리">
+											        <span class="input-group-text">-</span>
+											        <input type="text" class="form-control text-center" id="secondSsn" maxlength="7" placeholder="뒤 7자리">
+											    </div>
+											</div>
 										</div>
-
+										
 										<div class="mb-2">
 											<label class="fw-bold">이메일</label>
 											<!-- 이메일 아이디 입력 필드 -->
@@ -172,12 +186,20 @@
 												<select class="form-select" id="modalSubDepartment"></select>
 											</div>
 										</div>
-
-										<!-- 직급 -->
-										<div class="mb-2">
-											<label class="fw-bold">직급</label> 
-											<select class="form-select" id="modalPosition"></select>
+										
+										<div class="row mb-2 align-items-center">
+											<!-- 직급 -->
+											<div class="col-md-6">
+												<label class="fw-bold">직급</label> 
+												<select class="form-select" id="modalPosition"></select>
+											</div>
+											<!-- 권한 -->
+											<div class="col-md-6">
+												<label class="fw-bold">권한</label> 
+												<select class="form-select" id="modalAutority"></select>
+											</div>
 										</div>
+										
 										<!-- 근무유형 -->
 										<div class="mb-2">
 											<label class="fw-bold">근무 유형</label>
@@ -268,10 +290,6 @@
 		</div>
 	</form>
 
-	<script>
-
-
-	</script>
 
 	<script
 		src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>

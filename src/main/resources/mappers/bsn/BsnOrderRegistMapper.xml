@@ -11,9 +11,14 @@ SELECT ORDER_CODE
       ,due_date
       ,remark
       ,company_num
+      ,RN
 FROM (
 SELECT /*+ INDEX_ASC(BHF_ORDER PK_BHF_ORDER) */ 
-      ROWNUM RN
+      ROW_NUMBER() OVER (
+              ORDER BY TO_NUMBER(REGEXP_SUBSTR(order_code, '\d+')) DESC, 
+                       order_date DESC, 
+                       due_date DESC
+          ) AS RN
       ,ORDER_CODE
       ,branch_office_id
       ,order_date
@@ -23,16 +28,22 @@ SELECT /*+ INDEX_ASC(BHF_ORDER PK_BHF_ORDER) */
 FROM BHF_ORDER
 WHERE progress_status = '신청'
 -- AND   company_num = 1
+<include refid="searchInfoBhfOrder"></include>
 <![CDATA[
 AND ROWNUM <= #{end}
 ]]>
-) WHERE RN >= #{start}
-<include refid="searchInfoBhfOrder"></include>
-
-
 ORDER BY TO_NUMBER(REGEXP_SUBSTR(order_code, '\d+')) desc, order_date desc, due_date desc
+) WHERE RN >= #{start}
+
+
+
 
 </select>
+
+
+
+
+
 
 <select id="getCountOfBhfOrder" resultType="int">
 SELECT COUNT(*) FROM BHF_ORDER
@@ -85,8 +96,9 @@ SELECT order_detail_code,
        goods_standard,
        quantity
 FROM (
-SELECT /*+ INDEX_ASC(bhf_order_detail order_detail_code) */ 
-      ROWNUM RN
+SELECT ROW_NUMBER() OVER (
+              ORDER BY TO_NUMBER(REGEXP_SUBSTR(order_detail_code, '\d+')) ASC
+       ) AS RN
       ,order_detail_code,
        order_code,
        goods_code,
@@ -102,8 +114,6 @@ WHERE  order_code = #{orderCode}
 AND ROWNUM <= #{end}
 ]]>
 ) WHERE RN >= #{start}
-
-ORDER BY order_detail_code
 </select>
 
 <select id="getCountOfBhfOrderDetail" parameterType="BhfOrderDTO" resultType="int">

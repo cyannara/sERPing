@@ -22,35 +22,432 @@
 <head>
 <body layout:fragment="content">
 	<style>
+		#custom-container{
+	        background-color: #f8f9fa; /* 연한 회색 배경 /
+	        padding: 20px;
+	        border-radius: 10px;
+	        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); / 박스 그림자 */
+	        margin-bottom: 20px;
+			font-weight: bold;
+			text-align: center;
+			font-size: 26px;
+	    }
+	    /* 그리드 선택하면 생기는 색상 */
+		.tui-grid-row-highlight {
+		    background-color: #f0f8ff !important; /* 연한 하늘색 */
+		}
 	</style>
 	<div class="container">
-		<div class="container">
-        <h3>구독 정보</h3>
-        <nav class="p-0 m-0 d-flex justify-content-start">
-		    <div class="nav nav-tabs" id="nav-tab" role="tablist">
-		        <button class="nav-link border active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-fp"
-		            type="button" role="tab" aria-controls="#nav-fp" aria-selected="true">구독 상태</button>
-		        <button class="nav-link border" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-rg"
-		            type="button" role="tab" aria-controls="#nav-rg" aria-selected="false">구독 목록</button>
-		    </div>
-		</nav>
-
-
-        <div class="tab-content border" id="nav-tabContent" style="background-color: #ffffff;">
-            <!-- 구독 상태 -->
-            <div class="tab-pane fade show active" id="nav-fp" role="tabpanel" aria-labelledby="nav-fp-tab" tabindex="0">
-                <h3>구독 상태</h3>
+		<div class="row">
+			<div class="h3 pb-2 mb-2 text-black border-bottom border-secondary">
+				구독현황
 			</div>
-            <!-- 구독 목록 -->
-            <div class="tab-pane fade" id="nav-rg" role="tabpanel" aria-labelledby="nav-rg-tab" tabindex="0">
-                <h3>구독 목록</h3>
-            </div>
-        </div>
-    </div>
+			<!-- 
+			<div id="custom-container">
+				<div class="d-flex">
+					<div class="p-1 flex-fill">
+						<div class="d-flex">
+							<div class="p-1 flex-fill bg-primary-subtle">
+								구독형태
+							</div>
+							<div class="p-1 flex-fill border border-primary-subtle border-2">
+							</div>
+						</div>
+					</div>
+					<div class="p-1 flex-fill">
+						<div class="d-flex">
+							<div class="p-1 flex-fill bg-primary-subtle">
+								남은기간
+							</div>
+							<div class="p-1 flex-fill border border-primary-subtle border-2">
+							</div>
+						</div>
+					</div>
+					<div class="p-1 flex-fill">
+						<div class="d-flex">
+							<div class="p-1 flex-fill bg-primary-subtle">
+								만료일
+							</div>
+							<div class="p-1 flex-fill border border-primary-subtle border-2">
+							</div>
+						</div>
+					</div>
+				</div>
+				 -->
+				 <!-- 
+				<div class="d-flex justify-content-center" style="font-size: 20px;">
+					<div class="d-flex flex-column mb-3">
+						<div class="p-1 bg-primary-subtle">구독형태</div>
+						<div class="p-1 bg-primary-subtle border border-primary-subtle border-2 border-bottom-0">남은기간</div>
+						<div class="p-1 bg-primary-subtle border border-primary-subtle border-2">만료일</div>
+					</div>
+					<div class="d-flex flex-column mb-3">
+						<div class="p-1 bg-primary-subtle"><span id=subObj></span></div>
+						<div class="p-1 border border-primary-subtle border-2 border-bottom-0"><span id="subObjdate"></span></div>
+						<div class="p-1 border border-primary-subtle border-2"><span id="subObjdateDay"></span></div>
+					</div>
+					<div class="d-flex flex-column mb-3">
+						<div class="p-1 bg-primary-subtle">그룹웨어</div>
+						<div class="p-1 border border-primary-subtle border-2 border-bottom-0"><span id="gpOption"></span></div>
+						<div class="p-1 border border-primary-subtle border-2"><span id="groupObj"></span></div>
+					</div>
+					<div class="d-flex flex-column mb-3">
+						<div class="p-1 bg-primary-subtle">인사관리</div>
+						<div class="p-1 border border-primary-subtle border-2 border-bottom-0"><span id="hrObj"></span></div>
+						<div class="p-1 border border-primary-subtle border-2"><span id="hrObjdate"></span></div>
+					</div>
+					<div class="d-flex flex-column mb-3">
+						<div class="p-1 bg-primary-subtle">지점관리</div>
+						<div class="p-1 border border-primary-subtle border-2 border-bottom-0"><span id="pointObj"></span></div>
+						<div class="p-1 border border-primary-subtle border-2"><span id="pointObjdate"></span></div>
+					</div>
+					<div class="d-flex flex-column mb-3">
+						<div class="p-1 bg-primary-subtle">회계관리</div>
+						<div class="p-1 border border-primary-subtle border-2 border-bottom-0"><span id="accountObj"></span></div>
+						<div class="p-1 border border-primary-subtle border-2"><span id="accountObjdate"></span></div>
+					</div>
+				</div>
+			</div>
+			 -->
+			<!-- 
+			<div class="col-md-6 mt-2 mb-2">
+				<div class="row">
+					<label class="col-sm-4">상품명</label> 
+					<input type="text" class="col-sm-5" id="goodsName">
+					<button type="button" class="col-sm-2" onclick="search()">검색</button>
+				</div>
+			</div>
+			<div class="col-md-6 mt-2 mb-2">
+				<div class="row">
+					<div class="col-sm-1"></div>
+					<label class="col-sm-4">주문 지점</label> 
+					<input type="text"class="col-sm-7" id="branchOfficeId">
+				</div>
+			</div>
+			<div class="col-md-12 mt-2 mb-5">
+				<div class="row">
+					<label class="col-sm-2">비고</label> 
+					<input type="text"class="col-sm-10" id="remark">
+				</div>
+			</div>
+			 -->
+			<div class="col-md-6 stretch-card mt-2 mb-2">
+				<div class="card">
+					<div class="card-body">
+						<h6 class="mb-4">구독상세</h6>
+						<div id="subDetailgrid"></div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6 stretch-card mt-2 mb-2">
+				<div class="card">
+					<div class="card-body">
+						<h6 class="mb-4">처리상세</h6>
+							<div class="d-flex justify-content-center" style="font-size: 20px;">
+								<div class="d-flex flex-column mb-3">
+									<div class="p-1 bg-primary-subtle">구독형태</div>
+									<div class="p-1 bg-primary-subtle border border-primary-subtle border-2 border-bottom-0">남은기간</div>
+									<div class="p-1 bg-primary-subtle border border-primary-subtle border-2">만료일</div>
+								</div>
+								<div class="d-flex flex-column mb-3">
+									<div class="p-1 bg-primary-subtle"><span id=subObj></span></div>
+									<div class="p-1 border border-primary-subtle border-2 border-bottom-0"><span id="subObjdate"></span></div>
+									<div class="p-1 border border-primary-subtle border-2"><span id="subObjdateDay"></span></div>
+								</div>
+								<div class="d-flex flex-column mb-3">
+									<div class="p-1 bg-primary-subtle">그룹웨어</div>
+									<div class="p-1 border border-primary-subtle border-2 border-bottom-0"><span id="gpOption"></span></div>
+									<div class="p-1 border border-primary-subtle border-2"><span id="groupObj"></span></div>
+								</div>
+								<div class="d-flex flex-column mb-3">
+									<div class="p-1 bg-primary-subtle">인사관리</div>
+									<div class="p-1 border border-primary-subtle border-2 border-bottom-0"><span id="hrObj"></span></div>
+									<div class="p-1 border border-primary-subtle border-2"><span id="hrObjdate"></span></div>
+								</div>
+								<div class="d-flex flex-column mb-3">
+									<div class="p-1 bg-primary-subtle">지점관리</div>
+									<div class="p-1 border border-primary-subtle border-2 border-bottom-0"><span id="pointObj"></span></div>
+									<div class="p-1 border border-primary-subtle border-2"><span id="pointObjdate"></span></div>
+								</div>
+								<div class="d-flex flex-column mb-3">
+									<div class="p-1 bg-primary-subtle">회계관리</div>
+									<div class="p-1 border border-primary-subtle border-2 border-bottom-0"><span id="accountObj"></span></div>
+									<div class="p-1 border border-primary-subtle border-2"><span id="accountObjdate"></span></div>
+								</div>
+							</div>
+						
+					</div>
+				</div>
+			</div>
+			<div class="col-md-12 stretch-card mt-0 mb-2">
+				<div class="card">
+					<div class="card-body">
+						<h6 class="mb-2">구독목록</h6>
+						<div id="sublist"></div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 	<script th:inline="javascript">
 		setTimeout(async () => {
 			console.log("여기는 사용하는곳:", window.subscriptionState);
+			let subObj = document.querySelector("#subObj");
+			let subObjdate = document.querySelector("#subObjdate");
+			let subObjdateDay = document.querySelector("#subObjdateDay");
+			let gpOption = document.querySelector("#gpOption");
+			let groupObj = document.querySelector("#groupObj");
+			let hrObj = document.querySelector("#hrObj");
+			let hrObjdate = document.querySelector("#hrObjdate");
+			let pointObj = document.querySelector("#pointObj");
+			let pointObjdate = document.querySelector("#pointObjdate");
+			let accountObj = document.querySelector("#accountObj");
+			let accountObjdate = document.querySelector("#accountObjdate");
+			
+			//subObj
+			if(window.subscriptionState.subObj=="date"){
+				subObj.innerHTML = "기간구독";
+			}else{
+				subObj.innerHTML = "정기구독";
+			}
+			//subObjdate //subObjdateDay
+			if(window.subscriptionState.subObjdate && window.subscriptionState.subObjdate != 0){
+				//만료 남은 기간
+				subObjdate.innerHTML = window.subscriptionState.subObjdate+"일";
+				//만료일자
+				let today = new Date();
+				today.setDate(today.getDate()+window.subscriptionState.subObjdate);
+				let result = today.toISOString().split("T")[0];
+				subObjdateDay.innerHTML = result;
+				groupObj.innerHTML = result;
+			}else{
+				subObjdate.innerHTML = "만료";
+				subObjdateDay.innerHTML = "-";
+			}
+			//gpOption
+			if(window.subscriptionState.gpOption=="50"){
+				gpOption.innerHTML = "50명";
+			}else if(window.subscriptionState.gpOption=="100"){
+				gpOption.innerHTML = "100명";
+			}else{
+				gpOption.innerHTML = "인원 무제한";
+			}
+			
+			//hrObj //hrObjdate
+			if(window.subscriptionState.hrObjdate && window.subscriptionState.hrObjdate != 0){
+				//만료 남은 기간
+				hrObj.innerHTML = window.subscriptionState.hrObjdate+"일";
+				//만료일자
+				let today = new Date();
+				today.setDate(today.getDate()+window.subscriptionState.hrObjdate);
+				let result = today.toISOString().split("T")[0];
+				hrObjdate.innerHTML = result;
+			}else{
+				hrObj.innerHTML = "만료";
+				hrObjdate.innerHTML = "-";
+			}
+			
+			//pointObj //pointObjdate
+			if(window.subscriptionState.pointObjdate && window.subscriptionState.pointObjdate != 0){
+				//만료 남은 기간
+				pointObj.innerHTML = window.subscriptionState.pointObjdate+"일";
+				//만료일자
+				let today = new Date();
+				today.setDate(today.getDate()+window.subscriptionState.pointObjdate);
+				let result = today.toISOString().split("T")[0];
+				pointObjdate.innerHTML = result;
+			}else{
+				pointObj.innerHTML = "만료";
+				pointObjdate.innerHTML = "-";
+			}
+			
+			//pointObj //pointObjdate
+			if(window.subscriptionState.accountObjdate && window.subscriptionState.accountObjdate != 0){
+				//만료 남은 기간
+				accountObj.innerHTML = window.subscriptionState.accountObjdate+"일";
+				//만료일자
+				let today = new Date();
+				today.setDate(today.getDate()+window.subscriptionState.accountObjdate);
+				let result = today.toISOString().split("T")[0];
+				accountObjdate.innerHTML = result;
+			}else{
+				accountObj.innerHTML = "만료";
+				accountObjdate.innerHTML = "-";
+			}
 		}, 500);
+		
+		
+		//구독목록 그리드 선언
+		var Grid = tui.Grid;
+		
+		//그리드 호출 항목 생성
+		const sublistdataSource = {
+				api : {
+					readData: { url: '/erp/rest/subscriptionlist', method: 'GET', initParams: { companyNum: [[${session.companyNum}]] }},
+				},
+				contentType : 'application/json',
+				headers: { 'x-custom-header': 'custom-header' },
+			};
+		//그리드 생성
+		const sublistgrid = new Grid({
+			el : document.getElementById('sublist'), // 컨테이너 엘리먼트
+			pageOptions : {
+				useClient : false, //페이지 네이션 할꺼면 false // 자동으로 하게할껴면 true
+				perPage : 5, //한페이지에 몇개 보여줄지
+			},
+			//칼럼 정하기
+			columns: [
+				{ header: "구독번호", name: "subscriptionNum", editor: 'text' },
+				{ header: "구독수단", name: "subscriptionMeanName", editor: 'text' },
+				{ header: "구독형태", name: "subscriptionFormName", editor: 'text' },
+				{ header: "구독금액", name: "subscriptionAmount", editor: 'text',
+					formatter: function({ value }) {
+				        return value.toLocaleString()+'원';
+				    },
+				},
+				{ header: "구독일시", name: "subscriptionDate", editor: 'text',
+					formatter: function({ value }) {
+						const utcDate = new Date(value);
+						// 한국 시간(KST)으로 변환 (24시간 형식 유지)
+						const options = { 
+						    year: 'numeric', month: '2-digit', day: '2-digit',
+						    hour: '2-digit', minute: '2-digit', second: '2-digit',
+						    hour12: false, timeZone: "Asia/Seoul"
+						};
+						// `toLocaleString` 사용하여 변환 후, 포맷을 `yyyy-MM-dd HH:mm:ss`로 조정
+						const kstDate = new Intl.DateTimeFormat("ko-KR", options).format(utcDate)
+						    .replace(/\./g, '-') // yyyy.MM.dd → yyyy-MM-dd 로 변환
+						    .replace(/ /g, '')    // 공백 제거
+						    .trim();
+						return kstDate;
+				    },
+				},
+				{ header: "거래명세서", name: "transactionstatement", editor: 'text',
+					formatter: function({ row }) {
+				        return `<button class="btn btn-info btn-sm sub-bill" data-id="${row.subscriptionNum}">거래명세서</button>`;
+				    },
+				},
+				{ header: "세금계산서", name: "taxinvoice", editor: 'text',
+					formatter: function({ row }) {
+						if(row.subscriptionMeanName=="카드" || row.subscriptionMeanName=="카카오페이" || row.subscriptionMeanName=="네이버페이"){
+							if(row.billNum){
+								return `<button class="btn btn-info btn-sm sub-tax" data-id="${row.subscriptionNum}_1">계산서보기</button>`;
+							}else{
+					        	return `<button class="btn btn-info btn-sm sub-tax" data-id="${row.subscriptionNum}_2">발행하기</button>`;							
+							}
+						}else{
+							return `발행불가`;
+						}
+				    },
+				},
+				{ header: "발행일시", name: "세금계산서", editor: 'text',
+					formatter: function({ row }) {
+						return `미발행`;
+					},
+				},
+				{ header: "현금영수증", name: "cashreceipt", editor: 'text',
+					formatter: function({ row }) {
+						if(row.subscriptionMeanName=="무통장" || row.subscriptionMeanName=="계좌이체"){
+							if(row.billNum){
+								return `<button class="btn btn-info btn-sm sub-cash" data-id="${row.subscriptionNum}_1">영수증보기</button>`;
+							}else{
+					        	return `<button class="btn btn-info btn-sm sub-cash" data-id="${row.subscriptionNum}_2">발행하기</button>`;							
+							}
+						}else{
+							return `발행불가`;
+						}
+				    },
+				},
+				{ header: "발행일시", name: "현금영수증", editor: 'text',
+					formatter: function({ row }) {
+						return `미발행`;
+					},
+				},
+			],
+			//초기 데이터 뭘로 할지
+			data : sublistdataSource,
+		});
+		
+		//현재 그리드에 강조된행을 기록할 변수
+		let selectedRowKey = null;
+		//아무셀 클릭
+		sublistgrid.on('click', function (ev) {
+			if (ev.rowKey !== null) {
+				//현재 강조된 행 클래스 초기화
+				if (selectedRowKey !== null) {
+					sublistgrid.removeRowClassName(selectedRowKey, 'tui-grid-row-highlight');
+		        }
+				// 클릭한 행에 강조 효과 추가
+				sublistgrid.addRowClassName(ev.rowKey, 'tui-grid-row-highlight');
+				 // 현재 강조된 행을 기록
+		        selectedRowKey = ev.rowKey;
+				
+				rowData = sublistgrid.getRow(ev.rowKey);
+				console.log(`클릭한 행 데이터:\n${JSON.stringify(rowData, null, 2)}`);
+				console.log(rowData.subscriptionNum);
+				
+				// 옵션조회 쿼리 호출(goodsCode)
+			    fetch('/erp/rest/subscriptionDetail/' + rowData.subscriptionNum, {
+			        method: 'GET',
+			        headers: {
+			            'Content-Type': 'application/json'
+			        }
+			    })
+			    .then(response => response.json())
+			    .then(data => {
+			        subDetailgrid.resetData(data);  // 옵션 테이블 데이터 업데이트
+			        console.log(data);
+			    })
+			    .catch(error => console.error("데이터 요청 실패:", error));
+			}
+		});
+		
+		//명세서버튼 클릭
+		document.getElementById('sublist').addEventListener('click', function(event) {
+		    if (event.target.classList.contains('sub-bill')) {
+		        const subscriptionNum = event.target.getAttribute('data-id');
+		       	alert(subscriptionNum+"거래번호의 명세서를 PDF로 발행하기");
+		        //handleTransactionStatement(subscriptionNum);
+		    }else if(event.target.classList.contains('sub-tax')){
+		    	const subscriptionNum = event.target.getAttribute('data-id');
+		    	let tax = subscriptionNum.split("_");
+		    	if(tax[1] == 2){
+		    		alert(subscriptionNum+"세금계산서를 PDF로 발행하기");
+		    	}else if(tax[1] == 1){
+		    		alert(subscriptionNum+"세금계산서 DB에 있는 계산서 보여주기");
+		    	}
+		    }else if(event.target.classList.contains('sub-cash')){
+		    	const subscriptionNum = event.target.getAttribute('data-id');
+		    	let cash = subscriptionNum.split("_");
+		    	if(cash[1] == 2){
+		    		alert(subscriptionNum+"현금영수증 PDF로 발행하기");
+		    	}else if(cash[1] == 1){
+		    		alert(subscriptionNum+"현금영수증 DB에 있는 계산서 보여주기");
+		    	}
+		    	alert(subscriptionNum+"현금영수증을 명세서를 PDF로 발행하기");
+		    }
+		});
+				
+		//구독 상세 그리드
+		const subDetailgrid = new Grid({
+			el : document.getElementById('subDetailgrid'), // 컨테이너 엘리먼트
+			//칼럼 정하기
+			columns: [
+				{ header: "구독상품명", name: "subscriptionName" },
+				{ header: "구독옵션명", name: "subscriptionOption" },
+				{ header: "구독기간", name: "subscriptionPeriod",
+					formatter: function({ value }) {
+						return value + '일';
+				    },
+				},
+				{ header: "금액", name: "subscriptionOptionPrice",
+					formatter: function({ value }) {
+						return Number(value).toLocaleString() + '원';
+				    },
+				},
+			],
+			//초기 데이터 뭘로 할지
+			data : "",
+		});
 	</script>
 </body>

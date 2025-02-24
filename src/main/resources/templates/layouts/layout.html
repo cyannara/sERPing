@@ -10,7 +10,6 @@
 
 
     <!-- ERP 구독 권한 관리 스크립트 시작 [하연 2025-02-17] -->
-    <!-- 
     <script th:inline="javascript">
 		const sessionData = /*[[${session}]]*/ {};
 		document.addEventListener("DOMContentLoaded", function () {
@@ -23,13 +22,21 @@
 	    });
 	</script>
 	<script src="/js/erp/erpsubscription.js"></script>
-	 -->
     <!-- ERP 구독 권한 관리 스크립트 끝 [하연 2025-02-17] -->
 
 	 
     <link rel="stylesheet" href="/vendors/mdi/css/materialdesignicons.min.css">
     <link rel="stylesheet" href="/common/_navbar.css">
-    
+
+    <!-- TOAST UI Editor CSS -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor-plugin-table-merged-cell/latest/toastui-editor-plugin-table-merged-cell.min.css" />
+
+    <!-- TOAST UI Editor JS -->
+    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+    <script src="https://uicdn.toast.com/editor-plugin-table-merged-cell/latest/toastui-editor-plugin-table-merged-cell.min.js"></script>
+
+
     <!-- plugins:css -->
     <link rel="stylesheet" href="/vendors/feather/feather.css">
     <link rel="stylesheet" href="/vendors/ti-icons/css/themify-icons.css">
@@ -71,10 +78,12 @@
 
     <link rel="stylesheet" href="/common/_navbar.css">
     <link rel="stylesheet" href="/css/mainpage/mainpage.css">
+    <link rel="stylesheet" href="/css/mypage/mypage.css">
+    <script src="/js/common/interceptor.js"></script>
 </head>
 <body>
 
-	
+
 <div class="container-scroller">
     <div th:replace="~{partials/_navbar :: navbar}"></div>
 

@@ -7,13 +7,13 @@
 		select returning_code, 
 			   request_date, 
 			   progress_status, 
-			   remark
+			   return_remark
 		from (  select /*+INDEX_DESC(bhf_returning pk_bhf_returning)*/
 					   rownum rn,
 					   returning_code, 
 					   request_date, 
 					   progress_status, 
-					   remark
+					   return_remark
 				from   bhf_returning
 		<![CDATA[
 			where rownum <= #{end}

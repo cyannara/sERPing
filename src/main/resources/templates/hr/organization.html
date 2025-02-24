@@ -16,25 +16,21 @@
       font-family: "Inter", sans-serif;
       background: #f8f9fa;
     }
-
     .container {
       display: flex;
       flex-direction: column;
       gap: 15px;
     }
-
     .header-section {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
       gap: 10px;
     }
-
     .content-section {
       display: flex;
       gap: 20px;
     }
-
     .org-chart {
       width: 30%;
       background: white;
@@ -42,7 +38,6 @@
       border-radius: 5px;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
-
     .employee-table {
       flex: 1;
       background: white;
@@ -50,17 +45,20 @@
       border-radius: 5px;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
-
     .department-tree ul {
       list-style: none;
       padding-left: 20px;
     }
-
     .toggle-btn {
       cursor: pointer;
       margin-right: 5px;
     }
-
+    .select-wrapper {
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
     #grid {
       width: 100%;
       height: 300px;
@@ -81,68 +79,110 @@
 
     <div class="content-section">
       <section class="org-chart">
-        <input type="text" class="form-control mb-3" placeholder="부서 검색 후 [Enter]">
+        <input type="text" class="form-control mb-3" id="deptSearchKW" placeholder="부서 검색 후 [Enter]">
         <div class="department-tree">
-          <ul>
-            <li>
-              <span class="toggle-btn">▶</span> (주)YEDAM ERP
-              <ul>
-                <li>
-                  <span class="toggle-btn">▶</span> 경영지원본부(6)
-                  <ul>
-                    <li>📄 인사팀(6)</li>
-                    <li>📄 회계팀(5)</li>
-                  </ul>
+            <ul>
+                <!-- ✅ 회사 정보 -->
+                <li th:data-company-id="${company.companyNum}" class="select-item" id="selectCompanySJ">
+                    <div class="select-wrapper" id="comClick">
+                        <span class="toggle-btn">▼</span> 
+                        <span class="select-text" th:text="${company.companyName}" id="selectComKorName"></span> <span> / </span> 
+                        <span class="select-text" th:text="${company.companyEngName}" id="selectComEngName"></span> 
+                        (<span class="count" th:text="${company.totalEmployeeCount}"></span>)
+                    </div>
+                    <ul class="sub-list company-sub-list">
+                        <!-- ✅ 본사 & 지점 -->
+                        <li th:each="dept : ${departments}" th:if="${dept.parentDepartmentNum == null}" th:data-dept-id="${dept.departmentNum}" class="select-item selectTopDept">
+                            <div class="select-wrapper" id="topDeptClick">
+                                <span class="toggle-btn">▼</span> 
+                                <span class="select-text" th:text="${dept.departmentName}"></span> 
+                                (<span class="count" th:text="${dept.totalEmployeeCount}"></span>)
+                            </div>
+                            <ul class="sub-list">
+                                <!-- ✅ 하위 부서 -->
+                                <li th:each="subDept : ${departments}" th:if="${subDept.parentDepartmentNum == dept.departmentNum}" th:data-dept-id="${subDept.departmentNum}" class="select-item selectSubDept">
+                                    <div class="select-wrapper" id="subDeptClick">
+                                        📄 <span class="select-text" th:text="${subDept.departmentName}"></span> 
+                                        (<span class="count" th:text="${subDept.totalEmployeeCount}"></span>)
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
                 </li>
-                <li>
-                  <span class="toggle-btn">▶</span> 서비스본부(6)
-                  <ul>
-                    <li>📄 고객지원팀(0)</li>
-                    <li>
-                      <span class="toggle-btn">▶</span> 영업교육팀(0)
-                      <ul>
-                        <li>📄 영업팀(6)</li>
-                        <li>📄 교육팀(0)</li>
-                      </ul>
-                    </li>
-                  </ul>
-                </li>
-              </ul>
-            </li>
-          </ul>
+            </ul>
         </div>
       </section>
 
       <section class="employee-table">
-        <h5 class="fw-bold">선택한 부서: 경영지원본부</h5>
-        <input type="text" class="form-control mb-3" placeholder="사원 검색 후 [Enter]">
+        <h5 class="fw-bold">사원 목록</h5>
         <div id="grid"></div>
       </section>
     </div>
   </div>
 
-  <script>
-    $(document).ready(function () {
-      $('.toggle-btn').click(function () {
-        $(this).siblings('ul').toggle();
-        $(this).text($(this).text() === '▶' ? '▼' : '▶');
-      });
-    });
+  <script th:inline="javascript">
+  let companyNumSJ = [[${company.companyNum}]];
+  let departmentNumSJ = 0;
+  
+  
+  const dataSource = {
+	        api: {
+	            readData: {
+	                url: 'http://localhost:81/hr/rest/emp/organization',
+	                method: 'GET',
+	                initParams: { companyNum:companyNumSJ , departmentNum:departmentNumSJ  }
+	            }
+	        },
+	        contentType: 'application/json',
+	    };
 
-    const grid = new tui.Grid({
-      el: document.getElementById('grid'),
-      data: [
-        { id: '2520401', name: '홍길동', department: '영업', position: '과장', email: 'seozzini@gmail.com' },
-        { id: '2520402', name: '김길동', department: '인사', position: '대리', email: 'seozzini@gmail.com' }
-      ],
-      columns: [
-        { header: '사원번호', name: 'id' },
-        { header: '사원명', name: 'name' },
-        { header: '부서', name: 'department' },
-        { header: '직급', name: 'position' },
-        { header: '이메일', name: 'email' }
-      ]
-    });
+      $(document).ready(function () {
+          $(".company-sub-list, .sub-list").show();
+
+          // ✅ 부서 트리 토글 기능만 유지
+          $(document).on("click", ".toggle-btn", function (event) {
+              event.stopPropagation();
+              let $targetList = $(this).closest("li").children("ul.sub-list");
+              $targetList.slideToggle(200);
+              $(this).text($(this).text() === "▼" ? "▶" : "▼");
+          });
+
+          // ✅ Toast Grid 초기화 (데이터 없이)
+          const grid = new tui.Grid({
+              el: document.getElementById("grid"),
+              pageOptions: { useClient: false, perPage: 2 }, // ✅ 클라이언트 모드
+              data: dataSource,
+              columns: [
+                  { header: "사원 ID", name: "employeeId" },
+                  { header: "사원명", name: "employeeName" },
+                  { header: "이메일", name: "email" },
+                  { header: "직급", name: "position" },
+                  { header: "부서", name: "departmentName" }
+              ]
+          });
+
+          
+          
+          
+          $(document).on('click', '.department-tree [data-company-id], .department-tree [data-dept-id]', function(event) {
+        	    event.stopPropagation(); // 부모 요소로 이벤트 전파 방지
+
+        	    let companyId = $(this).data('company-id'); // `data-company-id` 값 가져오기
+        	    let departmentId = $(this).data('dept-id'); // `data-dept-id` 값 가져오기
+
+        	    if (companyId !== undefined) {
+        	        alert(`회사 ID: ${companyId} 클릭됨!`);
+        	    } else if (departmentId !== undefined) {
+        	        alert(`부서 ID: ${departmentId} 클릭됨!`);
+        	    }
+        	});
+      });
+      
+
+
+
+      
   </script>
 </body>
 </html>

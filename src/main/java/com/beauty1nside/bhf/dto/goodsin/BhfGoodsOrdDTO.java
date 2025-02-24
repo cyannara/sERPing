@@ -13,6 +13,7 @@ public class BhfGoodsOrdDTO {
 	private Date dueDate;
 	private String remark;
 	
+	private String goodsCode;
 	private String goodsName;
 	private String optionCode;
 	private String optionName;

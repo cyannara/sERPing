@@ -29,8 +29,18 @@ public class ApprovalServiceImpl implements ApprovalService{
 	}
 	
 	@Override
+	public List<ApprovalDTO> myList(ApprovalSearchDTO dto) {
+		return approvalMapper.myList(dto);
+	}
+	
+	@Override
 	public int count(ApprovalSearchDTO dto, Long companyNum) {
 		return approvalMapper.count(dto, companyNum);
+	}
+	
+	@Override
+	public int myCount(ApprovalSearchDTO dto) {
+		return approvalMapper.myCount(dto);
 	}
 	
 	@Override

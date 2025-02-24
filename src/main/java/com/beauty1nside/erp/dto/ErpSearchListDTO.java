@@ -22,5 +22,6 @@ import lombok.Data;
 public class ErpSearchListDTO {
 
 	String companyName;
+	int companyNum;
 	
 }

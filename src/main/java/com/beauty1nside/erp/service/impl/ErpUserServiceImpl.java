@@ -10,7 +10,10 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 import com.beauty1nside.erp.dto.ContractDTO;
+import com.beauty1nside.erp.dto.ErpSearchDTO;
 import com.beauty1nside.erp.dto.ErpSubOptionDTO;
+import com.beauty1nside.erp.dto.SubScriptionDTO;
+import com.beauty1nside.erp.dto.SubscriptionDetailDTO;
 import com.beauty1nside.erp.dto.erpSubscriptionInfoListDTO;
 import com.beauty1nside.erp.mapper.ErpUserMapper;
 import com.beauty1nside.erp.service.ErpUserService;
@@ -34,6 +37,7 @@ import lombok.extern.log4j.Log4j2;
  *  2025.02.17  표하연          최초 생성
  *  2025.02.18  표하연          기간 구독 결제 서비스 생성
  *  2025.02.20  표하연          사용계약서 정보를 CR 한다
+ *  2025.02.21  표하연          결제 목록을 리드한다
  *
  *  </pre>
 */
@@ -108,10 +112,15 @@ public class ErpUserServiceImpl implements ErpUserService {
 		
 		//결제 정보로 구독목록 업뎃하기 erp_subscription_info_list [여러개] 바디 포문안에서 해야함
 		String[] optionNum = ((String) requestData.get("orderId")).split("_");
+		String[] optionDay = ((String) requestData.get("dataDay")).split("-");
+		int i = 0;
 		for (String ele : optionNum) {
 		    //ele => 옵션번호 // 이거랑 lastKey 이용해서 인서트
+			
+			String[] optioninfo = optionDay[i].split("_");
+			
 		    //구독 결제 바디 저장
-		    erpUserMapper.prosubscriptiontail(lastKey, Integer.parseInt(ele));
+		    erpUserMapper.prosubscriptiontail(lastKey, Integer.parseInt(ele), Integer.parseInt(optioninfo[0]), optioninfo[1]);
 		    
 		    ErpSubOptionDTO dto = erpUserMapper.lastoptionlist(Integer.parseInt(ele));
 		    log.info("dto정보 : "+dto);
@@ -194,6 +203,7 @@ public class ErpUserServiceImpl implements ErpUserService {
 		    		erpUserMapper.prosubupdate(subDTO);
 		    	}
 		    }
+		    i++;
 		}
 		log.info("결제정보 : "+requestData);
 		return 1;
@@ -230,6 +240,39 @@ public class ErpUserServiceImpl implements ErpUserService {
 	@Override
 	public ContractDTO readcontract(int companyNum) {
 		return erpUserMapper.readcontract(companyNum);
+	}
+
+	/**
+     * 결제 정보 리스트를 조회
+     *
+     * @param ErpSearchDTO
+     * @return List<subscriptioncount>
+     */
+	@Override
+	public List<SubScriptionDTO> subscriptionlist(ErpSearchDTO searchDTO) {
+		return erpUserMapper.subscriptionlist(searchDTO);
+	}
+
+	/**
+     * 결제 정보 리스트의 갯수를 조회
+     *
+     * @param ErpSearchDTO
+     * @return int
+     */
+	@Override
+	public int subscriptioncount(ErpSearchDTO searchDTO) {
+		return erpUserMapper.subscriptioncount(searchDTO);
+	}
+
+	/**
+     * 구독리스트의 상세 구독내역을 가져온다
+     *
+     * @param int
+     * @return List<SubscriptionDetailDTO>
+     */
+	@Override
+	public List<SubscriptionDetailDTO> subscriptionDetail(int subscriptionNum) {
+		return erpUserMapper.subscriptionDetail(subscriptionNum);
 	}
 	
 }

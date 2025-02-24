@@ -22,27 +22,27 @@
 		e.department_num = d.department_num
 		WHERE e.employee_num =
 		#{employee_num}
-		ORDER BY e.employee_num DESC;
+		ORDER BY e.employee_num DESC
 	</select>
 
 	<select id="list" resultType="com.beauty1nside.hr.dto.EmpDTO"
 		parameterType="com.beauty1nside.hr.dto.EmpSearchDTO">
 		SELECT * FROM (
-		SELECT ROWNUM rn, employeeNum, employeeId, employeeName, email, phone,
-		hireDate, position, status, employmentType, departmentName
-		FROM (
-		SELECT
-		e.employee_num AS employeeNum,
-		e.employee_id AS employeeId,
-		e.employee_name AS employeeName,
-		e.email AS email,
-		e.phone AS phone,
-		e.hire_date AS hireDate,
-		fn_get_cmmn_name(e.position) AS position,
-		fn_get_cmmn_name(e.status) AS status,
-		fn_get_cmmn_name(e.employment_type) AS employmentType,
-		COALESCE(d.department_name, '부서 없음') AS departmentName
-		FROM hr_employee e
+			SELECT ROWNUM rn, employeeNum, employeeId, employeeName, email, phone,
+			hireDate, position, status, employmentType, departmentName
+			FROM (
+			SELECT
+			e.employee_num AS employeeNum,
+			e.employee_id AS employeeId,
+			e.employee_name AS employeeName,
+			e.email AS email,
+			e.phone AS phone,
+			e.hire_date AS hireDate,
+			fn_get_cmmn_name(e.position) AS position,
+			fn_get_cmmn_name(e.status) AS status,
+			fn_get_cmmn_name(e.employment_type) AS employmentType,
+			COALESCE(d.department_name, '부서 없음') AS departmentName
+			FROM hr_employee e
 		<if test="departmentNum == null ">
 			LEFT
 		</if>
@@ -56,6 +56,120 @@
          ]]>
 		)
 		WHERE rn >= #{start}
+	</select>
+	
+	<select id="countForSubDept" parameterType="com.beauty1nside.hr.dto.EmpSearchDTO">
+		select count(*)
+		from hr_employee e
+		    left join hr_department d
+		    on e.department_num = d.department_num 
+		<where>
+		 e.company_num = #{companyNum}    
+            <if test="departmentNum != 0">
+			    and (e.department_num = #{departmentNum} 
+			         or e.department_num in
+			         (
+			         select department_num
+			         from hr_department
+			         where parent_department_num = #{departmentNum}    
+			         )
+			    )
+            </if>
+		</where>
+
+	</select>
+	
+	
+	
+		<select id="listWithSubDept" resultType="com.beauty1nside.hr.dto.EmpDTO" 
+	        parameterType="com.beauty1nside.hr.dto.EmpSearchDTO">
+			select 
+				e.employee_num,
+				e.employee_id,
+				e.employee_name,
+				e.email ,
+				e.phone ,
+				e.hire_date,
+				fn_get_cmmn_name(e.position) as position,
+				fn_get_cmmn_name(e.authority) as authority,
+				fn_get_cmmn_name(e.status) as status,
+				e.quit_date,
+				e.address,
+				e.zip_code,
+				fn_get_cmmn_name(e.employment_type) as employmentType,
+				e.profile_image,
+				e.memo,
+				e.company_num,
+				e.department_num,
+				e.salary,
+				d.department_name,
+				d.parent_department_num,
+				d.department_type,
+				d.manager_num,
+				d.department_status
+			from hr_employee e
+			    left join hr_department d
+			    on e.department_num = d.department_num 
+			<where>
+			 e.company_num = #{companyNum}    
+	            <if test="departmentNum != 0">
+				    and (e.department_num = #{departmentNum} 
+				         or e.department_num in
+				         (
+				         select department_num
+				         from hr_department
+				         where parent_department_num = #{departmentNum}    
+				         )
+				    )
+	            </if>
+			</where>
+	
+		</select>
+		
+	
+	
+	
+	
+	<select id="listWithSubDepartment2" resultType="com.beauty1nside.hr.dto.EmpDTO" 
+	        parameterType="com.beauty1nside.hr.dto.EmpSearchDTO">
+	    SELECT * 
+	    FROM (
+	        SELECT a.*, ROWNUM rn 
+	        FROM (
+	            SELECT e.employee_num AS employeeNum,
+	                   e.employee_id  AS employeeId,
+	                   e.employee_name AS employeeName,
+	                   e.email,
+	                   fn_get_cmmn_name(e.position) AS position, 
+	                   d.department_name AS departmentName,
+	                   e.department_num AS departmentNum,
+	                   COUNT(*) OVER() AS totalEmployeeCount  -- ✅ 전체 직원 수 추가
+	            FROM hr_employee e
+	            JOIN hr_department d ON e.department_num = d.department_num
+	            <where>
+	                <!-- ✅ 회사 번호 조건 -->
+	                <if test="companyNum != null">
+	                    AND e.company_num = #{companyNum}
+	                </if>
+	                <!-- ✅ 부서 번호 조건 (하위 부서 포함) -->
+	                <if test="departmentNum != null">
+	                    AND (
+	                        e.department_num = #{departmentNum}
+	                        OR e.department_num IN (
+	                            SELECT department_num
+	                            FROM hr_department
+	                            WHERE parent_department_num = #{departmentNum}
+	                        )
+	                    )
+	                </if>
+	            </where>
+	            ORDER BY e.employee_num DESC  -- ✅ ORDER BY는 ROWNUM 필터링 전에 위치해야 함
+	        ) a 
+	        <![CDATA[
+	        WHERE ROWNUM <= #{end}
+	        ]]>
+	    ) 
+	    WHERE rn >= #{start}  -- ✅ 최종적으로 시작 번호 필터링
 	</select>
 
 
@@ -191,11 +305,11 @@
 	    INSERT INTO hr_employee (
 	        employee_num, employee_id, employee_pw, employee_name, email, phone, hire_date, 
 	        position, authority, status, employment_type, department_num, salary, bank_name, 
-	        account_num, register_date
+	        account_num, register_date, ssn, address, zip_code, memo, company_num
 	    ) VALUES (
 	        HR_EMPLOYEE_SEQ.NEXTVAL, #{employeeId}, #{employeePw}, #{employeeName}, #{email}, #{phone}, #{hireDate},
 	        #{position}, #{authority}, #{status}, #{employmentType}, #{departmentNum}, #{salary}, #{bankName},
-	        #{accountNum}, SYSDATE
+	        #{accountNum}, SYSDATE, #{ssn}, #{address}, #{zipCode}, #{memo}, #{companyNum}
 	    )
 	</insert>
 
@@ -206,7 +320,54 @@
 	    WHERE REGEXP_LIKE(employee_id, '^[0-9]{6}[0-9]{3}$') -- 숫자로 된 9자리 employee_id만 선택
 	</select>
 
+
+	<!-- 권한 목록 조회 (최고관리자 AU001,관리자 AU002,지점장 AU003,사원 AU004)-->
+	<select id="getAuths" resultType="map">
+		SELECT DISTINCT c.cmmn_code AS cmmnCode, c.cmmn_name AS cmmnName
+		FROM cmmn c
+		WHERE c.upper_cmmn_code = 'AU'
+		ORDER BY c.cmmn_code DESC		
+	</select>
 	
+	<select id="checkEmailExists" resultType="int">
+	    SELECT COUNT(*) FROM HR_EMPLOYEE WHERE EMAIL = #{email}
+	</select>
+	
+	<!-- 특정 부서의 사원 목록 가져오기 -->
+	<select id="listByDept" resultType="com.beauty1nside.hr.dto.EmpDTO"
+										 parameterType="com.beauty1nside.hr.dto.EmpSearchDTO">
+		
+	    SELECT * FROM (
+	        SELECT ROWNUM rn, employeeNum, employeeId, employeeName, email, phone,
+	        hireDate, position, status, employmentType, departmentName, authority
+	        FROM (
+	            SELECT
+	                e.employee_num AS employeeNum,
+	                e.employee_id AS employeeId,
+	                e.employee_name AS employeeName,
+	                e.email AS email,
+	                e.phone AS phone,
+	                e.hire_date AS hireDate,
+				    fn_get_cmmn_name(e.position) as position, 
+				    fn_get_cmmn_name(e.status) as status, 
+				    fn_get_cmmn_name(e.authority) as authority,  
+				    fn_get_cmmn_name(e.employment_type) as employmentType, 
+	                d.department_name AS departmentName
+	            FROM hr_employee e
+	            LEFT JOIN hr_department d ON e.department_num = d.department_num
+	            <where>
+	                <if test="departmentNum != null">
+	                    AND e.department_num = #{departmentNum}  <!-- 특정 부서 필터 추가 -->
+	                </if>
+	                <include refid="searchInfo"></include>  <!-- 기존 검색 조건 유지 -->
+	            </where>
+	        ) 
+        <![CDATA[
+        WHERE ROWNUM <= #{end} 
+         ]]>
+	    )
+	    WHERE rn >= #{start}
+	</select>
 
 
 </mapper>

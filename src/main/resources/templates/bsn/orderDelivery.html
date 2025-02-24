@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html 
+lang="en"
+layout:decorate="~{layouts/layout}" 
+xmlns:th="http://www.thymeleaf.org"
+xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+>
+
+<head>
+
+  <style>
+  	#custom-container{
+		background-color: #f8f9fa; /* 연한 회색 배경 */
+		padding: 20px;
+		border-radius: 10px;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 박스 그림자 */
+		margin-bottom: 20px;
+	
+	}
+  </style>
+
+</head>
+<body layout:fragment="content">
+  <!-- 페이지 내용 시작 -->
+	<div>
+		<h1>출고 페이지</h1>
+		<div class="row">
+        	<div class="col-md-8  grid-margin stretch-card">
+            	<div class="card">
+              		<div class="card-body">
+                		<h4 class="card-title">주문 목록</h4>
+                		<p class="card-description">그리드 - 검색한 주문 리스트 출력</p>
+                		<div id="orderList"></div>
+               		 	<div id="pagination" class="tui-pagination"></div>
+              		</div>
+            	</div>
+            	
+          	</div>
+          	
+          	<div class="col-md-4  grid-margin stretch-card">
+            	<div class="card">
+              		<div class="card-body">
+                		<h4 class="card-title">주문 목록</h4>
+                		<p class="card-description">그리드 - 검색한 주문 리스트 출력</p>
+                		<div id="orderList"></div>
+               		 	<div id="pagination" class="tui-pagination"></div>
+              		</div>
+            	</div>
+            	
+          	</div>
+        </div>
+	</div>
+	
+<script>
+var Grid = tui.Grid;
+const OrderListDataSource = {
+		api: {
+			readData: { url: 'http://localhost:81/bsn/rest/orderList', method: 'GET', initParams: { page: 1 }},
+		},
+		contentType: 'application/json'
+};
+
+
+//상품 테이블
+const orderList = new Grid({
+		el: document.getElementById('orderList'), // 컨테이너 엘리먼트
+		pageOptions: {
+		useClient: false,
+		perPage: 10,
+	},
+	columns: [ 
+		{ header : "주문ID", name : "orderId", sortable : true},
+		{ header : "주문명", name : "orderName", width: 'auto',  sortable : true},
+		{ header : "발주코드", name : "orderCode"},
+		{ header : "지점코드", name : "branchOfficeId"},
+		// { header : "회사번호", name : "companyNum"},
+		{ header : "주문일", name : "orderDate", formatter: ({ value }) => formatDate(value, 'order'), width: 'auto', sortable : true},
+		{ header : "납기일", name : "dueDate", formatter: ({ value }) => formatDate(value, 'due'), width: 'auto', sortable : true},
+		{ header : "비고", name : "remark", width: 'auto'},
+	],
+	data: OrderListDataSource
+});
+
+//그리드 날짜 형식 변경(데이터 수정X, 표기만)
+function formatDate(dateString, type) {
+    if (!dateString) return ''; // 데이터가 없으면 빈 문자열 반환
+    const date = new Date(dateString);
+    if (isNaN(date)) return dateString; // 날짜 변환이 실패하면 원본 유지
+
+    return type === 'order' 
+        ? date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }) // "2025년 2월 17일"
+        : date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }); // "02/17 (월)"
+}
+
+</script>
+</body>
+</html>

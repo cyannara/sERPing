@@ -1,0 +1,46 @@
+<!doctype html>
+<html layout:decorate="~{layouts/layout}"
+      lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Document</title>
+    <style>
+        #editor {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: white;
+            padding: 40px;
+            margin-top: 40px;
+        }
+
+    </style>
+</head>
+<body layout:fragment="content">
+<h3>문서 템플릿</h3>
+<span id="documentId" th:data-document-id="${documentId}"></span>
+<div id="editor" class="toastui-editor-contents"></div>
+<script>
+    const documentId = document.getElementById("documentId").dataset.documentId
+    const url = `/api/stdr/document/${documentId}`;
+    fetch(url, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+        }
+    })
+        .then(result => result.json())
+        .then(data => {
+            const editor = document.getElementById('editor')
+            editor.innerHTML = data.documentTemplate;
+        })
+        .catch(error => console.error("Error fetching data:", error));
+</script>
+</body>
+
+</html>
+
