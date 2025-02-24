@@ -52,20 +52,12 @@
 		s.document_type
 		FROM (
 		SELECT /*+ INDEX_DESC(grpwr_in_approval pk_grpwr_in_approval) */
-		rownum rn,
-		g.in_approval_id,
-		g.document_id,
-		g.employee_num,
-		g.in_approval_request_date,
-		g.in_approval_status,
-		g.in_approval_request_content,
-		g.in_approval_rejected_content,
-		g.in_approval_file_path,
-		g.company_num
+		g.*,
+		ROW_NUMBER() OVER (ORDER BY g.in_approval_request_date DESC) AS rn
 		FROM grpwr_in_approval g
 
 		<![CDATA[
-            WHERE rownum <= #{dto.end} and g.in_approval_status = 'WAITING'
+            WHERE g.in_approval_status = 'WAITING'
             AND
         ]]>
 <!--		<include refid="searchInfo"></include>-->
@@ -82,7 +74,7 @@
 
 		JOIN hr_employee h ON g.employee_num = h.employee_num
 		join stdr_document s on g.document_id = s.document_id
-		WHERE rn >= #{dto.start}
+		WHERE rn BETWEEN #{dto.start} AND #{dto.end}
 		<if test="dto.documentType != null and ! dto.documentType.equals('')">
 			AND s.document_type Like '%' || #{dto.documentType} || '%'
 		</if>
@@ -107,19 +99,11 @@
 		s.document_type
 		FROM (
 		SELECT /*+ INDEX_DESC(grpwr_in_approval pk_grpwr_in_approval) */
-		rownum rn,
-		g.in_approval_id,
-		g.document_id,
-		g.employee_num,
-		g.in_approval_request_date,
-		g.in_approval_status,
-		g.in_approval_request_content,
-		g.in_approval_rejected_content,
-		g.in_approval_file_path,
-		g.company_num
+		g.*,
+		ROW_NUMBER() OVER (ORDER BY g.in_approval_request_date DESC) AS rn
 		FROM grpwr_in_approval g
 		<![CDATA[
-            WHERE rownum <= #{end} and g.employee_num = #{employeeNum}
+            WHERE g.employee_num = #{employeeNum}
             AND
         ]]>
 		<!--		<include refid="searchInfo"></include>-->
@@ -138,11 +122,12 @@
 		) g
 		JOIN hr_employee h ON g.employee_num = h.employee_num
 		join stdr_document s on g.document_id = s.document_id
-		WHERE rn >= #{start}
+		WHERE rn BETWEEN #{start} AND #{end}
 		<if test="documentType != null and ! documentType.equals('')">
 			AND s.document_type Like '%' || #{documentType} || '%'
 		</if>
-	</select>
+		order by g.in_approval_request_date desc
+		</select>
 
 
 	<select id="documentList" resultType="com.beauty1nside.stdr.dto.DocumentDTO">
