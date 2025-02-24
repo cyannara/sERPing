@@ -22,8 +22,9 @@
         SELECT /*+index_desc(purchs_purchase_header PK_PURCHS_PURCHASE_HEADER)*/
                ROWNUM RN, 
                h.purchase_num,
+               h.purchase_date,
                h.purchase_due_date,
-               h.PUCHASE_TOTAL_AMOUNT,
+               h.PUCHASE_TOTAL_AMOUNT AS purchase_total_amount,
                h.purchase_status,
                h.purchase_vat_flag,
                b.purchase_quantity,
@@ -36,7 +37,7 @@
                c.business_num,
                c.company_num,
                c.REPRESENTATION_NAME,
-               erp_employee_name(h.employee_num),
+               e.employee_name AS employee_name,
                e.phone AS employee_phone,
                e.email AS employee_email,
                g.goods_name,
@@ -77,8 +78,11 @@
     <if test="purchaseNum != null and purchaseNum != ''">
         AND h.purchase_num = #{purchaseNum}
     </if>
-    <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
-        AND h.purchase_due_date BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+    <if test="startDate != null">
+        AND purchase_date >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+    </if>
+    <if test="endDate != null">
+        AND purchase_date <![CDATA[ <=  ]]>  TO_DATE(#{endDate}, 'YYYY-MM-DD')
     </if>
 </sql>
 

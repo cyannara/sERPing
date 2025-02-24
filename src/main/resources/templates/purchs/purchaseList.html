@@ -1,11 +1,10 @@
 <html layout:decorate="~{layouts/layout}"
-      lang="ko"
+      lang="en"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
-      
-<body layout:fragment="content">
-
-<style>
+ 
+ <head>
+ 	<style>
     /* ✅ 컨테이너 스타일 */
     #custom-container {
         background-color: #f8f9fa; /* 연한 회색 배경 */
@@ -49,6 +48,10 @@
         margin-top: 15px;
     }
 </style>
+ 	
+ </head>     
+<body layout:fragment="content">
+
 
 <div class="container mt-4">
     <h2 class="mb-4">발주서 조회</h2>
@@ -86,7 +89,7 @@
     
     <!-- ✅ 발주서 리스트 테이블 -->
     <div id="table-container" class="mt-3">
-        <div id="purchaseGrid"></div>
+        <div id="purchaselistGrid"></div>
         <div id="pagination" class="tui-pagination"></div>
     </div>
     
@@ -96,22 +99,26 @@
     </div>
 </div>
 
+
+
+
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     console.log("✅ 발주서 그리드 초기화");
     initPurchaseGrid();
 });
 
-let purchaseGrid;
+let purchaselistGrid;
 
 function initPurchaseGrid() {
-    const companyNum = [[${session.companyNum}]];  // ✅ 기본 회사 번호 (예제)
     
+	const companyNum = [[${session.companyNum}]];
+	
     if (!companyNum) {
         console.error("❌ 세션에서 companyNum 값을 찾을 수 없음.");
         return; // companyNum이 없으면 요청을 하지 않음
     } 
-    const purchaseDataSource = {
+    const purchaselistDataSource = {
         api: {
             readData: {
                 url: 'http://localhost:81/purchs/rest/purchase/list',
@@ -124,6 +131,20 @@ function initPurchaseGrid() {
                     page: 1,
                     perPage: 10,
                     companyNum: companyNum
+                },
+                beforeRequest: function(request) {
+                    console.log("📢 서버로 요청 보내기 전 requestParams:", request.params);
+                },
+                afterResponse: function(response) {
+                    console.log("📢 서버 응답:", response);
+
+                    if (response.data && response.data.contents) {
+                        console.log("✅ 변환된 데이터:", response.data.contents);
+                        return { data: response.data.contents, totalCount: response.data.pagination.totalCount };
+                    }
+
+                    console.warn("⚠️ 서버 응답에 contents가 없습니다.");
+                    return { data: [], totalCount: 0 };
                 }
             }
         },
@@ -131,9 +152,9 @@ function initPurchaseGrid() {
         serverSidePagination: true
     };
 
-    purchaseGrid = new tui.Grid({
-        el: document.getElementById('purchaseGrid'),
-        data: purchaseDataSource,
+    purchaselistGrid = new tui.Grid({
+        el: document.getElementById('purchaselistGrid'),
+        data: purchaselistDataSource,
         pageOptions: {
             useClient: false,
             perPage: 10
@@ -161,7 +182,7 @@ function purchaseSearch() {
     let startDate = document.querySelector('#searchStartDate').value;
     let endDate = document.querySelector('#searchEndDate').value;
 
-    purchaseGrid.setRequestParams({
+    purchaselistGrid.setRequestParams({
         "companyNum": [[${session.companyNum}]],
         "goodsName": goodsName,
         "purchaseNum": purchaseNum,
@@ -169,14 +190,14 @@ function purchaseSearch() {
         "endDate": endDate
     });
 
-    purchaseGrid.reloadData();
+    purchaselistGrid.reloadData();
 }
 
 //표시 수량 변경
 function changeProductDisplay() {
     let gap = parseInt(document.querySelector('#purchase_display_amount').value);
-    purchaseGrid.setPerPage(gap);
-    purchaseGrid.reloadData();
+    purchaselistGrid.setPerPage(gap);
+    purchaselistGrid.reloadData();
 }
 
 // ✅ 필터 초기화
@@ -185,17 +206,17 @@ function resetFilters() {
     document.querySelector('#searchPurchaseNum').value = '';
     document.querySelector('#searchStartDate').value = '';
     document.querySelector('#searchEndDate').value = '';
-    document.querySelector(#purchase_display_amount).value='';
+    document.querySelector('#purchase_display_amount').value='';
 
-    purchaseGrid.setRequestParams({
-        "companyNum": companyNums,
+    purchaselistGrid.setRequestParams({
+        "companyNum": companyNum,
         "goodsName": '',
         "purchaseNum": '',
         "startDate": '',
         "endDate": ''
     });
 
-    purchaseGrid.reloadData();
+    purchaselistGrid.reloadData();
 }
 
 // ✅ 텍스트 정렬 & 강조 렌더러
@@ -231,4 +252,4 @@ class PrintRenderer {
 </script>
 
 </body>
-</html>
+

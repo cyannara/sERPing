@@ -2,6 +2,9 @@ package com.beauty1nside.purchs.dto;
 
 import java.util.Date;
 
+import org.apache.ibatis.annotations.Param;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import groovy.transform.builder.Builder;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,8 +38,9 @@ public class PurchaseDTO {
 	private String employeePhone;
 	private String employeeEmail;
 	
-	private Date startDate;
-	private Date endDate;
+	
+	private String startDate ;
+	private String endDate;
 	
 	
 	

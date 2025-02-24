@@ -70,11 +70,14 @@ public class PurchsSampleController {
 		return "/purchs/mailsender"; // 페이지 출력 
 	};
 	
-	// 메일 페이지 이동
-	@GetMapping("/purchaselist")
-	public String purchslist() {
-		return "/purchs/purchslist"; // 페이지 출력 
-	};
+	
+
+	    @GetMapping("/purchaseList")
+	    public String purchaseList() {
+	        return "purchs/purchaseList"; // templates/purchs/purchaseList.html을 반환
+	    }
+
+
 
 	
 	
