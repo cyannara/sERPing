@@ -1,10 +1,190 @@
 <!DOCTYPE html>
-<html>
+<html layout:decorate="~{layouts/layout}" lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta charset="UTF-8">
 <title>근로계약관리</title>
+  <link rel="stylesheet" href="https://uicdn.toast.com/tui.grid/latest/tui-grid.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://uicdn.toast.com/tui.grid/latest/tui-grid.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </head>
-<body>
+
+<body layout:fragment="content">
+
+<div class="container mt-3">
+    <h2 class="mb-4">근로 계약서 등록</h2>
+
+    <form id="contractForm">
+        <!-- 사원 선택 -->
+        <div class="row">
+            <div class="col-md-6">
+                <label class="form-label">사원 번호</label>
+                <div class="input-group">
+                    <input type="number" class="form-control" id="employeeNum" required readonly>
+                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#employeeSelectModal">사원 선택</button>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">사원명</label>
+                <input type="text" class="form-control" id="employeeName" readonly>
+            </div>
+        </div>
+
+        <!-- 계약 정보 -->
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <label class="form-label">계약 시작일</label>
+                <input type="date" class="form-control" id="contractStartDate" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">계약 종료일 (무기계약이면 비워두세요)</label>
+                <input type="date" class="form-control" id="contractEndDate">
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <label class="form-label">부서 번호</label>
+                <input type="number" class="form-control" id="departmentNum" required readonly>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">직급</label>
+                <input type="text" class="form-control" id="position" readonly>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <label class="form-label">근무 시작 시간</label>
+                <input type="time" class="form-control" id="workStartTime" value="09:00">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">근무 종료 시간</label>
+                <input type="time" class="form-control" id="workEndTime" value="18:00">
+            </div>
+        </div>
+
+        <!-- 계약 유형 (오른쪽 정렬) -->
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <label class="form-label">기본 급여</label>
+                <input type="number" class="form-control" id="salary" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">계약 유형</label>
+                <select class="form-select" id="contractType">
+                    <option value="CT001">정규직</option>
+                    <option value="CT002">계약직</option>
+                </select>
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-primary mt-3" onclick="submitContract()">등록</button>
+    </form>
+</div>
+
+<!-- 사원 선택 모달 -->
+<div class="modal fade" id="employeeSelectModal" tabindex="-1" aria-labelledby="employeeSelectModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">사원 선택</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- 🔍 검색 필터 -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" id="searchKeyword" placeholder="사원명 검색">
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-primary" onclick="loadEmployees()">검색</button>
+                    </div>
+                </div>
+
+                <!-- 🔽 사원 리스트 (Toast Grid) -->
+                <div id="employeeGrid"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// 계약 등록 요청
+function submitContract() {
+    const contractData = {
+        employeeNum: document.getElementById("employeeNum").value,
+        employeeName: document.getElementById("employeeName").value,
+        contractType: document.getElementById("contractType").value,
+        contractStartDate: document.getElementById("contractStartDate").value,
+        contractEndDate: document.getElementById("contractEndDate").value,
+        departmentNum: document.getElementById("departmentNum").value,
+        position: document.getElementById("position").value,
+        workStartTime: document.getElementById("workStartTime").value,
+        workEndTime: document.getElementById("workEndTime").value,
+        salary: document.getElementById("salary").value
+    };
+
+    fetch("/contract/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(contractData)
+    })
+    .then(response => response.json())
+    .then(() => alert("계약이 성공적으로 등록되었습니다."))
+    .catch(() => alert("등록 실패"));
+}
+
+//사원 목록 불러오기 (데이터 구조 반영)
+function loadEmployees() {
+    fetch("/hr/rest/emp/list")
+        .then(response => response.json())
+        .then(data => {
+            if (data.result && data.data && data.data.contents) {
+                console.log("📊 사원 목록 데이터:", data.data.contents); // 콘솔로 데이터 확인
+                grid.resetData(data.contents); // Toast Grid에 데이터 넣기
+            } else {
+                alert("사원 목록을 불러오는 데 실패했습니다.");
+            }
+        })
+        .catch(() => alert("사원 목록 불러오기 실패"));
+}
+
+
+// Toast Grid 설정 (사원 목록)
+const grid = new tui.Grid({
+    el: document.getElementById('employeeGrid'),
+    columns: [
+        { header: "사원번호", name: "employeeNum" },
+        { header: "이름", name: "employeeName" },
+        { header: "부서명", name: "departmentName" }, 
+        { header: "부서번호", name: "departmentNum" }, 
+        { header: "직급", name: "position" },
+        { header: "선택", name: "select", formatter: () => '<button class="btn btn-success btn-sm selectEmployee">선택</button>' }
+    ]
+});
+
+// 사원 선택 버튼 클릭 이벤트
+document.getElementById("employeeGrid").addEventListener("click", function (event) {
+    if (event.target.classList.contains("selectEmployee")) {
+        const rowKey = event.target.closest("tr").dataset.rowKey; // rowKey 가져오기
+        const rowData = grid.getRow(rowKey); // rowKey로 데이터 가져오기
+
+        document.getElementById("employeeNum").value = rowData.employeeNum;
+        document.getElementById("employeeName").value = rowData.employeeName;
+        document.getElementById("departmentNum").value = rowData.departmentNum;
+        document.getElementById("position").value = rowData.position;
+
+        // 모달 닫기
+        $('#employeeSelectModal').modal('hide');
+    }
+});
+
+</script>
 
 </body>
 </html>

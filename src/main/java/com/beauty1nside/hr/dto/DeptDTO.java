@@ -31,5 +31,4 @@ public class DeptDTO {
     private Integer employeeCount; 
     private Integer totalEmployeeCount; // 하위 부서 포함 직원 수
     
-    
 }

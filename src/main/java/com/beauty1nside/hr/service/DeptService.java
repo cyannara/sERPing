@@ -18,5 +18,7 @@ public interface DeptService {
     
     Map<String, Object> getOrganization(Long companyNum);
     
+    // 부서 추가
+    void insertDepartment(DeptDTO dto);
 
 }
