@@ -182,7 +182,7 @@ orderList.on('click', (ev) => {
 	 // 주문 상세, LOT 상세 초기화
     deliveryDetailGrid.resetData([]);
     deliveryLotDetailGrid.resetData([]);
-
+    selectedRow = null;
     
     
     if (rowData && rowData.deliveryId) {

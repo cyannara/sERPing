@@ -39,11 +39,9 @@ FROM bsn_delivery bd
 LEFT JOIN bsn_order bo ON bo.order_id = bd.order_id
 WHERE bd.company_num = 1
 <include refid="searchInfoBsnDLV"></include>
-<![CDATA[
-AND ROWNUM <= #{end}
-]]>
 )
-WHERE RN >= #{start}
+WHERE RN BETWEEN #{start} AND #{end}
+
 </select>
 
 <!-- 출고 목록 수량 -->
@@ -82,11 +80,8 @@ bod.goods_standard
 FROM bsn_delivery_detail bdd
 LEFT JOIN bsn_order_detail bod ON bdd.order_detail_id = bod.order_detail_id
 WHERE bdd.delivery_id = #{deliveryId}
-<![CDATA[
-AND ROWNUM <= #{end}
-]]>
 )
-WHERE RN >= #{start}
+WHERE RN BETWEEN #{start} AND #{end}
 </select>
 
 <!-- 출고 상세 목록 수량-->
@@ -109,11 +104,9 @@ SELECT /*+ INDEX_ASC(bsn_delivery_lot_detail PK_BSN_DELIVERY_LOT_DETAIL) */
        delivery_qnt
 FROM bsn_delivery_lot_detail
 WHERE delivery_detail_id = #{deliveryDetailId}
-<![CDATA[
-AND ROWNUM <= #{end}
-]]>
+
 )
-WHERE RN >= #{start}
+WHERE RN BETWEEN #{start} AND #{end}
 </select>
 <!-- 출고 LOT 상세 목록 수량-->
 
@@ -165,6 +158,14 @@ FROM purchs_warehousing_body pwb
 LEFT JOIN purchse_option po ON pwb.option_num = po.option_num
 WHERE pwb.company_num = 1
   AND po.option_code = #{optionCode}
+--  AND pwb.goods_lot_num IN ('LH0011_2502201437')
+  AND NOT EXISTS (
+      SELECT 1 
+      FROM BSN_DELIVERY_LOT_DETAIL bdl
+      WHERE bdl.goods_lot_num = pwb.goods_lot_num
+        AND bdl.delivery_detail_id = #{deliveryDetailId}
+        -- 8
+  )
 ORDER by rn
 
 </select>

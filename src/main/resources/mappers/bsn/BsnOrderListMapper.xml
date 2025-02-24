@@ -37,11 +37,8 @@ FROM
 FROM bsn_order
 WHERE company_num = 1
 <include refid="searchInfoBsnOrder"></include>
-<![CDATA[
-AND ROWNUM <= #{end}
-]]>
 )
-WHERE RN >= #{start}
+WHERE RN BETWEEN #{start} AND #{end}
 </select>
 
 <!-- 주문조회- 카운팅 -->

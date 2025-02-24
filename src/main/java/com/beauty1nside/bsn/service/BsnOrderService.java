@@ -55,7 +55,7 @@ public interface BsnOrderService {
 	
 	
 	//본사 창고 재고(LOT별)조회 임시
-	public List<BsnGoodsLOTDTO> getGoodsWarehouseLot(BsnOrderDetailDTO bsnOrderDetailDTO);
+	public List<BsnGoodsLOTDTO> getGoodsWarehouseLot(BsnDeliveryDetailDTO bsnDeliveryDetailDTO);
 	
 	
 }

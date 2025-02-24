@@ -11,6 +11,7 @@
 	<script>
         let registerGrid;
 
+
         document.addEventListener("DOMContentLoaded", function () {
             registerGrid = new tui.Grid({
                 el: document.getElementById('registerGrid'),
@@ -32,7 +33,10 @@
         // 모달이 열릴 때 데이터 업데이트
         document.getElementById('registerModal').addEventListener('shown.bs.modal', function () {
             if (registerGrid) {
+            	registerGrid.reloadData();
                 registerGrid.refreshLayout();
+                console.log(selectedRow)
+                
             }
         });
         
@@ -40,6 +44,7 @@
      const LotListDataSource = {
 		api: {
 			readData: { url: 'http://localhost:81/bsn/rest/goods/lot', method: 'GET', initParams: { page: 1 }},
+			//?optionCode=${selectedRow.optionCode}&deliveryDetailId=${selectedRow.deliveryDetailId}
 		},
 		contentType: 'application/json'
 	 };
