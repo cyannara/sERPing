@@ -45,11 +45,6 @@ public class BhfVueController {
 		return "/bhf/orderList";
 	};
 	
-	// 교환 및 반품 요청 페이지
-	@GetMapping("/return")
-	public String returning() {
-		return "/bhf/returnRequest";
-	}
 	// 교환 및 반품 요청 페이지(바코드)
 	@GetMapping("/returning")
 	public String returnInsert() {

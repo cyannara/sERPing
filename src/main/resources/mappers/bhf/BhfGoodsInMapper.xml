@@ -86,24 +86,26 @@
 	
 	<!-- 주문서 상세조회 -->
 	<select id="goodsOrdDtlList" resultType="BhfGoodsOrdDTO" parameterType="BhfGoodsOrdSearchDTO">
-		select  goods_name, 
+		select  branch_office_id,
+				goods_name, 
 				goods_code,
 				option_code, 
 				option_name, 
 				goods_standard, 
 				quantity
 		from(	select 	rownum rn,
-						goods_name, 
-						goods_code,
-						option_code, 
-						option_name, 
-						goods_standard, 
-						quantity
-				from 	bsn_order_detail
+						o.branch_office_id,
+				        d.goods_name, 
+				        d.goods_code,
+				        d.option_code, 
+				        d.option_name, 
+				        d.goods_standard, 
+				        d.quantity
+				from 	bsn_order_detail d join bsn_order o on d.order_id = o.order_id
 				<![CDATA[
 				where rownum <= #{end}
 		]]>
-				and order_id = #{orderId}
+				and d.order_id = #{orderId}
 				)
 		where rn >= #{start}
 	</select>

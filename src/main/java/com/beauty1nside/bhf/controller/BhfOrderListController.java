@@ -54,12 +54,12 @@ public class BhfOrderListController {
 	
 	// 발주서 상세 조회
 	@GetMapping("/order/detail")
-	public Object goodsDtlList(@RequestParam(name = "perPage", defaultValue = "10", required = false) int perPage, 
+	public Object goodsDtlList(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage, 
 			@RequestParam(name = "page", defaultValue = "1", required = false) int page, 
 			
 			BhfOrdListSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
 		// 페이징 유닛 수
-		paging.setPageUnit(perPage);
+		paging.setPageUnit(1000);
 		paging.setPage(page);
 		
 		log.info(dto);

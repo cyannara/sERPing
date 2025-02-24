@@ -197,10 +197,10 @@
 		// 발주 테이블
 		const grid3 = new Grid({
 			el: document.getElementById('order'), // 컨테이너 엘리먼트
-			pageOptions: {
+/* 			pageOptions: {
 				useClient: false,
 				perPage: 5
-			},
+			}, */
 			columns: [ 
 				{ header : "상품코드", name : "goodsCode"},
 				{ header : "상품명", name : "goodsName"},
@@ -223,7 +223,7 @@
 		            }
 				}
 			],
-			data: ""
+			data: []
 		});
 		
 		// 발주 등록 함수

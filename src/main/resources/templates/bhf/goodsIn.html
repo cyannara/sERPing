@@ -117,6 +117,7 @@
 			perPage: 5,
 		},
 		columns: [ 
+			{ header : "지점명", name : "branchOfficeId", hidden : 1},
 			{ header : "상품코드", name : "goodsCode", hidden : 1},
 			{ header : "옵션코드", name : "optionCode", hidden : 1},
 			{ header : "상품명", name : "goodsName"},
@@ -143,9 +144,12 @@
 			        // 그리드 값 업데이트
 			        grid2.setValue(rowKey, "stockQuantity", stockQuantity); // 계산된 값 적용
 			        
-			        // 발주수량이랑 입고수량 비교
-			        let num = Math.abs(quantity - inQuantity); // Math.abs() 음수를 양수로 변경
-			        grid2.setValue(rowKey, "num", num);
+			        // 발주수량이랑 입고수량 비교(재발주수량)
+			        let reorder = Math.abs(quantity - inQuantity); // Math.abs() 음수를 양수로 변경
+			        grid2.setValue(rowKey, "reorder", reorder);
+			        // 재발주수량에 낱개수량 구해서 반품수량 구하기
+			        let returnNum = reorder * standardValue;
+			        grid2.setValue(rowKey, "returnNum", returnNum);
 			        
 			        // 입고수량에 숫자를 제외한 값들이 들어오면
 			        if (!/^[0-9]*$/.test(ev.value)) {
@@ -154,7 +158,8 @@
 	                }
 				}
 			},
-			{ header : "재발주OR반품수량",  name : "num", hidden : 1}
+			{ header : "재발주수량",  name : "reorder"},
+			{ header : "반품수량",  name : "returnNum"}
 		],
 		data: ""
 	});
