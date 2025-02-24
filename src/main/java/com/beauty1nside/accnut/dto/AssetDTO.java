@@ -18,5 +18,6 @@ public class AssetDTO {
 	int quantity;
 	int fixturesAmount;
 	int companyNum;
+	String rgno;
 
 }

@@ -246,7 +246,7 @@ SET asd = (asd - def);
 -- 2025-02-20
 
 select * from accnut_assets order by 1;
-select * from cmmn where upper_cmmn_code like '%AC%';
+select * from cmmn where upper_cmmn_code like '%FI%';
 
 select * from accnut_dealings_account_book order by 1;
 
@@ -262,3 +262,85 @@ select * from hr_employee;
 
 select * from cmmn;
 select * from hr_department;
+
+
+SELECT c.* , d.*
+FROM bhf_closing c RIGHT JOIN bhf_closing_detail d
+ON (c.closing_code = d.closing_code);
+
+SET SERVEROUTPUT ON;
+
+CREATE OR REPLACE FUNCTION test_json
+RETURN CLOB
+IS
+    v_json_closing CLOB;
+    v_json_returning CLOB;
+    v_json_order CLOB;
+    v_final_json CLOB;
+BEGIN
+    -- BHF_CLOSING 데이터를 JSON 형식으로 변환
+    v_json_closing := '[';
+    FOR rec IN (SELECT closing_code, branch_office_id, closing_date FROM bhf_closing) LOOP
+        v_json_closing := v_json_closing || 
+                          '{"closing_code":"' || rec.closing_code || 
+                          '","branch_office_id":"' || rec.branch_office_id || 
+                          '","closing_date":"' || rec.closing_date || '"},';
+    END LOOP;
+    IF LENGTH(v_json_closing) > 1 THEN
+        v_json_closing := SUBSTR(v_json_closing, 1, LENGTH(v_json_closing) - 1);
+    END IF;
+    v_json_closing := v_json_closing || ']';
+
+    -- BHF_RETURNING 데이터를 JSON 형식으로 변환
+    v_json_returning := '[';
+    FOR rec IN (SELECT returning_code, progress_status, request_date FROM bhf_returning) LOOP
+        v_json_returning := v_json_returning || 
+                            '{"returning_code":"' || rec.returning_code || 
+                            '","progress_status":"' || rec.progress_status || 
+                            '","request_date":"' || rec.request_date || '"},';
+    END LOOP;
+    IF LENGTH(v_json_returning) > 1 THEN
+        v_json_returning := SUBSTR(v_json_returning, 1, LENGTH(v_json_returning) - 1);
+    END IF;
+    v_json_returning := v_json_returning || ']';
+
+    -- BHF_ORDER 데이터를 JSON 형식으로 변환
+    v_json_order := '[';
+    FOR rec IN (SELECT order_code, order_date FROM bhf_order) LOOP
+        v_json_order := v_json_order || 
+                        '{"order_code":"' || rec.order_code || 
+                        '","order_date":"' || rec.order_date || '"},';
+    END LOOP;
+    IF LENGTH(v_json_order) > 1 THEN
+        v_json_order := SUBSTR(v_json_order, 1, LENGTH(v_json_order) - 1);
+    END IF;
+    v_json_order := v_json_order || ']';
+
+    -- 최종 JSON 데이터 조합
+    v_final_json := '{"bhf_closing": ' || v_json_closing || ', "bhf_returning": ' || v_json_returning || ', "bhf_order": ' || v_json_order || '}';
+
+    RETURN v_final_json;
+END test_json;
+/
+
+select test_json() from dual;
+
+SELECT bc.* , bcd.*
+FROM bhf_closing bc JOIN bhf_closing_detail bcd
+ON (bc.closing_code = bcd.closing_code);
+
+SELECT bo.*, bod.*
+FROM bhf_order bo JOIN bhf_order_detail bod
+ON (bo.order_code = bod.order_code);
+
+SELECT br.*, brd.*
+FROM bhf_returning br JOIN bhf_returning_detail brd
+ON (br.returning_code = brd.returning_code);
+
+select * from accnut_assets where financial_institution LIKE '%FI%' AND section = 'AC02';
+update accnut_assets set finance_information = '3020000012496' where assets_code = '01';
+update accnut_assets set rgno = '20250224000002848' where assets_code = '64';
+commit;
+
+alter table accnut_assets add rgno varchar2(1000);
+

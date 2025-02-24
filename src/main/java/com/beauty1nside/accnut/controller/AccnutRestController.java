@@ -53,13 +53,17 @@ import lombok.extern.log4j.Log4j2;
 @RequestMapping("/accnut/rest/*")
 public class AccnutRestController {
 
+	
+	
 	final AssetService assetService;
 	final DebtService debtService;
 	final DealBookService dealBookService;
 	final SalaryBookService salaryBookService;
 	final EtcBookService etcBookService;
 	final IncidentalCostService incidentalCostService;
-	JsonQueryService jsonQueryService;
+	final JsonQueryService jsonQueryService;
+	RestTemplate restTemplate;
+	
 	
 	// 목록 조회 ------------------------------------------------------------------------------------------
 	
@@ -80,9 +84,36 @@ public class AccnutRestController {
 		// 페이징 처리
 		paging.setTotalRecord(assetService.count(dto));
 		
+		// 농협 api 호출
+		List<AssetDTO> list = assetService.list(dto);
+		
+		for (AssetDTO asset : list) {
+			// 구분이 통장일 때
+	        if ("통장".equals(asset.getSection())) {
+				// 금융기관이 농협일 때 
+				if(  "농협".equals(asset.getFinancialInstitution() ) ) {
+					
+					// 핀어카운트 조회
+					NHService nh = new NHService();
+					String finAcno = nh.getFinAcno(asset);
+					
+					// 실제 통장 잔고 조회
+					nh = new NHService();
+					String amount = nh.getAmount(finAcno);
+					// 통장잔고로 금액 변경
+					if(amount != null) {
+						asset.setAmount(Integer.parseInt(amount));						
+					}
+					
+				} // 농협일때 if문
+			} // 통장일때 if문
+		} // for 문
+		
+		
+		//log.info(list);
 		// grid 배열 처리
 		GridArray grid = new GridArray();
-		Object result = grid.getArray( paging.getPage(), assetService.count(dto), assetService.list(dto) );
+		Object result = grid.getArray( paging.getPage(), assetService.count(dto), list );
 		return result;
 	}
 	
