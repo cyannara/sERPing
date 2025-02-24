@@ -34,54 +34,77 @@
             </div>
         </div>
 
-        <!-- 계약 정보 -->
-        <div class="row mt-3">
-            <div class="col-md-6">
-                <label class="form-label">계약 시작일</label>
-                <input type="date" class="form-control" id="contractStartDate" required>
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">계약 종료일 (무기계약이면 비워두세요)</label>
-                <input type="date" class="form-control" id="contractEndDate">
-            </div>
-        </div>
+	<!-- 회사 정보 -->
+	<div class="row mt-3">
+	    <div class="col-md-6">
+	        <label class="form-label">회사 번호</label>
+	        <input type="number" class="form-control" id="companyNum" required readonly>
+	    </div>
+	    <div class="col-md-6">
+	        <label class="form-label">회사명</label>
+	        <input type="text" class="form-control" id="companyName" readonly>
+	    </div>
+	</div>
+	
+	<!-- 계약 정보 -->
+	<div class="row mt-3">
+	    <div class="col-md-6">
+	        <label class="form-label">계약 시작일</label>
+	        <input type="date" class="form-control" id="contractStartDate" required>
+	    </div>
+	    <div class="col-md-6">
+	        <label class="form-label">계약 종료일 (무기계약이면 비워두세요)</label>
+	        <input type="date" class="form-control" id="contractEndDate">
+	    </div>
+	</div>
+	
+	<!-- 근무 정보 -->
+	<div class="row mt-3">
+	    <div class="col-md-6">
+	        <label class="form-label">부서 번호</label>
+	        <input type="number" class="form-control" id="departmentNum" required readonly>
+	    </div>
+	    <div class="col-md-6">
+	        <label class="form-label">직급</label>
+	        <input type="text" class="form-control" id="position" readonly>
+	    </div>
+	</div>
+	
+	<!-- 근무 시간 -->
+	<div class="row mt-3">
+	    <div class="col-md-6">
+	        <label class="form-label">근무 시작 시간</label>
+	        <input type="time" class="form-control" id="workStartTime" value="09:00">
+	    </div>
+	    <div class="col-md-6">
+	        <label class="form-label">근무 종료 시간</label>
+	        <input type="time" class="form-control" id="workEndTime" value="18:00">
+	    </div>
+	</div>
+	
+	<!-- 급여 정보 & 수습 기간 -->
+	<div class="row mt-3">
+	    <div class="col-md-6">
+	        <label class="form-label">기본 급여</label>
+	        <input type="number" class="form-control" id="salary" required>
+	    </div>
+	    <div class="col-md-6">
+	        <label class="form-label">수습 기간 (개월)</label>
+	        <input type="number" class="form-control" id="probationPeriod" value="0" min="0" max="12">
+	    </div>
+	</div>
+	
+	<!-- 계약 유형 -->
+	<div class="row mt-3">
+	    <div class="col-md-6">
+	        <label class="form-label">계약 유형</label>
+	        <select class="form-select" id="contractType">
+	            <option value="CT001">정규직</option>
+	            <option value="CT002">계약직</option>
+	        </select>
+	    </div>
 
-        <div class="row mt-3">
-            <div class="col-md-6">
-                <label class="form-label">부서 번호</label>
-                <input type="number" class="form-control" id="departmentNum" required readonly>
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">직급</label>
-                <input type="text" class="form-control" id="position" readonly>
-            </div>
-        </div>
-
-        <div class="row mt-3">
-            <div class="col-md-6">
-                <label class="form-label">근무 시작 시간</label>
-                <input type="time" class="form-control" id="workStartTime" value="09:00">
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">근무 종료 시간</label>
-                <input type="time" class="form-control" id="workEndTime" value="18:00">
-            </div>
-        </div>
-
-        <!-- 계약 유형 (오른쪽 정렬) -->
-        <div class="row mt-3">
-            <div class="col-md-6">
-                <label class="form-label">기본 급여</label>
-                <input type="number" class="form-control" id="salary" required>
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">계약 유형</label>
-                <select class="form-select" id="contractType">
-                    <option value="CT001">정규직</option>
-                    <option value="CT002">계약직</option>
-                </select>
-            </div>
-        </div>
+	</div>
 
         <button type="button" class="btn btn-primary mt-3" onclick="submitContract()">등록</button>
     </form>
@@ -114,25 +137,33 @@
 </div>
 
 <script>
-// 계약 등록 요청
+//계약 등록 요청
 function submitContract() {
-    const contractData = {
-        employeeNum: document.getElementById("employeeNum").value,
-        employeeName: document.getElementById("employeeName").value,
-        contractType: document.getElementById("contractType").value,
-        contractStartDate: document.getElementById("contractStartDate").value,
-        contractEndDate: document.getElementById("contractEndDate").value,
-        departmentNum: document.getElementById("departmentNum").value,
-        position: document.getElementById("position").value,
-        workStartTime: document.getElementById("workStartTime").value,
-        workEndTime: document.getElementById("workEndTime").value,
-        salary: document.getElementById("salary").value
-    };
+    const contractData = new FormData();
+    
+    contractData.append("employeeNum", document.getElementById("employeeNum").value);
+    contractData.append("employeeName", document.getElementById("employeeName").value);
+    contractData.append("companyNum", document.getElementById("companyNum").value);
+    contractData.append("companyName", document.getElementById("companyName").value);
+    contractData.append("contractType", document.getElementById("contractType").value);
+    contractData.append("contractStartDate", document.getElementById("contractStartDate").value);
+    contractData.append("contractEndDate", document.getElementById("contractEndDate").value);
+    contractData.append("departmentNum", document.getElementById("departmentNum").value);
+    contractData.append("position", document.getElementById("position").value);
+    contractData.append("workStartTime", document.getElementById("workStartTime").value);
+    contractData.append("workEndTime", document.getElementById("workEndTime").value);
+    contractData.append("salary", document.getElementById("salary").value);
+    contractData.append("probationPeriod", document.getElementById("probationPeriod").value);
+
+    // 파일 업로드 추가
+    const fileInput = document.getElementById("contractFile");
+    if (fileInput.files.length > 0) {
+        contractData.append("contractFile", fileInput.files[0]);
+    }
 
     fetch("/contract/register", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(contractData)
+        body: contractData
     })
     .then(response => response.json())
     .then(() => alert("계약이 성공적으로 등록되었습니다."))
@@ -168,18 +199,19 @@ const grid = new tui.Grid({
     ]
 });
 
-// 사원 선택 버튼 클릭 이벤트
+//사원 선택 시 회사 번호 & 회사명 자동 입력 추가
 document.getElementById("employeeGrid").addEventListener("click", function (event) {
     if (event.target.classList.contains("selectEmployee")) {
-        const rowKey = event.target.closest("tr").dataset.rowKey; // rowKey 가져오기
-        const rowData = grid.getRow(rowKey); // rowKey로 데이터 가져오기
+        const rowKey = event.target.closest("tr").dataset.rowKey;
+        const rowData = grid.getRow(rowKey);
 
         document.getElementById("employeeNum").value = rowData.employeeNum;
         document.getElementById("employeeName").value = rowData.employeeName;
         document.getElementById("departmentNum").value = rowData.departmentNum;
         document.getElementById("position").value = rowData.position;
+        document.getElementById("companyNum").value = rowData.companyNum;
+        document.getElementById("companyName").value = rowData.companyName; // 추가
 
-        // 모달 닫기
         $('#employeeSelectModal').modal('hide');
     }
 });
