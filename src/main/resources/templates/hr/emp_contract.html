@@ -19,7 +19,7 @@
     <h2 class="mb-4">근로 계약서 등록</h2>
 
     <form id="contractForm">
-        <!-- ✅ 사원 선택 -->
+        <!-- 사원 선택 -->
         <div class="row">
             <div class="col-md-6">
                 <label class="form-label">사원 번호</label>
@@ -34,7 +34,7 @@
             </div>
         </div>
 
-        <!-- ✅ 계약 정보 -->
+        <!-- 계약 정보 -->
         <div class="row mt-3">
             <div class="col-md-6">
                 <label class="form-label">계약 시작일</label>
@@ -68,7 +68,7 @@
             </div>
         </div>
 
-        <!-- ✅ 계약 유형 (오른쪽 정렬) -->
+        <!-- 계약 유형 (오른쪽 정렬) -->
         <div class="row mt-3">
             <div class="col-md-6">
                 <label class="form-label">기본 급여</label>
@@ -87,7 +87,7 @@
     </form>
 </div>
 
-<!-- ✅ 사원 선택 모달 -->
+<!-- 사원 선택 모달 -->
 <div class="modal fade" id="employeeSelectModal" tabindex="-1" aria-labelledby="employeeSelectModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -114,7 +114,7 @@
 </div>
 
 <script>
-// ✅ 계약 등록 요청
+// 계약 등록 요청
 function submitContract() {
     const contractData = {
         employeeNum: document.getElementById("employeeNum").value,
@@ -139,14 +139,14 @@ function submitContract() {
     .catch(() => alert("등록 실패"));
 }
 
-//✅ 사원 목록 불러오기 (데이터 구조 반영)
+//사원 목록 불러오기 (데이터 구조 반영)
 function loadEmployees() {
     fetch("/hr/rest/emp/list")
         .then(response => response.json())
         .then(data => {
             if (data.result && data.data && data.data.contents) {
-                console.log("📊 사원 목록 데이터:", data.data.contents); // ✅ 콘솔로 데이터 확인
-                grid.resetData(data.contents); // ✅ Toast Grid에 데이터 넣기
+                console.log("📊 사원 목록 데이터:", data.data.contents); // 콘솔로 데이터 확인
+                grid.resetData(data.contents); // Toast Grid에 데이터 넣기
             } else {
                 alert("사원 목록을 불러오는 데 실패했습니다.");
             }
@@ -155,7 +155,7 @@ function loadEmployees() {
 }
 
 
-// ✅ Toast Grid 설정 (사원 목록)
+// Toast Grid 설정 (사원 목록)
 const grid = new tui.Grid({
     el: document.getElementById('employeeGrid'),
     columns: [
@@ -168,18 +168,18 @@ const grid = new tui.Grid({
     ]
 });
 
-// ✅ 사원 선택 버튼 클릭 이벤트
+// 사원 선택 버튼 클릭 이벤트
 document.getElementById("employeeGrid").addEventListener("click", function (event) {
     if (event.target.classList.contains("selectEmployee")) {
-        const rowKey = event.target.closest("tr").dataset.rowKey; // ✅ rowKey 가져오기
-        const rowData = grid.getRow(rowKey); // ✅ rowKey로 데이터 가져오기
+        const rowKey = event.target.closest("tr").dataset.rowKey; // rowKey 가져오기
+        const rowData = grid.getRow(rowKey); // rowKey로 데이터 가져오기
 
         document.getElementById("employeeNum").value = rowData.employeeNum;
         document.getElementById("employeeName").value = rowData.employeeName;
         document.getElementById("departmentNum").value = rowData.departmentNum;
         document.getElementById("position").value = rowData.position;
 
-        // ✅ 모달 닫기
+        // 모달 닫기
         $('#employeeSelectModal').modal('hide');
     }
 });
