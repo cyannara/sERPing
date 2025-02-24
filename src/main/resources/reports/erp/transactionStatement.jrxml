@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 7.2.0.final using JasperReports Library version 6.6.0  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="transactionStatement" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a8c40d1a-6612-49de-a185-46641c428240">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="sERPing"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="357"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="632"/>
+	<style name="han_font" fontName="맑은"/>
+	<subDataset name="Dataset1" uuid="eee53230-eccd-4a52-aec8-88963d62e930">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="sERPing"/>
+		<queryString>
+			<![CDATA[]]>
+		</queryString>
+	</subDataset>
+	<subDataset name="Dataset2" uuid="3c0917cf-9aa6-415f-be1c-32a3cb5eba70">
+		<queryString>
+			<![CDATA[]]>
+		</queryString>
+	</subDataset>
+	<subDataset name="Dataset3" uuid="77294cc8-2263-4dec-8b39-ccbc8d88e51e">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="sERPing"/>
+		<queryString language="SQL">
+			<![CDATA[SELECT 
+	e.company_name,
+	e.company_address,
+	e.representation_phone,
+	e.charger_name,
+	to_char(l.subscription_amount, '999,999,999') as subscription_amount,
+    to_char(l.subscription_date, 'yyyy') year,
+    to_char(l.subscription_date, 'mm') month,
+    to_char(l.subscription_date, 'dd') day,
+    n.subscription_name,
+    o.subscription_option,
+    1 as count,
+    t.subscription_option_price*0.9 as bill,
+    t.subscription_option_price*0.1 as tax,
+    t.subscription_option_price as price   
+FROM erp_company e
+left join erp_subscription_list l
+ON e.company_num = l.company_num
+left join erp_subscription_tail t
+on l.subscription_num = t.subscription_num
+left join erp_subscription_option o
+    on t.subscription_option_num = o.subscription_option_num
+left join erp_subscription_name n
+    on o.subscription_name_num = n.subscription_name_num
+WHERE e.company_num = 1
+and l.subscription_num =  68]]>
+		</queryString>
+		<field name="COMPANY_NAME" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="COMPANY_NAME"/>
+		</field>
+		<field name="COMPANY_ADDRESS" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="COMPANY_ADDRESS"/>
+		</field>
+		<field name="REPRESENTATION_PHONE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="REPRESENTATION_PHONE"/>
+		</field>
+		<field name="CHARGER_NAME" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="CHARGER_NAME"/>
+		</field>
+		<field name="SUBSCRIPTION_AMOUNT" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="SUBSCRIPTION_AMOUNT"/>
+		</field>
+		<field name="YEAR" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="YEAR"/>
+		</field>
+		<field name="MONTH" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="MONTH"/>
+		</field>
+		<field name="DAY" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="DAY"/>
+		</field>
+		<field name="SUBSCRIPTION_NAME" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="SUBSCRIPTION_NAME"/>
+		</field>
+		<field name="SUBSCRIPTION_OPTION" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="SUBSCRIPTION_OPTION"/>
+		</field>
+		<field name="COUNT" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="COUNT"/>
+		</field>
+		<field name="BILL" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="BILL"/>
+		</field>
+		<field name="TAX" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="TAX"/>
+		</field>
+		<field name="PRICE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="PRICE"/>
+		</field>
+		<group name="COMPANY_NAME">
+			<groupExpression><![CDATA[$F{COMPANY_NAME}]]></groupExpression>
+		</group>
+		<group name="COMPANY_ADDRESS">
+			<groupExpression><![CDATA[$F{COMPANY_ADDRESS}]]></groupExpression>
+		</group>
+		<group name="REPRESENTATION_PHONE">
+			<groupExpression><![CDATA[$F{REPRESENTATION_PHONE}]]></groupExpression>
+		</group>
+		<group name="CHARGER_NAME">
+			<groupExpression><![CDATA[$F{CHARGER_NAME}]]></groupExpression>
+		</group>
+		<group name="SUBSCRIPTION_AMOUNT">
+			<groupExpression><![CDATA[$F{SUBSCRIPTION_AMOUNT}]]></groupExpression>
+		</group>
+		<group name="YEAR">
+			<groupExpression><![CDATA[$F{YEAR}]]></groupExpression>
+		</group>
+		<group name="MONTH">
+			<groupExpression><![CDATA[$F{MONTH}]]></groupExpression>
+		</group>
+		<group name="DAY">
+			<groupExpression><![CDATA[$F{DAY}]]></groupExpression>
+		</group>
+		<group name="SUBSCRIPTION_NAME">
+			<groupExpression><![CDATA[$F{SUBSCRIPTION_NAME}]]></groupExpression>
+		</group>
+		<group name="SUBSCRIPTION_OPTION">
+			<groupExpression><![CDATA[$F{SUBSCRIPTION_OPTION}]]></groupExpression>
+		</group>
+		<group name="COUNT">
+			<groupExpression><![CDATA[$F{COUNT}]]></groupExpression>
+		</group>
+		<group name="BILL">
+			<groupExpression><![CDATA[$F{BILL}]]></groupExpression>
+		</group>
+		<group name="TAX">
+			<groupExpression><![CDATA[$F{TAX}]]></groupExpression>
+		</group>
+		<group name="PRICE">
+			<groupExpression><![CDATA[$F{PRICE}]]></groupExpression>
+		</group>
+	</subDataset>
+	<parameter name="p_companynum" class="java.lang.Integer"/>
+	<parameter name="p_subscriptionnum" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[SELECT 
+    e.company_name,
+    e.company_address,
+    e.representation_phone,
+    e.charger_name,
+    TO_CHAR(l.subscription_amount, '999,999,999') AS subscription_amount,
+    TO_CHAR(l.subscription_date, 'yyyy') AS year,
+    TO_CHAR(l.subscription_date, 'mm') AS month,
+    TO_CHAR(l.subscription_date, 'dd') AS day,
+    NVL(n.subscription_name, 'N/A') AS subscription_name,
+    NVL(o.subscription_option, 'N/A') AS subscription_option,
+    1 AS count,
+    NVL(TO_CHAR(t.subscription_option_price * 0.9, '999,999,999'), '0') AS bill,
+    NVL(TO_CHAR(t.subscription_option_price * 0.1, '999,999,999'), '0') AS tax,
+    NVL(TO_CHAR(t.subscription_option_price, '999,999,999'), '0') AS price   
+FROM erp_company e
+LEFT JOIN erp_subscription_list l ON e.company_num = l.company_num
+LEFT JOIN erp_subscription_tail t ON l.subscription_num = t.subscription_num
+LEFT JOIN erp_subscription_option o ON t.subscription_option_num = o.subscription_option_num
+LEFT JOIN erp_subscription_name n ON o.subscription_name_num = n.subscription_name_num
+WHERE e.company_num = $P{p_companynum}
+AND l.subscription_num = $P{p_subscriptionnum}]]>
+	</queryString>
+	<field name="COMPANY_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="COMPANY_NAME"/>
+	</field>
+	<field name="COMPANY_ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="COMPANY_ADDRESS"/>
+	</field>
+	<field name="REPRESENTATION_PHONE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="REPRESENTATION_PHONE"/>
+	</field>
+	<field name="CHARGER_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="CHARGER_NAME"/>
+	</field>
+	<field name="SUBSCRIPTION_AMOUNT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SUBSCRIPTION_AMOUNT"/>
+	</field>
+	<field name="YEAR" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="YEAR"/>
+	</field>
+	<field name="MONTH" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="MONTH"/>
+	</field>
+	<field name="DAY" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DAY"/>
+	</field>
+	<field name="SUBSCRIPTION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SUBSCRIPTION_NAME"/>
+	</field>
+	<field name="SUBSCRIPTION_OPTION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SUBSCRIPTION_OPTION"/>
+	</field>
+	<field name="COUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="COUNT"/>
+	</field>
+	<field name="BILL" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="BILL"/>
+	</field>
+	<field name="TAX" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="TAX"/>
+	</field>
+	<field name="PRICE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="PRICE"/>
+	</field>
+	<background>
+		<band height="802" splitType="Stretch">
+			<image>
+				<reportElement x="1" y="10" width="555" height="568" uuid="22631d63-bb37-4b9d-962f-4b8ce9b7f096">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA["reports/bill.jpg"]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement style="han_font" x="129" y="48" width="129" height="29" uuid="0c15a1c4-d2c2-4c10-97cd-58da37793f7f">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COMPANY_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="han_font" x="129" y="76" width="129" height="30" uuid="3ef91b41-8203-4447-aed7-9b5c53ea8efa"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{COMPANY_ADDRESS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="han_font" x="129" y="107" width="129" height="30" uuid="3b6b363a-e687-4088-80bd-28b8414119c9">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{REPRESENTATION_PHONE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="han_font" x="147" y="468" width="54" height="20" uuid="97cce9c5-809a-4bd2-a4dc-b3498d6a4df3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="15"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CHARGER_NAME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="han_font" x="263" y="468" width="92" height="20" uuid="ca67254b-2872-4d06-a69b-49641ad9782c"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[sERPing]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="han_font" x="442" y="468" width="104" height="20" uuid="05c168cc-ebbd-4c05-9a4b-b5102f817213"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="13" isBold="true"/>
+				</textElement>
+				<text><![CDATA[0]]></text>
+			</staticText>
+			<textField>
+				<reportElement style="han_font" x="120" y="137" width="138" height="30" uuid="b4211dba-840d-4101-88d1-ac8a2ee34ef7"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="15" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SUBSCRIPTION_AMOUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</background>
+	<title>
+		<band height="185"/>
+	</title>
+	<detail>
+		<band height="28" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField>
+				<reportElement style="han_font" x="358" y="0" width="56" height="28" uuid="6b5b8c11-1385-484c-b330-3771ff99bd6e">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{PRICE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="han_font" x="486" y="0" width="67" height="28" uuid="4d8915af-2d82-4509-a9c2-25323d91d8bf"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{TAX}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="han_font" x="414" y="0" width="71" height="28" uuid="1c72a45b-37c4-487b-ba1f-8bc620047f5d">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{BILL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="han_font" x="294" y="0" width="63" height="28" uuid="f0bf5956-a171-4f12-a557-2dff092a14a0">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{COUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="han_font" x="0" y="0" width="40" height="28" uuid="7e365073-4a93-4bc5-abc8-a2261a480a22">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{YEAR}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="han_font" x="42" y="0" width="20" height="28" uuid="de70cf93-936a-4fd6-8a59-975be2289e7e">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{MONTH}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="han_font" x="64" y="0" width="20" height="28" uuid="892e9810-04f2-4aa7-b5ab-bbb045de9c66">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{DAY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="han_font" x="87" y="0" width="141" height="28" uuid="d82bef70-3515-424d-af16-278e22ef7e20">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{SUBSCRIPTION_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="han_font" x="230" y="0" width="63" height="28" uuid="19b198bc-93ae-4e9b-a366-d3e87435700b">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{SUBSCRIPTION_OPTION}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
