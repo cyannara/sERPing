@@ -12,7 +12,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 import org.springframework.util.StringUtils;
 
-import com.beauty1nside.bhf.dto.returning.BhfReturningDtlVO;
+import com.beauty1nside.bhf.dto.returnInsert.BhfReturnInsertDtlVO;
 
 import oracle.jdbc.OracleConnection;
 
@@ -34,13 +34,13 @@ public class ReturningArrayStructHandler implements TypeHandler<Object> {
 		
 		OracleConnection conn = ps.getConnection().unwrap(OracleConnection.class); 
 		
-		List<BhfReturningDtlVO> files = (List<BhfReturningDtlVO>)parameter;
+		List<BhfReturnInsertDtlVO> files = (List<BhfReturnInsertDtlVO>)parameter;
 		
-		Object[] returningFileType = new Object[7]; 
+		Object[] returningFileType = new Object[9]; 
 	    Struct[] returningArray = new Struct[files.size()];
 
 	    int returningIndex = 0;
-	    for (BhfReturningDtlVO file : files) {
+	    for (BhfReturnInsertDtlVO file : files) {
 	    	returningFileType[0] = file.getGoodsCode();
 	        returningFileType[1] = file.getGoodsName();
 	        returningFileType[2] = file.getOptionCode();
@@ -48,6 +48,8 @@ public class ReturningArrayStructHandler implements TypeHandler<Object> {
 	        returningFileType[4] = file.getQuantity();
 	        returningFileType[5] = file.getExchangeReturningChoice(); 
 	        returningFileType[6] = file.getReturningReason(); 
+	        returningFileType[7] = file.getGoodsBarcode();
+	        returningFileType[8] = file.getGoodsLotNum();
 	        returningArray[returningIndex++] = conn.createStruct("RETURNINGFILETYPE", returningFileType);
 	    }		
 	    Array returningFileArray = (Array)conn.createOracleArray("RETURNINGFILEARRAY", (Struct[]) returningArray); 		

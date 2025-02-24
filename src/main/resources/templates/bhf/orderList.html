@@ -170,7 +170,9 @@
 		const grid2 = new Grid({
 			el: document.getElementById('orderListDetail'), 
 			pageOptions: {
-				useClient: false,
+				useClient: true, 
+				//true로 해놓으면 그리드가 알아서 페이징 해준다 그래서 백단에서 페이징 넣어서 할 필요 없이 데이터만 넘기면된다(백단에서 페이징 걸어서 넘겨서 페이지가 안됬었음 임시로 perpage값 늘려줌)
+				//위에는 false로 하고 백단에서 페이징을 넣은 이유는 처음 화면이 로딩될때 한번에 데이터가 많이 넘어오면 로딩이 느려지기 때문에 페이징을 걸어서 처음 5개만 빨리 넘기게 해주시 위해서다
 				perPage: 5,
 			},
 			columns: [ 
@@ -182,7 +184,7 @@
 				{ header : "규격", name : "goodsStandard"},
 				{ header : "수량", name : "quantity"}
 			],
-			data: ""
+			data: []
 		});
 		
 		// 발주서 취소

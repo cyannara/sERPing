@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beauty1nside.bhf.mapper.BhfInventoryMapper">
+
+	<!-- 조정 등록 -->
+	<insert id="mediationInsert" parameterType="BhfInventoryInsertDTO">
+		insert into bhf_goods_mediation 
+				( MEDIATION_CODE, 
+                  GOODS_CODE,
+                  GOODS_NAME,
+                  OPTION_CODE,
+                  OPTION_NAME,
+                  GOODS_STANDARD,
+                  MEDIATION_QUANTITY,
+                  MEDIATION_REASON,
+                  COMPANY_NUM,
+                  BRANCH_OFFICE_ID )
+		values ('medaiation' || MEDIATION_CODE_SEQ.nextval,
+		        #{goodsCode},
+		        #{goodsName},
+		        #{optionCode},
+		        #{optionName},
+		        #{goodsStandard},
+		        #{mediationQuantity},
+		        #{mediationReason},
+		        #{companyNum},
+		        #{branchOfficeId} )
+	</insert>
+	<!-- 조정 등록 후 창고 수량 변경 -->
+	<update id="quantityUpdate" parameterType="BhfInventoryInsertDTO">
+		UPDATE 	bhf_warehouse
+	    SET 	stock_quantity = stock_quantity - #{mediationQuantity}
+	    WHERE 	option_code = #{optionCode}
+	</update>
+	
+	<!-- 조정 내역 조회 -->
+	<select id="invenHistory" resultType="BhfInventoryInsertDTO" parameterType="BhfInventoryListSearchDTO">
+		select  GOODS_CODE,
+				GOODS_NAME,
+				OPTION_CODE,
+				OPTION_NAME,
+				GOODS_STANDARD,
+				MEDIATION_QUANTITY,
+				MEDIATION_REASON
+		from  ( select	rownum rn,
+						GOODS_CODE,
+						GOODS_NAME,
+						OPTION_CODE,
+						OPTION_NAME,
+						GOODS_STANDARD,
+						MEDIATION_QUANTITY,
+						MEDIATION_REASON
+				from 	bhf_goods_mediation
+		<![CDATA[
+				where rownum <= #{end}
+		]]>
+				and <include refid="searchInfo"></include>
+				)
+		where rn >= #{start}
+	</select>
+	
+	<!-- 창고 재고 조회 -->
+	<select id="warehouseList" resultType="BhfInventoryListDTO" parameterType="BhfInventoryListSearchDTO">
+		select  goods_code, 
+	   			goods_name, 
+	  			option_code, 
+	   			option_name, 
+	   			goods_standard,
+	   			stock_quantity
+		from ( 	select  rownum rn,
+						goods_code, 
+			   			goods_name, 
+			  			option_code, 
+			   			option_name, 
+			   			goods_standard,
+			   			stock_quantity
+				from   	bhf_warehouse
+		<![CDATA[
+				where rownum <= #{end}
+		]]>
+				and <include refid="searchInfo"></include>
+				)
+		where rn >= #{start}
+	</select>
+	
+	<!-- 페이징에 전체숫자 알려주기 위해서 -->
+	<select id="count" parameterType="BhfInventoryListSearchDTO">
+		SELECT COUNT(warehouse_code)
+		FROM bhf_warehouse
+		<where>
+			<include refid="searchInfo"></include>
+		</where>
+	</select>
+	
+	<!-- 검색조건(검색을 안하면 그냥 조회가 되게) -->
+	<sql id="searchInfo">
+		company_num = 1<!-- #{companyNum}  --> 
+		<if test="goodsName != null and ! goodsName.equals('')">
+			AND goods_name Like '%' || #{goodsName} || '%'
+		</if>
+	</sql>
+	
+</mapper>

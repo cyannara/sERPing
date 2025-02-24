@@ -54,7 +54,7 @@ public class BhfReturnListController {
 			@RequestParam(name = "page", defaultValue = "1", required = false) int page, 
 			BhfReturnListSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
 		// 페이징 유닛 수
-		paging.setPageUnit(perPage);
+		paging.setPageUnit(1000);
 		paging.setPage(page);
 		
 		log.info(dto);

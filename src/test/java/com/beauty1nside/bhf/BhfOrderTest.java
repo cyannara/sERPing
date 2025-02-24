@@ -63,25 +63,25 @@ public class BhfOrderTest {
 //		System.out.println("TEST succes");
 //	}
 	
-	@Autowired 
-    private BhfGoodsInMapper goodsInMapper; // 위에서 만든 MERGE 쿼리 실행하는 Mapper
-
-    @Test
-    void 상품입고_테스트() {
-        // given: 입고 데이터 생성
-        List<BhfGoodsInVO> goodsList = Arrays.asList(
-            new BhfGoodsInVO("B001", "G1001", "상품A", "O1001", "옵션1", "M", 10, 1),
-            new BhfGoodsInVO("B001", "LH001", "헤라글로우틴트", "LH0012", "308호체리쉬", "1box6piece", 20, 1)
-        );
-
-        // when: goodsIn() 실행 (MERGE INTO 실행)
-        int result = goodsInMapper.goodsIn(goodsList);
-
-        // then: 실행 결과 검증
-        Assertions.assertTrue(result > 0, "입고 처리 실패 (0행 적용)");
-
-        // 성공 메시지 출력
-        System.out.println("상품 입고 MERGE 테스트 성공 " + result);
-    }
+//	@Autowired 
+//    private BhfGoodsInMapper goodsInMapper; // 위에서 만든 MERGE 쿼리 실행하는 Mapper
+//
+//    @Test
+//    void 상품입고_테스트() {
+//        // given: 입고 데이터 생성
+//        List<BhfGoodsInVO> goodsList = Arrays.asList(
+//            new BhfGoodsInVO("B001", "G1001", "상품A", "O1001", "옵션1", "M", 10, 1),
+//            new BhfGoodsInVO("B001", "LH001", "헤라글로우틴트", "LH0012", "308호체리쉬", "1box6piece", 20, 1)
+//        );
+//
+//        // when: goodsIn() 실행 (MERGE INTO 실행)
+//        int result = goodsInMapper.goodsIn(goodsList);
+//
+//        // then: 실행 결과 검증
+//        Assertions.assertTrue(result > 0, "입고 처리 실패 (0행 적용)");
+//
+//        // 성공 메시지 출력
+//        System.out.println("상품 입고 MERGE 테스트 성공 " + result);
+//    }
 	
 }

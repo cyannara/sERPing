@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.beauty1nside.bhf.dto.returnInsert.BhfBarcodeDTO;
 import com.beauty1nside.bhf.dto.returnInsert.BhfBarcodeSearchDTO;
+import com.beauty1nside.bhf.dto.returnInsert.BhfReturnInsertVO;
 import com.beauty1nside.bhf.mapper.BhfReturnInsertMapper;
 import com.beauty1nside.bhf.service.BhfReturnInsertService;
 
@@ -26,6 +27,12 @@ public class BhfReturnInsertServiceImpl implements BhfReturnInsertService {
 	public int count(BhfBarcodeSearchDTO dto) {
 		
 		return mapper.count(dto);
+	}
+
+	@Override
+	public void returnGoods(BhfReturnInsertVO vo) {
+		
+		mapper.returnGoods(vo);
 	}
 
 }

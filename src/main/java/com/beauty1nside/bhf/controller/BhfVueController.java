@@ -20,6 +20,12 @@ public class BhfVueController {
 	  public void setAttributes(Model model) {
 	    model.addAttribute("menu", "branch");
 	  }
+	
+	//샘플 페이지
+	@GetMapping("/barcodeCreate")
+	public String barcodeCreate() {
+		return "/bhf/barcodeCreate";
+	};
 
 	//샘플 페이지
 	@GetMapping("/")
@@ -39,11 +45,6 @@ public class BhfVueController {
 		return "/bhf/orderList";
 	};
 	
-	// 교환 및 반품 요청 페이지
-	@GetMapping("/return")
-	public String returning() {
-		return "/bhf/returnRequest";
-	}
 	// 교환 및 반품 요청 페이지(바코드)
 	@GetMapping("/returning")
 	public String returnInsert() {
@@ -60,6 +61,18 @@ public class BhfVueController {
 	@GetMapping("/goodsIn")
 	public String goodsIn() {
 		return "/bhf/goodsIn";
+	}
+	
+	// 재고 관리 페이지
+	@GetMapping("/inventory")
+	public String inventory() {
+		return "/bhf/inventory";
+	}
+	
+	// 상품 입고 페이지
+	@GetMapping("/invenHistory")
+	public String invenHistory() {
+		return "/bhf/invenHistory";
 	}
 	
 }

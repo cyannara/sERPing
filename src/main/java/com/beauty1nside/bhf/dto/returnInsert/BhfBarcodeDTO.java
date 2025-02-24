@@ -8,6 +8,7 @@ import lombok.Data;
 public class BhfBarcodeDTO {
 
 	private String branchOfficeId;
+	private String returnRemark;
 	private String goodsCode;
 	private String goodsName;
 	private String optionCode;
