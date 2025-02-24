@@ -83,7 +83,7 @@
         <input type="text" class="form-control mb-3" id="deptSearchKW" placeholder="부서 검색 후 [Enter]">
         <div class="department-tree">
             <ul>
-                <!-- ✅ 회사 정보 -->
+                <!-- 회사 정보 -->
                 <li th:data-company-id="${company.companyNum}" class="select-item" id="selectCompanySJ">
                     <div class="select-wrapper" id="comClick">
                         <span class="toggle-btn">▼</span> 
@@ -92,7 +92,7 @@
                         (<span class="count" th:text="${company.totalEmployeeCount}"></span>)
                     </div>
                     <ul class="sub-list company-sub-list">
-                        <!-- ✅ 본사 & 지점 -->
+                        <!-- 본사 & 지점 -->
                         <li th:each="dept : ${departments}" th:if="${dept.parentDepartmentNum == null}" th:data-dept-id="${dept.departmentNum}" class="select-item selectTopDept">
                             <div class="select-wrapper" id="topDeptClick">
                                 <span class="toggle-btn">▼</span> 
@@ -100,7 +100,7 @@
                                 (<span class="count" th:text="${dept.totalEmployeeCount}"></span>)
                             </div>
                             <ul class="sub-list">
-                                <!-- ✅ 하위 부서 -->
+                                <!-- 하위 부서 -->
                                 <li th:each="subDept : ${departments}" th:if="${subDept.parentDepartmentNum == dept.departmentNum}" th:data-dept-id="${subDept.departmentNum}" class="select-item selectSubDept">
                                     <div class="select-wrapper" id="subDeptClick">
                                         📄 <span class="select-text" th:text="${subDept.departmentName}"></span> 
@@ -122,7 +122,7 @@
     </div>
     
     
-    <!-- ✅ 사원 정보 / 인사 발령 모달 -->
+    <!-- 사원 정보 / 인사 발령 모달 -->
 <div class="modal fade" id="employeeModal" tabindex="-1" aria-labelledby="employeeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -135,12 +135,12 @@
       <!-- 모달 바디 -->
       <div class="modal-body">
         <div class="row">
-          <!-- ✅ 프로필 이미지 -->
+          <!-- 프로필 이미지 -->
           <div class="col-md-3 text-center">
             <img src="https://via.placeholder.com/150" class="profile-image" id="modalProfileImage" alt="프로필 이미지">
           </div>
 
-          <!-- ✅ 사원 정보 -->
+          <!-- 사원 정보 -->
           <div class="col-md-9">
             <div class="row mb-2">
               <label class="col-md-4 fw-bold">사원번호</label>
@@ -191,7 +191,7 @@
               </div>
             </div>
 
-            <!-- ✅ 인사 발령 시 보일 부분 (숨김 처리) -->
+            <!-- 인사 발령 시 보일 부분 (숨김 처리) -->
             <div id="transferFields" style="display: none;">
               <hr>
               <div class="row mb-2">
@@ -262,7 +262,7 @@
 	    };
   
   
-  // ✅ 모달 열기 함수 (전역 함수로 정의)
+  // 모달 열기 함수 (전역 함수로 정의)
   function openEmployeeModal(mode, data) {
     $("#employeeModalLabel").text(mode === "transfer" ? "인사 발령" : "사원 정보");
 
@@ -291,7 +291,7 @@
       $(document).ready(function () {
           $(".company-sub-list, .sub-list").show();
 
-          // ✅ 부서 트리 토글 기능만 유지
+          // 부서 트리 토글 기능만 유지
           $(document).on("click", ".toggle-btn", function (event) {
               event.stopPropagation();
               let $targetList = $(this).closest("li").children("ul.sub-list");
@@ -299,7 +299,7 @@
               $(this).text($(this).text() === "▼" ? "▶" : "▼");
           });
 
-          // ✅ Toast Grid 초기화 (데이터 없이)
+          // Toast Grid 초기화 (데이터 없이)
           const grid = new tui.Grid({
               el: document.getElementById("grid"),
               pageOptions: { useClient: false, perPage: 5 },
@@ -312,9 +312,9 @@
                   { header: "부서", name: "departmentName" }
               ]
           });
+
           
-          
-          // ✅ Toast Grid 클릭 이벤트 (모달 열기)
+          // Toast Grid 클릭 이벤트 (모달 열기)
           grid.on('click', function(ev) {
             if (ev.rowKey !== null) {
               let rowData = grid.getRow(ev.rowKey); // 선택한 행의 데이터 가져오기
@@ -324,7 +324,7 @@
 
           
           
-       // ✅ 부서 선택 시 데이터 로드
+       // 부서 선택 시 데이터 로드
           $(document).on('click', '.department-tree [data-company-id], .department-tree [data-dept-id]', function(event) {
         	    event.stopPropagation(); // 부모 요소로 이벤트 전파 방지
 
@@ -378,5 +378,44 @@
 
       
   </script>
+  
+  <!-- ✅ 부서 추가 모달 -->
+<div class="modal fade" id="deptModal" tabindex="-1" aria-labelledby="deptModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <!-- 모달 헤더 -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="deptModalLabel">부서 추가</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <!-- 모달 바디 -->
+      <div class="modal-body">
+        <form id="deptForm">
+          <div class="mb-3">
+            <label class="fw-bold">부서명</label>
+            <input type="text" class="form-control" id="deptName" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="fw-bold">상위 부서</label>
+            <select class="form-select" id="parentDept">
+              <option value="">최상위 부서</option>
+              <!-- 상위 부서 목록은 JavaScript에서 동적으로 채운다 -->
+            </select>
+          </div>
+        </form>
+      </div>
+
+      <!-- 모달 푸터 -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-primary" id="saveDeptBtn">저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+  
+  
 </body>
 </html>

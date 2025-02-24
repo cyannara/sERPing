@@ -71,6 +71,12 @@ public class DeptServiceImpl implements DeptService {
         result.put("departments", departments);
         return result;
     }
+
+	@Override
+	public void insertDepartment(DeptDTO dto) {
+		// TODO Auto-generated method stub
+		deptMapper.insertDepartment(dto);
+	}
     
 
 }

@@ -14,5 +14,8 @@ public interface DeptMapper {
     
     // 회사 정보 조회 (회사명, 영문명, 회사번호)
     DeptDTO getCompanyInfo(Long companyNum);
+    
+    // 부서 추가
+    void insertDepartment(DeptDTO dto);
 
 }
