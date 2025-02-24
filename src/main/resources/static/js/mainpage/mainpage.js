@@ -1,3 +1,114 @@
+let Grid = tui.Grid;
+
+const dataSource = {
+    api: {
+        readData: {
+            url: 'http://localhost:81/api/mainpage/approval/list',
+            method: 'GET',
+            initParams: { page: 1 }
+        },
+        contentType: 'application/json'
+    },
+};
+
+const grid = new Grid({
+    el: document.querySelector('#grid'),
+    scrollX: false,
+    scrollY: false,
+    pageOptions: {
+        useClient: false,
+        perPage: 10,
+    },
+    columns: [
+        {header: "번호", name: "inApprovalId", sortable: true},
+        {header: "요청 구분", name: "documentType", sortable: true},
+        {header: "요청자", name: "employeeName", sortable: true},
+        {
+            header: "결재요청 날짜",
+            name: "inApprovalRequestDate",
+            sortable: true,
+            width: 150,
+            formatter: ({value}) => {
+                return formatDateTime(value)
+            }
+        },
+        {
+            header: "처리",
+            name: "process",
+            formatter: ({row}) => {
+                return `
+                    <button class="btn btn-approve" data-bs-toggle="modal" data-bs-target="#commonModal" data-in-approval-id="${row.inApprovalId}">승인</button>
+                    <button class="btn btn-reject" data-bs-toggle="modal" data-bs-target="#commonModal" data-in-approval-id="${row.inApprovalId}">반려</button>`
+            }
+        },
+        {
+            header: "상태",
+            name: "inApprovalStatus",
+            sortable: true,
+            rowClassName: 'center',
+            width: 80,
+            hidden: true,
+            formatter: ({value}) => {
+                const statusMap = {
+                    WAITING: {text: "대기중", color: "gray"},
+                    APPROVED: {text: "승인", color: "green"},
+                    REJECTED: {text: "거절", color: "red"}
+                };
+                const status = statusMap[value] || {text: "알 수 없음", color: "black"};
+                return `<span class="status-label"
+                                style="background-color: ${status.color};
+                            ">${status.text}</span>`;
+            }
+        },
+        {header: "요청 내용", name: "inApprovalRequestContent", sortable: true, hidden: true},
+        {header: "요청 내용 확인", name: "moveToPage", sortable: true,
+            formatter: ({ row }) => {
+                return `<button class="move-btn" data-id="${row.inApprovalId}">
+                          <i class="mdi mdi-arrow-right-bold"></i>
+                        </button>`;
+            }
+        },
+        {
+            header: "다운로드",
+            name: "download",
+            sortable: true,
+            formatter: ({ row }) => {
+                return `<button class="download-btn" data-content='${row.inApprovalRequestContent}'>
+                    <i class="mdi mdi-folder-download"></i>
+                  </button>`;
+            }
+        }  ],
+    data : dataSource,
+});
+
+document.addEventListener("click", function (event) {
+    let buttonApprove = event.target.closest(".btn-approve");
+    let buttonReject = event.target.closest(".btn-reject");
+
+    if (buttonApprove) {
+        setModalContent('전자 결재 처리', 'approval-approved', '취소', '승인', () => doApprove(buttonApprove))
+    } else if(buttonReject) {
+        setModalContent('전자 결재 처리', 'approval-rejected', '취소', '반려', () => doReject(buttonReject))
+    }
+});
+
+document.addEventListener("click", function (event) {
+    const button = event.target.closest(".move-btn");
+    if (button) {
+        const dataset = button.dataset; // 버튼에서 data-id 값 가져오기
+        window.location.href = `/mainpage/approval?inApprovalId=${dataset.id}`;
+
+    }
+});
+
+document.addEventListener("click", function (event) {
+    const button = event.target.closest(".download-btn");
+    if (button) {
+        const dataset = button.dataset;
+        downloadPDF(dataset);
+    }
+});
+
 const getApprovalType = () => {
     const url = `/api/mainpage/approval/type`;
     fetch(url, {

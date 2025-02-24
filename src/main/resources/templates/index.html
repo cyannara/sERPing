@@ -6,202 +6,98 @@
         xmlns="http://www.w3.org/1999/xhtml"
         xmlns:sec=""
 >
+<head>
+  <link rel="stylesheet" href="/vendors/ti-icons/css/themify-icons.css">
+</head>
 <body layout:fragment="content">
+
 <div class="row">
   <div class="col-md-12 grid-margin">
     <div class="row">
       <div class="col-12 col-xl-8 mb-4 mb-xl-0">
-        <h3 class="font-weight-bold">결재문서</h3>
         <div sec:authorize="isAuthenticated()">
           환영합니다. <span sec:authentication="name" class="h4"></span>님!
         </div>
+        <h3 class="font-weight-bold">결재문서</h3>
       </div>
     </div>
   </div>
 </div>
-<div class="row approval">
-  <div class="container">
-    <div class="search-grid">
-      <div class="row">
-        <div class="">
-          <label class="label-search col-4" for="documentType">요청 구분</label>
-          <select name="documentType" id="documentType" class="col-8 input-box">
-            <option value="" selected>선택</option>
-          </select>
-        </div>
-        <div class="">
-          <span class="label-search col-4">요청 날짜</span>
-          <input type="date" id="inApprovalRequestDateStart" class="col-8 input-box"/>~
-          <input type="date" id="inApprovalRequestDateEnd" class="col-8 input-box"/>
-        </div>
-      </div>
-      <div class="row">
-        <div class="">
-          <label class="label-search col-4" for="employeeName">요청자</label>
-          <input type="text" name="employeeName" id="employeeName" class="col-8 input-box">
-        </div>
-        <div class="">
-          <label class="label-search col-4" for="display_amount">표시수량</label>
-          <select name="display_amount" id="display_amount" class="col-8 input-box" onchange="changeDisplay()">
-            <option value="5">5</option>
-            <option value="10" selected>10</option>
-            <option value="20">20</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-          </select>
-        </div>
-      </div>
-      <div class="row btn-box">
-        <button type="button" class="btn btn-primary col-1" onclick="search()">검색</button>
-        <button type="button" class="btn btn-secondary col-1" onclick="reset()">초기화</button>
-      </div>
 
-    </div>
-    <!-- 그리드 -->
-    <div id="table-container">
-      <div id="grid"></div>
-      <div id="pagination" class="tui-pagination"></div>
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">결재</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">일정</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">Contact</button>
+  </li>
+<!--  <li class="nav-item" role="presentation">-->
+<!--    <button class="nav-link" id="disabled-tab" data-bs-toggle="tab" data-bs-target="#disabled-tab-pane" type="button" role="tab" aria-controls="disabled-tab-pane" aria-selected="false" disabled>Disabled</button>-->
+<!--  </li>-->
+</ul>
+<div class="tab-content" id="myTabContent">
+  <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+    <div class="row approval">
+      <div class="container">
+        <div class="search-grid">
+          <div class="row">
+            <div class="">
+              <label class="label-search col-4" for="documentType">요청 구분</label>
+              <select name="documentType" id="documentType" class="col-8 input-box">
+                <option value="" selected>선택</option>
+              </select>
+            </div>
+            <div class="">
+              <span class="label-search col-4">요청 날짜</span>
+              <input type="date" id="inApprovalRequestDateStart" class="col-8 input-box"/>~
+              <input type="date" id="inApprovalRequestDateEnd" class="col-8 input-box"/>
+            </div>
+          </div>
+          <div class="row">
+            <div class="">
+              <label class="label-search col-4" for="employeeName">요청자</label>
+              <input type="text" name="employeeName" id="employeeName" class="col-8 input-box">
+            </div>
+            <div class="">
+              <label class="label-search col-4" for="display_amount">표시수량</label>
+              <select name="display_amount" id="display_amount" class="col-8 input-box" onchange="changeDisplay()">
+                <option value="5">5</option>
+                <option value="10" selected>10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </div>
+          </div>
+          <div class="row btn-box">
+            <button type="button" class="btn btn-primary col-1" onclick="search()">검색</button>
+            <button type="button" class="btn btn-secondary col-1" onclick="reset()">초기화</button>
+          </div>
+
+        </div>
+        <!-- 그리드 -->
+        <div id="table-container">
+          <div id="grid"></div>
+          <div id="pagination" class="tui-pagination"></div>
+        </div>
+      </div>
     </div>
   </div>
+  <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+    <div class="row">
+
+    </div>
+  </div>
+  <div class="tab-pane fade" id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
+    ...
+  </div>
+  <div class="tab-pane fade" id="disabled-tab-pane" role="tabpanel" aria-labelledby="disabled-tab" tabindex="0">
+    ...
+  </div>
 </div>
-<script>
-
-
-  let Grid = tui.Grid;
-
-  const dataSource = {
-    api: {
-      readData: {
-        url: 'http://localhost:81/api/mainpage/approval/list',
-        method: 'GET',
-        initParams: { page: 1 }
-      },
-      contentType: 'application/json'
-    },
-  };
-
-  const grid = new Grid({
-            el: document.querySelector('#grid'),
-            scrollX: false,
-            scrollY: false,
-            pageOptions: {
-              useClient: false,
-              perPage: 10,
-            },
-            columns: [
-              {header: "번호", name: "inApprovalId", sortable: true},
-              {header: "요청 구분", name: "documentType", sortable: true},
-              {header: "요청자", name: "employeeName", sortable: true},
-              {
-                header: "결재요청 날짜",
-                name: "inApprovalRequestDate",
-                sortable: true,
-                width: 150,
-                formatter: ({value}) => {
-                  return formatDateTime(value)
-                }
-              },
-              {
-                header: "처리",
-                name: "process",
-                formatter: ({row}) => {
-                  return `
-                    <button class="btn btn-approve" data-bs-toggle="modal" data-bs-target="#commonModal" data-in-approval-id="${row.inApprovalId}">승인</button>
-                    <button class="btn btn-reject" data-bs-toggle="modal" data-bs-target="#commonModal" data-in-approval-id="${row.inApprovalId}">반려</button>`
-                }
-              },
-              {
-                header: "상태",
-                name: "inApprovalStatus",
-                sortable: true,
-                rowClassName: 'center',
-                width: 80,
-                hidden: true,
-                formatter: ({value}) => {
-                  const statusMap = {
-                    WAITING: {text: "대기중", color: "gray"},
-                    APPROVED: {text: "승인", color: "green"},
-                    REJECTED: {text: "거절", color: "red"}
-                  };
-                  const status = statusMap[value] || {text: "알 수 없음", color: "black"};
-                  return `<span class="status-label"
-                                style="background-color: ${status.color};
-                            ">${status.text}</span>`;
-                }
-              },
-              {header: "요청 내용", name: "inApprovalRequestContent", sortable: true, hidden: true},
-              {header: "요청 내용 확인", name: "moveToPage", sortable: true,
-              formatter: ({ row }) => {
-                return `<button class="move-btn" data-id="${row.inApprovalId}">
-                          <i class="mdi mdi-arrow-right-bold"></i>
-                        </button>`;
-              }
-          },
-          {
-            header: "다운로드",
-            name: "download",
-            sortable: true,
-        formatter: ({ row }) => {
-          return `<button class="download-btn" data-content='${row.inApprovalRequestContent}'>
-                    <i class="mdi mdi-folder-download"></i>
-                  </button>`;
-        }
-      }  ],
-    data : dataSource,
-  });
-
-  // grid.on('beforeRequest', function(data) {
-  //   console.log('beforeRequest', data)
-  //   // Before sending the request
-  // })
-  // grid.on('response', function(data) {
-  //   console.log('response', data)
-  //   // When a response has been received regardless of success.
-  // })
-  // grid.on('successResponse', function(data) {
-  //   console.log('successResponse', data)
-  //   // When the result is set to true
-  // })
-  // grid.on('failResponse', function(data) {
-  //   console.log('failResponse', data)
-  //   // When the result is set to false
-  // })
-  // grid.on('errorResponse', function(data) {
-  //   console.log('errorResponse', data)
-  //   // When an error occurs
-  // });
-
-  document.addEventListener("click", function (event) {
-    let buttonApprove = event.target.closest(".btn-approve");
-    let buttonReject = event.target.closest(".btn-reject");
-
-    if (buttonApprove) {
-      setModalContent('전자 결재 처리', 'approval-approved', '취소', '승인', () => doApprove(buttonApprove))
-    } else if(buttonReject) {
-      setModalContent('전자 결재 처리', 'approval-rejected', '취소', '반려', () => doReject(buttonReject))
-    }
-  });
-
-  document.addEventListener("click", function (event) {
-    const button = event.target.closest(".move-btn");
-    if (button) {
-      const dataset = button.dataset; // 버튼에서 data-id 값 가져오기
-      window.location.href = `/mainpage/approval?inApprovalId=${dataset.id}`;
-
-    }
-  });
-
-  document.addEventListener("click", function (event) {
-    const button = event.target.closest(".download-btn");
-    if (button) {
-      const dataset = button.dataset;
-      downloadPDF(dataset);
-    }
-  });
-
-
-
-</script>
 <script src="/js/mainpage/mainpage.js"></script>
 
 </body>
