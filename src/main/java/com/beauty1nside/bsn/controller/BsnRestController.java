@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.beauty1nside.bsn.dto.OrderSearchDTO;
 import com.beauty1nside.bsn.dto.delivery.BsnDeliveryDTO;
+import com.beauty1nside.bsn.dto.delivery.BsnDeliveryDetailDTO;
 import com.beauty1nside.bsn.dto.order.BhfOrderDTO;
 import com.beauty1nside.bsn.dto.order.BsnOrderDTO;
 import com.beauty1nside.bsn.dto.order.BsnOrderDetailDTO;
@@ -228,6 +229,30 @@ public class BsnRestController {
 
 	};
 	
+	@GetMapping("/deli/lot/detail")
+	public Object deliveryLotDetail(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
+			@RequestParam(name ="page", defaultValue = "1", required = false) int page,
+			@RequestParam(name = "deliveryDetailId", defaultValue = "5") int deliveryDetailId,
+			BsnDeliveryDetailDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException  {
+		
+		
+		//한 페이지에 출력할 수 : 기본값: 5
+		paging.setPageUnit(perPage);
+		//현재 페이지(기본값: 1)
+		paging.setPage(page);
+		
+		//첫 페이지, 마지막 페이지
+		dto.setStart(paging.getFirst());
+		dto.setEnd(paging.getLast());
+		dto.setDeliveryDetailId(deliveryDetailId);
+		
+		GridArray grid = new GridArray();
+		Object result = grid.getArray(paging.getPage(), 10, bsnOrderService.getBsnDeliveryLotDetail(dto) );
+
+		return result;		
+
+	};
+	
 	
 	
 	//임시 창고
@@ -245,7 +270,7 @@ public class BsnRestController {
 				//첫 페이지, 마지막 페이지
 				dto.setStart(paging.getFirst());
 				dto.setEnd(paging.getLast());
-				dto.setOrderId(optionCode);
+				dto.setOptionCode(optionCode);
 				
 				GridArray grid = new GridArray();
 				Object result = grid.getArray(paging.getPage(), 10, bsnOrderService.getGoodsWarehouseLot(dto) );

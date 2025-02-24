@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+ <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css">
+    <script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+</head>
+<body>
+	<div id="registerGrid"></div>
+	
+	<script>
+        let registerGrid;
+
+        document.addEventListener("DOMContentLoaded", function () {
+            registerGrid = new tui.Grid({
+                el: document.getElementById('registerGrid'),
+                columns: [
+                    { header: 'LOT번호', name: 'goodsLotNum', },
+                    { header: '출고가능수량', name: 'warehousingRemainingQuantity',  },
+                    { header: '유통기한', name: 'goodsConsumptionDate', formatter: ({ value }) => formatDate(value), },
+                    { header: '수량', name: 'deliveryQnt', editor: 'text',  }
+                ],
+                data: LotListDataSource,
+                rowHeaders: ['rowNum'],
+                pageOptions: {
+                    useClient: false,
+                    perPage: 50
+                }
+            });
+        });
+
+        // 모달이 열릴 때 데이터 업데이트
+        document.getElementById('registerModal').addEventListener('shown.bs.modal', function () {
+            if (registerGrid) {
+                registerGrid.refreshLayout();
+            }
+        });
+        
+     // 📌 REST API에서 데이터 가져오는 함수
+     const LotListDataSource = {
+		api: {
+			readData: { url: 'http://localhost:81/bsn/rest/goods/lot', method: 'GET', initParams: { page: 1 }},
+		},
+		contentType: 'application/json'
+	 };
+     
+     function formatDate(dateString) {
+    	    if (!dateString) return ''; // 데이터가 없으면 빈 문자열 반환
+    	    const date = new Date(dateString);
+    	    if (isNaN(date)) return dateString; // 날짜 변환이 실패하면 원본 유지
+
+    	    return date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }) // "2025년 2월 17일"
+    	        
+    	}
+    </script>
+</body>
+</html>

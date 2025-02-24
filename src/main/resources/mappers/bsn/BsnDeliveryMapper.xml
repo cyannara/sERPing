@@ -91,7 +91,31 @@ WHERE RN >= #{start}
 
 <!-- 출고 상세 목록 수량-->
 
-<!-- 출고 상세 목록-->
+<!-- 출고 LOT 상세 목록-->
+<select id="selectBsnDeliveryLotDTO">
+SELECT delivery_lot_detail_num, 
+       delivery_detail_id, 
+       goods_lot_num, 
+       delivery_possible_qnt, 
+       delivery_qnt
+FROM
+(
+SELECT /*+ INDEX_ASC(bsn_delivery_lot_detail PK_BSN_DELIVERY_LOT_DETAIL) */
+       ROWNUM rn,
+       delivery_lot_detail_num, 
+       delivery_detail_id, 
+       goods_lot_num, 
+       delivery_possible_qnt, 
+       delivery_qnt
+FROM bsn_delivery_lot_detail
+WHERE delivery_detail_id = #{deliveryDetailId}
+<![CDATA[
+AND ROWNUM <= #{end}
+]]>
+)
+WHERE RN >= #{start}
+</select>
+<!-- 출고 LOT 상세 목록 수량-->
 
 <!-- 검색조건 -->
 <sql id="searchInfoBsnDLV">
@@ -125,24 +149,23 @@ WHERE RN >= #{start}
 
 <!-- 임시 -->
 <select id="selectGoodsWarehouseLot">
-SELECT goods_lot_num,
-       goods_consumption_date,
-       warehousing_standard_quantity,
-       warehousing_total_quantity,
-       warehousing_remaining_quantity,
-       pwb.warehouse_id AS warehouse_id,
-       pwb.company_num,
+SELECT ROW_NUMBER() OVER (
+              ORDER BY goods_consumption_date asc
+       ) AS RN, 
+       pwb.warehousing_body_num,
        pwb.option_num,
        po.option_code,
-       po.option_name
+       pwb.goods_lot_num,
+       TRUNC(pwb.warehousing_remaining_quantity / 6) AS warehousing_remaining_quantity
+      ,pwb.goods_consumption_date
 
        
-FROM purchs_warehousing_body pwb 
-LEFT JOIN purchse_option po ON po.option_num = pwb.option_num
+
+FROM purchs_warehousing_body pwb
+LEFT JOIN purchse_option po ON pwb.option_num = po.option_num
 WHERE pwb.company_num = 1
--- AND po.option_code = 'LH0011'
-AND warehousing_remaining_quantity != 0
-ORDER by goods_consumption_date
+  AND po.option_code = #{optionCode}
+ORDER by rn
 
 </select>
 

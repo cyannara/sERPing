@@ -6,6 +6,7 @@ import com.beauty1nside.bsn.dto.BsnGoodsLOTDTO;
 import com.beauty1nside.bsn.dto.OrderSearchDTO;
 import com.beauty1nside.bsn.dto.delivery.BsnDeliveryDTO;
 import com.beauty1nside.bsn.dto.delivery.BsnDeliveryDetailDTO;
+import com.beauty1nside.bsn.dto.delivery.BsnDeliveryLotDTO;
 import com.beauty1nside.bsn.dto.order.BhfOrderDTO;
 import com.beauty1nside.bsn.dto.order.BhfOrderDetailDTO;
 import com.beauty1nside.bsn.dto.order.BsnOrderDTO;
@@ -47,6 +48,11 @@ public interface BsnOrderService {
 	
 	//출고 상세 조회
 	public List<BsnDeliveryDetailDTO> getBsnDeliveryDetail(BsnDeliveryDTO bsnDeliveryDTO);
+	
+	
+	//츨고 LOT 상세 조회
+	public List<BsnDeliveryLotDTO> getBsnDeliveryLotDetail(BsnDeliveryDetailDTO bsnDeliveryDetailDTO);
+	
 	
 	//본사 창고 재고(LOT별)조회 임시
 	public List<BsnGoodsLOTDTO> getGoodsWarehouseLot(BsnOrderDetailDTO bsnOrderDetailDTO);

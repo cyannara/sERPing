@@ -23,12 +23,12 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 <body layout:fragment="content">
   <!-- 페이지 내용 시작 -->
 	<div>
-		<h1>출고 페이지</h1>
+		<h1>출고 관리</h1>
 		<div class="row">
-        	<div class="col-md-8  grid-margin stretch-card">
+        	<div class="col-md-12  grid-margin stretch-card">
             	<div class="card">
               		<div class="card-body">
-                		<h4 class="card-title">출고 목록</h4>
+                		<h4 class="card-title">출고 준비중인 주문 목록</h4>
                 		<p class="card-description">그리드 - 검색한 주문 리스트 출력</p>
                 		<div id="orderList"></div>
                		 	<div id="pagination" class="tui-pagination"></div>
@@ -37,22 +37,72 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
             	
           	</div>
           	
-          	<div class="col-md-4  grid-margin stretch-card">
+
+        </div>
+        <div class="row">
+          	<div class="col-md-6  grid-margin stretch-card">
             	<div class="card">
               		<div class="card-body">
-                		<h4 class="card-title">주문 목록</h4>
+                		<h4 class="card-title">주문 상세 </h4>
                 		<p class="card-description">그리드 - 검색한 주문 리스트 출력</p>
                 		<div id="deliDetail"></div>
                		 	<div id="pagination" class="tui-pagination"></div>
+               		 	
               		</div>
             	</div>
             	
           	</div>
+          	<div class="col-md-6 grid-margin stretch-card">
+			    <div class="card">
+			        <div class="card-body">
+			        	<h4 class="card-title">LOT별 정보</h4>
+			            <p class="card-description">그리드 - 검색한 주문 리스트 출력</p>
+			         	<div class="d-flex justify-content-end gap-3 mt-3">
+			                <button type="button" class="btn btn-primary px-4" id="registerButton">추가</button>
+			                <button type="button" class="btn btn-danger px-4" id="deleteButton">삭제</button>
+			            </div>
+			            
+			            <div id="deliLotDetail"></div>
+			            <div id="pagination" class="tui-pagination"></div>
+			            
+			        </div>
+			    </div>
+			</div>
+
+        </div>
+        <div class="row">
+          	<div class="d-flex justify-content-center gap-3 mt-3">
+			                <button type="button" class="btn btn-primary px-4">상품 출고 확정</button>
+			</div>
         </div>
 	</div>
-	
+
+<!-- 모달들  (모달ID, 모달사이즈(modal-xl,...), 모달제목, 모달내용 HTML, 모달풋터 HTML)-->
+      
+       
+    <div th:include="bsn/modal/bsnModalTemplate :: ModalTemplate (
+						    	'registerModal', 
+						    	'modal-lg', 
+						    	'LOT 연결 추가', 
+						    	'bsn/modal/bsnLotRegister', 
+						    	'bsn/modal/bsnModalFooter'
+						    )">
+     </div>
+     
+      
+     <div th:include="bsn/modal/bsnModalTemplate :: ModalTemplate(
+						    	'deleteModal', 
+						    	'modal-md', 
+						    	'LOT 연결 삭제', 
+						    	'bsn/modal/bsnLotDelete', 
+						    	'bsn/modal/bsnModalFooter')">
+     </div>	
 <script>
 var Grid = tui.Grid;
+var selectedRow = null; // 선택된 상품 상세
+var detailData = [];    // 상세 LOT정보
+
+
 const OrderListDataSource = {
 		api: {
 			readData: { url: 'http://localhost:81/bsn/rest/deli', method: 'GET', initParams: { page: 1 }},
@@ -78,7 +128,7 @@ const orderList = new Grid({
 		{ header : "주문일", name : "orderDate", formatter: ({ value }) => formatDate(value, 'order'), width: 'auto', sortable : true},
 		{ header : "납기일", name : "dueDate", formatter: ({ value }) => formatDate(value, 'due'), width: 'auto', sortable : true},
 		{ header : "출고일", name : "delivaryDate", formatter: ({ value }) => formatDate(value, 'due'), width: 'auto', sortable : true},
-		{ header : "출고상태", name : "deliveryStatus", sortable : true},
+		{ header : "출고상태", name : "deliveryStatus", formatter: ({ value }) => formatStatus(value), sortable : true},
 		{ header : "비고", name : "remark", width: 'auto'},
 	],
 	data: OrderListDataSource
@@ -95,6 +145,26 @@ function formatDate(dateString, type) {
         : date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }); // "02/17 (월)"
 }
 
+//상태여부 표기 변경
+function formatStatus(status) {
+    if (status === null || status === undefined) return ''; // 데이터가 없으면 빈 문자열 반환
+    switch(status){
+    case "DS01":
+    	return "출고준비중";
+    case "DS02":
+    	return "출고완료";
+    case "DS03":
+    	return "출고취소";
+    	
+    case 0 :
+    	return "요구수량미달";
+    case 1 :
+    	return "요구수량충족";
+    }
+    
+    	
+}
+
 
 
 //출고 클릭 시 상세 불러오기
@@ -108,6 +178,13 @@ orderList.on('click', (ev) => {
     //console.log(rowKey);
     const rowData = orderList.getRow(rowKey); // 클릭한 행 데이터 가져오기
     console.log(rowData.deliveryId);
+    
+	 // 주문 상세, LOT 상세 초기화
+    deliveryDetailGrid.resetData([]);
+    deliveryLotDetailGrid.resetData([]);
+
+    
+    
     if (rowData && rowData.deliveryId) {
     	loadDeliveryDetail(rowData.deliveryId); // 상세 정보 불러오기
     }
@@ -131,12 +208,11 @@ function loadDeliveryDetail(deliveryId) {
             if (data && data.data && data.data.contents) {
             	const detailData = data.data.contents; // 상세 데이터 저장
             	
-            	
-            	//
+
                 deliveryDetailGrid.resetData(detailData);
             } else {
                 console.warn("상세 데이터가 없습니다.");
-                orderDetailGrid.resetData([]); // 빈 배열로 초기화
+                //orderDetailGrid.resetData([]); // 빈 배열로 초기화
             }
         })
         .catch(error => console.error('Error fetching order detail:', error));
@@ -150,8 +226,10 @@ columns: [
     //	width: 'auto' ,	
     },
     { header: "옵션명", name: "optionName", },
-    { header: "옵션코드", name: "optionCode",  },
-    { header: "수량", name: "quantity",  },
+    //{ header: "옵션코드", name: "optionCode",  },
+    { header: "요구수량", name: "deliveryDemandQnt",  },
+    { header: "출고대기총수량", name: "deliveryTotalQnt",  },
+    { header: "출고준비여부", name: "sufficiencyStatus", formatter: ({ value }) => formatStatus(value), sortable : true},
 
 ],
 pageOptions: {
@@ -159,6 +237,151 @@ pageOptions: {
     perPage: 5
 }
 });
+
+////////////////////////////////////////////////
+
+//출고 클릭 시 LOT상세 불러오기
+deliveryDetailGrid.on('click', (ev) => {
+	
+    const rowKey = ev.rowKey; // 클릭한 행의 키
+    selectedRow = deliveryDetailGrid.getRow(rowKey);
+    if (rowKey === null || rowKey === undefined) {
+        return;
+    }
+    
+    const rowData = deliveryDetailGrid.getRow(rowKey); // 클릭한 행 데이터 가져오기
+    console.log(rowData.deliveryDetailId);
+    
+ 	// LOT 상세 초기화
+    deliveryLotDetailGrid.resetData([]);
+ 	
+    if (rowData && rowData.deliveryDetailId) {
+    	loadDeliveryLotDetail(rowData.deliveryDetailId); // 상세 정보 불러오기
+    }
+});
+
+//불러오는 함수
+function loadDeliveryLotDetail(deliveryDetailId) {
+	if (!deliveryDetailId) {
+        console.warn("유효하지 않은 주문 Id입니다.");
+        return;
+    }
+	
+    fetch(`http://localhost:81/bsn/rest/deli/lot/detail?deliveryDetailId=${deliveryDetailId}`)
+    	
+        .then(response => {
+	            if (!response.ok) throw new Error(`HTTP 오류! 상태: ${response.status}`);
+	            return response.json();
+	     })
+	     
+        .then(data => {
+            if (data && data.data && data.data.contents) {
+            	const detailData = data.data.contents; // 상세 데이터 저장
+            	
+                deliveryLotDetailGrid.resetData(detailData);
+            } else {
+                console.warn("상세 데이터가 없습니다.");
+                //orderDetailGrid.resetData([]); // 빈 배열로 초기화
+            }
+        })
+        .catch(error => console.error('Error fetching order detail:', error));
+}
+
+//상세 그리드 형식
+const deliveryLotDetailGrid = new Grid({
+el: document.getElementById('deliLotDetail'),
+rowHeaders: ['rowNum', 
+	'checkbox'],
+columns: [
+	
+    { header: "예약번호", name: "deliveryLotDetailNum", 
+    //	width: 'auto' ,	
+    },
+    { header: "LOT번호", name: "goodsLotNum", },
+    { header: "출고가능수량", name: "deliveryPossibleQnt",  },
+    { header: "출고예약수량", name: "deliveryQnt",  },
+    { header : "수량수정", name : "detail", formatter : () => '<button class="btn btn-warning btn-sm btnInfo" data-bs-toggle="modal" data-bs-target="#assetdetailModal">수량수정</button>', align: 'center'},
+
+],
+pageOptions: {
+    useClient: false,
+    perPage: 5
+}
+});
+
+////////////////////////////////////
+
+//모달 인스턴스 생성
+const registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
+const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+
+// 주문 선택 확인 함수
+function checkOrderSelection(modal) {
+    if (selectedRow && selectedRow.optionCode) {
+        modal.show();
+    } else {
+        showAlert('상품을 선택해주세요!', 'danger');
+    }
+}
+
+// 주문 등록 버튼 클릭 이벤트
+document.getElementById('registerButton').addEventListener('click', () => {
+    checkOrderSelection(registerModal); // 등록 모달 띄우기
+});
+
+// 주문 거부 버튼 클릭 이벤트
+document.getElementById('deleteButton').addEventListener('click', () => {
+    checkOrderSelection(deleteModal); // 삭제 모달 띄우기
+});
+
+
+// 공통된 버튼을 다루되, 모달에 따라 다르게 동작하도록 설정
+document.querySelectorAll('.modal-footer #btn-register').forEach(button => {
+    button.addEventListener('click', () => {
+        if (selectedRow && selectedRow.optionCode) {
+            // 현재 show 클래스가 있는 모달 찾기
+            const activeModal = document.querySelector('.modal.show');
+            
+            if (activeModal) {
+                if (activeModal.id === 'registerModal') {
+                    // 주문 등록 처리
+
+                    registerModal.hide();
+                    registerGrid.reloadData();
+                } else if (activeModal.id === 'deleteModal') {
+
+
+                    deleteModal.hide();
+                }
+            }
+        } else {
+            showAlert('상품을 선택해주세요!', 'danger');
+        }
+    });
+});
+
+
+
+document.querySelectorAll('.modal-footer .btn-secondary').forEach(button => {
+    button.addEventListener('click', () => {
+        // 현재 활성화된 모달 찾기
+        const activeModal = document.querySelector('.modal.show');
+
+        if (activeModal) {
+        	//console.log(activeModal);
+        	if (activeModal.id === 'registerModal') {
+        		
+                registerModal.hide();
+                registerGrid.reloadData();
+            } else if (activeModal.id === 'deleteModal') {
+            	
+                deleteModal.hide();
+            }
+        }
+    });
+});
+
+
 </script>
 </body>
 </html>
