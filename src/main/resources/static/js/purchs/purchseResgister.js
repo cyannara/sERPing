@@ -87,10 +87,10 @@ function initPurchaseGrid() {
             { header: '거래처명', name: 'vendorName' },
 			{ header: '거래처번호', name: 'vendorId' , hidden: true},
             { header: '규격', name: 'goodsStandard' },
-            { header: '수량', name: 'puchaseQuantity',editor: { type: "text", useFormatter: false } },
-            { header: '단가', name: 'puchaseUnitPrice',editor: { type: "text", useFormatter: false }},
+            { header: '수량', name: 'purchaseQuantity',editor: { type: "text", useFormatter: false } },
+            { header: '단가', name: 'purchaseUnitPrice',editor: { type: "text", useFormatter: false }},
             { header: '공급가격', name: 'purchaseSupplyPrice' },
-            { header: '부가세', name: 'puchaseVat' },
+            { header: '부가세', name: 'purchaseVat' },
             { header: '발주계획바디번호', name: 'orderPlanBodyNum' , hidden: true},
             {
                     header : "삭제"
@@ -230,17 +230,20 @@ function initPurchaseGrid() {
 
 // ✅ 모달 닫힐 때 sessionStorage 값 가져와서 그리드에 저장
 function setupModalCloseEvent() {
+	console.log("✅ 모달 닫힘 이벤트 실행");
+
+	 
   
 
-        const rowKey = purchaseGrid.getFocusedCell()?.rowKey;
+ const rowKey = purchaseGrid.getFocusedCell()?.rowKey;
         if (rowKey === null || rowKey === undefined) {
             console.warn("❌ 먼저 행을 선택해야 합니다.");
             return;
         }
 		
 		
-		// ✅ sessionStorage의 key와 그리드의 name을 매칭
-		        const dataMap = {
+//✅ sessionStorage의 key와 그리드의 name을 매칭
+		 const dataMap = {
 		            selectedGoodsCode: "goodsCode",
 		            selectedGoodsName: "goodsName",
 		            selectedOptionCode: "optionCode",
@@ -249,7 +252,7 @@ function setupModalCloseEvent() {
 		            selectedVendorName: "vendorName",
 					selectedVendorId: "vendorId",
 		            selectedGoodsStandard: "goodsStandard",
-		            selectedGoodsSupplyPrice: "puchaseUnitPrice"
+		            selectedGoodsSupplyPrice: "purchaseUnitPrice"
 		        };
 
 		        Object.keys(dataMap).forEach(storageKey => {
@@ -261,11 +264,22 @@ function setupModalCloseEvent() {
 		            }
 		        });
 		
-		
+	
 
         console.log("✅ 발주 그리드에 데이터 저장 완료");
   
 }
+
+// ✅ 특정 행을 강조 (반짝거리는 효과)
+/*function highlightRow(rowKey) {
+    const rowElement = document.querySelector(`[data-row-key="${rowKey}"]`);
+    if (rowElement) {
+        rowElement.classList.add("highlight-row");
+        setTimeout(() => rowElement.classList.remove("highlight-row"), 1500); // 1.5초 후 효과 제거
+    }
+}
+*/
+
 //수량과 단가 변경 시 공급가격 자동 계산
 function calculateSupplyPrice(rowKey) {
     let quantity = purchaseGrid.getValue(rowKey, "puchaseQuantity") || "0";
@@ -335,13 +349,13 @@ function purchaseRegister() {
 
         if (!groupedData[vendorId]) {
             groupedData[vendorId] = {
-                vendorId: vendorId,
-                purchaseDate: document.getElementById("purchaseDate").value,
-                purchaseDueDate: document.getElementById("puchaseDueDate").value,
                 employeeNum: parseInt(document.getElementById("employeeNum").value) || 0,
                 companyNum: parseInt(document.getElementById("companyNum").value) || 0,
+                purchaseDate: document.getElementById("purchaseDate").value,
+                purchaseDueDate: document.getElementById("puchaseDueDate").value,
                 purchaseVatFlag: vatFlag,
-                purchaseDetails: []
+                vendorId: vendorId,
+                files: []
             };
         }
 
@@ -349,21 +363,52 @@ function purchaseRegister() {
         const orderPlanBodyNum = item.orderPlanBodyNum ? parseInt(item.orderPlanBodyNum) : null;
 
         // ✅ 발주서 바디 추가 (숫자로 변환)
-        groupedData[vendorId].purchaseDetails.push({
-		    puchaseQuantity: parseInt(item.puchaseQuantity.replace(/,/g, '')) || 0,  // ✅ 정수 변환
-		    puchaseUnitPrice: parseFloat(item.puchaseUnitPrice.replace(/,/g, '')) || 0,  // ✅ 실수 변환
-		    puchaseSupplyPrice: parseFloat(item.purchaseSupplyPrice.replace(/,/g, '')) || 0,  // ✅ 실수 변환 (문자열 제거)
-		    puchaseVat: parseFloat(item.puchaseVat.replace(/,/g, '')) || 0,  // ✅ 실수 변환 (문자열 제거)
-		    optionNum: parseInt(item.optionNum.replace(/,/g, '')) || 0,  // ✅ 정수 변환
+        groupedData[vendorId].files.push({
 		    companyNum: parseInt(document.getElementById("companyNum").value.replace(/,/g, '')) || 0,  // ✅ 정수 변환
 		    goodsStandard: item.goodsStandard,
-		    orderPlanBodyNum: orderPlanBodyNum ? parseInt(orderPlanBodyNum.replace(/,/g, '')) : null  // ✅ 정수 변환 (nullable)
+		    optionNum: parseInt(item.optionNum.replace(/,/g, '')) || 0,  // ✅ 정수 변환
+		    orderPlanBodyNum: orderPlanBodyNum ? parseInt(orderPlanBodyNum.replace(/,/g, '')) : null , // ✅ 정수 변환 (nullable)
+		    purchaseQuantity: parseInt(item.puchaseQuantity.replace(/,/g, '')) || 0,  // ✅ 정수 변환
+		    purchaseSupplyPrice: parseFloat(item.purchaseSupplyPrice.replace(/,/g, '')) || 0,  // ✅ 실수 변환 (문자열 제거)
+		    purchaseUnitPrice: parseFloat(item.puchaseUnitPrice.replace(/,/g, '')) || 0,  // ✅ 실수 변환
+		    purchaseVat: parseFloat(item.puchaseVat.replace(/,/g, '')) || 0,  // ✅ 실수 변환 (문자열 제거)
 		});
 
 
     });
 
-    console.log("📢 서버로 전송할 데이터:", Object.values(groupedData));
+	// groupedData를 배열로 변환 (각 그룹별 발주 데이터)
+	    const purchaseArray = Object.values(groupedData);
+	    console.log("서버로 전송할 데이터:", purchaseArray);
+		
+		// CSRF 토큰 및 헤더 정보 (meta 태그에서 미리 읽어옴)
+		    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+		    const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+
+		    // 컨트롤러의 엔드포인트로 POST 요청 전송 (예: /purchs/rest/purchase/insert)
+		    fetch("http://localhost:81/purchs/rest/purchase/insert", {
+		        method: "POST",
+		        headers: {
+		            "Content-Type": "application/json",
+		            [csrfHeader]: csrfToken
+		        },
+		        body: JSON.stringify(purchaseArray)
+		    })
+		    .then(response => response.json())
+		    .then(data => {
+		        if (data.status === "success") {
+		            showAlert("발주 등록 성공", "success");
+		            setTimeout(() => location.reload(), 1000);
+		        } else {
+		            showAlert("발주 등록 실패", "danger");
+		        }
+		    })
+		    .catch(error => {
+		        console.error("발주 등록 오류:", error);
+		        showAlert("서버 오류: " + error, "danger");
+		    });
+	
+	
 }
 
 

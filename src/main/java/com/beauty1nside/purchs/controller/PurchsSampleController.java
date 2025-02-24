@@ -63,8 +63,24 @@ public class PurchsSampleController {
 		return "/purchs/goodslist";
 	}
 	
+	
+	// 메일 페이지 이동
+	@GetMapping("/mailsender")
+	public String mailtest() {
+		return "/purchs/mailsender"; // 페이지 출력 
+	};
+	
+	
+
+	    @GetMapping("/purchaseList")
+	    public String purchaseList() {
+	        return "purchs/purchaseList"; // templates/purchs/purchaseList.html을 반환
+	    }
 
 
+
+	
+	
 	
 	
 	

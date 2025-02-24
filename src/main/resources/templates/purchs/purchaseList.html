@@ -1,0 +1,255 @@
+<html layout:decorate="~{layouts/layout}"
+      lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+ 
+ <head>
+ 	<style>
+    /* ✅ 컨테이너 스타일 */
+    #custom-container {
+        background-color: #f8f9fa; /* 연한 회색 배경 */
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 박스 그림자 */
+        margin-bottom: 20px;
+    }
+    
+    /* ✅ 검색 바 스타일 */
+    .search-container { margin-bottom: 15px; }
+    .btn-search { background-color: #28a745; color: white; }
+    .btn-reset { background-color: #007bff; color: white; }
+    
+    /* ✅ 테이블 & 그리드 스타일 */
+    .tui-grid-container {
+        border: 1px solid #ddd !important;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+
+    .tui-grid-header-cell {
+        background-color: #f1f1f1 !important;
+        font-weight: bold;
+        text-align: center;
+        border-right: 1px solid #ddd !important;
+    }
+
+    .tui-grid-cell {
+        border-right: 1px solid #ddd !important;
+        border-bottom: 1px solid #ddd !important;
+    }
+
+    .tui-grid-cell:hover {
+        background-color: #f9f9f9 !important;
+    }
+
+    /* ✅ 페이지네이션 스타일 */
+    .pagination-container {
+        text-align: center;
+        margin-top: 15px;
+    }
+</style>
+ 	
+ </head>     
+<body layout:fragment="content">
+
+
+<div class="container mt-4">
+    <h2 class="mb-4">발주서 조회</h2>
+    
+    <!-- ✅ 검색 필터 -->
+    <div class="search-grid" id="custom-container">
+        <div class="d-flex flex-wrap align-items-center gap-3">
+            <div class="d-flex align-items-center">
+                <span class="label-search me-2">상품명</span>
+                <input type="text" id="searchGoodsName" class="form-control w-auto">
+            </div>
+            <div class="d-flex align-items-center">
+                <span class="label-search me-2">발주번호</span>
+                <input type="text" id="searchPurchaseNum" class="form-control w-auto">
+            </div>
+            <div class="d-flex align-items-center">
+                <span class="label-search me-2">발주일자</span>
+                <input type="date" id="searchStartDate" class="form-control w-auto">
+                <span class="mx-2">~</span>
+                <input type="date" id="searchEndDate" class="form-control w-auto">
+            </div>
+            <div class="d-flex align-items-center">
+	            <span class="label-search me-2">표시수량</span>
+	            <select name="display_amount" id="purchase_display_amount" class="form-control w-auto" onchange="changeProductDisplay()">
+	                <option value="10" selected>10</option>
+	                <option value="20">20</option>
+	                <option value="50">50</option>
+	                <option value="100">100</option>
+	            </select>
+	        </div>
+            <button type="button" class="btn btn-primary ms-auto" onclick="purchaseSearch()">검색</button>
+            <button type="button" class="btn btn-secondary" onclick="resetFilters()">초기화</button>
+        </div>
+    </div>
+    
+    <!-- ✅ 발주서 리스트 테이블 -->
+    <div id="table-container" class="mt-3">
+        <div id="purchaselistGrid"></div>
+        <div id="pagination" class="tui-pagination"></div>
+    </div>
+    
+    <!-- 발주서 등록 버튼 -->
+    <div class="text-end">
+        <button class="btn btn-register">발주서 등록</button>
+    </div>
+</div>
+
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("✅ 발주서 그리드 초기화");
+    initPurchaseGrid();
+});
+
+let purchaselistGrid;
+
+function initPurchaseGrid() {
+    
+	const companyNum = [[${session.companyNum}]];
+	
+    if (!companyNum) {
+        console.error("❌ 세션에서 companyNum 값을 찾을 수 없음.");
+        return; // companyNum이 없으면 요청을 하지 않음
+    } 
+    const purchaselistDataSource = {
+        api: {
+            readData: {
+                url: 'http://localhost:81/purchs/rest/purchase/list',
+                method: 'GET',
+                requestOptions: {
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin' // ✅ CORS 문제 방지
+                },
+                initParams: {
+                    page: 1,
+                    perPage: 10,
+                    companyNum: companyNum
+                },
+                beforeRequest: function(request) {
+                    console.log("📢 서버로 요청 보내기 전 requestParams:", request.params);
+                },
+                afterResponse: function(response) {
+                    console.log("📢 서버 응답:", response);
+
+                    if (response.data && response.data.contents) {
+                        console.log("✅ 변환된 데이터:", response.data.contents);
+                        return { data: response.data.contents, totalCount: response.data.pagination.totalCount };
+                    }
+
+                    console.warn("⚠️ 서버 응답에 contents가 없습니다.");
+                    return { data: [], totalCount: 0 };
+                }
+            }
+        },
+        contentType: 'application/json',
+        serverSidePagination: true
+    };
+
+    purchaselistGrid = new tui.Grid({
+        el: document.getElementById('purchaselistGrid'),
+        data: purchaselistDataSource,
+        pageOptions: {
+            useClient: false,
+            perPage: 10
+        },
+        bodyHeight: 'auto',
+        columns: [
+            { header: "발주번호", name: "purchaseNum", rowSpan: true, renderer: { type: CustomTextRenderer } },
+            { header: "거래처명", name: "vendorName" },
+            { header: "담당자", name: "employeeName" },
+            { header: "상품명", name: "goodsName" },
+            { header: "옵션명", name: "optionName" },
+            { header: "금액", name: "purchaseTotalAmount" },
+            { header: "발주상태", name: "purchaseStatus" },
+            { header: "인쇄", name: "print", renderer: { type: PrintRenderer } }
+        ]
+    });
+
+    console.log("✅ Toast Grid 초기화 완료");
+}
+
+// ✅ 검색 실행
+function purchaseSearch() {
+    let goodsName = document.querySelector('#searchGoodsName').value.trim();
+    let purchaseNum = document.querySelector('#searchPurchaseNum').value.trim();
+    let startDate = document.querySelector('#searchStartDate').value;
+    let endDate = document.querySelector('#searchEndDate').value;
+
+    purchaselistGrid.setRequestParams({
+        "companyNum": [[${session.companyNum}]],
+        "goodsName": goodsName,
+        "purchaseNum": purchaseNum,
+        "startDate": startDate,
+        "endDate": endDate
+    });
+
+    purchaselistGrid.reloadData();
+}
+
+//표시 수량 변경
+function changeProductDisplay() {
+    let gap = parseInt(document.querySelector('#purchase_display_amount').value);
+    purchaselistGrid.setPerPage(gap);
+    purchaselistGrid.reloadData();
+}
+
+// ✅ 필터 초기화
+function resetFilters() {
+    document.querySelector('#searchGoodsName').value = '';
+    document.querySelector('#searchPurchaseNum').value = '';
+    document.querySelector('#searchStartDate').value = '';
+    document.querySelector('#searchEndDate').value = '';
+    document.querySelector('#purchase_display_amount').value='';
+
+    purchaselistGrid.setRequestParams({
+        "companyNum": companyNum,
+        "goodsName": '',
+        "purchaseNum": '',
+        "startDate": '',
+        "endDate": ''
+    });
+
+    purchaselistGrid.reloadData();
+}
+
+// ✅ 텍스트 정렬 & 강조 렌더러
+class CustomTextRenderer {
+    constructor(props) {
+        const el = document.createElement('div');
+        el.innerText = props.value;
+        el.style.padding = '10px';
+        el.style.fontWeight = 'bold';
+        el.style.textAlign = 'left';
+        this.el = el;
+    }
+    getElement() {
+        return this.el;
+    }
+}
+
+// ✅ 인쇄 버튼 렌더러
+class PrintRenderer {
+    constructor(props) {
+        const el = document.createElement('a');
+        el.innerText = "인쇄";
+        el.href = `/purchase/print/${props.value}`;
+        el.style.color = "#007bff";
+        el.style.cursor = "pointer";
+        el.style.textDecoration = "underline";
+        this.el = el;
+    }
+    getElement() {
+        return this.el;
+    }
+}
+</script>
+
+</body>
+
