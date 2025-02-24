@@ -55,6 +55,9 @@
             <if test="fixturesAmount != null and fixturesAmount != 0">
             , fixtures_amount
             </if>
+            <if test="rgno != null and ! rgno.equals('')">
+            , rgno
+            </if>
             )
 		VALUES (ASSETS_SEQ.nextval, #{assetsName}, #{section}, #{owner}, #{amount}, #{registerDate}, #{companyNum}
             <if test="financialInstitution != null and ! financialInstitution.equals('')">
@@ -68,6 +71,9 @@
             </if>
             <if test="fixturesAmount != null and fixturesAmount != 0">
         	, #{fixturesAmount}
+            </if>
+            <if test="rgno != null and ! rgno.equals('')">
+            , #{rgno}
             </if>
 			)
 	</insert>

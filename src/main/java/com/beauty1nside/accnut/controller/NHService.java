@@ -75,6 +75,8 @@ public class NHService {
         paramMap1.put("Bncd", "011");
         paramMap1.put("Acno", dto.getFinanceInformation());
         
+        log.info(paramMap1);
+        
         HttpEntity<Map<String, Object>> requestEntity1 = new HttpEntity<>(paramMap1, getHeaders());
         
         try {

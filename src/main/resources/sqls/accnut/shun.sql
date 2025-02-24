@@ -338,9 +338,10 @@ FROM bhf_returning br JOIN bhf_returning_detail brd
 ON (br.returning_code = brd.returning_code);
 
 select * from accnut_assets where financial_institution LIKE '%FI%' AND section = 'AC02';
+select * from accnut_assets where section = 'AC02';
 update accnut_assets set finance_information = '3020000012496' where assets_code = '01';
-update accnut_assets set rgno = '20250224000002848' where assets_code = '64';
+update accnut_assets set rgno = '20250224000002849' where assets_code = '121';
 commit;
-
+delete from accnut_assets where assets_code = '124';
 alter table accnut_assets add rgno varchar2(1000);
 

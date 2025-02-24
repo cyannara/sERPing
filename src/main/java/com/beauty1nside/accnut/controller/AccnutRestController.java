@@ -256,6 +256,16 @@ public class AccnutRestController {
 	
 	@PostMapping("/asset/insert")
 	public ResponseEntity<Map<String, Object>> assetsInsert(@RequestBody AssetDTO dto) {
+		log.info(dto);
+		if("AC02".equals(dto.getSection())) {
+			if("FI01".equals(dto.getFinancialInstitution())) {
+				NHService nh = new NHService();
+				String rgno = nh.getRgno(dto);
+				log.info(rgno);
+				dto.setRgno(rgno);
+				log.info(dto);
+			}
+		}
 	    Map<String, Object> response = new HashMap<>();
 	    try {
 	    	assetService.insert(dto);
