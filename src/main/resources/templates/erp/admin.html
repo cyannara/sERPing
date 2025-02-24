@@ -303,6 +303,26 @@
 		</div>
 	</div>
 	
+	<!-- PDF 만드는 라이브러리 -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+	<!-- 계약서 모달 -->
+	<div class="modal fade" id="contractModal" tabindex="-1" aria-labelledby="contractModalLabel" aria-hidden="true">
+	    <div class="modal-dialog modal-lg modal-dialog-centered">
+	        <div class="modal-content">
+	            <div class="modal-header">
+	                <h5 class="modal-title" id="contractModalLabel">사용계약서</h5>
+	                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	            </div>
+	            <div class="modal-body" id="contractContent">
+	            </div>
+	            <div class="modal-footer">
+	                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+		
+	
 	<script th:inline="javascript">
 		//클릭한 행의 정보를 담는 전역 변수
 		var rowData = false;
@@ -373,11 +393,11 @@
 				},
 				{ header: "계약서", 
 			        name: "contractNum", 
-			        formatter: function({ value }) {
-			            if (value === 0) {
+			        formatter: function({ row }) {
+			            if (row.contractNum === 0) {
 			            	return `미계약`;
 			            } else {
-			                return `<button class="btn btn-info" data-id="${value}" onclick="contractAction(${value})">계약</button>`;
+			                return `<button class="btn btn-info contact-info" data-id="${row.companyNum}">계약</button>`;
 			            }
 			        },
 			        editor: 'text',
@@ -539,7 +559,81 @@
 			grid.readData();
 		}
 		
+		//계약서 버튼 클릭
+		document.getElementById('grid').addEventListener('click', function(event) {
+			if (event.target.classList.contains('contact-info')) {
+				let companyNum = event.target.getAttribute("data-id"); // 회사번호 가져오기
+				console.log("companyNum"+companyNum);
+		        fetchContract(companyNum);
+			}
+		});
 		
+		// 계약서 데이터를 가져오는 함수
+		function fetchContract(companyNum) {
+		    fetch(`/erp/rest/contactread/`+companyNum, {
+		        method: 'GET',
+		        headers: {
+		            "Content-Type": "application/json"
+		        }
+		    })
+		    .then(response => response.json())
+		    .then(data => {
+		        if (data) {
+		            displayContract(data);
+		            let modal = new bootstrap.Modal(document.getElementById("contractModal"));
+		            modal.show();
+		        } else {
+		            alert("계약서 정보를 불러오지 못했습니다.");
+		        }
+		    })
+		    .catch(error => console.error("계약서 불러오기 오류:", error));
+		}
+
+		// 계약서 내용을 모달에 표시하는 함수
+		function displayContract(data) {
+		    let content = `
+		        <div class="container">
+		            <h2 class="text-center fw-bold pt-0">사용계약서</h2>
+		            <div class="pt-0 ps-4 pe-4 pm-0">
+		                <p style="margin-bottom:8px;"><strong>beautyInside</strong> (이하 "제공자")와 <strong>${data.contract1}</strong> (이하 "사용자")간에 sERPing 사용 계약을 체결한다.</p>
+		                <h5 class="fw-bold mt-2">제 1조 &lt;목적&gt;</h5>
+		                <p style="margin-bottom:8px;">본 계약의 목적은 "제공자"의 sERPing 프로그램(이하 "프로그램")을 "사용자"에게 제공함에 있어 "제공자", "사용자" 양자간의 제반 약정 내용을 규정함에 있다.</p>
+		                
+		                <h5 class="fw-bold mt-2">제 2조 &lt;"프로그램" 사용범위&gt;</h5>
+		                <p style="margin-bottom:8px;">가. "사용자"는 "제공자"의 "프로그램"을 <strong>${data.contract2}</strong> 동안 사용하고, <strong>${data.contract3}원</strong>을 지불한다.</p>
+		                <p style="margin-bottom:8px;">나. "사용자"는 "프로그램"을 <strong>${data.contract4}</strong> 기능을 필요에 맞게 사용한다.</p>
+		                <p style="margin-bottom:8px;">다. 추가 기능은 <strong>${data.contract5}</strong> 항목에 따라 <strong>${data.contract6}원</strong>을 <strong>${data.contract7}</strong>하여 사용한다.</p>
+
+		                <h5 class="fw-bold mt-2">제 3조 &lt;"프로그램" 사용기간&gt;</h5>
+		                <p style="margin-bottom:8px;">가. 사용기간은 "제공자"에 의해 변경될 수 있으며, 변경 전 "사용자"에게 고지한다.</p>
+		                <p style="margin-bottom:8px;">나. 최초 사용 시 계약서를 작성하며, <strong>${data.contract8}</strong> 및 <strong>${data.contract9}</strong> 시에는 별도 계약서를 작성하지 않는다.</p>
+
+		                <h5 class="fw-bold mt-2">제 4조 &lt;조건&gt;</h5>
+		                <p style="margin-bottom:8px;">가. "사용자"는 계약 종료 시 <strong>${data.contract10}</strong>할 수 있다.</p>
+		                <p style="margin-bottom:8px;">나. "제공자"는 "사용자"의 <strong>${data.contract11}</strong> 및 <strong>${data.contract12}</strong>로 인해 계약을 종료할 수 있다.</p>
+		                <p style="margin-bottom:8px;">다. 계약 종료 시 남은 서비스기간과 할인율을 고려하여 <strong>${data.contract13}</strong> 가능하다.</p>
+
+		                <h5 class="fw-bold mt-2">제 5조 &lt;귀속&gt;</h5>
+		                <p style="margin-bottom:8px;">가. "프로그램"의 저작권은 "제공자"에게 있으며, "사용자"는 내부 기능 <strong>${data.contract17}</strong>을 활용하여 생성한 <strong>${data.contract18}</strong>에 대한 저작권을 가진다.</p>
+
+		                <div class="text-end contract-date">
+			                <div class="d-flex justify-content-between">
+				                <div class="text-center">
+				                    <img style="width=100px;" src="http://www.hanalin.net/erp/signup/${data.erpContractDocument}" class="img-fluid" alt="전자 서명">
+				                </div>
+				                <div>
+				                    <strong>계약 체결 후</strong> <strong>${data.contract21}</strong> 즉시 효력 발생한다.
+				                    <br>
+				                    <strong>${data.contract22}</strong>년 <strong>${data.contract23}</strong>월 <strong>${data.contract24}</strong>일
+			                    </div>
+			                </div>
+		                </div>
+		            </div>
+		        </div>
+		    `;
+		    document.getElementById("contractContent").innerHTML = content;
+		}
+	
 		// 주소검색 api
 		document.addEventListener("DOMContentLoaded", function() {
 		    // 주소 검색 버튼 클릭 이벤트
@@ -569,6 +663,37 @@
 		    });
 		});
 		// 주소검색 api 끝
+		
+		//구독정보 리스트 화면 보여주기
+		var subscriptionState;
+		document.querySelector(".reinfo").addEventListener("click", function(){
+			subinfo();
+		});
+		async function subinfo(){
+			const requestData = {
+					companyNum: rowData.companyNum,	//회사번호
+			};
+			
+			document.querySelector(".appendsection").innerHTML = '여기다';
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		//cs 내역
 		document.querySelector(".cslist").addEventListener("click", function(){
