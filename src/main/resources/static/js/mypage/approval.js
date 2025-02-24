@@ -6,7 +6,9 @@ fetch(getDocUrl, {
         "Content-Type": "application/json",
     }
 })
-    .then(result => result.json())
+    .then(result => {
+        return result.json()
+    })
     .then(data => {
         getTemplate(data)
     })
@@ -55,12 +57,19 @@ submitBtn.addEventListener('click', () => {
 })
 
 const submitUrl = `/api/mypage/approval`
-const documentTemplate = editorObj.getHTML({ sanitize: false })
 
-const body = {
-    documentId,
-    documentTemplate
+const setSubmitBody = () => {
+    let documentTemplate = ''
+    if(Object.keys(editorObj).length) {
+        documentTemplate  = editorObj.getHTML({ sanitize: false })
+    }
+
+    return {
+        documentId,
+        documentTemplate
+    }
 }
+
 const submitApproval = () => {
     fetch(submitUrl,{
         method: "POST",
@@ -69,12 +78,15 @@ const submitApproval = () => {
             "Content-Type": "application/json",
             'X-CSRF-Token': token_csrf
         },
-        body: JSON.stringify(body)
-        }).then(result => result.json())
+        body: JSON.stringify(setSubmitBody())
+    }).then(result => result.json())
         .then(data => {
-            showAlert('결제서를 제출했습니다.', 'success')
-            window.location = '/mypage'
-            console.log('data: ', data)
+            if(data.message === 'success') {
+                showAlert('결제서를 제출했습니다.', 'success')
+                window.location = '/mypage'
+            } else {
+                showAlert('결제서를 제출 실패', 'danger')
+            }
         })
         .catch(error => console.error("Error submitApproval:", error));
 }

@@ -150,6 +150,27 @@
     data : dataSource,
   });
 
+  // grid.on('beforeRequest', function(data) {
+  //   console.log('beforeRequest', data)
+  //   // Before sending the request
+  // })
+  // grid.on('response', function(data) {
+  //   console.log('response', data)
+  //   // When a response has been received regardless of success.
+  // })
+  // grid.on('successResponse', function(data) {
+  //   console.log('successResponse', data)
+  //   // When the result is set to true
+  // })
+  // grid.on('failResponse', function(data) {
+  //   console.log('failResponse', data)
+  //   // When the result is set to false
+  // })
+  // grid.on('errorResponse', function(data) {
+  //   console.log('errorResponse', data)
+  //   // When an error occurs
+  // });
+
   document.addEventListener("click", function (event) {
     let buttonApprove = event.target.closest(".btn-approve");
     let buttonReject = event.target.closest(".btn-reject");

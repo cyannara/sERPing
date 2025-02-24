@@ -14,4 +14,5 @@ public interface ApprovalService {
   int myCount(ApprovalSearchDTO dto);
   int update(ApprovalDTO dto);
   List<DocumentDTO> documentList(Long companyNum);
+  int insert(ApprovalDTO dto);
 }
