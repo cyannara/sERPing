@@ -17,6 +17,6 @@ public class MainpageController {
   public String mainpage(@RequestParam("inApprovalId") Long inApprovalId,
                          Model model) {
     model.addAttribute("inApprovalId", inApprovalId);
-    return "mainpage/mainpage";
+    return "mainpage/mainApproval";
   }
 }

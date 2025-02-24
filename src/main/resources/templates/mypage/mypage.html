@@ -58,15 +58,16 @@
         <h5 class="mb-3">결재 요청</h5>
         <div class="row">
             <div class="col-md-6">
-                <select class="form-select" id="requestType">
-                    <option selected>요청 구분</option>
-                    <option value="근태 수정">근태 수정</option>
-                    <option value="경력증명서 요청">경력증명서 요청</option>
-                    <option value="부대 비용 요청">부대 비용 요청</option>
+                <label class="label-search col-4" for="documentTypeSelected">요청 구분</label>
+                <select name="documentTypeSelected" id="documentTypeSelected" class="col-8 input-box">
+                    <option value="" selected>선택</option>
                 </select>
+
             </div>
             <div class="col-md-6">
-                <button class="btn btn-outline-primary w-100" id="requestApproval">결재서 작성</button>
+                <button class="btn btn-outline-primary w-100" id="requestApproval">
+                   결재서 작성
+                </button>
             </div>
         </div>
     </div>

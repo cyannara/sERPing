@@ -14,7 +14,6 @@ public interface ApprovalMapper {
 	int count(@Param("dto") ApprovalSearchDTO dto, @Param("companyNum") Long companyNum);
 	int myCount(ApprovalSearchDTO dto);
 	int update(ApprovalDTO dto);
-	
+	int insert(ApprovalDTO dto);
 	List<DocumentDTO> documentList(Long companyNum);
-	
 }

@@ -29,7 +29,6 @@ if(employeeNum) {
                 header: "결재요청 날짜",
                 name: "inApprovalRequestDate",
                 sortable: true,
-                width: 150,
                 formatter: ({value}) => {
                     return formatDateTime(value)
                 }
@@ -45,11 +44,10 @@ if(employeeNum) {
                 }
             },
             {
-                header: "상태",
+                header: "처리 상태",
                 name: "inApprovalStatus",
                 sortable: true,
                 rowClassName: 'center',
-                width: 80,
                 // hidden: true,
                 formatter: ({value}) => {
                     const statusMap = {
@@ -65,6 +63,7 @@ if(employeeNum) {
             },
             {header: "요청 내용", name: "inApprovalRequestContent", sortable: true, hidden: true},
             {header: "요청 내용 확인", name: "moveToPage", sortable: true,
+                hidden: true,
                 formatter: ({ row }) => {
                     return `<button class="move-btn" data-id="${row.inApprovalId}">
                           <i class="mdi mdi-arrow-right-bold"></i>
@@ -75,6 +74,7 @@ if(employeeNum) {
                 header: "다운로드",
                 name: "download",
                 sortable: true,
+                hidden: true,
                 formatter: ({ row }) => {
                     return `<button class="download-btn" data-content="${row.inApprovalRequestContent}">
                     <i class="mdi mdi-folder-download"></i>
@@ -87,46 +87,19 @@ if(employeeNum) {
     setTimeout(() => {
         showAlert("세션이 만료되었습니다. 로그인 페이지로 이동합니다.", 'danger');
     }, 100)
-
     setTimeout(() => {
         window.location.href = "/login";
     }, 3000);
 }
 
-const getMyApprovalType = () => {
-    const url = `/api/mainpage/approval/type`;
-    fetch(url, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-        }
+let inApprovalStatus = ''
+let filterBtns = document.getElementsByClassName('filter-btn')
+filterBtns = Array.from(filterBtns)
+filterBtns.forEach((btn) => {
+    btn.addEventListener('click', (event) => {
+        inApprovalStatus = event.target.dataset.status
     })
-        .then(data => {
-            return data.json()
-        })
-        .then(data => {
-            const docType = data.map((doc) => {
-                return doc.documentType
-            })
-
-            const selectElement = document.getElementById("documentType");
-
-            function populateSelect(options, select) {
-                options.forEach(optionText => {
-                    const option = document.createElement("option");
-                    option.value = optionText;  // value 값 설정
-                    option.textContent = optionText; // 표시할 텍스트
-                    select.appendChild(option); // select 요소에 추가
-                });
-            }
-
-            populateSelect(docType, selectElement);
-        })
-        .catch(error => console.error("Error fetching data:", error));
-}
-
-getMyApprovalType()
-
+})
 function reset(){
     let documentType = document.querySelector('#documentType');
     let inApprovalRequestDateStart = document.querySelector('#inApprovalRequestDateStart');
@@ -164,11 +137,57 @@ function changeDisplay() {
     mypageGrid.setPerPage(gap, mypageDataSource)
 }
 
-let inApprovalStatus = ''
-let filterBtns = document.getElementsByClassName('filter-btn')
-filterBtns = Array.from(filterBtns)
-filterBtns.forEach((btn) => {
-    btn.addEventListener('click', (event) => {
-        inApprovalStatus = event.target.dataset.status
+let typeFilter = document.getElementById("documentType");
+let typeSelected = document.getElementById("documentTypeSelected");
+
+const getMyApprovalType = () => {
+    const url = `/api/mainpage/approval/type`;
+    fetch(url, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+        }
     })
+        .then(data => {
+            return data.json()
+        })
+        .then(data => {
+            const docType = data.map((doc) => {
+                return {
+                    documentType: doc.documentType,
+                    documentId: doc.documentId
+                }
+            })
+
+            docType.forEach(optionText => {
+                const option1 = document.createElement("option");
+                option1.value = optionText.documentType;
+                option1.textContent = optionText.documentType;
+
+                const option2 = document.createElement("option");
+                option2.value = optionText.documentId;
+                option2.textContent = optionText.documentType;
+
+                typeFilter.appendChild(option1);
+                typeSelected.appendChild(option2);
+            });
+        })
+        .catch(error => console.error("Error fetching data:", error));
+}
+
+getMyApprovalType()
+
+let selectedDocType = ''
+typeSelected.addEventListener('change', (e) => {
+    selectedDocType = e.target.value
+});
+
+const requestApproval = document.getElementById('requestApproval')
+requestApproval.addEventListener('click', () => {
+    if(selectedDocType) {
+        window.location = `mypage/approval/${selectedDocType}`
+    } else {
+        showAlert('요청 구분을 선택해주세요.', 'danger')
+    }
 })
+

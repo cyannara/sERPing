@@ -64,7 +64,6 @@ public class StdrRestController {
     Long companyNum = user.getUserDTO().getCompanyNum();
     dto.setCompanyNum(companyNum);
     dto.setDocumentId(documentId);
-    
     return documentService.info(dto);
   }
   

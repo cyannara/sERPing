@@ -52,4 +52,9 @@ public class ApprovalServiceImpl implements ApprovalService{
 	public List<DocumentDTO> documentList(Long companyNum) {
 		return approvalMapper.documentList(companyNum);
 	}
+	
+	@Override
+	public int insert(ApprovalDTO dto) {
+		return approvalMapper.insert(dto);
+	}
 }
