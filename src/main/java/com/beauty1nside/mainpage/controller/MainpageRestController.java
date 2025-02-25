@@ -4,6 +4,8 @@ import com.beauty1nside.common.GridArray;
 import com.beauty1nside.common.Paging;
 import com.beauty1nside.mainpage.dto.ApprovalDTO;
 import com.beauty1nside.mainpage.dto.ApprovalSearchDTO;
+import com.beauty1nside.mainpage.dto.ScheduleDTO;
+import com.beauty1nside.mainpage.service.ScheduleService;
 import com.beauty1nside.stdr.dto.DocumentDTO;
 import com.beauty1nside.mainpage.service.ApprovalService;
 import com.beauty1nside.security.service.CustomerUser;
@@ -27,6 +29,7 @@ import java.util.Map;
 public class MainpageRestController {
   final ApprovalService approvalService;
   final StdrDeptService stdrDeptService;
+  final ScheduleService scheduleService;
   
   @GetMapping("/approval/list")
   public Object approvalList(@RequestParam(name = "perPage", defaultValue = "20", required = false) int perPage,
@@ -104,6 +107,35 @@ public class MainpageRestController {
     
     Map<String, Object> response = new HashMap<>();
     int isSuccess = approvalService.update(dto);
+    response.put("message", isSuccess == 1 ? "success" : "fail");
+    return ResponseEntity.ok(response);
+  }
+  
+  @PostMapping("/schedule")
+  public ResponseEntity<Map<String, Object>> addEvent(@RequestBody ScheduleDTO dto,
+                                                             @AuthenticationPrincipal CustomerUser user) {
+    Long companyNum = user.getUserDTO().getCompanyNum();
+    dto.setCompanyNum(companyNum);
+    
+    Long employeeNum = user.getUserDTO().getEmployeeNum();
+    dto.setEmployeeNum(employeeNum);
+    
+    Map<String, Object> response = new HashMap<>();
+    int isSuccess = scheduleService.insert(dto);
+    response.put("message", isSuccess == 1 ? "success" : "fail");
+    return ResponseEntity.ok(response);
+  }
+  
+  @GetMapping("/schedule")
+  public List<ScheduleDTO> getScheduleList(@AuthenticationPrincipal CustomerUser user) {
+    Long companyNum = user.getUserDTO().getCompanyNum();
+    return scheduleService.scheduleList(companyNum);
+  }
+  
+  @DeleteMapping("/schedule/{scheduleId}")
+  public ResponseEntity<Map<String, Object>> deleteSchedule(@PathVariable(name="scheduleId") Long scheduleId) {
+    Map<String, Object> response = new HashMap<>();
+    int isSuccess = scheduleService.deleteSchedule(scheduleId);
     response.put("message", isSuccess == 1 ? "success" : "fail");
     return ResponseEntity.ok(response);
   }
