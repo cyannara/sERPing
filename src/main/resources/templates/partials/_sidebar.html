@@ -43,12 +43,12 @@
 			</a></li>
 		</ul>
 	</div>
-	<div
-		th:if="${#strings.equals('inventory', param.menu) or #strings.equals('inventory', menu)}">
+	<!-- 재고관리 사이드 바 -->
+	<div th:if="${#strings.equals('inventory', param.menu) or #strings.equals('inventory', menu)}">
 		<ul class="nav">
 			<!-- 상품 메뉴 -->
 			<li class="nav-item"><a class="nav-link"
-				data-bs-toggle="collapse" href="#ui-basic-2" aria-expanded="false"
+				data-bs-toggle="collapse" href="#ui-basic-2"  role="button" aria-expanded="false"
 				aria-controls="ui-basic-2"> <i class="icon-grid menu-icon"></i>
 					<span class="menu-title">상품</span> <i class="menu-arrow"></i>
 			</a>
@@ -66,7 +66,7 @@
 			<!-- 발주계획 메뉴 -->
 			<li class="nav-item">
 			<a class="nav-link"
-				data-bs-toggle="collapse" href="#ui-basic-3" aria-expanded="false"
+				data-bs-toggle="collapse" href="#ui-basic-3"  role="button" aria-expanded="false"
 				aria-controls="ui-basic-3">
 				 <i class="icon-grid menu-icon"></i>
 					<span class="menu-title">발주서</span>
@@ -83,6 +83,8 @@
 			</li>
 		</ul>
 	</div>
+	
+
 	
 	<!-- 인사관리 사이드바 -->
 	<div th:if="${#strings.equals('hr', param.menu) or #strings.equals('hr', menu)}">
