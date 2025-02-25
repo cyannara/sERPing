@@ -259,8 +259,8 @@ public class BsnRestController {
 	@GetMapping("/goods/lot")
 	public Object goodsLot(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
 			@RequestParam(name ="page", defaultValue = "1", required = false) int page,
-			@RequestParam(name = "optionCode", defaultValue = "LH0012") String optionCode,
-			@RequestParam(name = "deliveryDetailId", defaultValue = "8") int deliveryDetailId,
+			@RequestParam(name = "optionCode", required = false) String optionCode,
+			@RequestParam(name = "deliveryDetailId", required = false) int deliveryDetailId,
 			BsnDeliveryDetailDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException  {
 	
 		//한 페이지에 출력할 수 : 기본값: 5

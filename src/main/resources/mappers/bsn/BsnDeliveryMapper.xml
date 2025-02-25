@@ -92,19 +92,33 @@ SELECT delivery_lot_detail_num,
        delivery_detail_id, 
        goods_lot_num, 
        delivery_possible_qnt, 
-       delivery_qnt
+       delivery_qnt,
+       goods_consumption_date
 FROM
 (
 SELECT /*+ INDEX_ASC(bsn_delivery_lot_detail PK_BSN_DELIVERY_LOT_DETAIL) */
        ROWNUM rn,
-       delivery_lot_detail_num, 
-       delivery_detail_id, 
-       goods_lot_num, 
-       delivery_possible_qnt, 
-       delivery_qnt
-FROM bsn_delivery_lot_detail
-WHERE delivery_detail_id = #{deliveryDetailId}
-
+       bdl.delivery_lot_detail_num, 
+       bdl.delivery_detail_id, 
+       bdl.goods_lot_num, 
+       --  여기서 delivery_possible_qnt를 다시 계산
+       TRUNC((pwb.warehousing_remaining_quantity)
+       - COALESCE((
+           SELECT SUM(delivery_qnt) 
+           FROM bsn_delivery_lot_detail bdl2
+           JOIN bsn_delivery_detail bdd2 ON bdl2.delivery_detail_id = bdd2.delivery_detail_id
+           JOIN bsn_delivery bd2 ON bdd2.delivery_id = bd2.delivery_id
+           WHERE bdl2.goods_lot_num = bdl.goods_lot_num
+           AND bd2.delivery_status = 'DS01'
+           <![CDATA[
+           AND bdl2.delivery_detail_id < #{deliveryDetailId}
+       )*6, 0))/ 6 AS delivery_possible_qnt,
+       ]]>
+       bdl.delivery_qnt,
+       pwb.goods_consumption_date
+FROM bsn_delivery_lot_detail bdl
+JOIN purchs_warehousing_body pwb ON bdl.goods_lot_num = pwb.goods_lot_num
+WHERE bdl.delivery_detail_id = #{deliveryDetailId}
 )
 WHERE RN BETWEEN #{start} AND #{end}
 </select>
@@ -143,30 +157,48 @@ WHERE RN BETWEEN #{start} AND #{end}
 <!-- 임시 -->
 <select id="selectGoodsWarehouseLot">
 SELECT ROW_NUMBER() OVER (
-              ORDER BY goods_consumption_date asc
+              ORDER BY pwb.goods_consumption_date ASC
        ) AS RN, 
        pwb.warehousing_body_num,
        pwb.option_num,
        po.option_code,
        pwb.goods_lot_num,
-       TRUNC(pwb.warehousing_remaining_quantity / 6) AS warehousing_remaining_quantity
-      ,pwb.goods_consumption_date
-
+       -- 기존 수량에서 "출고대기" 상태의 LOT 수량 빼기
+       TRUNC(pwb.warehousing_remaining_quantity / 6) - 
+       COALESCE((
+           SELECT SUM(bdl.delivery_qnt) 
+           FROM BSN_DELIVERY_LOT_DETAIL bdl
+           JOIN BSN_DELIVERY_DETAIL bdd ON bdl.delivery_detail_id = bdd.delivery_detail_id
+           JOIN BSN_DELIVERY bd ON bdd.delivery_id = bd.delivery_id
+           WHERE bdl.goods_lot_num = pwb.goods_lot_num
+             -- 출고대기 상태인 것만 합산
+             AND bd.delivery_status = 'DS01'
+       ), 0) AS warehousing_remaining_quantity,
+       pwb.goods_consumption_date
        
-
 FROM purchs_warehousing_body pwb
 LEFT JOIN purchse_option po ON pwb.option_num = po.option_num
 WHERE pwb.company_num = 1
   AND po.option_code = #{optionCode}
---  AND pwb.goods_lot_num IN ('LH0011_2502201437')
+  
+  AND (TRUNC(pwb.warehousing_remaining_quantity / 6) - 
+       COALESCE((
+           SELECT SUM(bdl.delivery_qnt) 
+           FROM BSN_DELIVERY_LOT_DETAIL bdl
+           JOIN BSN_DELIVERY_DETAIL bdd ON bdl.delivery_detail_id = bdd.delivery_detail_id
+           JOIN BSN_DELIVERY bd ON bdd.delivery_id = bd.delivery_id
+           WHERE bdl.goods_lot_num = pwb.goods_lot_num
+             AND bd.delivery_status = 'DS01'
+  <![CDATA[
+       ), 0) > 0) 
+  ]]>
   AND NOT EXISTS (
       SELECT 1 
       FROM BSN_DELIVERY_LOT_DETAIL bdl
       WHERE bdl.goods_lot_num = pwb.goods_lot_num
         AND bdl.delivery_detail_id = #{deliveryDetailId}
-        -- 8
   )
-ORDER by rn
+ORDER BY pwb.goods_consumption_date ASC
 
 </select>
 

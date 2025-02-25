@@ -29,7 +29,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
             	<div class="card">
               		<div class="card-body">
                 		<h4 class="card-title">출고 준비중인 주문 목록</h4>
-                		<p class="card-description">그리드 - 검색한 주문 리스트 출력</p>
+                		<p class="card-description">출고 처리할 주문 선택</p>
                 		<div id="orderList"></div>
                		 	<div id="pagination" class="tui-pagination"></div>
               		</div>
@@ -43,8 +43,8 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
           	<div class="col-md-6  grid-margin stretch-card">
             	<div class="card">
               		<div class="card-body">
-                		<h4 class="card-title">주문 상세 </h4>
-                		<p class="card-description">그리드 - 검색한 주문 리스트 출력</p>
+                		<h4 class="card-title">주문 상세</h4>
+                		<p class="card-description">출고 하기전에 본사 창고에서 해당 상품을 LOT별로 매칭하여 연결</p>
                 		<div id="deliDetail"></div>
                		 	<div id="pagination" class="tui-pagination"></div>
                		 	
@@ -55,8 +55,8 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
           	<div class="col-md-6 grid-margin stretch-card">
 			    <div class="card">
 			        <div class="card-body">
-			        	<h4 class="card-title">LOT별 정보</h4>
-			            <p class="card-description">그리드 - 검색한 주문 리스트 출력</p>
+			        	<h4 class="card-title">출고할 상품 LOT 정보</h4>
+			            <p class="card-description">LOT연결을 추가하거나 수정, 삭제를 할 수 있다. </p>
 			         	<div class="d-flex justify-content-end gap-3 mt-3">
 			                <button type="button" class="btn btn-primary px-4" id="registerButton">추가</button>
 			                <button type="button" class="btn btn-danger px-4" id="deleteButton">삭제</button>
@@ -294,10 +294,9 @@ rowHeaders: ['rowNum',
 	'checkbox'],
 columns: [
 	
-    { header: "예약번호", name: "deliveryLotDetailNum", 
-    //	width: 'auto' ,	
-    },
+    
     { header: "LOT번호", name: "goodsLotNum", },
+    { header: "유통기한", name: "goodsConsumptionDate", formatter: ({ value }) => formatDate(value, 'order'), width: 'auto', sortable : true},
     { header: "출고가능수량", name: "deliveryPossibleQnt",  },
     { header: "출고예약수량", name: "deliveryQnt",  },
     { header : "수량수정", name : "detail", formatter : () => '<button class="btn btn-warning btn-sm btnInfo" data-bs-toggle="modal" data-bs-target="#assetdetailModal">수량수정</button>', align: 'center'},
@@ -341,11 +340,55 @@ document.querySelectorAll('.modal-footer #btn-register').forEach(button => {
         if (selectedRow && selectedRow.optionCode) {
             // 현재 show 클래스가 있는 모달 찾기
             const activeModal = document.querySelector('.modal.show');
-            
+			
             if (activeModal) {
                 if (activeModal.id === 'registerModal') {
-                    // 주문 등록 처리
+                	
+                	
+                    // 주문 등록 처리///////////////
+                    
+                    registerGrid.finishEditing();
+                 // 출고 수량 합계 초기화
+                    let qntSum = 0; 
+                 
+                 // 모든 행 데이터 가져오기(LOT상세의 수량들 합)
+                    const allData = deliveryLotDetailGrid.getData(); 
+                    let totalSum = allData.reduce((sum, row) => sum + Number(row.deliveryQnt || 0), 0);
+                    
+                    const selectedRows = registerGrid.getCheckedRows(); // 선택된 행 가져오기(모달창에서 체크한 것만)
+                    
+				    const requestData = selectedRows.map(row => ({
+				    	goodsLotNum: row.goodsLotNum,
+				        deliveryQnt: Number(row.deliveryQnt),
+				        warehousingRemainingQuantity: Number(row.warehousingRemainingQuantity)
+				    }));
+				 // 유효성 검사 (출고 수량이 출고 가능 수량보다 많지 않게)
+				    for (let item of requestData) {
+				        if (item.deliveryQnt > item.warehousingRemainingQuantity) {
+				            showAlert('출고 수량이 가능 수량을 초과할 수 없습니다.', 'danger');
+				            return;
+				        } 
+				        
+				        qntSum += item.deliveryQnt; // 숫자로 변환한 후 더하기
 
+				        if (selectedRow.deliveryDemandQnt <totalSum + qntSum) { 
+				            showAlert('연결된 출고 수량들의 합이 요구 수량을 초과할 수 없습니다.', 'danger');
+				            return;
+				        }
+				        
+				        
+				    }
+				 	//console.log(selectedRow.deliveryDemandQnt);
+					//console.log(requestData);
+					//console.log(totalSum);
+					let dlvyDTO = {
+						deliveryDetailId: selectedRow.deliveryDetailId,
+						optionCode: selectedRow.optionCode,
+				        lotDetails: requestData
+				    };
+					console.log(dlvyDTO);
+
+					/////////////////////////
                     registerModal.hide();
                     registerGrid.reloadData();
                 } else if (activeModal.id === 'deleteModal') {

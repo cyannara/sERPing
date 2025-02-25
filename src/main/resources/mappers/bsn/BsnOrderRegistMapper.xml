@@ -127,6 +127,7 @@ call insert_Bsn_Order(
               #{dueDate}, 
               #{employeeNum}, 
               #{companyNum}, 
+              #{remark},
               #{orderDetails, typeHandler=com.beauty1nside.bsn.OrdDtlArrayTypeHandler}
 ) 
 </insert>

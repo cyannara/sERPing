@@ -16,7 +16,8 @@ SELECT
        due_date,
        order_status,
        employee_num,
-       company_num
+       company_num,
+       remark
 FROM
 (SELECT 
        ROW_NUMBER() OVER (
@@ -33,7 +34,8 @@ FROM
        due_date,
        order_status,
        employee_num,
-       company_num
+       company_num,
+       remark
 FROM bsn_order
 WHERE company_num = 1
 <include refid="searchInfoBsnOrder"></include>
