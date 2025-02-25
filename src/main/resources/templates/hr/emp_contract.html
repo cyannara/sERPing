@@ -181,58 +181,67 @@
 </script>
 
 <script>
+
+const header = document.querySelector('meta[name="_csrf_header"]').content;
+const token = document.querySelector('meta[name="_csrf"]').content;
+
 document.addEventListener("DOMContentLoaded", function() {
 	
     // ✅ 테스트용 변수 설정
     let testContractData = {
-        employeeNum: "49",
-        companyNum: "1",
-        departmentNum: "101",  // ✅ 부서 번호 추가 (예시: IT 부서)
-        position: "PO001",      // ✅ 직급 추가 (예시: 주임)
-        contractType: "ET002",
-        contractStartDate: "2025-02-25",
-        contractEndDate: "2025-02-26",
-        workLocation: "본사 - IT팀",
-        jobDescription: "백엔드 개발 업무 수행",
-        workStartTime: "09:00",
-        workEndTime: "18:00",
-        breakStartTime: "15:46",
-        breakEndTime: "15:47",
-        annualSalary: "40000000",
-        bonus: "0",
-        additionalPay: "0",
-        salaryPaymentDate: "25",
-        paymentMethod: "BANK"
+    	    employeeNum: 49, // 숫자로 유지
+    	    companyNum: 1, // 숫자로 유지
+    	    departmentNum: 101,  // 숫자로 유지
+    	    position: "PO001",
+    	    contractType: "ET002",
+    	    contractStartDate: "2025-02-25",
+    	    contractEndDate: "2025-02-26",
+    	    workLocation: "본사 - IT팀",
+    	    jobDescription: "백엔드 개발 업무 수행",
+    	    workStartTime: "09:00",
+    	    workEndTime: "18:00",
+    	    breakStartTime: "15:46",
+    	    breakEndTime: "15:47",
+    	    annualSalary: 40000000, // 숫자로 유지
+    	    bonus: 0, // 숫자로 유지
+    	    additionalPay: 0, // 숫자로 유지
+    	    salaryPaymentDate: 25, // 숫자로 유지
+    	    paymentMethod: "BANK"
     };
 
     // ✅ 테스트 버튼 추가
     let testButton = document.createElement("button");
     testButton.textContent = "📋 테스트 계약 등록";
     testButton.className = "btn btn-warning w-100 mt-3";
-    testButton.onclick = function() {
+    testButton.onclick = function () {
         console.log("📋 테스트 데이터 전송:", testContractData);
 
         fetch("/hr/rest/contract/register", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "X-CSRF-Token": token
             },
             body: JSON.stringify(testContractData)
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert("✅ 테스트 계약 등록 성공!");
-                window.location.reload();
-            } else {
-                alert("❌ 테스트 계약 등록 실패: " + data.message);
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    throw new Error("❌ 서버 응답 오류: " + text);
+                });
             }
+            return response.json();
+        })
+        .then(data => {
+            alert("✅ 테스트 계약 등록 성공!");
+            window.location.reload();
         })
         .catch(error => {
             console.error("❌ 테스트 계약 등록 오류:", error);
-            alert("서버 오류로 인해 테스트 계약을 등록할 수 없습니다.");
+            alert("서버 오류: " + error.message);
         });
     };
+
 
     // 버튼을 폼 아래 추가
     document.getElementById("contractForm").appendChild(testButton);
@@ -374,10 +383,12 @@ function submitContract() {
     }
 
     // ✅ AJAX 요청 (근로계약 + 급여 등록 API 호출)
-    fetch(`http://localhost:81/hr/rest/contract/register`, {
+/*     fetch("hr/rest/contract/register", {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            'header': header,
+            "Content-Type": "application/json",
+            'X-CSRF-Token': token
         },
         body: JSON.stringify(contractData)
     })
@@ -393,7 +404,7 @@ function submitContract() {
     .catch(error => {
         console.error("❌ 계약 등록 오류:", error);
         alert("서버 오류로 인해 계약을 등록할 수 없습니다.");
-    });
+    }); */
 }
 
 </script>

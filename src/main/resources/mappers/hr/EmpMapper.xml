@@ -429,7 +429,7 @@
 </select>
 
 
-<insert id="insertContract" parameterType="com.beauty1nside.hr.dto.EmpContractDTO" useGeneratedKeys="true" keyProperty="contractNum">
+<insert id="insertContract" parameterType="EmpContractDTO">
     INSERT INTO HR_EMPLOYEE_CONTRACT (
         CONTRACT_NUM, EMPLOYEE_NUM, COMPANY_NUM, DEPARTMENT_NUM, POSITION, CONTRACT_TYPE,
         CONTRACT_START_DATE, CONTRACT_END_DATE, WORK_LOCATION, JOB_DESCRIPTION, 
@@ -439,13 +439,20 @@
     ) VALUES (
         HR_EMPLOYEE_CONTRACT_SEQ.NEXTVAL, 
         #{employeeNum}, #{companyNum}, #{departmentNum}, #{position}, #{contractType},
-        #{contractStartDate}, #{contractEndDate}, #{workLocation}, #{jobDescription}, 
+        #{contractStartDate, jdbcType=TIMESTAMP}, #{contractEndDate, jdbcType=TIMESTAMP}, #{workLocation}, #{jobDescription},
         #{workStartTime}, #{workEndTime}, #{breakStartTime}, #{breakEndTime},
         #{probationPeriod}, 'CS001', SYSDATE, SYSDATE,
         #{annualSalary}, #{bonus}, #{additionalPay}
     )
-    RETURNING CONTRACT_NUM INTO #{contractNum} 
 </insert>
+
+<select id="getLastInsertedContractNum" resultType="java.lang.Long">
+    SELECT CONTRACT_NUM FROM HR_EMPLOYEE_CONTRACT 
+    WHERE EMPLOYEE_NUM = #{employeeNum}
+    ORDER BY REGISTER_DATE DESC
+    FETCH FIRST 1 ROWS ONLY
+</select>
+
 
 <insert id="insertSalary" parameterType="com.beauty1nside.hr.dto.SalaryDTO">
     INSERT INTO HR_SALARY (

@@ -7,6 +7,7 @@ import org.apache.ibatis.type.Alias;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -15,6 +16,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@Builder
 @Alias("SalaryDTO")  // MyBatis 별칭
 public class SalaryDTO {
     
@@ -31,8 +33,7 @@ public class SalaryDTO {
     private Double deduction; // 공제액 (세금 + 보험료)
     private Double netSalary; // 실수령액 (월급 - 공제액)
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date salaryPaymentDate; // 급여 지급일
+    private Integer salaryPaymentDate; // 급여 지급일
     
     private String paymentMethod; // 지급 방식 (BANK or CASH)
     
@@ -44,4 +45,5 @@ public class SalaryDTO {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateDate; // 수정일
+    
 }

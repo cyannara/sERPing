@@ -7,6 +7,7 @@ import org.apache.ibatis.type.Alias;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -15,6 +16,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@Builder
 @Alias("EmpContractDTO")  // MyBatis 별칭
 public class EmpContractDTO {
     
@@ -53,4 +55,7 @@ public class EmpContractDTO {
     private Double annualSalary;  // 연봉
     private Double bonus; // 상여금
     private Double additionalPay; // 추가 수당
+    
+    private Integer salaryPaymentDate;  // ✅ 급여 지급일 (1~31)
+    private String paymentMethod;  // ✅ 급여 지급 방식 (BANK / CASH)
 }
