@@ -101,6 +101,9 @@
 	
 	<script>
 		var Grid = tui.Grid;
+		
+		const header = document.querySelector('meta[name="_csrf_header"]').content; //서버에서 요구하는 CSRF 헤더이름
+	    const token = document.querySelector('meta[name="_csrf"]').content; //서버에서 생성한 CSRF 토큰 값
 	
 		const grid = new Grid({
 			el: document.getElementById('salesNum'), 
@@ -200,25 +203,55 @@
 		});
 		
 		function sendToServer() {
+			
+			let closingDate = document.getElementById('closingDate').value;
+			
+			if(!closingDate){
+				 alert("마감일자를 선택해주세요.");
+			     return;
+			}
+			
 		    const requestData = {
+		    	branchOfficeId: document.getElementById("branchOfficeId").value,
+		    	closingDate: document.getElementById("closingDate").value,
 		        businessReserves: document.getElementById("businessReserves").value,
 		        cashAmount: document.getElementById("cashAmount").value,
 		        cashPresent: document.getElementById("cashPresent").value,
 		        cardAmount: document.getElementById("cardAmount").value,
 		        saleAmount: document.getElementById("saleAmount").value,
 		        transferAmount: document.getElementById("transferAmount").value,
-		        sales: grid.getData()  // Grid 데이터 포함
+		        companyNum: 1,
+		        files: grid.getData()  // Grid 데이터 포함
 		    };
 
-		    fetch("/api/excel/upload", {
+		    fetch("http://localhost:81/bhf/rest/close/insert", {
 		        method: "POST",
-		        headers: { "Content-Type": "application/json" },
+		        headers: { 
+		        	"Content-Type": "application/json" ,
+		        	//위에 변수로 저장한 헤더이름,토큰값 넣어주기
+		        	'header': header, 
+		            'X-CSRF-Token': token
+		        },
 		        body: JSON.stringify(requestData)
 		    })
 		    .then(response => response.json())
 		    .then(data => {
-		        alert("업로드 성공!");
-		        console.log("서버 응답: ", data);
+		    	if (data.status === "success") {
+		            alert("마감 정산 등록 성공");
+		         	// 등록 후 초기화
+		         	document.getElementById('branchOfficeId').value = "";
+					document.getElementById('closingDate').value = "";
+					document.getElementById("businessReserves").value = ""
+			        document.getElementById("cashAmount").value = ""
+			        document.getElementById("cashPresent").value = ""
+			        document.getElementById("cardAmount").value = ""
+			        document.getElementById("saleAmount").value = ""
+			        document.getElementById("transferAmount").value = ""
+		            grid.resetData([]); 
+		           
+		        } else {
+		            alert("마감 정산 등록 실패: " + data.message);
+		        }
 		    })
 		    .catch(error => console.error("업로드 실패", error));
 		}
