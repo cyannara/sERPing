@@ -155,7 +155,7 @@
 	                   fn_get_cmmn_name(e.position) AS position, 
 	                   d.department_name AS departmentName,
 	                   e.department_num AS departmentNum,
-	                   COUNT(*) OVER() AS totalEmployeeCount  -- ✅ 전체 직원 수 추가
+	                   COUNT(*) OVER() AS totalEmployeeCount
 	            FROM hr_employee e
 	            JOIN hr_department d ON e.department_num = d.department_num
 	            <where>
@@ -175,13 +175,13 @@
 	                    )
 	                </if>
 	            </where>
-	            ORDER BY e.employee_num DESC  -- ✅ ORDER BY는 ROWNUM 필터링 전에 위치해야 함
+	            ORDER BY e.employee_num DESC 
 	        ) a 
 	        <![CDATA[
 	        WHERE ROWNUM <= #{end}
 	        ]]>
 	    ) 
-	    WHERE rn >= #{start}  -- ✅ 최종적으로 시작 번호 필터링
+	    WHERE rn >= #{start}
 	</select>
 
 
@@ -379,6 +379,87 @@
 	    )
 	    WHERE rn >= #{start}
 	</select>
+	
+	
+<!-- ✅ 특정 회사의 사원 개수 조회 -->
+<select id="countEmployeesByCompany" parameterType="com.beauty1nside.hr.dto.EmpSearchDTO" resultType="int">
+    SELECT COUNT(*) FROM hr_employee e
+    LEFT JOIN hr_department d ON e.department_num = d.department_num
+    WHERE e.company_num = #{companyNum}
+    <include refid="searchInfo"/> <!-- ✅ 검색 필터 추가 -->
+</select>
+
+<!-- ✅ 특정 회사의 사원 목록 (검색 + 페이징 적용) -->
+<select id="getEmployeesByCompanyWithSearch" parameterType="com.beauty1nside.hr.dto.EmpSearchDTO" resultType="com.beauty1nside.hr.dto.EmpDTO">
+    SELECT * FROM (
+        SELECT ROWNUM rn, employeeNum, employeeId, employeeName, email, phone, hireDate, position, positionCode, status, 
+               employmentType, employmentTypeCode, departmentNum, departmentName, parentDepartmentNum, parentDepartmentName, 
+               companyNum, companyName
+        FROM (
+            SELECT
+                e.employee_num AS employeeNum,
+                e.employee_id AS employeeId,
+                e.employee_name AS employeeName,
+                e.email AS email,
+                e.phone AS phone,
+                e.hire_date AS hireDate,
+                fn_get_cmmn_name(e.position) AS position,
+                e.position AS positionCode,
+                fn_get_cmmn_name(e.status) AS status,
+                fn_get_cmmn_name(e.employment_type) AS employmentType,  -- ✅ 근무 유형 (공통 코드에서 이름 가져오기)
+                e.employment_type AS employmentTypeCode,  -- ✅ 근무 유형 코드 추가
+                d.department_num AS departmentNum,
+                COALESCE(d.department_name, '부서 없음') AS departmentName,
+                d.parent_department_num AS parentDepartmentNum,
+                p.department_name AS parentDepartmentName,
+                c.company_num AS companyNum,
+                c.company_name AS companyName
+            FROM hr_employee e
+            LEFT JOIN hr_department d ON e.department_num = d.department_num  
+            LEFT JOIN hr_department p ON d.parent_department_num = p.department_num
+            LEFT JOIN erp_company c ON e.company_num = c.company_num  
+            WHERE e.company_num = #{companyNum}
+            <include refid="searchInfo"/> 
+            ORDER BY e.employee_num DESC
+        ) 
+         <![CDATA[
+        WHERE ROWNUM <= #{end}
+         ]]>
+    ) WHERE rn >= #{start}
+</select>
+
+
+<insert id="insertContract" parameterType="com.beauty1nside.hr.dto.EmpContractDTO" useGeneratedKeys="true" keyProperty="contractNum">
+    INSERT INTO HR_EMPLOYEE_CONTRACT (
+        CONTRACT_NUM, EMPLOYEE_NUM, COMPANY_NUM, DEPARTMENT_NUM, POSITION, CONTRACT_TYPE,
+        CONTRACT_START_DATE, CONTRACT_END_DATE, WORK_LOCATION, JOB_DESCRIPTION, 
+        WORK_START_TIME, WORK_END_TIME, BREAK_START_TIME, BREAK_END_TIME,
+        PROBATION_PERIOD, CONTRACT_STATUS, REGISTER_DATE, UPDATE_DATE, 
+        ANNUAL_SALARY, BONUS, ADDITIONAL_PAY
+    ) VALUES (
+        HR_EMPLOYEE_CONTRACT_SEQ.NEXTVAL, 
+        #{employeeNum}, #{companyNum}, #{departmentNum}, #{position}, #{contractType},
+        #{contractStartDate}, #{contractEndDate}, #{workLocation}, #{jobDescription}, 
+        #{workStartTime}, #{workEndTime}, #{breakStartTime}, #{breakEndTime},
+        #{probationPeriod}, 'CS001', SYSDATE, SYSDATE,
+        #{annualSalary}, #{bonus}, #{additionalPay}
+    )
+    RETURNING CONTRACT_NUM INTO #{contractNum} 
+</insert>
+
+<insert id="insertSalary" parameterType="com.beauty1nside.hr.dto.SalaryDTO">
+    INSERT INTO HR_SALARY (
+        SALARY_NUM, EMPLOYEE_NUM, CONTRACT_NUM, COMPANY_NUM, MONTHLY_SALARY, 
+        BONUS, ADDITIONAL_PAY, OVERTIME_PAY, DEDUCTION, NET_SALARY, 
+        SALARY_PAYMENT_DATE, PAYMENT_METHOD, PAYMENT_DATE, REGISTER_DATE, UPDATE_DATE
+    ) VALUES (
+        HR_SALARY_SEQ.NEXTVAL,
+        #{employeeNum}, #{contractNum}, #{companyNum}, #{monthlySalary}, 
+        #{bonus}, #{additionalPay}, 0, 0, #{netSalary},
+        #{salaryPaymentDate}, #{paymentMethod}, SYSDATE, SYSDATE, SYSDATE
+    )
+</insert>
+
 
 
 </mapper>
