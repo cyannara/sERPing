@@ -432,67 +432,47 @@ ORDER BY result_date desc,
 
 -- À¯´Ï¿ÂÀ¸·Î µÎ Å×ÀÌºí ÇÕÄ¥°Å
 
-;
-
-
-SELECT a.result_date,
-       a.office_id, 
-       a.option_code, 
-       a.option_name, 
-       a.qy
+SELECT TO_CHAR(c.result_date, 'YYYY-MM') as result_date,
+       c.office_id,
+       c.option_code,
+       c.option_name,
+       SUM(c.qy)
 FROM (SELECT br.request_date AS result_date, 
              br.branch_office_id AS office_id,
              brd.option_code,
              brd.goods_name || '-' || brd.option_name AS option_name,
-             brd.quantity AS qy
+             0 - NVL(brd.quantity, 0) AS qy
       FROM bhf_returning br JOIN bhf_returning_detail brd
              ON (br.returning_code = brd.returning_code)
-      WHERE brd.returning_reason IN ('ÆÄ¼Õ', 'Âî±×·¯Áü') ) AS a
-
+      WHERE brd.returning_reason IN ('ÆÄ¼Õ', 'Âî±×·¯Áü')
 UNION ALL
-
-SELECT b.result_date
-       b.office_id,
-       b.option_code,
-       b.option_name,
-       b.qy
-FROM (SELECT mediation_date AS result_date, 
+      SELECT mediation_date AS result_date, 
             branch_office_id AS office_id, 
             option_code, 
             goods_name || '-' || option_name AS option_name, 
             NVL(quantity, 0) - NVL(mediation_quantity, 0) AS qy
-      FROM bhf_goods_mediation) AS b
+      FROM bhf_goods_mediation ) c
+GROUP BY TO_CHAR(result_date, 'YYYY-MM'),
+         office_id, 
+         option_code, 
+         option_name
+--HAVING option_code = 'LH0011'
+ORDER BY result_date desc, 
+         office_id, 
+         option_code 
 ;
-      
 
 
--- ½ÇÇà µÇ´Â°Í 
-      
-SELECT a.result_date,
-       a.office_id, 
-       a.option_code, 
-       a.option_name, 
-       a.qy
-FROM (SELECT br.request_date AS result_date, 
-             br.branch_office_id AS office_id,
-             brd.option_code,
-             brd.goods_name || '-' || brd.option_name AS option_name,
-             brd.quantity AS qy
-      FROM bhf_returning br
-      JOIN bhf_returning_detail brd
-        ON (br.returning_code = brd.returning_code)
-      WHERE brd.returning_reason IN ('ÆÄ¼Õ', 'Âî±×·¯Áü')) a
+create or replace FUNCTION fn_get_goods_code(p_option_code number)
+    RETURN number
+IS
+    v_result number;
+BEGIN
+    SELECT pg.goods_num
+    INTO v_result
+    FROM purchse_goods pg JOIN purchse_option po
+    ON (pg.goods_num = po.goods_num)
+    WHERE option_num = p_option_code;
 
-UNION ALL
-
-SELECT b.result_date,
-       b.office_id,
-       b.option_code,
-       b.option_name,
-       b.qy
-FROM (SELECT mediation_date AS result_date, 
-             branch_office_id AS office_id, 
-             option_code, 
-             goods_name || '-' || option_name AS option_name, 
-             NVL(quantity, 0) - NVL(mediation_quantity, 0) AS qy
-      FROM bhf_goods_mediation) b;
+    RETURN v_result;
+END;
