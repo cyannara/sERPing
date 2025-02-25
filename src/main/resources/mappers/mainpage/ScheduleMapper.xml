@@ -50,4 +50,19 @@
             #{location}
         )
     </insert>
+
+    <update id="updateSchedule" parameterType="com.beauty1nside.mainpage.dto.ScheduleDTO">
+        update GRPWR_SCHEDULE
+        set SCHEDULE_TYPE = #{scheduleType},
+            SCHEDULE_CONTENT = #{scheduleContent},
+            SCHEDULE_START = #{scheduleStart},
+            SCHEDULE_END = #{scheduleEnd},
+            EMPLOYEE_NUM = #{employeeNum},
+            COMPANY_NUM = #{companyNum},
+            DEPT_NO = #{deptNo},
+            IS_ALLDAY = #{isAllday},
+            IS_PRIVATE = #{isPrivate},
+            LOCATION = #{location}
+        where schedule_id = #{scheduleId}
+    </update>
 </mapper>

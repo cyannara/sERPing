@@ -126,6 +126,24 @@ public class MainpageRestController {
     return ResponseEntity.ok(response);
   }
   
+  @PutMapping("/schedule/{scheduleId}")
+  public ResponseEntity<Map<String, Object>> updateSchedule(@RequestBody ScheduleDTO dto,
+                                                            @PathVariable(name="scheduleId") Long scheduleId,
+                                                            @AuthenticationPrincipal CustomerUser user) {
+    Long companyNum = user.getUserDTO().getCompanyNum();
+    dto.setCompanyNum(companyNum);
+    
+    Long employeeNum = user.getUserDTO().getEmployeeNum();
+    dto.setEmployeeNum(employeeNum);
+    
+    dto.setScheduleId(scheduleId);
+    
+    Map<String, Object> response = new HashMap<>();
+    int isSuccess = scheduleService.updateSchedule(dto);
+    response.put("message", isSuccess == 1 ? "success" : "fail");
+    return ResponseEntity.ok(response);
+  }
+  
   @GetMapping("/schedule")
   public List<ScheduleDTO> getScheduleList(@AuthenticationPrincipal CustomerUser user) {
     Long companyNum = user.getUserDTO().getCompanyNum();

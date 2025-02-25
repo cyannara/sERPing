@@ -26,6 +26,11 @@ public class ScheduleServiceImpl implements ScheduleService {
   }
   
   @Override
+  public int updateSchedule(ScheduleDTO dto) {
+    return scheduleMapper.updateSchedule(dto);
+  }
+  
+  @Override
   public List<ScheduleDTO> scheduleList(Long companyNum) {
     return scheduleMapper.scheduleList(companyNum);
   }

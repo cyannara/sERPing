@@ -99,7 +99,7 @@ fetch(deptListUrl, {
                 return '<div style="background-color: #4B49AC;width: 100px;height: 40px;border-radius: 80px;position: absolute;bottom: 19px;right: 16px;display: flex;justify-content: center;align-items: center;font-size: 14px;">추가</div>';
             },
             popupUpdate() {
-                return '변경';
+                return '<div style="background-color: #4B49AC;width: 100px;height: 40px;border-radius: 80px;position: absolute;bottom: 19px;right: 16px;display: flex;justify-content: center;align-items: center;font-size: 14px;">변경</div>';
             },
             popupEdit() {
                 return '변경';
@@ -150,10 +150,50 @@ fetch(deptListUrl, {
     calendar.on('beforeDeleteEvent', (eventObj) => {
         deleteSchedule(calendar, eventObj)
     });
+
+    calendar.on('beforeUpdateEvent', ({event, changes}) => {
+        updateSchedule(calendar, event, changes)
+    });
 })
 
+const updateSchedule = (calendar, event, changes) => {
+    let updatedEvent = {
+        ...event,
+        ...changes
+    }
+    let updatedSchedule = {
+        deptNo: updatedEvent.calendarId,
+        scheduleEnd: updatedEvent.end.d.d,
+        scheduleStart: updatedEvent.start.d.d,
+        scheduleType: updatedEvent.calendarId ? 'DEPT' : 'PERSONAL',
+        scheduleContent: updatedEvent.title,
+        isAllday: updatedEvent.isAllday ? 'Y' : 'N',
+        isPrivate: updatedEvent.isPrivate ? 'Y' : 'N',
+        location: updatedEvent.location
+    }
+    const url = `api/mainpage/schedule/${updatedEvent.id}`
+    fetch(url, {
+        method: 'put',
+        headers: {
+            'header': header_csrf,
+            "Content-Type": "application/json",
+            'X-CSRF-Token': token_csrf
+        },
+        body: JSON.stringify(updatedSchedule)
+    }).then((result) => {
+        return result.json()
+    }).then((data) => {
+        if(data.message === 'success') {
+            calendar.updateEvent(event.id, event.calendarId, changes);
+            showAlert('일정이 수정되었습니다.', 'success')
+        } else {
+            showAlert('일정 수정 실패', 'danger')
+        }
+    })
+}
+
+
 const deleteSchedule = (calendar, eventObj) => {
-    console.log(eventObj)
     const url = `api/mainpage/schedule/${eventObj.id}`
     fetch(url, {
         method: 'delete',
@@ -180,10 +220,10 @@ const addSchedule = (calendar, eventObj) => {
         deptNo: eventObj.calendarId,
         scheduleEnd: eventObj.end.d.d,
         scheduleStart: eventObj.start.d.d,
-        scheduleType: eventObj.name === '개인' ? 'PERSONAL' : 'DEPT',
+        scheduleType: eventObj.calendarId ? 'DEPT' : 'PERSONAL',
         scheduleContent: eventObj.title,
         isAllday: eventObj.isAllday ? 'Y' : 'N',
-        isPrivate: eventObj.isAllday ? 'Y' : 'N',
+        isPrivate: eventObj.isPrivate ? 'Y' : 'N',
         location: eventObj.location
     }
     const url = 'api/mainpage/schedule'
