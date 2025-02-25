@@ -125,7 +125,7 @@ function initPurchaseGrid() {
 	// ✅ 수량 또는 단가 변경 시 공급가격 자동 계산
 	    purchaseGrid.on("afterChange", function (ev) {
 	        ev.changes.forEach(change => {
-	            if (change.columnName === "puchaseQuantity" || change.columnName === "puchaseUnitPrice") {
+	            if (change.columnName === "purchaseQuantity" || change.columnName === "purchaseUnitPrice") {
             let formattedValue = formatNumberWithCommas(change.value);
             purchaseGrid.setValue(change.rowKey, change.columnName, formattedValue);
             calculateSupplyPrice(change.rowKey);
@@ -282,8 +282,8 @@ function setupModalCloseEvent() {
 
 //수량과 단가 변경 시 공급가격 자동 계산
 function calculateSupplyPrice(rowKey) {
-    let quantity = purchaseGrid.getValue(rowKey, "puchaseQuantity") || "0";
-    let unitPrice = purchaseGrid.getValue(rowKey, "puchaseUnitPrice") || "0";
+    let quantity = purchaseGrid.getValue(rowKey, "purchaseQuantity") || "0";
+    let unitPrice = purchaseGrid.getValue(rowKey, "purchaseUnitPrice") || "0";
 
     // ✅ 문자열에 포함된 콤마(,) 제거 후 숫자로 변환
     quantity = parseFloat(quantity.toString().replace(/,/g, '')) || 0;
@@ -312,7 +312,7 @@ function updateVat() {
         let vat = applyVat ? supplyPrice * 0.1 : 0; // ✅ 부가세 계산
 
         // ✅ 부가세 업데이트 (화면에 표시할 때 `,` 추가)
-        purchaseGrid.setValue(rowIndex, "puchaseVat", formatNumberWithCommas(vat.toFixed(2)));
+        purchaseGrid.setValue(rowIndex, "purchaseVat", formatNumberWithCommas(vat.toFixed(2)));
     });
 
     console.log("✅ 부가세 적용 여부:", applyVat ? "적용됨" : "미적용");
