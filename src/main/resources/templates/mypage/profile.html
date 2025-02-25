@@ -78,8 +78,14 @@
               </div>
     </form>
     <div>
-        <div class="profile-img">🛠</div>
-        <button class="mt-4">프로필 사진 변경</button>
+        <div class="profile-img">
+            <img src="/" id="profileImg" />
+        </div>
+        <div class="file-upload">
+            <input type="file" id="imgUpdate" />
+            <label for="imgUpdate"><i class="mdi mdi-upload"></i></label>
+            <button id="imgUpdateBtn">프로필 사진 변경</button>
+        </div>
     </div>
 </div>
 <script src="/js/mypage/profile.js"></script>

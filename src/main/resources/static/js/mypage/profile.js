@@ -15,6 +15,44 @@ let position = document.getElementById('position')
 let salary = document.getElementById('salary')
 let bankName = document.getElementById('bankName')
 let accountNum = document.getElementById('accountNum')
+let imgUpdateBtn = document.getElementById('imgUpdateBtn')
+let profileImg = document.getElementById('profileImg')
+let imgUpdate = document.getElementById('imgUpdate')
+const profileImgContainer = document.querySelector(".profile-img");
+
+document.addEventListener("DOMContentLoaded", function () {
+    const fileInput = document.getElementById("imgUpdate");
+
+    fileInput.addEventListener("change", function (event) {
+        const file = event.target.files[0];
+
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                profileImg.src = e.target.result;
+            };
+
+            reader.readAsDataURL(file); // 파일을 읽어 base64 URL로 변환
+        }
+    });
+});
+
+
+
+imgUpdateBtn.addEventListener('click', () => {
+    const url = '/api/mypage/profile-img'
+    // fetch(url, {
+    //     method: 'post',
+    //     headers: {
+    //         headers: {
+    //             'header': header_csrf,
+    //             "Content-Type": "application/json",
+    //             'X-CSRF-Token': token_csrf
+    //         },
+    //     }
+    // })
+})
 
 const setInfo = (data) => {
     if(data.employmentType === 'ET001') {
@@ -39,6 +77,9 @@ const setInfo = (data) => {
     bankName.value = data.bankName
     accountNum.value = data.accountNum
 
+    if(!data.profileImage) {
+        profileImg.src = '/file/image/mypage/profile/noProfileImg.jpg'
+    }
 
 }
 
