@@ -81,7 +81,7 @@
         </a>
         <div class="dropdown-menu dropdown-menu-right navbar-dropdown" style="padding-top: 20px" aria-labelledby="profileDropdown">
           <span th:inline="text" sec:authentication="name" class="empId"></span>
-          <a class="dropdown-item mymenu mypage" data="mypage" th:href="@{/mypage(menu='mypage')}">
+          <a class="dropdown-item mymenu mypage" data="mypage" th:href="@{/mypage/profile(menu='mypage')}">
             <i class="mdi mdi-account-circle"></i>
             마이페이지
           </a>

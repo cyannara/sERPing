@@ -1,5 +1,4 @@
-<nav th:fragment="sidebar" class="sidebar sidebar-offcanvas"
-	id="sidebar">
+<nav th:fragment="sidebar" class="sidebar sidebar-offcanvas" id="sidebar">
 	<!--==[[${param.menu}]]==-->
 	<div
 		th:if="${#strings.equals('standard', param.menu) or #strings.equals('standard', menu)}">
@@ -116,7 +115,7 @@
 	</div>
 	
 	<div th:if="${#strings.equals('branch', param.menu) or #strings.equals('branch', menu)}">
-    <ul class="nav">
+    	<ul class="nav">
         <li class="nav-item">
           <a class="nav-link" th:href="@{/bhf/order(menu='branch')}">
             <i class="icon-grid menu-icon"></i>
@@ -160,12 +159,24 @@
           </a>
         </li>
       </ul>
-  </div>
+	</div>
 	<div
 		th:if="${#strings.equals('account', param.menu) or #strings.equals('account', menu)}">
 		<span class="menu-title">account</span>
 	</div>
 
+	<div th:if="${#strings.equals('mypage', param.menu) or #strings.equals('mypage', menu)}">
+		<ul class="nav">
+			<li class="nav-item"><a class="nav-link" th:href="@{/mypage/profile(menu='mypage')}">
+				<i class="icon-grid menu-icon"></i><span class="menu-title">기본정보</span></a>
+			</li>
+			<li class="nav-item"><a class="nav-link" th:href="@{/mypage/approval(menu='mypage')}">
+				<i class="icon-grid menu-icon"></i> <span class="menu-title">전자 결재</span></a>
+			</li>
+		</ul>
+	</div>
+
+</nav>
 
 
 	<!--  <ul class="nav">-->
@@ -270,5 +281,5 @@
 	<!--      </a>-->
 	<!--    </li>-->
 	<!--  </ul>-->
-</nav>
+
 
