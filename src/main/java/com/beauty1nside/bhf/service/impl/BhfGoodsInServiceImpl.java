@@ -18,9 +18,10 @@ public class BhfGoodsInServiceImpl implements BhfGoodsInService {
 	private BhfGoodsInMapper mapper;
 
 	@Override
-	public int goodsIn(List<BhfGoodsInVO> goodsList) {
+	public void goodsIn(BhfGoodsInVO vo) {
 		
-		return mapper.goodsIn(goodsList);
+		System.out.println(vo);
+		mapper.goodsIn(vo);
 	}
 
 	@Override

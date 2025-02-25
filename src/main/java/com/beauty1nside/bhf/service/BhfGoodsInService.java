@@ -8,7 +8,7 @@ import com.beauty1nside.bhf.dto.goodsin.BhfGoodsOrdSearchDTO;
 
 public interface BhfGoodsInService {
 
-	int goodsIn(List<BhfGoodsInVO> goodsList);
+	public void goodsIn(BhfGoodsInVO vo);
 	
 	List<BhfGoodsOrdDTO> goodsOrdList(BhfGoodsOrdSearchDTO dto);
 	

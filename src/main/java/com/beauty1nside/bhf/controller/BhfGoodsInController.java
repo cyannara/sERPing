@@ -1,7 +1,9 @@
 package com.beauty1nside.bhf.controller;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,9 +33,20 @@ public class BhfGoodsInController {
 	
 	// 상품입고 등록
 	@PostMapping("/goods/in")
-    public ResponseEntity<String> goodsIn(@RequestBody List<BhfGoodsInVO> goodsList) {
-        int result = service.goodsIn(goodsList);
-        return ResponseEntity.ok(result + " rows inserted/updated.");
+    public ResponseEntity<Map<String, Object>> goodsIn(@RequestBody BhfGoodsInVO vo) {
+		Map<String, Object> response = new HashMap<>();
+		
+		try {
+			service.goodsIn(vo);
+			response.put("status", "success");
+	        response.put("message", "발주 등록 성공");
+	        return ResponseEntity.ok(response);
+		} catch (Exception e) {
+			log.error("발주 등록 실패", e);
+	        response.put("status", "error");
+	        response.put("message", "발주 등록 실패");
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+		}
     }
 	
 	// 주문서 조회

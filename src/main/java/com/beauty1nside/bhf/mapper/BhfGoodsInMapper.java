@@ -8,8 +8,8 @@ import com.beauty1nside.bhf.dto.goodsin.BhfGoodsOrdSearchDTO;
 
 public interface BhfGoodsInMapper {
 
-	 // 상품 입고 - List<BhfGoodsInVO> 데이터를 받아 MERGE 실행
-    int goodsIn(List<BhfGoodsInVO> goodsList);
+	 // 상품 입고 등록 프로시저
+    public void goodsIn(BhfGoodsInVO vo);
     
     // 발송완료인 주문서 조회
     List<BhfGoodsOrdDTO> goodsOrdList(BhfGoodsOrdSearchDTO dto);
