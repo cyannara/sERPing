@@ -17,7 +17,7 @@ public class SalaryBookDTO {
 	int incidentalCost;
 	int deductionItem;
 	int paymentAmount;
-	Date paymentPrearranged_date;
+	Date paymentPrearrangedDate;
 	String paymentAlternative;
 	String payer;
 	int companyNum;
