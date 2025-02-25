@@ -124,7 +124,8 @@ fetch(deptListUrl, {
         let schedules = []
 
         data.forEach((schedule) => {
-            if(!(schedule.isPrivate === 'Y' && schedule.employeeNum.toString() === employeeNum)) {
+            // private schedule(lock icon) && not my schedule => false
+            if(!(schedule.isPrivate === 'Y' && schedule.employeeNum.toString() !== employeeNum)) {
                 schedules.push({
                     id: schedule.scheduleId,
                     calendarId: schedule.scheduleType === 'DEPT' ? schedule.deptNo : 0,
