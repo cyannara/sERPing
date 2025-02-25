@@ -31,11 +31,11 @@
 				        i.goods_barcode,
 				        i.goods_lot_num,
 				        i.goods_consumption_date
-				from    bhf_warehouse w join bhf_in_list i on w.warehouse_code = i.warehouse_code
+				from    bhf_warehouse w join bhf_in_list i on w.branch_office_id = i.branch_office_id
 		<![CDATA[
 			where rownum <= #{end}
 		]]>
-			and i.goods_barcode = #{goodsBarcode} and w.company_num = 1 and w.branch_office_id = 'yedam'
+			and i.goods_barcode = #{goodsBarcode} and w.company_num = 1 and w.branch_office_id = 'YEDAM'
 			)
 		where rn >= #{start}
 	</select>
