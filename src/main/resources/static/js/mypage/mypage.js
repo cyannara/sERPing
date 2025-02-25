@@ -185,7 +185,7 @@ typeSelected.addEventListener('change', (e) => {
 const requestApproval = document.getElementById('requestApproval')
 requestApproval.addEventListener('click', () => {
     if(selectedDocType) {
-        window.location = `mypage/approval/${selectedDocType}`
+        window.location = `/mypage/approval/${selectedDocType}`
     } else {
         showAlert('요청 구분을 선택해주세요.', 'danger')
     }
