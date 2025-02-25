@@ -122,7 +122,7 @@
         <div id="pagination" class="tui-pagination"></div>
     </div>
     
-    <!--  창고 모달 -->
+    <!--  발주서 모달 -->
 		    <div th:include="purchs/ModalTemplate :: ModalTemplate (
 		    'printModal', 
 		    'modal-xl', 
@@ -130,6 +130,15 @@
 		    'purchs/purchaseForm', 
 		    'purchs/purchaseFooter'
 		    )"></div>
+    <!--  메일 모달 -->
+		    <div th:include="purchs/ModalTemplate :: ModalTemplate (
+		    'mailsenderModal', 
+		    'modal-xl', 
+		    'EMAIL', 
+		    'purchs/mailsender', 
+		    'purchs/mailFooter'
+		    )"></div>
+    
     
     <!-- 발주서 등록 버튼 -->
     <div class="text-end">
@@ -170,6 +179,7 @@
 	    console.error('PDF 로드 오류:', error);
 	  });
 	}
+	
   // 2. 커스텀 렌더러 클래스 정의 (최상단)
   class CustomTextRenderer {
       constructor(props) {
@@ -178,6 +188,54 @@
           el.style.padding = '10px';
           el.style.fontWeight = 'bold';
           el.style.textAlign = 'left';
+          this.el = el;
+      }
+      getElement() {
+          return this.el;
+      }
+  }
+	//사용자 정의 이메일 버튼 렌더러 정의
+  class EmailRenderer {
+      constructor(props) {
+          const el = document.createElement('button');
+          el.textContent = 'EMAIL';
+          el.className = 'btn btn-danger btn-sm';
+          el.addEventListener('click', () => {
+              console.log("메일 전송 버튼 클릭");
+              const focusedCell = purchaselistGrid.getFocusedCell();
+              if (!focusedCell) {
+                  alert("먼저 발주 행을 선택하세요.");
+                  return;
+              }
+              const rowData = purchaselistGrid.getRow(focusedCell.rowKey);
+              if (!rowData) {
+                  alert("선택된 행의 데이터가 없습니다.");
+                  return;
+              }
+              
+              // vendor_email과 employee_email 컬럼명이 실제 데이터에 맞게 조정하세요.
+              const vendorEmail = rowData.vendor_email || rowData.vendorEmail;
+              const employeeEmail = rowData.employee_email || rowData.employeeEmail;
+              
+              if (!vendorEmail || !employeeEmail) {
+                  alert("메일 전송에 필요한 이메일 정보가 없습니다.");
+                  return;
+              }
+              
+              // sessionStorage에 저장
+              sessionStorage.setItem("vendorEmail", vendorEmail);
+              sessionStorage.setItem("employeeEmail", employeeEmail);
+              console.log("vendorEmail:", vendorEmail, "employeeEmail:", employeeEmail);
+              
+              // mailsender 모달 표시
+              const mailSenderModalEl = document.getElementById("mailsenderModal");
+              if (mailSenderModalEl) {
+                  const mailSenderModal = new bootstrap.Modal(mailSenderModalEl);
+                  mailSenderModal.show();
+              } else {
+                  console.error("메일 전송 모달(mailsenderModal)을 찾을 수 없습니다.");
+              }
+          });
           this.el = el;
       }
       getElement() {
@@ -315,7 +373,8 @@
               { header: "옵션명", name: "optionName" },
               { header: "금액", name: "purchaseTotalAmount" },
               { header: "발주상태", name: "purchaseStatus" },
-              { header: "인쇄", name: "print", renderer: { type: PrintRenderer } }
+              { header: "인쇄", name: "print", renderer: { type: PrintRenderer } },
+              { header: "EMAIL", name: "email", renderer: { type: EmailRenderer }, cellStyle: { textAlign: "center" } }
           ]
       });
 
@@ -383,7 +442,13 @@
       });
   } else {
       console.warn("❌ 창고 모달 닫기 버튼을 찾을 수 없습니다.");
-  } 
+  }
+  
+	//PDF 모달 닫힘 시 sessionStorage의 발주번호 삭제 (예: printModal)
+	  modalElement.addEventListener("hidden.bs.modal", function () {
+	      console.log("PDF 모달이 닫혔습니다. 발주번호 삭제");
+	      sessionStorage.removeItem("purchaseNum");
+	  });
 </script>
 
 </body>
