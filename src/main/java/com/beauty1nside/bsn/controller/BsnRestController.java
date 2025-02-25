@@ -40,10 +40,6 @@ public class BsnRestController {
 	@GetMapping("/bhfOrder")
 	public Object bhfOrder(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
 			@RequestParam(name ="page", defaultValue = "1", required = false) int page,
-//			@RequestParam(name ="deteOption", defaultValue = "notSelect", required = false) String deteOption,
-//			@RequestParam(name ="startDate",  required = false) Date startDate,
-//			@RequestParam(name ="endDate", required = false) Date endDate,
-//			@RequestParam(name ="selectBhf", defaultValue = "all", required = false) String selectBhf,
 			OrderSearchDTO searchDTO, Paging paging) throws JsonMappingException, JsonProcessingException  {
 		
 		//한 페이지에 출력할 수 : 기본값: 5

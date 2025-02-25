@@ -37,7 +37,7 @@ SELECT ROW_NUMBER() OVER (
 
 FROM bsn_delivery bd
 LEFT JOIN bsn_order bo ON bo.order_id = bd.order_id
-WHERE bd.company_num = 1
+WHERE bd.company_num = #{companyNum}
 <include refid="searchInfoBsnDLV"></include>
 )
 WHERE RN BETWEEN #{start} AND #{end}

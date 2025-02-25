@@ -97,11 +97,23 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 						    	'bsn/modal/bsnLotDelete', 
 						    	'bsn/modal/bsnModalFooter')">
      </div>	
+  <!-- 세션정보 -->
+  	  <script th:inline="javascript">
+	  	let companyNum = [[${session.companyNum}]];
+	  	//let employeeNum = [[${session.employeeNum}]];
+	  </script>    
+	   
 <script>
 var Grid = tui.Grid;
 var selectedRow = null; // 선택된 상품 상세
 var detailData = [];    // 상세 LOT정보
 
+document.addEventListener('DOMContentLoaded', function() {
+    search();  // DOMContentLoaded 이벤트 후 자동으로 검색 실행
+});
+
+
+    
 
 const OrderListDataSource = {
 		api: {
@@ -164,7 +176,27 @@ function formatStatus(status) {
     
     	
 }
-
+function search(){
+	//let selectedOption = document.querySelector('input[name="optionsRadios"]:checked').value; // 라디오 버튼 선택 값
+    //let startDate = document.getElementById("startDate").value; // 시작 날짜
+    //let endDate = document.getElementById("endDate").value; // 끝 날짜
+    //let selectedBhf = document.getElementById("selectBhf").value; // 발주지점 선택 값
+    
+    //console.log(selectedOption, startDate, endDate, selectedBhf);
+    
+    let params = {
+    		//"companyNum": companyNum,
+    		//"deteOption": selectedOption,
+            //"startDate": startDate,
+            //"endDate": endDate,
+            //"branch": selectedBhf,
+            "companyNum": companyNum
+            
+    };
+    console.log("검색 조건:", params);
+    
+    orderList.readData(1, params, true);
+}
 
 
 //출고 클릭 시 상세 불러오기
@@ -354,17 +386,28 @@ document.querySelectorAll('.modal-footer #btn-register').forEach(button => {
                  // 모든 행 데이터 가져오기(LOT상세의 수량들 합)
                     const allData = deliveryLotDetailGrid.getData(); 
                     let totalSum = allData.reduce((sum, row) => sum + Number(row.deliveryQnt || 0), 0);
+
+                   
                     
                     const selectedRows = registerGrid.getCheckedRows(); // 선택된 행 가져오기(모달창에서 체크한 것만)
-                    
+                    if(selectedRows.length == 0){
+                    	showAlert('선택한 LOT가 없습니다. 체크를 확인해주세요.', 'danger');
+                    	registerModal.hide();
+                    	return;
+                    }
 				    const requestData = selectedRows.map(row => ({
 				    	goodsLotNum: row.goodsLotNum,
 				        deliveryQnt: Number(row.deliveryQnt),
-				        warehousingRemainingQuantity: Number(row.warehousingRemainingQuantity)
+				        // warehousingRemainingQuantity: Number(row.warehousingRemainingQuantity)
 				    }));
 				 // 유효성 검사 (출고 수량이 출고 가능 수량보다 많지 않게)
 				    for (let item of requestData) {
-				        if (item.deliveryQnt > item.warehousingRemainingQuantity) {
+				    	if (isNaN(item.deliveryQnt) || !Number.isInteger(item.deliveryQnt) || item.deliveryQnt <= 0) {
+				            showAlert('올바르지 않은 출고 수량입니다.(원인:0, 공백, 글자...)', 'danger');
+				            return;
+				        }
+				    	
+				        if (item.deliveryQnt > selectedRows.find(row => row.goodsLotNum === item.goodsLotNum).warehousingRemainingQuantity) {
 				            showAlert('출고 수량이 가능 수량을 초과할 수 없습니다.', 'danger');
 				            return;
 				        } 
@@ -384,9 +427,12 @@ document.querySelectorAll('.modal-footer #btn-register').forEach(button => {
 					let dlvyDTO = {
 						deliveryDetailId: selectedRow.deliveryDetailId,
 						optionCode: selectedRow.optionCode,
-				        lotDetails: requestData
+						lotDetails: requestData
 				    };
 					console.log(dlvyDTO);
+					
+					
+					
 
 					/////////////////////////
                     registerModal.hide();
