@@ -96,8 +96,13 @@ let inApprovalStatus = ''
 let filterBtns = document.getElementsByClassName('filter-btn')
 filterBtns = Array.from(filterBtns)
 filterBtns.forEach((btn) => {
+
     btn.addEventListener('click', (event) => {
+        filterBtns.forEach((btn) => {
+            btn.classList.remove('active')
+        })
         inApprovalStatus = event.target.dataset.status
+        event.target.classList.add('active')
     })
 })
 function reset(){
