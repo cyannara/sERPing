@@ -105,7 +105,7 @@ fetch(deptListUrl, {
                 return '변경';
             },
             popupDelete() {
-                return '삭제';
+                return '<span data-bs-toggle="modal" data-bs-target="#commonModal">삭제</span>';
             },
         },
         useFormPopup: true,
@@ -149,7 +149,7 @@ fetch(deptListUrl, {
     });
 
     calendar.on('beforeDeleteEvent', (eventObj) => {
-        deleteSchedule(calendar, eventObj)
+        setModalContent('일정 삭제', 'delete-schedule', '닫기', '삭제', () => deleteSchedule(calendar, eventObj))
     });
 
     calendar.on('beforeUpdateEvent', ({event, changes}) => {
