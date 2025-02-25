@@ -98,8 +98,8 @@ public class BsnOrderServiceImpl implements BsnOrderService {
 	
 	//(임시) 상품 재고 LOT별 조회
 	@Override
-	public List<BsnGoodsLOTDTO> getGoodsWarehouseLot(BsnOrderDetailDTO bsnOrderDetailDTO) {
-		return bsnOrderMapper.selectGoodsWarehouseLot(bsnOrderDetailDTO);
+	public List<BsnGoodsLOTDTO> getGoodsWarehouseLot(BsnDeliveryDetailDTO bsnDeliveryDetailDTO) {
+		return bsnOrderMapper.selectGoodsWarehouseLot(bsnDeliveryDetailDTO);
 	}
 	
 	

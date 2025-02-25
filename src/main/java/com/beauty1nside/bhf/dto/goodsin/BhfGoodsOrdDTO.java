@@ -20,6 +20,7 @@ public class BhfGoodsOrdDTO {
 	private String goodsStandard;
 	private int quantity;
 	
+	private String branchOfficeId;
 	private int companyNum;
 	
 }

@@ -10,8 +10,10 @@ public interface BhfInventoryMapper {
 	
 	// 조정 등록
 	int mediationInsert(BhfInventoryInsertDTO dto);
-	// 조정 등록 후 창고 업데이트
+	// 조정 등록 후 창고 수량뺴기
 	int quantityUpdate(BhfInventoryInsertDTO dto);
+	// 조정 등록 후 창고 수량더하기
+	int quantityPlus(BhfInventoryInsertDTO dto);
 	
 	// 조정 내역 조회
 	List<BhfInventoryInsertDTO> invenHistory(BhfInventoryListSearchDTO dto);

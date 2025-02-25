@@ -1,5 +1,6 @@
 package com.beauty1nside.hr.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,8 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.beauty1nside.common.GridArray;
 import com.beauty1nside.common.Paging;
+import com.beauty1nside.hr.dto.EmpContractDTO;
 import com.beauty1nside.hr.dto.EmpDTO;
 import com.beauty1nside.hr.dto.EmpSearchDTO;
+import com.beauty1nside.hr.dto.SalaryDTO;
 import com.beauty1nside.hr.service.EmpService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -177,4 +180,66 @@ public class HrRestController {
 
     }
 
+ // ✅ 특정 회사(companyNum)에 속한 사원 목록 조회 API (사원명 검색 + 페이징 적용)
+    @GetMapping("/emp/list-by-company")
+    public ResponseEntity<Map<String, Object>> getEmployeesByCompany(
+            @RequestParam("companyNum") Long companyNum,
+            @RequestParam(name = "perPage", defaultValue = "10") int perPage,
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "searchKeyword", required = false) String searchKeyword) {
+
+        // DTO 설정
+        EmpSearchDTO searchDTO = new EmpSearchDTO();
+        searchDTO.setCompanyNum(companyNum);
+        searchDTO.setSearchType("employeeName");  // ✅ 사원명 검색으로 고정
+        searchDTO.setSearchKeyword(searchKeyword); // 검색어 설정
+        searchDTO.setStart((page - 1) * perPage + 1);
+        searchDTO.setEnd(page * perPage);
+
+        // ✅ 검색된 사원 수
+        int totalRecords = empService.countEmployeesByCompany(searchDTO);
+        
+        // ✅ 검색된 사원 목록
+        List<EmpDTO> employees = empService.getEmployeesByCompanyWithSearch(searchDTO);
+
+        // 결과 맵핑
+        Map<String, Object> result = new HashMap<>();
+        result.put("totalRecords", totalRecords);
+        result.put("employees", employees);
+
+        return ResponseEntity.ok(result);
+    }
+
+    
+    // ✅ 근로계약 및 급여 등록 API
+    @PostMapping("/contract/register")
+    public ResponseEntity<String> registerContract(@RequestBody Map<String, Object> ContractReqData) {
+    	
+    	log.info("ContractReqData::::{}",ContractReqData);
+    	
+    	return ResponseEntity.ok("계약등록완료");
+    	
+		/*
+		 * try { empService.registerContractWithSalary(contractDTO);
+		 * response.put("success", true); response.put("message",
+		 * "근로계약이 정상적으로 등록되었습니다."); return ResponseEntity.ok(response); } catch
+		 * (Exception e) { log.error("❌ 근로계약 등록 실패:", e); response.put("success",
+		 * false); response.put("message", "계약 등록 중 오류 발생"); return
+		 * ResponseEntity.status(500).body(response); }
+		 */
+    }
+
+    // ✅ 특정 사원의 계약 목록 조회
+    @GetMapping("/contract/{employeeNum}")
+    public ResponseEntity<List<EmpContractDTO>> getContractsByEmployee(@PathVariable Long employeeNum) {
+        return ResponseEntity.ok(empService.getContractsByEmployee(employeeNum));
+    }
+
+    // ✅ 특정 사원의 급여 내역 조회
+    @GetMapping("/salary/{employeeNum}")
+    public ResponseEntity<List<SalaryDTO>> getSalariesByEmployee(@PathVariable Long employeeNum) {
+        return ResponseEntity.ok(empService.getSalariesByEmployee(employeeNum));
+    }
+
+    
 }

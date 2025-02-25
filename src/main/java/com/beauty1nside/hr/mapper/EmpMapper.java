@@ -5,8 +5,10 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.beauty1nside.hr.dto.EmpContractDTO;
 import com.beauty1nside.hr.dto.EmpDTO;
 import com.beauty1nside.hr.dto.EmpSearchDTO;
+import com.beauty1nside.hr.dto.SalaryDTO;
 
 @Mapper
 public interface EmpMapper {
@@ -37,6 +39,24 @@ public interface EmpMapper {
     // 특정 부서의 사원 목록 가져오기 (부서 이름 포함)
     List<EmpDTO> listByDept(EmpSearchDTO dto);
 
+ // ✅ 특정 회사(companyNum)의 사원 목록 (검색 & 페이징 적용)
+    List<EmpDTO> getEmployeesByCompanyWithSearch(EmpSearchDTO searchDTO);
+
+    // ✅ 특정 회사(companyNum)의 사원 개수 조회
+    int countEmployeesByCompany(EmpSearchDTO searchDTO);
     
+    
+    // ✅ 계약 정보 삽입 (계약번호 자동 생성)
+    void insertContract(EmpContractDTO contractDTO);
+
+    // ✅ 급여 정보 삽입
+    void insertSalary(SalaryDTO salaryDTO);
+
+    // ✅ 특정 사원의 계약 목록 조회
+    List<EmpContractDTO> getContractsByEmployee(Long employeeNum);
+
+    // ✅ 특정 사원의 급여 내역 조회
+    List<SalaryDTO> getSalariesByEmployee(Long employeeNum);
+
 
 }

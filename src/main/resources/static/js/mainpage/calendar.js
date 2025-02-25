@@ -3,88 +3,264 @@
 
 // calendar
 const Calendar = tui.Calendar;
-
 const container = document.getElementById('calendar');
+let employeeNum = document.getElementById("sessionEmployeeNum").value;
+const deptListUrl = '/api/mainpage/dept'
+let deptList = []
+fetch(deptListUrl, {
+    method: 'GET',
+    headers: {
+        "Content-Type": "application/json",
+    }
+}).then(data => {
+    return data.json()
+}).then((data) => {
+    deptList = data
+    const color = [
+        '#A7C7E7', '#98FB98', '#FADADD', '#FFDAB9',
+        '#C6A2D9', '#F5E6CC',
+        '#A7C7E7', '#98FB98', '#FADADD', '#FFFACD', '#E6E6FA', '#D3D3D3',
+        '#A7C7E7', '#98FB98', '#FADADD', '#FFFACD', '#E6E6FA', '#D3D3D3',
+    ]
 
-// const deptList = ''
-// fetch()
+    let scheduleType = data.map((dept, idx) => {
+        return {
+            id: dept.deptNo,
+            name: `${dept.deptName}-${dept.branch}`,
+            backgroundColor: color[idx]
+        }
+    })
+    scheduleType.push({
+        id: 0,
+        name: '개인',
+        backgroundColor: color[scheduleType.length]
+    })
 
-const options = {
-    defaultView: 'month',
-    isReadOnly: false,
-    timezone: {
-        zones: [
-            {
-                timezoneName: 'Asia/Seoul',
-                displayLabel: 'Seoul',
+    let calendar = new Calendar(container,  {
+        defaultView: 'month',
+        isReadOnly: false,
+        timezone: {
+            zones: [
+                {
+                    timezoneName: 'Asia/Seoul',
+                    displayLabel: 'Seoul',
+                },
+            ],
+        },
+        calendars: scheduleType,
+        theme: {
+            common: {
+                gridSelection: {
+                    backgroundColor: 'rgba(21, 30, 92, 0.05)',
+                    border: '1px solid A7C7E7',
+                },
             },
-        ],
-    },
-    theme: {
-        // ...
-    },
-    calendars: [
-        {
-            id: 'cal1',
-            name: '개인',
-            backgroundColor: '#03bd9e',
         },
-        {
-            id: 'cal2',
-            name: '부서',
-            backgroundColor: '#00a9ff',
+        template: {
+            time(event) {
+                const { start, end, title } = event;
+
+                return `<span style="color: black;">${formatTime(start)}~${formatTime(end)} ${title}</span>`;
+            },
+            allday(event) {
+                return `<span style="color: black;">${event.title}</span>`;
+            },
+            monthMoreClose() {
+                return '';
+            },
+            monthGridHeaderExceed(hiddenEvents) {
+                return `<span>${hiddenEvents} +</span>`;
+            },
+            monthDayName(model) {
+                const dayKor = {
+                    0: '일 ❤',
+                    1: '월',
+                    2: '화',
+                    3: '수',
+                    4: '목',
+                    5: '금',
+                    6: '토 💙',
+                }
+                return dayKor[model.day];
+            },
+            titlePlaceholder() {
+                return '내용';
+            },
+            locationPlaceholder() {
+                return '장소';
+            },
+            startDatePlaceholder() {
+                return '시작 날짜';
+            },
+            endDatePlaceholder() {
+                return '종료 날짜';
+            },
+            popupSave() {
+                return '<div style="background-color: #4B49AC;width: 100px;height: 40px;border-radius: 80px;position: absolute;bottom: 19px;right: 16px;display: flex;justify-content: center;align-items: center;font-size: 14px;">추가</div>';
+            },
+            popupUpdate() {
+                return '<div style="background-color: #4B49AC;width: 100px;height: 40px;border-radius: 80px;position: absolute;bottom: 19px;right: 16px;display: flex;justify-content: center;align-items: center;font-size: 14px;">변경</div>';
+            },
+            popupEdit() {
+                return '변경';
+            },
+            popupDelete() {
+                return '<span data-bs-toggle="modal" data-bs-target="#commonModal">삭제</span>';
+            },
         },
-    ],
-    template: {
-        // ...
-    },
-};
+        useFormPopup: true,
+        useDetailPopup: true,
+    });
 
-const calendar = new Calendar(container, options);
-
-calendar.createEvents([
-    {
-        id: 'event1',
-        calendarId: 'cal2',
-        title: '주간 회의',
-        start: '2025-02-07T09:00:00',
-        end: '2025-02-07T10:00:00',
-    },
-    {
-        id: 'event2',
-        calendarId: 'cal1',
-        title: '점심 약속',
-        start: '2025-02-08T12:00:00',
-        end: '2025-02-08T13:00:00',
-    },
-    {
-        id: 'event3',
-        calendarId: 'cal2',
-        title: '휴가',
-        start: '2025-02-08',
-        end: '2025-02-10',
-        isAllday: true,
-        category: 'allday',
-    },
-]);
-
-// 일정 생성 팝업을 사용하기 위해 tui-date-picker와 tui-time-picker의 css 파일을 불러온다.
-// import 'tui-date-picker/dist/tui-date-picker.css';
-// import 'tui-time-picker/dist/tui-time-picker.css';
-
-calendar.setOptions({
-    useFormPopup: true,
-    useDetailPopup: true,
-});
-
-calendar.setTheme({
-    common: {
-        gridSelection: {
-            backgroundColor: 'rgba(81, 230, 92, 0.05)',
-            border: '1px dotted #515ce6',
+    const url = 'api/mainpage/schedule'
+    fetch(url, {
+        method: 'get',
+        headers: {
+            "Content-Type": "application/json",
         },
-    },
-});
+    }).then((result) => {
+        return result.json()
+    }).then((data) => {
+        let schedules = []
+
+        data.forEach((schedule) => {
+            // private schedule(lock icon) && not my schedule => false
+            if(!(schedule.isPrivate === 'Y' && schedule.employeeNum.toString() !== employeeNum)) {
+                schedules.push({
+                    id: schedule.scheduleId,
+                    calendarId: schedule.scheduleType === 'DEPT' ? schedule.deptNo : 0,
+                    title: schedule.scheduleContent,
+                    start: schedule.scheduleStart,
+                    end: schedule.scheduleEnd,
+                    isAllday: schedule.isAllday === 'Y',
+                    isPrivate: schedule.isPrivate === 'Y',
+                    location: schedule.location,
+                    attendees: getDeptName(deptList, schedule.deptNo)
+                })
+            }
+
+        })
+
+        calendar.createEvents(schedules)
+    })
+
+    calendar.on('beforeCreateEvent', (eventObj) => {
+        addSchedule(calendar, eventObj)
+    });
+
+    calendar.on('beforeDeleteEvent', (eventObj) => {
+        setModalContent('일정 삭제', 'delete-schedule', '닫기', '삭제', () => deleteSchedule(calendar, eventObj))
+    });
+
+    calendar.on('beforeUpdateEvent', ({event, changes}) => {
+        updateSchedule(calendar, event, changes)
+    });
+})
+
+const updateSchedule = (calendar, event, changes) => {
+    let updatedEvent = {
+        ...event,
+        ...changes
+    }
+    let updatedSchedule = {
+        deptNo: updatedEvent.calendarId,
+        scheduleEnd: updatedEvent.end.d.d,
+        scheduleStart: updatedEvent.start.d.d,
+        scheduleType: updatedEvent.calendarId ? 'DEPT' : 'PERSONAL',
+        scheduleContent: updatedEvent.title,
+        isAllday: updatedEvent.isAllday ? 'Y' : 'N',
+        isPrivate: updatedEvent.isPrivate ? 'Y' : 'N',
+        location: updatedEvent.location
+    }
+    const url = `api/mainpage/schedule/${updatedEvent.id}`
+    fetch(url, {
+        method: 'put',
+        headers: {
+            'header': header_csrf,
+            "Content-Type": "application/json",
+            'X-CSRF-Token': token_csrf
+        },
+        body: JSON.stringify(updatedSchedule)
+    }).then((result) => {
+        return result.json()
+    }).then((data) => {
+        if(data.message === 'success') {
+            calendar.updateEvent(event.id, event.calendarId, changes);
+            showAlert('일정이 수정되었습니다.', 'success')
+        } else {
+            showAlert('일정 수정 실패', 'danger')
+        }
+    })
+}
+
+
+const deleteSchedule = (calendar, eventObj) => {
+    const url = `api/mainpage/schedule/${eventObj.id}`
+    fetch(url, {
+        method: 'delete',
+        headers: {
+            'header': header_csrf,
+            "Content-Type": "application/json",
+            'X-CSRF-Token': token_csrf
+        },
+    }).then((result) => {
+        return result.json()
+    }).then((data) => {
+        if(data.message === 'success') {
+            calendar.deleteEvent(eventObj.id, eventObj.calendarId);
+            showAlert('일정이 삭제되었습니다.', 'success')
+        } else {
+            showAlert('일정 삭제 실패', 'danger')
+        }
+    })
+
+}
+
+const addSchedule = (calendar, eventObj) => {
+    let newSchedule = {
+        deptNo: eventObj.calendarId,
+        scheduleEnd: eventObj.end.d.d,
+        scheduleStart: eventObj.start.d.d,
+        scheduleType: eventObj.calendarId ? 'DEPT' : 'PERSONAL',
+        scheduleContent: eventObj.title,
+        isAllday: eventObj.isAllday ? 'Y' : 'N',
+        isPrivate: eventObj.isPrivate ? 'Y' : 'N',
+        location: eventObj.location
+    }
+    const url = 'api/mainpage/schedule'
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'header': header_csrf,
+            "Content-Type": "application/json",
+            'X-CSRF-Token': token_csrf
+        },
+        body: JSON.stringify(newSchedule)
+    }).then((result) => {
+        return result.json()
+    }).then((data) => {
+        if(data.message === 'success') {
+            calendar.createEvents([
+                {
+                    ...eventObj,
+                    id: new Date().getTime(),
+                },
+            ]);
+
+            showAlert('일정이 등록되었습니다.', 'success')
+        } else {
+            showAlert('일정 등록 실패', 'danger')
+        }
+    })}
+
+const getDeptName = (deptList, scheduleDeptNo) => {
+    if(!scheduleDeptNo) {
+        return ['나']
+    }
+
+    let dept = deptList.find((dept) => dept.deptNo === scheduleDeptNo)
+    return [dept.deptName + '-' + dept.branch]
+}
 
 function formatTime(time) {
     const hours = `${time.getHours()}`.padStart(2, '0');
@@ -92,32 +268,3 @@ function formatTime(time) {
 
     return `${hours}:${minutes}`;
 }
-
-calendar.setOptions({
-    template: {
-        time(event) {
-            const { start, end, title } = event;
-
-            return `<span style="color: white;">${formatTime(start)}~${formatTime(end)} ${title}</span>`;
-        },
-        allday(event) {
-            return `<span style="color: gray;">${event.title}</span>`;
-        },
-    },
-});
-
-// 인스턴스 이벤트 설정
-calendar.on('beforeCreateEvent', (eventObj) => {
-    // 이벤트 실행 시 인스턴스 메서드 활용
-    calendar.createEvents([
-        {
-            ...eventObj,
-            id: uuid(),
-        },
-    ]);
-});
-
-calendar.on('clickEvent', ({ event }) => {
-    const el = document.getElementById('clicked-event');
-    el.innerText = event.title;
-});

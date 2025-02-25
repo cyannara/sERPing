@@ -23,6 +23,7 @@ import com.beauty1nside.common.dto.ComDTO;
 import com.beauty1nside.common.mapper.ErpComMapper;
 import com.beauty1nside.erp.dto.CustomerServiceDTO;
 import com.beauty1nside.erp.dto.ErpSearchDTO;
+import com.beauty1nside.erp.dto.ServiceReturnDTO;
 import com.beauty1nside.erp.dto.testDTO;
 import com.beauty1nside.erp.service.ErpAdminService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -47,6 +48,7 @@ import lombok.extern.log4j.Log4j2;
  *  2025.02.12  표하연          최초 생성
  *  2025.02.13  표하연          회사영문명(코드명) 중복검사, 회사등록, 검색페이징
  *  2025.02.15  표하연          회사정보 수정 및 문의 처리
+ *  2025.02.25  표하연          회사의 구독현황을 조회한다 [ServiceReturnDTO]
  *
  *  </pre>
 */
@@ -322,6 +324,20 @@ public class ErpAdminRestController {
 		return cslist;
 	}
 	
+	//
+    /**
+     * ERP 사용회사 처리된 구독 정보를 조회한다
+     *
+     * @param int
+     * @return List<ServiceReturnDTO>
+     */
+	@GetMapping("/servicereturn/{companyNum}")
+	public List<ServiceReturnDTO> servicereturn(@PathVariable(name="companyNum") int companyNum) {
+		List<ServiceReturnDTO> dto = erpAdminService.serviceReturninfo(companyNum);
+		return dto; 
+	}
+	
+	
 	/**
      * 사업자 등록증 이미지를 서버에 저장한다 [사용중지 FTP서버변경하려고]
      * 미사용 FTPFileUploadController.java에서 처리중
@@ -363,5 +379,5 @@ public class ErpAdminRestController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
- 
+    
 }

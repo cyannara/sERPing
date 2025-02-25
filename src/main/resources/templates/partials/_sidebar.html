@@ -1,17 +1,16 @@
-<nav th:fragment="sidebar" class="sidebar sidebar-offcanvas"
-	id="sidebar">
+<nav th:fragment="sidebar" class="sidebar sidebar-offcanvas" id="sidebar">
 	<!--==[[${param.menu}]]==-->
 	<div
 		th:if="${#strings.equals('standard', param.menu) or #strings.equals('standard', menu)}">
 		<ul class="nav">
 			<li class="nav-item"><a class="nav-link"
-				href="/standard/product"> <i class="icon-grid menu-icon"></i> <span
+									th:href="@{/standard/product(menu='standard')}"> <i class="icon-grid menu-icon"></i> <span
 					class="menu-title">상품</span>
 			</a></li>
-			<li class="nav-item"><a class="nav-link" href="/standard/store">
+			<li class="nav-item"><a class="nav-link" th:href="@{/standard/store(menu='standard')}">
 					<i class="icon-grid menu-icon"></i> <span class="menu-title">창고</span>
 			</a></li>
-			<li class="nav-item"><a class="nav-link" href="/standard/doc">
+			<li class="nav-item"><a class="nav-link" th:href="@{/standard/doc(menu='standard')}">
 					<i class="icon-grid menu-icon"></i> <span class="menu-title">결재문서</span>
 			</a></li>
 		</ul>
@@ -20,26 +19,26 @@
 		th:if="${#strings.equals('sales', param.menu) or #strings.equals('sales', menu)}">
 		<ul class="nav">
 			<li class="nav-item"><a class="nav-link"
-				href="/bsn/order"> <i class="icon-grid menu-icon"></i> <span
+				th:href="@{/bsn/order(menu='sales')}"> <i class="icon-grid menu-icon"></i> <span
 					class="menu-title">주문관리</span>
 			</a>
 			<div class="collapse" id="ui-basic-1">
 					<ul class="nav flex-column sub-menu">
 						<li class="nav-item"><a class="nav-link"
-							href="/bsn/orderList">주문조회</a></li>
+							th:href="@{/bsn/orderList(menu='sales')}">주문조회</a></li>
 						<li class="nav-item"><a class="nav-link"
-							href="/bsn/orderRegist">주문등록</a></li>
+							th:href="@{/bsn/orderRegist(menu='sales')}">주문등록</a></li>
 						<li class="nav-item"><a class="nav-link"
-							href="/bsn/order">상품재고조회</a></li>
+							th:href="@{/bsn/order(menu='sales')}">상품재고조회</a></li>
 					</ul>
 				</div>
 			</li>
 			<li class="nav-item"><a class="nav-link"
-				href="/bsn/order"> <i class="icon-grid menu-icon"></i> <span
+				th:href="@{/bsn/order(menu='sales')}"> <i class="icon-grid menu-icon"></i> <span
 					class="menu-title">출고관리</span>
 			</a></li>
 			<li class="nav-item"><a class="nav-link"
-				href="/bsn/order"> <i class="icon-grid menu-icon"></i> <span
+				th:href="@{/bsn/order(menu='sales')}"> <i class="icon-grid menu-icon"></i> <span
 					class="menu-title">CS관리</span>
 			</a></li>
 		</ul>
@@ -49,36 +48,36 @@
 		<ul class="nav">
 			<!-- 상품 메뉴 -->
 			<li class="nav-item"><a class="nav-link"
-				data-bs-toggle="collapse" href="#ui-basic-1" aria-expanded="false"
-				aria-controls="ui-basic-1"> <i class="icon-grid menu-icon"></i>
+				data-bs-toggle="collapse" href="#ui-basic-2" aria-expanded="false"
+				aria-controls="ui-basic-2"> <i class="icon-grid menu-icon"></i>
 					<span class="menu-title">상품</span> <i class="menu-arrow"></i>
 			</a>
-				<div class="collapse" id="ui-basic-1">
+				<div class="collapse" id="ui-basic-2">
 					<ul class="nav flex-column sub-menu">
 						<li class="nav-item"><a class="nav-link"
-							href="/purchs/goodsRegister">상품등록</a></li>
+							th:href="@{/purchs/goodsRegister(menu='inventory')}">상품등록</a></li>
 						<li class="nav-item"><a class="nav-link"
-							href="/purchs/goodslist">상품조회</a></li>
+							th:href="@{/purchs/goodslist(menu='inventory')}">상품조회</a></li>
 						<li class="nav-item"><a class="nav-link"
-							href="/pages/ui-features/typography.html">상품재고조회</a></li>
+							th:href="@{/pages/ui-features/typography.html(menu='inventory')}">상품재고조회</a></li>
 					</ul>
 				</div></li>
 
 			<!-- 발주계획 메뉴 -->
 			<li class="nav-item">
 			<a class="nav-link"
-				data-bs-toggle="collapse" href="#ui-basic-2" aria-expanded="false"
-				aria-controls="ui-basic-2">
+				data-bs-toggle="collapse" href="#ui-basic-3" aria-expanded="false"
+				aria-controls="ui-basic-3">
 				 <i class="icon-grid menu-icon"></i>
 					<span class="menu-title">발주서</span>
 					 <i class="menu-arrow"></i>
 			</a>
-				<div class="collapse" id="ui-basic-2">
+				<div class="collapse" id="ui-basic-3">
 					<ul class="nav flex-column sub-menu">
 						<li class="nav-item"><a class="nav-link"
-							href="/purchs/purchaseRegister">발주서등록</a></li>
+							th:href="@{/purchs/purchaseRegister(menu='inventory')}">발주서등록</a></li>
 						<li class="nav-item"><a class="nav-link"
-							href="/purchs/purchaseList">발주서조회</a></li>
+							th:href="@{/purchs/purchaseList(menu='inventory')}">발주서조회</a></li>
 					</ul>
 				</div>
 			</li>
@@ -89,25 +88,25 @@
 	<div th:if="${#strings.equals('hr', param.menu) or #strings.equals('hr', menu)}">
 	    <ul class="nav">
 	        <li class="nav-item">
-	          <a class="nav-link" href="/hr/employee">
+	          <a class="nav-link" th:href="@{/hr/employee(menu='hr')}">
 	            <i class="icon-grid menu-icon"></i>
 	            <span class="menu-title">사원정보관리</span>
 	          </a>
 	        </li>
 	        <li class="nav-item">
-	          <a class="nav-link" href="/hr/organization">
+	          <a class="nav-link" th:href="@{/hr/organization(menu='hr')}">
 	            <i class="icon-grid menu-icon"></i>
 	            <span class="menu-title">조직도관리</span>
 	          </a>
 	        </li>
 	        <li class="nav-item">
-	          <a class="nav-link" href="/hr/emp_change">
+	          <a class="nav-link" th:href="@{/hr/emp_change(menu='hr')}">
 	            <i class="icon-grid menu-icon"></i>
 	            <span class="menu-title">인사발령관리</span>
 	          </a>
 	        </li>
 	        <li class="nav-item">
-	          <a class="nav-link" href="/hr/emp_contract">
+	          <a class="nav-link" th:href="@{/hr/emp_contract(menu='hr')}">
 	            <i class="icon-grid menu-icon"></i>
 	            <span class="menu-title">근로계약관리</span>
 	          </a>
@@ -116,56 +115,74 @@
 	</div>
 	
 	<div th:if="${#strings.equals('branch', param.menu) or #strings.equals('branch', menu)}">
-    <ul class="nav">
+    	<ul class="nav">
         <li class="nav-item">
-          <a class="nav-link" href="/bhf/order">
+          <a class="nav-link" th:href="@{/bhf/order(menu='branch')}">
             <i class="icon-grid menu-icon"></i>
             <span class="menu-title">상품 발주 요청</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/bhf/ordList">
+          <a class="nav-link" th:href="@{/bhf/ordList(menu='branch')}">
             <i class="icon-grid menu-icon"></i>
             <span class="menu-title">상품 발주 조회</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/bhf/returning">
+          <a class="nav-link" th:href="@{/bhf/returning(menu='branch')}">
             <i class="icon-grid menu-icon"></i>
             <span class="menu-title">교환 및 반품 요청</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/bhf/returnList">
+          <a class="nav-link" th:href="@{/bhf/returnList(menu='branch')}">
             <i class="icon-grid menu-icon"></i>
             <span class="menu-title">교환 및 반품 조회</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/bhf/goodsIn">
+          <a class="nav-link" th:href="@{/bhf/goodsIn(menu='branch')}">
             <i class="icon-grid menu-icon"></i>
             <span class="menu-title">상품 입고</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/bhf/inventory">
+          <a class="nav-link" th:href="@{/bhf/inventory(menu='branch')}">
             <i class="icon-grid menu-icon"></i>
             <span class="menu-title">재고 관리</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/bhf/invenHistory">
+          <a class="nav-link" th:href="@{/bhf/invenHistory(menu='branch')}">
             <i class="icon-grid menu-icon"></i>
             <span class="menu-title">재고 조정 내역</span>
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/bhf/closing">
+            <i class="icon-grid menu-icon"></i>
+            <span class="menu-title">마감 정산</span>
+          </a>
+        </li>
       </ul>
-  </div>
+	</div>
 	<div
 		th:if="${#strings.equals('account', param.menu) or #strings.equals('account', menu)}">
 		<span class="menu-title">account</span>
 	</div>
 
+	<div th:if="${#strings.equals('mypage', param.menu) or #strings.equals('mypage', menu)}">
+		<ul class="nav">
+			<li class="nav-item"><a class="nav-link" th:href="@{/mypage/profile(menu='mypage')}">
+				<i class="icon-grid menu-icon"></i><span class="menu-title">기본정보</span></a>
+			</li>
+			<li class="nav-item"><a class="nav-link" th:href="@{/mypage/approval(menu='mypage')}">
+				<i class="icon-grid menu-icon"></i> <span class="menu-title">전자 결재</span></a>
+			</li>
+		</ul>
+	</div>
+
+</nav>
 
 
 	<!--  <ul class="nav">-->
@@ -270,5 +287,5 @@
 	<!--      </a>-->
 	<!--    </li>-->
 	<!--  </ul>-->
-</nav>
+
 

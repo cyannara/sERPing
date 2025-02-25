@@ -9,9 +9,12 @@ import java.util.Map;
 
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.beauty1nside.hr.dto.EmpContractDTO;
 import com.beauty1nside.hr.dto.EmpDTO;
 import com.beauty1nside.hr.dto.EmpSearchDTO;
+import com.beauty1nside.hr.dto.SalaryDTO;
 import com.beauty1nside.hr.mapper.EmpMapper;
 import com.beauty1nside.hr.service.EmpService;
 
@@ -160,7 +163,57 @@ public class EmpServiceImpl implements EmpService {
     }
     
     
+    @Override
+    public List<EmpDTO> getEmployeesByCompanyWithSearch(EmpSearchDTO searchDTO) {
+        return empMapper.getEmployeesByCompanyWithSearch(searchDTO);
+    }
+
+    @Override
+    public int countEmployeesByCompany(EmpSearchDTO searchDTO) {
+        return empMapper.countEmployeesByCompany(searchDTO);
+    }
     
+    
+    @Transactional
+    @Override
+    public void registerContractWithSalary(EmpContractDTO contractDTO) {
+        // ✅ 1. 근로계약 정보 저장 (contractNum 자동 생성 후 DTO에 저장됨)
+        empMapper.insertContract(contractDTO);
+        
+        // ✅ 2. 급여 정보 생성
+        SalaryDTO salaryDTO = new SalaryDTO();
+        salaryDTO.setEmployeeNum(contractDTO.getEmployeeNum());
+        salaryDTO.setContractNum(contractDTO.getContractNum());  // ✅ 방금 생성된 계약번호 사용
+        salaryDTO.setCompanyNum(contractDTO.getCompanyNum());
+
+        // ✅ 3. 급여 계산
+        double monthlySalary = contractDTO.getAnnualSalary() / 12;
+        double deduction = monthlySalary * 0.19; // 세금(10%) + 보험(9%)
+        double netSalary = monthlySalary + contractDTO.getBonus() + contractDTO.getAdditionalPay() - deduction;
+
+        salaryDTO.setMonthlySalary(monthlySalary);
+        salaryDTO.setBonus(contractDTO.getBonus());
+        salaryDTO.setAdditionalPay(contractDTO.getAdditionalPay());
+        salaryDTO.setDeduction(deduction);
+        salaryDTO.setNetSalary(netSalary);
+        salaryDTO.setSalaryPaymentDate(new Date());
+        salaryDTO.setPaymentMethod("BANK"); // 기본값
+
+        // ✅ 4. 급여 정보 저장
+        empMapper.insertSalary(salaryDTO);
+    }
+
+	@Override
+	public List<EmpContractDTO> getContractsByEmployee(Long employeeNum) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<SalaryDTO> getSalariesByEmployee(Long employeeNum) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 
 

@@ -9,6 +9,7 @@ import com.beauty1nside.common.dto.ComDTO;
 import com.beauty1nside.erp.dto.CompanyListDTO;
 import com.beauty1nside.erp.dto.CustomerServiceDTO;
 import com.beauty1nside.erp.dto.ErpSearchDTO;
+import com.beauty1nside.erp.dto.ServiceReturnDTO;
 import com.beauty1nside.erp.dto.testDTO;
 
 /**
@@ -26,6 +27,7 @@ import com.beauty1nside.erp.dto.testDTO;
  *  2025.02.12  표하연          최초 생성
  *  2025.02.13  표하연          회사영문코드 중복처리
  *  2025.02.14  표하연          회사신규등록(회사,cs,최고관리자,구독정보목록생성)
+ *  2025.02.25  표하연          회사의 구독현황을 조회한다 [ServiceReturnDTO]
  *
  *  </pre>
 */
@@ -130,4 +132,12 @@ public interface ErpAdminService {
      * @return List<CustomerServiceDTO>
      */
 	public List<CustomerServiceDTO> csList(int companyNum);
+	
+	/**
+     * ERP 사용회사 처리된 구독 정보를 조회한다
+     *
+     * @param int
+     * @return List<ServiceReturnDTO>
+     */
+	public List<ServiceReturnDTO> serviceReturninfo(int companyNum);
 }

@@ -11,6 +11,48 @@
 	document.querySelector('#salaryModal').addEventListener('shown.bs.modal', (ev) => {
 		document.querySelector('#salaryModal').querySelector('.payBtn').addEventListener('click', (e)=>{
 			console.log(checkArray);
+			
+			// 버튼 동작
+			const header = document.querySelector('meta[name="_csrf_header"]').content;
+            const token = document.querySelector('meta[name="_csrf"]').content;
+            
+            let newArray = [];
+            checkArray.forEach(check =>{
+            	let newCheck = {}
+            	newCheck.salaryAccountBookCode = check.salaryAccountBookCode;
+            	newCheck.employeeCode = check.employeeCode;
+            	newCheck.employeeName = check.employeeName;
+            	newCheck.department = check.department;
+            	newCheck.salary = check.salary;
+            	newCheck.excessAllowance = check.excessAllowance;
+            	newCheck.bonus = check.bonus;
+            	newCheck.incidentalCost = check.incidentalCost;
+            	newCheck.deductionItem = check.deductionItem;
+            	newCheck.paymentAmount = check.paymentAmount;
+            	newCheck.paymentPrearrangedDate = check.paymentPrearrangedDate;
+            	newCheck.paymentAlternative = check.paymentAlternative;
+            	newCheck.payer = 1111;
+				newCheck.companyNum = check.companyNum;
+				newArray.push(newCheck);
+            })
+			
+			fetch("http://localhost:81/accnut/rest/salary/update", {
+				method: "PUT",
+				headers: {
+						 	'header': header,
+   			                "Content-Type": "application/json",
+   			                'X-CSRF-Token': token				
+				 		},
+				body: JSON.stringify(newArray) // newArray 배열을 JSON 형식으로 변환(JSON.parse는 JSON을 객체로 변환)
+			})
+			 .then(response => response.json())
+			 .then(data => { 
+				 //console.log(data);
+				 	grid.readData();
+				 	checkArray = [];
+			 });
+			
+			
 			e.target.blur();
 		},{once : true});
 		

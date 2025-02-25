@@ -26,13 +26,15 @@ public class EmpDTO {
     private String phone; // 연락처
     private Date hireDate; // 입사일
     private String position; // 직급 (공통코드: PO)
+    private String positionCode;  // ✅ 직급 코드 (계약유형 자동 선택)
     private String authority; // 사원 권한 (공통코드: AU)
     private String status; // 재직 상태 (공통코드: ST)
     private Date quitDate; // 퇴사일
     private String address; // 주소
     private String addressDetail; // 상세주소
     private String zipCode; // 우편번호
-    private String employmentType; // 근무 유형 (공통코드: ET)
+    private String employmentType;  // ✅ 근무 유형 (ex: 정규직, 계약직)
+    private String employmentTypeCode;  // ✅ 근무 유형 코드 (ex: ET001, ET002)
     private String bankName; // 급여 지급 은행명
     private String accountNum; // 계좌번호 (암호화 필요)
     private String profileImage; // 프로필 이미지 경로
@@ -48,5 +50,7 @@ public class EmpDTO {
     private String parentDeptNum; //상위부서번호(departmentNum)
     private String firstSsn; //주민번호 앞자리
     private String secondSsn; //주민번호 뒷자리
+    private Long parentDepartmentNum;  // ✅ 상위 부서 번호 추가
+    private String parentDepartmentName;  // ✅ 상위 부서명 추가
     
 }

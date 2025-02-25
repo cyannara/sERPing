@@ -5,7 +5,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
 <meta charset="UTF-8">
-<title>자산관리</title>    
+<title>자산관리</title>
 </head>
 <body layout:fragment="content">
 	<div class="container">
@@ -29,7 +29,11 @@
 				<div class="col-5 row ">
 					<span class="label-search col-4">구분</span>
 					<select name="section" id="section" class="col-8 input-box">
-						<option value="" selected>통장</option>
+						<option value="" selected>구분</option>
+						<option value="AC01" >현금</option>
+						<option value="AC02" >통장</option>
+						<option value="AC03" >카드</option>
+						<option value="AC04" >비품</option>
 
 					</select>
 				</div>
@@ -43,7 +47,7 @@
 					<input type="text" name="financialInstitution" id="financialInstitution" class="col-8 input-box">
 				</div>
 				<div class="col-1"></div>
-				<!-- 그리드 표시 수량 인풋 -->
+				<!-- 그리드 표시 수량 인풋 
 				<div class="col-5 row ">
 					<span class="label-search col-4">표시수량</span>
 					<select name="display_amount" id="display_amount" class="col-8 input-box" onchange="changeDisplay()">
@@ -54,6 +58,7 @@
 						<option value="100">100</option>
 					</select>
 				</div>
+				-->
 			</div>
 			<!-- 검색 버튼 줄 -->
 			<div class="row 3row">
@@ -64,6 +69,21 @@
 			</div>
 
 		</div>
+		<div id="rayout-container" class="row">
+			<div class="col-9"></div>
+			<!-- 그리드 표시 수량 인풋 -->
+			<div class="col-3 row ">
+				<div class="col-3"></div>
+				<span class="label-search col-5" style="font-size: 1em">표시수량</span>
+				<select name="display_amount" id="display_amount" class="col-4 input-box" onchange="changeDisplay()">
+					<option value="5" selected>5</option>
+					<option value="10">10</option>
+					<option value="20">20</option>
+					<option value="50">50</option>
+					<option value="100">100</option>
+				</select>
+			</div>
+		</div>
 		<!-- 그리드 -->
 		<div id="table-container">
 			<div id="grid"></div>
@@ -71,10 +91,12 @@
 		</div>
 		<!-- 하부 버튼 -->
 		<div class="button-bar row">
+		<!-- 
 			<div class="col-1"></div>
+		 -->
 			<button type="button" class="btn btn-primary col-1 btnExcel">Excel</button>
 			<button type="button" class="btn btn-secondary col-1">PDF</button>
-			<div class="col-7"></div>
+			<div class="col-8"></div>
 			<!-- 등록 모달 띄울 버튼 -->
 			<div class="btn-group dropup col-2">
 				<button type="button" class="btn btn-success cash"  data-bs-toggle="modal" data-bs-target="#assetaddModal">현금 등록</button>

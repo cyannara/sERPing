@@ -29,11 +29,8 @@ FROM BHF_ORDER
 WHERE progress_status = '신청'
 -- AND   company_num = 1
 <include refid="searchInfoBhfOrder"></include>
-<![CDATA[
-AND ROWNUM <= #{end}
-]]>
-ORDER BY TO_NUMBER(REGEXP_SUBSTR(order_code, '\d+')) desc, order_date desc, due_date desc
-) WHERE RN >= #{start}
+
+) WHERE RN BETWEEN #{start} AND #{end}
 
 
 
@@ -109,11 +106,9 @@ SELECT ROW_NUMBER() OVER (
        quantity
 FROM bhf_order_detail
 WHERE  order_code = #{orderCode}
+)
+WHERE RN BETWEEN #{start} AND #{end}
 
-<![CDATA[
-AND ROWNUM <= #{end}
-]]>
-) WHERE RN >= #{start}
 </select>
 
 <select id="getCountOfBhfOrderDetail" parameterType="BhfOrderDTO" resultType="int">
@@ -132,6 +127,7 @@ call insert_Bsn_Order(
               #{dueDate}, 
               #{employeeNum}, 
               #{companyNum}, 
+              #{remark},
               #{orderDetails, typeHandler=com.beauty1nside.bsn.OrdDtlArrayTypeHandler}
 ) 
 </insert>
