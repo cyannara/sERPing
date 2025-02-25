@@ -16,6 +16,7 @@
 	*  2025.02.13  표하연          회사영문코드 중복처리
 	*  2025.02.14  표하연          회사신규등록(회사,cs,최고관리자,구독정보목록생성)
 	*  2025.02.15  표하연          회사정보수정 및 기본cs를 등록한다
+	*  2025.02.25  표하연          회사의 구독현황을 조회한다 [ServiceReturnDTO]
 	*
 	*  </pre>
 ======================================================== -->
@@ -352,6 +353,29 @@
 		from erp_customer_service
 				where company_num = #{companyNum}
 		order by customer_service_num desc
+	</select>
+	
+	<!-- 
+     * ERP 사용회사 처리된 구독 정보를 조회한다
+     *
+     * @param int
+     * @return List<ServiceReturnDTO>
+	-->
+	<select id="serviceReturninfo" resultType="ServiceReturnDTO">
+		select 
+		    e.subscription_name_num,
+		    n.subscription_name,
+		    e.subscription_option_num,
+		    o.subscription_option,
+		    fn_get_cmmn_name(e.subscription_form) as subscription_form,
+		    TRUNC(e.subscription_end_date - sysdate) as limit_day,
+		    e.subscription_end_date
+		from erp_subscription_info_list e
+		left join erp_subscription_name n
+		on e.subscription_name_num = n.subscription_name_num
+		left join erp_subscription_option o
+		on e.subscription_option_num = o.subscription_option_num
+		where company_num = #{companyNum}
 	</select>
 
 </mapper>
