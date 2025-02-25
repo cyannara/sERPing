@@ -321,19 +321,42 @@
 	        </div>
 	    </div>
 	</div>
+	
+	<!-- 결제 상세내역 모달 -->
+	<div class="modal fade" id="subinfolistModal" tabindex="-1" aria-labelledby="subinfolistModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="subinfolistModalLabel">상세 구독 내역</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<!-- 모달 내용이 여기에 추가될 예정 -->
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
 		
 	
 	<script th:inline="javascript">
 		//클릭한 행의 정보를 담는 전역 변수
 		var rowData = false;
+		var subrowData = false;
+		
+		//현재 그리드에 강조된행을 기록할 변수
+		let selectedRowKey = null;
+		let subselectedRowKey = null;
 		
 		//로그인 처리할때 까지 이건 계속 있어야함
 		let employeeNum = ErpEmployeeInfo.employeeNum;
 		document.querySelector("#employeeNum").value = employeeNum;
-	
+		
 		// 페이지 로드 후 이벤트 바인딩
 		document.addEventListener("DOMContentLoaded", function() {
-			
 			// 모달 버튼 클릭 이벤트 바인딩
 		    document.body.addEventListener("click", function(event) {
 		        if (event.target.classList.contains("contract-btn")) {
@@ -341,7 +364,6 @@
 		            openBusinessLicenseModal(value);
 		        }
 		    });
-		 
 		});
 		
 		// 모달 열기 함수
@@ -452,9 +474,6 @@
 			//초기 데이터 뭘로 할지
 			data : dataSource,
 		});
-	
-		//현재 그리드에 강조된행을 기록할 변수
-		let selectedRowKey = null;
 		
 		grid.on('click', function (ev) {
 			//행 전체 선택하는법
@@ -664,6 +683,180 @@
 		});
 		// 주소검색 api 끝
 		
+		//지금작업중
+		//구독내역 그리드 화면 보여주기
+		document.querySelector(".relist").addEventListener("click", function(){
+			sublist();//그리드 호출 항목 생성
+		});
+		function sublist(){
+			//화면 초기화
+			document.querySelector(".appendsection").innerHTML = '<h5>구독내역<h5>';
+			
+			const sublistdataSource = {
+					api : {
+						readData: { url: '/erp/rest/subscriptionlist', method: 'GET', initParams: { companyNum: rowData.companyNum }},
+					},
+					contentType : 'application/json',
+					headers: { 'x-custom-header': 'custom-header' },
+				};
+			
+			
+			// 새로운 div 생성
+		    const sublistContainer = document.createElement("div");
+		    sublistContainer.id = "sublist";
+		    sublistContainer.style.width = "780px"; // 가로 크기 조정 가능
+		    //sublistContainer.style.height = "500px"; // 높이 조정 가능
+		    document.querySelector(".appendsection").appendChild(sublistContainer);
+			
+		 	// 기존 `sublistgrid` 객체가 있다면 삭제
+		    if (window.sublistgrid) {
+		        window.sublistgrid.destroy();
+		    }
+
+		    // 새로운 `sublistgrid` 생성
+		    window.sublistgrid = new tui.Grid({
+		        el: document.getElementById('sublist'),
+		        pageOptions: {
+		            useClient: false,
+		            perPage: 5
+		        },
+		        columns: [
+		            { header: "구독번호", name: "subscriptionNum", editor: 'text' },
+		            { header: "구독수단", name: "subscriptionMeanName", editor: 'text' },
+		            { header: "구독형태", name: "subscriptionFormName", editor: 'text' },
+		            { header: "구독금액", name: "subscriptionAmount", editor: 'text', formatter: ({ value }) => value.toLocaleString() + '원' },
+		            { header: "구독일시", name: "subscriptionDate", editor: 'text',
+		              formatter: ({ value }) => {
+		                const utcDate = new Date(value);
+		                const options = { 
+		                    year: 'numeric', month: '2-digit', day: '2-digit',
+		                    hour: '2-digit', minute: '2-digit', second: '2-digit',
+		                    hour12: false, timeZone: "Asia/Seoul"
+		                };
+		                return new Intl.DateTimeFormat("ko-KR", options).format(utcDate)
+		                    .replace(/\./g, '-')
+		                    .replace(/ /g, '')
+		                    .trim();
+		              }
+		            },
+		            { header: "거래명세서", name: "transactionstatement", editor: 'text',
+		                formatter: ({ row }) => `<button class="btn btn-info btn-sm sub-bill" data-id="${row.subscriptionNum}">거래명세서</button>`
+		            },
+		            { header: "세금계산서", name: "taxinvoice", editor: 'text',
+		                formatter: ({ row }) => {
+		                    if (row.subscriptionMeanName === "카드" || row.subscriptionMeanName === "카카오페이" || row.subscriptionMeanName === "네이버페이") {
+		                        return row.billNum 
+		                            ? `<button class="btn btn-info btn-sm sub-tax" data-id="${row.subscriptionNum}_1">계산서보기</button>`
+		                            : `<button class="btn btn-info btn-sm sub-tax" data-id="${row.subscriptionNum}_2">발행하기</button>`;
+		                    }
+		                    return `발행불가`;
+		                }
+		            },
+		            { header: "현금영수증", name: "cashreceipt", editor: 'text',
+		                formatter: ({ row }) => {
+		                    if (row.subscriptionMeanName === "무통장" || row.subscriptionMeanName === "계좌이체") {
+		                        return row.billNum
+		                            ? `<button class="btn btn-info btn-sm sub-cash" data-id="${row.subscriptionNum}_1">영수증보기</button>`
+		                            : `<button class="btn btn-info btn-sm sub-cash" data-id="${row.subscriptionNum}_2">발행하기</button>`;
+		                    }
+		                    return `발행불가`;
+		                }
+		            }
+		        ],
+		        data: sublistdataSource
+		    });
+		  //명세서버튼 클릭
+			document.getElementById('sublist').addEventListener('click', function(event) {
+			    if (event.target.classList.contains('sub-bill')) {
+			       	//거래명세서 발행
+			        const subscriptionNum = event.target.getAttribute('data-id');
+			       	const url = `/erp/report/report?companynum=${rowData.companyNum}&subscriptionnum=${subscriptionNum}`;
+			        window.open(url, '_blank');
+			    }else if(event.target.classList.contains('sub-tax')){
+			    	//세금계산서 발행
+			    	const subscriptionNum = event.target.getAttribute('data-id');
+			    	let tax = subscriptionNum.split("_");
+			    	if(tax[1] == 2){
+			    		alert(subscriptionNum+"세금계산서를 PDF로 발행하기");
+			    	}else if(tax[1] == 1){
+			    		alert(subscriptionNum+"세금계산서 DB에 있는 계산서 보여주기");
+			    	}
+			    }else if(event.target.classList.contains('sub-cash')){
+			    	//현금영수증 발행
+			    	const subscriptionNum = event.target.getAttribute('data-id');
+			    	let cash = subscriptionNum.split("_");
+			    	if(cash[1] == 2){
+			    		alert(subscriptionNum+"현금영수증 PDF로 발행하기");
+			    	}else if(cash[1] == 1){
+			    		alert(subscriptionNum+"현금영수증 DB에 있는 계산서 보여주기");
+			    	}
+			    	alert(subscriptionNum+"현금영수증을 명세서를 PDF로 발행하기");
+			    }
+			});
+			//명세서버튼 클릭 끝
+			
+			//아무셀 클릭
+			sublistgrid.on('click', function (ev) {
+				if (ev.rowKey !== null) {
+					//현재 강조된 행 클래스 초기화
+					if (subselectedRowKey !== null) {
+						sublistgrid.removeRowClassName(subselectedRowKey, 'tui-grid-row-highlight');
+			        }
+					// 클릭한 행에 강조 효과 추가
+					sublistgrid.addRowClassName(ev.rowKey, 'tui-grid-row-highlight');
+					 // 현재 강조된 행을 기록
+			        subselectedRowKey = ev.rowKey;
+					 
+					subrowData = sublistgrid.getRow(ev.rowKey);
+					console.log(`클릭한 행 데이터:\n${JSON.stringify(subrowData, null, 2)}`);
+					
+					// 옵션조회 쿼리 호출(goodsCode)
+				    fetch('/erp/rest/subscriptionDetail/' + subrowData.subscriptionNum, {
+				        method: 'GET',
+				        headers: {
+				            'Content-Type': 'application/json'
+				        }
+				    })
+				    .then(response => response.json())
+				    .then(data => {
+				        //subDetailgrid.resetData(data);  // 옵션 테이블 데이터 업데이트
+				        console.log(data);
+				        
+				        if (data && data.length > 0) { // 데이터가 존재하면 모달 열기
+			                let modalContent = "";
+
+			                data.forEach((item, index) => {
+			                    modalContent += `
+			                        <div class="p-2 border-bottom">
+			                            <h6><strong>${index + 1}. ${item.subscriptionName}</strong></h6>
+			                            <p>구독옵션: ${item.subscriptionOption}</p>
+			                            <p>구독가격: ${item.subscriptionOptionPrice}원</p>
+			                        </div>
+			                    `;
+			                    console.log(modalContent);
+			                });
+
+			                document.querySelector("#subinfolistModal .modal-body").innerHTML = modalContent;
+
+			                // Bootstrap 모달 객체 생성 및 표시
+			                let modal = new bootstrap.Modal(document.getElementById("subinfolistModal"));
+			                modal.show();
+			            } else {
+			                alert("상세 구독 내역이 없습니다.");
+			            }
+				        
+				        
+				        
+				        
+				    })
+				    .catch(error => console.error("데이터 요청 실패:", error));
+				}
+			});
+		}
+		
+		
+		
+		
 		//구독정보 리스트 화면 보여주기
 		var subscriptionState;
 		document.querySelector(".reinfo").addEventListener("click", function(){
@@ -674,26 +867,105 @@
 					companyNum: rowData.companyNum,	//회사번호
 			};
 			
-			document.querySelector(".appendsection").innerHTML = '여기다';
+			const url = '/erp/rest/servicereturn/'+requestData.companyNum;
+			
+			fetch ( url, {
+				methmod:"get",
+				headers: {
+					"Content-Type": "application/json",
+				    'X-CSRF-TOKEN': document.querySelector('#csrfToken').value,
+				},
+				//body : 
+			})
+			.then( result => result.json() )
+			.then( result => {
+				console.log(result);
+				let servicetag = `
+						<h5>구독정보</h5>
+					`;
+				let servicetag1 = "";
+				let servicetag2 = "그룹웨서 서비스 : 미사용<br>";
+				let servicetag3 = "인사관리 서비스 : 미사용<br>";
+				let servicetag4 = "지점관리 서비스 : 미사용<br>";
+				let servicetag5 = "그룹웨어 서비스 : 미사용<br>";
+				
+				result.forEach(ele=>{
+					if(ele.subscriptionNameNum == 1 || ele.subscriptionNameNum == 6 ){
+						//서비스사용 형태와 방법
+						if(ele.limitDay <= 0){
+							servicetag1 = "sERPing 서비스 : 종료<br>";
+						}else{
+							let endday = localdate(ele.subscriptionEndDate);
+							servicetag1 +=`
+									sERPing 서비스 : ${ele.subscriptionForm} : ${ele.limitDay}일 남음 : 종료일=${endday}<br>
+								`;							
+						}
+					}
+					if(ele.subscriptionNameNum == 2 || ele.subscriptionNameNum == 7 ){
+						//그룹웨어 사용
+						if(ele.limitDay <= 0){
+							servicetag2 = "그룹웨어 서비스 : 종료<br>";
+						}else{
+							servicetag2 =`
+								그룹웨어 서비스 : ${ele.subscriptionOption}<br>
+							`;	
+						}
+					}
+					if(ele.subscriptionNameNum == 3 || ele.subscriptionNameNum == 8 ){
+						//인사관리 사용
+						if(ele.limitDay <= 0){
+							servicetag3 = "인사관리 서비스 : 종료<br>";
+						}else{
+							let endday = localdate(ele.subscriptionEndDate);
+							servicetag3 =`
+								인사관리 서비스 : ${ele.subscriptionForm} : ${ele.limitDay}일 남음 : 종료일=${endday}<br>
+							`;	
+						}
+					}
+					if(ele.subscriptionNameNum == 4 || ele.subscriptionNameNum == 9 ){
+						//지점관리 사용
+						if(ele.limitDay <= 0){
+							servicetag4 = "지점관리 서비스 : 종료<br>";
+						}else{
+							let endday = localdate(ele.subscriptionEndDate);
+							servicetag4 =`
+								지점관리 서비스 : ${ele.subscriptionForm} : ${ele.limitDay}일 남음 : 종료일=${endday}<br>
+							`;	
+						}
+					}
+					if(ele.subscriptionNameNum == 5 || ele.subscriptionNameNum == 10 ){
+						//회계관리 사용
+						if(ele.limitDay <= 0){
+							servicetag5 = "회계관리 서비스 : 종료<br>";
+						}else{
+							let endday = localdate(ele.subscriptionEndDate);
+							servicetag5 =`
+								회계관리 서비스 : ${ele.subscriptionForm} : ${ele.limitDay}일 남음 : 종료일=${endday}<br>
+							`;	
+						}
+					}
+				});	//foreach 끝
+				servicetag += servicetag1 + servicetag2 + servicetag3 + servicetag4 + servicetag5;
+				document.querySelector(".appendsection").innerHTML = '';
+				document.querySelector(".appendsection").insertAdjacentHTML("beforeend", servicetag);
+			})	// fetch 끝
 		}
 		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+		//날짜 변환 함수
+		function localdate(value){
+		    const utcDate = new Date(value);
+		    // 한국 시간(KST)으로 변환 (날짜만)
+		    const options = { 
+		        year: 'numeric', month: '2-digit', day: '2-digit',
+		        timeZone: "Asia/Seoul"
+		    };
+		    // `toLocaleDateString` 사용하여 변환 후, 포맷을 `yyyy-MM-dd`로 조정
+		    const kstDate = new Intl.DateTimeFormat("ko-KR", options).format(utcDate)
+		        .replace(/\./g, '-') // yyyy.MM.dd → yyyy-MM-dd 로 변환
+		        .replace(/\s+/g, '') // 불필요한 공백 제거
+		        .replace(/-$/, '');  // 마지막에 붙는 '-' 제거
+		    return kstDate;
+		}
 		
 		//cs 내역
 		document.querySelector(".cslist").addEventListener("click", function(){
@@ -992,8 +1264,7 @@
 	            grid.removeRowClassName(selectedRowKey, 'tui-grid-row-highlight');
 	        }
 			//cs내역 영역 지우기
-			document.querySelector(".appendsection").innerHTML = '';
-			
+			document.querySelector(".appendsection").innerHTML = '';			
 		});
 		
 		let isOkNo = false;
