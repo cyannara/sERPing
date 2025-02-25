@@ -69,10 +69,16 @@ public class BhfVueController {
 		return "/bhf/inventory";
 	}
 	
-	// 상품 입고 페이지
+	// 재고 조정 내역
 	@GetMapping("/invenHistory")
 	public String invenHistory() {
 		return "/bhf/invenHistory";
+	}
+	
+	// 마감 정산
+	@GetMapping("/closing")
+	public String closing() {
+		return "/bhf/closing";
 	}
 	
 }

@@ -131,7 +131,27 @@
 				{ header : "규격", name : "goodsStandard"},
 				{ header : "수량", name : "stockQuantity"},
 				{ 
-					header : "조정수량", 
+					header : "플러스 수량", 
+					name : "quantity", 
+					editor: 'text',
+					onAfterChange: function(ev) { // onAfterChange는 해당 열에 변경이 있을때마다 호출되는 이벤트
+		                // ev.value:사용자가 입력한 값, ev.rowkey:변경된 셀이 어떤 행인지 알려주는 키
+		                // 값이 숫자만 포함하고 있는지 확인
+		                const value = /^[0-9]*$/.test(ev.value); // 숫자만 허용하는 정규식
+		                // 숫자가 아닌 값이 들어왔을 때 
+		                if (!value) {
+		                    grid2.setValue(ev.rowKey, ev.columnName, '');  // 해당 셀을 비웁니다
+		                    alert("수량은 숫자만 입력할 수 있습니다.");
+		                }else {
+		                	 // 마이너스 수량이 이미 입력되어 있으면, 플러스 수량을 비우지 않음
+		                    if (grid2.getValue(ev.rowKey, "quantity")) {
+		                        grid2.setValue(ev.rowKey, "mediationQuantity", ''); // 비어있는 경우에만 마이너스 수량 비우기
+		                    }
+		                }
+		            }
+				},
+				{ 
+					header : "마이너스 수량", 
 					name : "mediationQuantity", 
 					editor: 'text',
 					onAfterChange: function(ev) { // onAfterChange는 해당 열에 변경이 있을때마다 호출되는 이벤트
@@ -141,7 +161,12 @@
 		                // 숫자가 아닌 값이 들어왔을 때 
 		                if (!value) {
 		                    grid2.setValue(ev.rowKey, ev.columnName, '');  // 해당 셀을 비웁니다
-		                    alert("조정수량은 숫자만 입력할 수 있습니다.");
+		                    alert("수량은 숫자만 입력할 수 있습니다.");
+		                } else {
+		                	// 플러스 수량이 이미 입력되어 있으면, 마이너스 수량을 비우지 않음
+		                    if (grid2.getValue(ev.rowKey, "mediationQuantity")) {
+		                        grid2.setValue(ev.rowKey, "quantity", ''); // 비어있는 경우에만 플러스 수량 비우기
+		                    }
 		                }
 		            }
 				},
@@ -164,13 +189,15 @@
 			// 조정 수량 및 사유 작성 했는지 확인
 			for (let i = 0; i < mediationData.length; i++) {
 				
-				const mediationQuantity = Number(mediationData[i].mediationQuantity); // 문자열을 숫자로 변환(0도 비교하기 위해서)
+				const quantity = Number(mediationData[i].quantity); // 문자열을 숫자로 변환(0도 비교하기 위해서)
+				const mediationQuantity = Number(mediationData[i].mediationQuantity);
 				const mediationReason = mediationData[i].mediationReason;
 				
-			    if (mediationQuantity === 0 || mediationQuantity === "" || mediationQuantity === null) {  // 수량이 비어있는지 확인
-		            alert("조정수량을 입력해주세요.");
-		            return;  // 수량이 없으면 더 이상 진행하지 않음
+				if (quantity === 0 && mediationQuantity === 0) {  // 발주수량이 비어있는지 확인
+		            alert("수량을 입력해주세요.");
+		            return;  // 발주수량이 없으면 더 이상 진행하지 않음
 		        }
+				
 			    if (mediationReason === "" || mediationReason === null){
 			    	alert("조정사유를 입력해주세요.");
 		            return;
@@ -185,6 +212,7 @@
 			        optionCode: item.optionCode,
 			        optionName: item.optionName,
 			        goodsStandard: item.goodsStandard,
+			        quantity: item.quantity,
 			        mediationQuantity: item.mediationQuantity,
 			        mediationReason: item.mediationReason,
 			        branchOfficeId: branchOfficeId,

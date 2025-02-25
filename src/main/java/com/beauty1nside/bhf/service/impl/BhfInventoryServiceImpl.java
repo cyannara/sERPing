@@ -34,11 +34,15 @@ public class BhfInventoryServiceImpl implements BhfInventoryService {
 		
 		// 조정 등록 메퍼
 		int insertResult = mapper.mediationInsert(dto);
-		// 창고 업데이트 메퍼
+		// 창고 수량 뺴기 메퍼
 		int updateResult = mapper.quantityUpdate(dto);
+		// 창고 수량 더하기 매퍼
+		int updatePlus = mapper.quantityPlus(dto);
+		
+		System.out.println(dto);
 		
 		// 삼항연산자로 두개의 결과 다 0보다 크면 true
-		return (insertResult > 0 && updateResult > 0) ? true : false;
+		return (insertResult > 0 && updateResult > 0 && updatePlus > 0) ? true : false;
 	}
 
 	@Override
