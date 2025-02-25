@@ -1,7 +1,9 @@
 package com.beauty1nside.mypage.controller;
 
+import com.beauty1nside.hr.dto.EmpDTO;
 import com.beauty1nside.mainpage.dto.ApprovalDTO;
 import com.beauty1nside.mainpage.service.ApprovalService;
+import com.beauty1nside.mypage.service.ProfileService;
 import com.beauty1nside.security.service.CustomerUser;
 import com.beauty1nside.stdr.dto.DocumentDTO;
 import lombok.AllArgsConstructor;
@@ -20,6 +22,16 @@ import java.util.Map;
 @RequestMapping("/api/mypage/*")
 public class MypageRestController {
   final ApprovalService approvalService;
+  final ProfileService profileService;
+  
+  @GetMapping("/profile")
+  public EmpDTO getMyProfile(@AuthenticationPrincipal CustomerUser user) {
+    EmpDTO empDTO = new EmpDTO();
+    
+    empDTO.setEmployeeNum(user.getUserDTO().getEmployeeNum());
+    empDTO.setCompanyNum(user.getUserDTO().getCompanyNum());
+    return profileService.info(empDTO);
+  }
   
   @PostMapping("/approval")
   public ResponseEntity<Map<String, Object>> submitApproval(@RequestBody DocumentDTO documentDTO,
