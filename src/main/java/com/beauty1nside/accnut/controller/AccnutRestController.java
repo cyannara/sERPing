@@ -15,6 +15,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,6 +30,7 @@ import com.beauty1nside.accnut.dto.DebtDTO;
 import com.beauty1nside.accnut.dto.DebtSearchDTO;
 import com.beauty1nside.accnut.dto.EtcBookSearchDTO;
 import com.beauty1nside.accnut.dto.IncidentalCostSearchDTO;
+import com.beauty1nside.accnut.dto.SalaryBookDTO;
 import com.beauty1nside.accnut.dto.SalaryBookSearchDTO;
 import com.beauty1nside.accnut.service.AssetService;
 import com.beauty1nside.accnut.service.DealBookService;
@@ -42,7 +44,7 @@ import com.beauty1nside.common.GridData;
 import com.beauty1nside.common.Paging;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -233,20 +235,14 @@ public class AccnutRestController {
 	}
 	
 	
-	// String => json으로 출력
+	// String => json => [{},{},{}]  으로 출력
     @GetMapping("/json/test")
     public Object jsonTest() throws JsonMappingException, JsonProcessingException{
     	
             String jsonString = jsonQueryService.jsonTest();
             GridArray grid = new GridArray();
             
-            JsonNode jsonNode = grid.getJson(jsonString);
-            log.info(jsonNode.get("bhf_order").isArray());
-            log.info(jsonNode.fieldNames());
-            
-            
-            
-            
+            List<ObjectNode> jsonNode = grid.getNewList(jsonString);
             
             return jsonNode;
     }
@@ -297,7 +293,7 @@ public class AccnutRestController {
 	}
 	
 	@PostMapping("/book/insert")
-	public Map register(@RequestBody GridData<DealBookDTO> dto) {
+	public Map bookInsert(@RequestBody GridData<DealBookDTO> dto) {
 		dto.getCreatedRows().forEach(dtos -> {
 			log.info("list: " + dtos);
 			if(dtos.getSection() != null) {
@@ -310,6 +306,38 @@ public class AccnutRestController {
 	
 	
 	
+	
+	
+	// 수정 ----------------------------------------------------------------------------------------------
+	
+	@PutMapping("/salary/update")
+	public ResponseEntity<Map<String, Object>> salaryUpdate(@RequestBody List<SalaryBookDTO> dtoList) {
+		int total = 0;
+		for(SalaryBookDTO dto : dtoList) {
+			total += dto.getPaymentAmount();
+		}
+		
+	    Map<String, Object> response = new HashMap<>();
+	    try {
+	    	salaryBookService.update(dtoList);
+	    	// 급여통장에서 빠짐
+	    	NHService nh = new NHService();
+	    	// 급여통장 조회
+	    	AssetDTO assetDTO = assetService.info("01");
+	    	// 급여통장 핀어카운트 조회
+	    	String finAcno = nh.getFinAcno(assetDTO);
+	    	nh.withdraw(finAcno, String.valueOf(total));
+	    	
+	        response.put("status", "success");
+	        response.put("message", "등록 성공");
+	        return ResponseEntity.ok(response); // JSON 형태 응답
+	    } catch (Exception e) {
+	        log.error("등록 실패", e);
+	        response.put("status", "error");
+	        response.put("message", "등록 실패");
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+	    }
+	}
 	
 	
 	

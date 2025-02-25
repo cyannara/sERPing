@@ -185,6 +185,48 @@ public class NHService {
 		return result;
 	}
 	
+	// 출금이체	------------------------------------------------------------
+		public boolean withdraw(String finAcno, String total) {
+			
+			boolean bool = false;
+			
+			String url1 = "https://developers.nonghyup.com/DrawingTransfer.nh";
+			
+			// 요청 파라미터 생성
+	        Map<String, Object> paramMap4 = new HashMap<>();
+	        Map<String, String> headerMap4 = new HashMap<>();
+	        headerMap4.put("ApiNm", "DrawingTransfer");
+	        headerMap4.put("Tsymd", getDate());
+	        headerMap4.put("Trtm", getTime());
+	        headerMap4.put("Iscd", "002869");
+	        headerMap4.put("FintechApsno", "001");
+	        headerMap4.put("ApiSvcCd", "DrawingTransferA");
+	        headerMap4.put("IsTuno", String.valueOf(System.currentTimeMillis()) );
+	        headerMap4.put("AccessToken", "f992edaa21154e076a3f2d856c37d2aaf72a4f8f72d009c89ded50fa9b917098");
+	        paramMap4.put("Header", headerMap4);
+	        paramMap4.put("FinAcno", finAcno);
+	        paramMap4.put("Tram", total);
+	        
+	        log.info(paramMap4);
+	        
+	        HttpEntity<Map<String, Object>> requestEntity4 = new HttpEntity<>(paramMap4, getHeaders());
+	        
+	        try {
+	            // POST 방식으로 API 호출 (응답 DTO는 API의 응답 구조에 맞게 정의)
+	            ResponseEntity<NHDTO> response4 = restTemplate.postForEntity(url1, requestEntity4, NHDTO.class );
+	            NHDTO responseBody4 = response4.getBody();
+	            
+	            if (responseBody4 != null) {
+	            	bool = finAcno.equals( responseBody4.getFinAcno() );
+	            }
+	            
+	        } catch (Exception e) {
+	            // 호출 실패 시 로그 남기기
+	            log.error("Nonghyup API 호출 실패: {}", e.getMessage());
+	        }
+			
+			return bool;
+		}
 	
 	
     

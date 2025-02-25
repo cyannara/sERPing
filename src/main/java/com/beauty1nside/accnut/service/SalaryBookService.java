@@ -9,4 +9,5 @@ public interface SalaryBookService {
 	SalaryBookDTO info(String salaryAccountBookCode);
 	List<SalaryBookDTO> list(SalaryBookSearchDTO dto);
 	int count(SalaryBookSearchDTO dto);
+	int update(List<SalaryBookDTO> dtoList);
 }

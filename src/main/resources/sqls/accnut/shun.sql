@@ -233,11 +233,6 @@ update (select a.quantity as asd, b.quantity as def
         where a.option_code = b.option_code) c
 set c.asd = (c.asd - c.def);
 
-UPDATE (SELECT e.salary AS emp_salary, d.bonus AS dept_bonus
-        FROM employees e
-        JOIN departments d ON e.dept_id = d.dept_id)
-SET emp_salary = emp_salary + dept_bonus;
-
 UPDATE (SELECT a.quantity as asd, b.quantity as def, a.warehouse_code, b.returning_detail_code
         FROM bhf_warehouse a
         JOIN bhf_returning_detail b ON a.option_code = b.option_code)
@@ -339,9 +334,165 @@ ON (br.returning_code = brd.returning_code);
 
 select * from accnut_assets where financial_institution LIKE '%FI%' AND section = 'AC02';
 select * from accnut_assets where section = 'AC02';
-update accnut_assets set finance_information = '3020000012496' where assets_code = '01';
+update accnut_assets set assets_name = '월급급여통장', amount=0, quantity=null, fixtures_amount=0 where assets_code = '01';
 update accnut_assets set rgno = '20250224000002849' where assets_code = '121';
 commit;
 delete from accnut_assets where assets_code = '124';
 alter table accnut_assets add rgno varchar2(1000);
 
+-- 2025-02-25
+
+select * from accnut_salary_account_book;
+update accnut_salary_account_book set payment_alternative = 'PY02', payer = '';
+commit;
+select * from cmmn where cmmn_code LIKE 'PY%';
+
+-- 매출 조회 => 마감 정산, 반품량, 재품 재고 조정
+SELECT bc.*, bcd.*
+FROM bhf_closing bc JOIN bhf_closing_detail bcd
+ON (bc.closing_code = bcd.closing_code);
+
+SELECT *
+FROM bhf_goods_mediation;
+update bhf_goods_mediation set company_num = 100 WHERE mediation_code = 'medaiation81';
+commit;
+
+SELECT br.*, brd.*
+FROM bhf_returning br JOIN bhf_returning_detail brd
+ON (br.returning_code = brd.returning_code)
+WHERE brd.returning_reason IN ('파손', '찌그러짐');
+
+SELECT  -- br.request_date,
+        TO_CHAR(br.request_date, 'YYYY-MM-DD') request_date,
+        --'2월' AS requst_date,
+        br.branch_office_id,
+        brd.option_code,
+        brd.goods_name || '-' || brd.option_name option_name,
+        sum( brd.quantity )
+FROM bhf_returning br JOIN bhf_returning_detail brd
+ON (br.returning_code = brd.returning_code)
+WHERE brd.returning_reason IN ('파손', '찌그러짐')
+--AND TO_CHAR(br.request_date, 'YYYY-MM-DD') LIKE '2025-02-%'
+GROUP BY  
+TO_CHAR(br.request_date, 'YYYY-MM-DD'),
+-- br.request_date, 
+br.branch_office_id, 
+brd.option_code, 
+(brd.goods_name || '-' || brd.option_name)
+--HAVING br.request_date BETWEEN '2025-02-01' AND '2025-02-20'
+HAVING brd.goods_code = 'P002'
+ORDER BY br.branch_office_id;
+
+SELECT TO_CHAR(result_date, 'YYYY-MM-DD') result_date,
+       a.office_id, 
+       a.option_code, 
+       a.option_name, 
+       SUM(a.qy)
+FROM (SELECT br.request_date result_date, 
+             br.branch_office_id office_id,
+             brd.option_code  option_code,
+             brd.goods_name || '-' || brd.option_name AS option_name ,
+             brd.quantity AS qy
+      FROM bhf_returning br JOIN bhf_returning_detail brd
+             ON (br.returning_code = brd.returning_code)
+      WHERE brd.returning_reason IN ('파손', '찌그러짐') )a
+GROUP BY TO_CHAR(result_date, 'YYYY-MM-DD'),
+         office_id, 
+         option_code, 
+         option_name
+-- HAVING option_code = 'LH0011'
+ORDER BY result_date desc, 
+         office_id, 
+         option_code 
+
+;
+UNION ALL
+
+SELECT TO_CHAR(result_date, 'YYYY-MM-DD') as result_date,
+       b.office_id,
+       b.option_code,
+       b.option_name,
+       SUM(b.qy)
+FROM (SELECT mediation_date result_date, 
+            branch_office_id as office_id, 
+            option_code, 
+            goods_name || '-' || option_name as option_name, 
+            NVL(quantity, 0) - NVL(mediation_quantity, 0) as qy
+      FROM bhf_goods_mediation) b
+GROUP BY TO_CHAR(result_date, 'YYYY-MM-DD'),
+         office_id, 
+         option_code, 
+         option_name
+-- HAVING option_code = 'LH0011'
+ORDER BY result_date desc, 
+         office_id, 
+         option_code 
+;
+
+
+-- 유니온으로 두 테이블 합칠거
+
+;
+
+
+SELECT a.result_date,
+       a.office_id, 
+       a.option_code, 
+       a.option_name, 
+       a.qy
+FROM (SELECT br.request_date AS result_date, 
+             br.branch_office_id AS office_id,
+             brd.option_code,
+             brd.goods_name || '-' || brd.option_name AS option_name,
+             brd.quantity AS qy
+      FROM bhf_returning br JOIN bhf_returning_detail brd
+             ON (br.returning_code = brd.returning_code)
+      WHERE brd.returning_reason IN ('파손', '찌그러짐') ) AS a
+
+UNION ALL
+
+SELECT b.result_date
+       b.office_id,
+       b.option_code,
+       b.option_name,
+       b.qy
+FROM (SELECT mediation_date AS result_date, 
+            branch_office_id AS office_id, 
+            option_code, 
+            goods_name || '-' || option_name AS option_name, 
+            NVL(quantity, 0) - NVL(mediation_quantity, 0) AS qy
+      FROM bhf_goods_mediation) AS b
+;
+      
+
+
+-- 실행 되는것 
+      
+SELECT a.result_date,
+       a.office_id, 
+       a.option_code, 
+       a.option_name, 
+       a.qy
+FROM (SELECT br.request_date AS result_date, 
+             br.branch_office_id AS office_id,
+             brd.option_code,
+             brd.goods_name || '-' || brd.option_name AS option_name,
+             brd.quantity AS qy
+      FROM bhf_returning br
+      JOIN bhf_returning_detail brd
+        ON (br.returning_code = brd.returning_code)
+      WHERE brd.returning_reason IN ('파손', '찌그러짐')) a
+
+UNION ALL
+
+SELECT b.result_date,
+       b.office_id,
+       b.option_code,
+       b.option_name,
+       b.qy
+FROM (SELECT mediation_date AS result_date, 
+             branch_office_id AS office_id, 
+             option_code, 
+             goods_name || '-' || option_name AS option_name, 
+             NVL(quantity, 0) - NVL(mediation_quantity, 0) AS qy
+      FROM bhf_goods_mediation) b;

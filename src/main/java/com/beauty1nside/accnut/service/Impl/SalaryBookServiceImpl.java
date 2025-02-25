@@ -3,6 +3,7 @@ package com.beauty1nside.accnut.service.Impl;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.beauty1nside.accnut.dto.SalaryBookDTO;
 import com.beauty1nside.accnut.dto.SalaryBookSearchDTO;
@@ -39,7 +40,17 @@ public class SalaryBookServiceImpl implements SalaryBookService{
 		return salaryBookMapper.count(dto);
 	}
 	
-	
+	@Override
+	@Transactional
+	public int update(List<SalaryBookDTO> dtoList) {
+		// TODO Auto-generated method stub
+		int result = 0;
+		for(SalaryBookDTO dto : dtoList) {
+			int co = salaryBookMapper.update(dto);
+			result += co;
+		}
+		return result;
+	}
 	
 	
 	
