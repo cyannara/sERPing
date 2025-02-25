@@ -39,6 +39,7 @@ public class OracleArrayStructHandler implements TypeHandler<Object> {
 	    Struct[] array = new Struct[files.size()];
 
 	    int arrayIndex = 0;
+	    //배열의 순서는 파일타입 만들떄 컬럼 순서와 맞춰야 한다.
 	    for (BhfOrdDtlVO file : files) {
 	    	filetype[0] = file.getGoodsCode();
 	    	filetype[1] = file.getGoodsName();

@@ -11,6 +11,7 @@
                   OPTION_CODE,
                   OPTION_NAME,
                   GOODS_STANDARD,
+                  QUANTITY,
                   MEDIATION_QUANTITY,
                   MEDIATION_REASON,
                   COMPANY_NUM,
@@ -21,15 +22,22 @@
 		        #{optionCode},
 		        #{optionName},
 		        #{goodsStandard},
+		        #{quantity},
 		        #{mediationQuantity},
 		        #{mediationReason},
 		        #{companyNum},
 		        #{branchOfficeId} )
 	</insert>
-	<!-- 조정 등록 후 창고 수량 변경 -->
+	<!-- 조정 등록 후 창고 수량 뺴기 -->
 	<update id="quantityUpdate" parameterType="BhfInventoryInsertDTO">
 		UPDATE 	bhf_warehouse
 	    SET 	stock_quantity = stock_quantity - #{mediationQuantity}
+	    WHERE 	option_code = #{optionCode}
+	</update>
+	<!-- 조정 등록 후 창고 수량 더하기 -->
+	<update id="quantityPlus" parameterType="BhfInventoryInsertDTO">
+		UPDATE 	bhf_warehouse
+	    SET 	stock_quantity = stock_quantity + #{quantity}
 	    WHERE 	option_code = #{optionCode}
 	</update>
 	

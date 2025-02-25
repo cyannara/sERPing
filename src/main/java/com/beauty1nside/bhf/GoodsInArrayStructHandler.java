@@ -46,11 +46,11 @@ public class GoodsInArrayStructHandler implements TypeHandler<Object> {
 	    	goodsInFileType[2] = file.getGoodsName();
 	    	goodsInFileType[3] = file.getOptionCode();
 	    	goodsInFileType[4] = file.getOptionName();
-	    	goodsInFileType[6] = file.getGoodsStandard(); 
-	    	goodsInFileType[5] = file.getQuantity(); 
+	    	goodsInFileType[5] = file.getGoodsStandard(); 
+	    	goodsInFileType[6] = file.getQuantity(); 
 	    	goodsInFileType[7] = file.getStockQuantity();
-	    	goodsInFileType[8] = file.getInQuantity();
-	    	goodsInFileType[9] = file.getCompanyNum();
+	    	goodsInFileType[8] = file.getCompanyNum();
+	    	goodsInFileType[9] = file.getInQuantity();
 	    	goodsInFileType[10] = file.getReorder();
 	    	goodsInFileType[11] = file.getReturnNum();
 	        goodsInArray[goodsInIndex++] = conn.createStruct("GOODSINFILETYPE", goodsInFileType);
