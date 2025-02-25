@@ -17,4 +17,7 @@ public class BsnDeliveryLotDTO {
 	private String GoodsLotNum;
 	private int DeliveryPossibleQnt;
 	private int DeliveryQnt;
+	
+	
+	private Date goodsConsumptionDate;
 }

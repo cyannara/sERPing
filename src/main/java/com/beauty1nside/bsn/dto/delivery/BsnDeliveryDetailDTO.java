@@ -19,7 +19,7 @@ public class BsnDeliveryDetailDTO extends OrderSearchDTO {
 	private int deliveryDemandQnt;
 	private int deliveryTotalQnt;
 	private int sufficiencyStatus;
-	
+
 	private String goodsName;
 	private String optionName;
 	private String goodsStandard;
