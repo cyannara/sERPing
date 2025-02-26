@@ -15,6 +15,7 @@
 	*  2025.02.17  표하연          최초생성
 	*  2025.02.18  표하연          기간결제에 따른 추가처리
 	*  2025.02.20  표하연          사용계약서 정보를 CR 한다 // 구독정보 및 상세정보를 read 한다
+	*  2025.02.26  표하연          구독 결제한 현금영수증, 세금계산서 데이터를 삽입한다
 	*
 	*  </pre>
 ======================================================== -->
@@ -306,5 +307,21 @@
 		    on o.subscription_name_num = n.subscription_name_num
 		where subscription_num = #{subscriptionNum}
 	</select>
+	
+	<!-- 
+     * 구독 결제한 현금영수증, 세금계산서 데이터를 삽입한다
+     *
+     * @param TaxInvoiceDTO
+     * @return int
+	-->
+	<insert id="insertTaxInvoice" parameterType="TaxInvoiceDTO">
+        INSERT INTO erp_bill (
+            BILL_NUM, SUBSCRIPTION_NUM, EMPLOYEE_NUM, BILL_FORM,
+            PDF_ADDRESS, ISSUE_COMPANY, COMPANY_CODE, ISSUE_DATE
+        ) VALUES (
+            erp_bill_seq.nextval, #{subscriptionNum}, #{employeeNum}, #{billForm},
+            #{pdfAddress}, #{issueCompany}, #{companyCode}, sysdate
+        )
+    </insert>
 
 </mapper>

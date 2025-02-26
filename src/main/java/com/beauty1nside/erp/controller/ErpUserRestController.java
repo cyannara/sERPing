@@ -19,6 +19,7 @@ import com.beauty1nside.common.Paging;
 import com.beauty1nside.erp.dto.ContractDTO;
 import com.beauty1nside.erp.dto.ErpSearchDTO;
 import com.beauty1nside.erp.dto.SubscriptionDetailDTO;
+import com.beauty1nside.erp.dto.TaxInvoiceDTO;
 import com.beauty1nside.erp.dto.erpSubscriptionInfoListDTO;
 import com.beauty1nside.erp.service.ErpUserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -42,6 +43,7 @@ import lombok.extern.log4j.Log4j2;
  *  2025.02.17  표하연          최초 생성
  *  2025.02.18  표하연          결제 모듈 등록
  *  2025.02.20  표하연          전자계약 모듈 등록 / 구독내역 리스트 전달
+ *  2025.02.26  표하연          계산서 처리 내역 등록
  *
  *  </pre>
 */
@@ -221,6 +223,23 @@ public class ErpUserRestController {
 	@GetMapping("/subscriptionDetail/{subscriptionNum}")
 	public List<SubscriptionDetailDTO> subscriptionDetail(@PathVariable(name="subscriptionNum") int subscriptionNum) {
 		return erpUserService.subscriptionDetail(subscriptionNum);
+	}
+	
+	
+	/**
+     * 구독 결제한 현금영수증, 세금계산서 데이터를 삽입한다
+     *
+     * @param TaxInvoiceDTO
+     * @return String
+     */
+	@PostMapping("/taxbillpublishing")
+	public String taxbillpublishing(@RequestBody TaxInvoiceDTO dto) {
+		log.info(dto);
+		if(erpUserService.insertTaxInvoice(dto)) {
+			return "OK";			
+		}else {
+			return "NO";
+		}
 	}
 	
 }

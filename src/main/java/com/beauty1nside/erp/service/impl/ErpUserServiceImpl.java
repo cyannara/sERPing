@@ -14,6 +14,7 @@ import com.beauty1nside.erp.dto.ErpSearchDTO;
 import com.beauty1nside.erp.dto.ErpSubOptionDTO;
 import com.beauty1nside.erp.dto.SubScriptionDTO;
 import com.beauty1nside.erp.dto.SubscriptionDetailDTO;
+import com.beauty1nside.erp.dto.TaxInvoiceDTO;
 import com.beauty1nside.erp.dto.erpSubscriptionInfoListDTO;
 import com.beauty1nside.erp.mapper.ErpUserMapper;
 import com.beauty1nside.erp.service.ErpUserService;
@@ -38,6 +39,7 @@ import lombok.extern.log4j.Log4j2;
  *  2025.02.18  표하연          기간 구독 결제 서비스 생성
  *  2025.02.20  표하연          사용계약서 정보를 CR 한다
  *  2025.02.21  표하연          결제 목록을 리드한다
+ *  2025.02.26  표하연          구독 결제한 현금영수증, 세금계산서 데이터를 삽입한다
  *
  *  </pre>
 */
@@ -273,6 +275,17 @@ public class ErpUserServiceImpl implements ErpUserService {
 	@Override
 	public List<SubscriptionDetailDTO> subscriptionDetail(int subscriptionNum) {
 		return erpUserMapper.subscriptionDetail(subscriptionNum);
+	}
+
+	/**
+     * 구독 결제한 현금영수증, 세금계산서 데이터를 삽입한다
+     *
+     * @param TaxInvoiceDTO
+     * @return boolean
+     */
+	@Override
+	public boolean insertTaxInvoice(TaxInvoiceDTO dto) {
+		return erpUserMapper.insertTaxInvoice(dto)==1 ? true : false;
 	}
 	
 }
