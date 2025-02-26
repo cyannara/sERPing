@@ -169,5 +169,4 @@ public class MainpageRestController {
     Long companyNum = user.getUserDTO().getCompanyNum();
     return stdrDeptService.deptList(companyNum);
   }
-  
 }

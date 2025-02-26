@@ -19,4 +19,5 @@ public class UserDTO  {
   private Long companyNum;
   private String companyEngName;
   private Long departmentNum;
+  private String profileImage;
 }

@@ -5,6 +5,7 @@ import com.beauty1nside.security.service.UserDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
@@ -12,8 +13,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
-  
   
   @Override
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -31,14 +32,13 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
     request.getSession().setAttribute("companyNum", userDTO.getCompanyNum());
     request.getSession().setAttribute("companyEngName", userDTO.getCompanyEngName());
     request.getSession().setAttribute("departmentNum", userDTO.getDepartmentNum());
+    request.getSession().setAttribute("profileImage", userDTO.getProfileImage());
     
     // user한명이 롤 여러개 가지고 있을 수 있으니까
     List<String> roleNames = new ArrayList<>();
     authentication.getAuthorities().forEach(authority -> {
       roleNames.add(authority.getAuthority());
     });
-    
-    System.out.println("roleNames = " + roleNames);
     
 //    if(roleNames.contains("ROLE_ADMIN")) {
 //      response.sendRedirect("/admin");
