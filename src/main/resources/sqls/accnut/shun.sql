@@ -476,3 +476,29 @@ BEGIN
 
     RETURN v_result;
 END;
+/
+
+-- 2025-02-26
+
+select fn_get_cmmn_code('√Îº“')
+from dual;
+
+select fn_get_cmmn_code_ver2('Ω¬¿Œ', 'ªÛ≈¬')
+from dual;
+
+select * from cmmn where cmmn_name = 'Ω¬¿Œ';
+
+SELECT option_code, option_name
+FROM purchse_option po JOIN purchse_goods pg
+            ON (po.goods_num = pg.goods_num)
+WHERE pg.company_num = 1 -- #{companyNum}
+-- AND pg.goods_name LIKE '%' || null || '%'
+ORDER BY 2;
+
+
+select * from bsn_bhf;
+
+select fn_get_cmmn_name(rental_type)
+FROM bsn_bhf;
+
+select * from cmmn;
