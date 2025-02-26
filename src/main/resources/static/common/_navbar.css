@@ -80,3 +80,8 @@ nav a:hover {
 
  }
 
+ .dropdown-toggle {
+     > img {
+         object-fit: cover;
+     }
+ }

@@ -59,6 +59,8 @@ imgUpdateBtn.addEventListener('click', () => {
     }).then((data) => {
         if(data.message === 'success') {
             showAlert('프로필 사진이 변경되었습니다.', 'success')
+            // to update header profile img
+            window.location.reload();
         } else {
             showAlert('프로필 사진 변경 실패', 'danger')
         }

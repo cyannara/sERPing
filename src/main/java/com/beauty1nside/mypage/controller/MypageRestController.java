@@ -5,7 +5,9 @@ import com.beauty1nside.mainpage.dto.ApprovalDTO;
 import com.beauty1nside.mainpage.service.ApprovalService;
 import com.beauty1nside.mypage.service.ProfileService;
 import com.beauty1nside.security.service.CustomerUser;
+import com.beauty1nside.security.service.UserDTO;
 import com.beauty1nside.stdr.dto.DocumentDTO;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -43,7 +45,8 @@ public class MypageRestController {
   
   @PostMapping("/profile/img")
   public ResponseEntity<Map<String, Object>> updateProfileImg(@RequestParam("image") MultipartFile file,
-                                                              @AuthenticationPrincipal CustomerUser user) {
+                                                              @AuthenticationPrincipal CustomerUser user,
+                                                              HttpServletRequest request) {
     EmpDTO empDTO = new EmpDTO();
     empDTO.setEmployeeNum(user.getUserDTO().getEmployeeNum());
     empDTO.setCompanyNum(user.getUserDTO().getCompanyNum());
@@ -62,6 +65,10 @@ public class MypageRestController {
       
       int isSuccess = profileService.update(empDTO);
       if (isSuccess == 1) {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setProfileImage(imageUrl);
+        request.getSession().setAttribute("profileImage", userDTO.getProfileImage());
+        
         response.put("message", "success");
         return ResponseEntity.ok(response);
       } else {
