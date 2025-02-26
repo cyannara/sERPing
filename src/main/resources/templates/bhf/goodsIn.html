@@ -25,7 +25,7 @@
 					<input type="text"class="col-sm-7" id="branchOfficeId">
 				</div>
 			</div>
-			<div class="col-md-6 stretch-card mt-2 mb-2">
+			<div class="col-md-12 stretch-card mt-2 mb-2">
 				<div class="card">
 					<div class="card-body">
 						<h6 class="mb-4">주문서</h6>
@@ -34,7 +34,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-md-6 stretch-card mt-2 mb-2">
+			<div class="col-md-12 stretch-card mt-2 mb-2">
 				<div class="card">
 					<div class="card-body">
 						<h6 class="mb-4">주문 상세</h6>
@@ -62,7 +62,7 @@
 	    const token = document.querySelector('meta[name="_csrf"]').content; //서버에서 생성한 CSRF 토큰 값
 		
 		//쿼리에 넘길 주문번호, 발주서코드
-		let orderId = '';
+		let deliveryId = '';
 		let orderCode = '';
 		
 		//페이지가 로드되면 테이블에 데이터가 없을때 뜨는 문구 함수 실행
@@ -86,8 +86,9 @@
 				perPage: 5,
 			},
 			columns: [ 
-				{ header : "주문번호", name : "orderId"},
+				{ header : "출고번호", name : "deliveryId"},
 				{ header : "발주서코드", name : "orderCode"},
+				{ header : "출고일자", name : "deliveryDate"},
 				{ header : "발주일자", name : "orderDate"},
 				{ header : "납기일자", name : "dueDate"},
 				{ header : "비고", name : "remark"}
@@ -100,11 +101,11 @@
 			if(rowKey != undefined){ 	// 행 말고 다른데 클릭해도 이 함수가 실행되서 행의 키값이 있을때만 실행되게 함
 				
 				const rowData = grid.getRow(rowKey); //해당 행의 데이터 가져오기
-				orderId = rowData.orderId; // 주문서 번호 담기
+				deliveryId = rowData.deliveryId //출고번호 담기
 				orderCode = rowData.orderCode; // 주문서 코드 담기 
 				
 				// 주문서 상세 조회 쿼리호출(orderId)
-			    fetch('http://localhost:81/bhf/rest/bsn/ordlist?orderId=' + orderId, {
+			    fetch('http://localhost:81/bhf/rest/bsn/ordlist?deliveryId=' + deliveryId, {
 			        method: 'GET',
 			        headers: {
 			            'Content-Type': 'application/json'
@@ -113,6 +114,7 @@
 			    .then(response => response.json())
 			    .then(data => {
 			        grid2.resetData(data.data.contents);  // 교환및반품 상세 테이블 데이터 업데이트
+			        console.log("dddddaaaaaaaattttttttaaaaaaaaaaa",data.data.contents);
 			    })
 			    .catch(error => console.error("데이터 요청 실패:", error));
 			}
@@ -183,36 +185,57 @@
 		// 상품입고 등록 함수
 		function goodsInsert(){
 			
-			//프로시저로 처리하면 여기서 값 다 보내줘야된다 발주수량이랑 입고수량 차이나는 수량 변수에 담아서
 			let dueDate = new Date().toISOString().split('T')[0]
-			console.log(orderId,orderCode,dueDate)
-			let returnData = grid2.getData();
+			let gooddsInData = grid2.getData();
+			console.log(deliveryId,orderCode,dueDate,"상세데이터->",gooddsInData)
 			
-			// 테이블에 데이터가 있는지 확인
-			if (returnData.length === 0) {
+ 			// 테이블에 데이터가 있는지 확인
+			if (gooddsInData.length === 0) {
 		        alert("입고할 상품을 추가해주세요.");
 		        return;
 		    }
 			// 발주 수량을 적었는지 확인
-			for (let i = 0; i < returnData.length; i++) {
+			for (let i = 0; i < gooddsInData.length; i++) {
 				
-				const stockQuantity = Number(returnData[i].stockQuantity); // 문자열을 숫자로 변환(0도 비교하기 위해서)
+				const stockQuantity = Number(gooddsInData[i].stockQuantity); // 문자열을 숫자로 변환(0도 비교하기 위해서)
 				
 			    if (stockQuantity === 0 || stockQuantity === "" || stockQuantity === null) {  // 수량이 비어있는지 확인
 		            alert("입고수량을 입력해주세요.");
 		            return;  // 수량이 없으면 더 이상 진행하지 않음
 		        }
 		    }
+			
+			// map으로 필요한 데이터 추가하여 새로운 배열 생성(객체로 담으면 밑에 객체에 담는거에 넣으면 files:files[]이렇게된다)
+		    let files = 
+		    	gooddsInData.map(item => ({
+			        goodsCode: item.goodsCode,
+			        goodsName: item.goodsName,
+			        optionCode: item.optionCode,
+			        optionName: item.optionName,
+			        goodsStandard: item.goodsStandard,
+			        quantity: item.quantity,
+			        stockQuantity: item.stockQuantity,
+			        inQuantity: item.inQuantity,
+			        reorder: item.reorder,
+			        returnNum: item.returnNum,
+			        goodsLotNum: item.goodsLotNum,
+			        optionBarcode: item.optionBarcode,
+			        goodsConsumptionDate: item.goodsConsumptionDate,
+			        companyNum: 1,
+			        branchOfficeId: 'yedam'
+		    	}));
+			console.log(files);
 	
 		     let returnInfo = {
-		        files: returnData,  // 상세 내역 (상품 정보)
+		    	files,  // 상세 내역 (상품 정보)
 		        branchOfficeId: document.querySelector('#branchOfficeId').value, //주문 지점
 		        dueDate: new Date().toISOString().split('T')[0], //납기일자는 현재날짜로 넣기
 		        companyNum: 1, // 아직 회사번호를 가져올떄가 없어서 1로 넣었놨음
-		        orderId: orderId,
+		        deliveryId: deliveryId,
 		        orderCode: orderCode   
 		    };
-	 	    fetch("http://localhost:81/bhf/rest/goods/in", {
+		     console.log(returnInfo);
+		    fetch("http://localhost:81/bhf/rest/goods/in", {
 		        method: "POST",
 		        headers: {
 		            "Content-Type": "application/json",
@@ -236,7 +259,7 @@
 		        }
 		        //테이블 데이터 없을떄 나오는 문구 다시 실행
 		        ORDnodata();
-		    })  
+		    })    
 		}
 		
 		// 초기화 버튼 함수

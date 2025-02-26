@@ -48,7 +48,7 @@ public class ReturningArrayStructHandler implements TypeHandler<Object> {
 	        returningFileType[4] = file.getQuantity();
 	        returningFileType[5] = file.getExchangeReturningChoice(); 
 	        returningFileType[6] = file.getReturningReason(); 
-	        returningFileType[7] = file.getGoodsBarcode();
+	        returningFileType[7] = file.getOptionBarcode();
 	        returningFileType[8] = file.getGoodsLotNum();
 	        returningArray[returningIndex++] = conn.createStruct("RETURNINGFILETYPE", returningFileType);
 	    }		

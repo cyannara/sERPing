@@ -19,7 +19,7 @@
         		goods_name,
 		        option_code,
 		        option_name,
-		        goods_barcode,
+		        option_barcode,
 		        goods_lot_num,
 		        goods_consumption_date
 		from (	select  rownum rn,
@@ -28,14 +28,18 @@
 		        		w.goods_name,
 				        w.option_code,
 				        w.option_name,
-				        i.goods_barcode,
-				        i.goods_lot_num,
-				        i.goods_consumption_date
-				from    bhf_warehouse w join bhf_in_list i on w.branch_office_id = i.branch_office_id
+				        o.option_barcode,
+				        b.goods_lot_num,
+				        b.goods_consumption_date
+				from    bhf_warehouse w 
+				join 	purchse_option o 
+				on 		w.option_code = o.option_code 
+				join 	purchs_warehousing_body b
+				on 		o.option_num = b.option_num
 		<![CDATA[
 			where rownum <= #{end}
 		]]>
-			and i.goods_barcode = #{goodsBarcode} and w.company_num = 1 and w.branch_office_id = 'YEDAM'
+			and w.option_code = bhf_option_code(#{optionBarcode}) and w.company_num = 1 and w.branch_office_id = 'YEDAM'
 			)
 		where rn >= #{start}
 	</select>

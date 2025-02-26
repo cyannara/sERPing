@@ -13,7 +13,7 @@ public class BhfBarcodeDTO {
 	private String goodsName;
 	private String optionCode;
 	private String optionName;
-	private String goodsBarcode;
+	private String optionBarcode;
 	private String goodsLotNum;
 	private Date goodsConsumptionDate;
 	
