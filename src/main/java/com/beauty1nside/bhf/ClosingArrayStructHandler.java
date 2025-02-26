@@ -12,11 +12,11 @@ import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 import org.springframework.util.StringUtils;
 
-import com.beauty1nside.bhf.dto.returnInsert.BhfReturnInsertDtlVO;
+import com.beauty1nside.bhf.dto.closing.BhfCloseDtlVO;
 
 import oracle.jdbc.OracleConnection;
 
-public class ReturningArrayStructHandler implements TypeHandler<Object> {
+public class ClosingArrayStructHandler implements TypeHandler<Object> {
 
 	@Override
 	public Object getResult(ResultSet rs, int columnIndex) throws SQLException {
@@ -34,26 +34,22 @@ public class ReturningArrayStructHandler implements TypeHandler<Object> {
 		
 		OracleConnection conn = ps.getConnection().unwrap(OracleConnection.class); 
 		
-		List<BhfReturnInsertDtlVO> files = (List<BhfReturnInsertDtlVO>)parameter;
+		List<BhfCloseDtlVO> files = (List<BhfCloseDtlVO>)parameter;
 		
-		Object[] returningFileType = new Object[9]; 
-	    Struct[] returningArray = new Struct[files.size()];
+		Object[] closingFileType = new Object[5]; 
+	    Struct[] closingArray = new Struct[files.size()];
 
-	    int returningIndex = 0;
-	    for (BhfReturnInsertDtlVO file : files) {
-	    	returningFileType[0] = file.getGoodsCode();
-	        returningFileType[1] = file.getGoodsName();
-	        returningFileType[2] = file.getOptionCode();
-	        returningFileType[3] = file.getOptionName();
-	        returningFileType[4] = file.getQuantity();
-	        returningFileType[5] = file.getExchangeReturningChoice(); 
-	        returningFileType[6] = file.getReturningReason(); 
-	        returningFileType[7] = file.getOptionBarcode();
-	        returningFileType[8] = file.getGoodsLotNum();
-	        returningArray[returningIndex++] = conn.createStruct("RETURNINGFILETYPE", returningFileType);
+	    int closingIndex = 0;
+	    for (BhfCloseDtlVO file : files) {
+	    	closingFileType[0] = file.getBnfSleQy();
+	    	closingFileType[1] = file.getGoodsCode();
+	    	closingFileType[2] = file.getGoodsName();
+	    	closingFileType[3] = file.getOptionCode();
+	    	closingFileType[4] = file.getOptionName();
+	    	closingArray[closingIndex++] = conn.createStruct("CLOSINGFILETYPE", closingFileType);
 	    }		
-	    Array returningFileArray = (Array)conn.createOracleArray("RETURNINGFILEARRAY", (Struct[]) returningArray); 		
-		ps.setArray(i, returningFileArray);
+	    Array closingFileArray = (Array)conn.createOracleArray("CLOSINGFILEARRAY", (Struct[]) closingArray); 		
+		ps.setArray(i, closingFileArray);
 	}
 
 	@Override
