@@ -42,7 +42,7 @@ public class PurchaseDTO {
 	private String startDate ;
 	private String endDate;
 	
-	
+	private int nonWarehousingNum;
 	
 	
 	

@@ -274,6 +274,45 @@ public class ProductRestController {
 			return result;
 		
 		}
+		
+		
+		
+		//미입고 발주서 조회 
+				@GetMapping("/nonwarehousing/list")
+				public Object nonwarehousing(@RequestParam(name="perPage",defaultValue="2", required = false) int perPage,
+										   @RequestParam(name="page", defaultValue = "1" ,required = false) int page,
+										   @RequestParam(name="companyNum", required=true) int companyNum,  // ✅ 회사번호 필수
+										   @RequestParam(name="startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+									       @RequestParam(name="endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
+										   @ModelAttribute PurchaseSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
+					// 회사 번호를 DTO에 설정 (필수)
+				    dto.setCompanyNum(companyNum); 
+				    
+				 // 날짜를 String 형태로 변환
+				    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+				    String startDateStr = (startDate != null) ? formatter.format(startDate) : null;
+				    String endDateStr = (endDate != null) ? formatter.format(endDate) : null;
+					
+				    dto.setStartDate(startDateStr);
+				    dto.setEndDate(endDateStr);
+				    
+					//페이징 유닛 수 
+					paging.setPageUnit(perPage);
+					paging.setPage(page);
+					
+					//페이징 조건
+					dto.setStart(paging.getFirst());
+					dto.setEnd(paging.getLast());
+					
+					//페이징 처리 
+					paging.setTotalRecord(purchaseService.nonwarehousingCount(dto));
+					
+					//grid배열 처리 
+					GridArray grid = new GridArray();
+					Object result = grid.getArray(paging.getPage(), purchaseService.nonwarehousingCount(dto),purchaseService.nonWarehousinglist(dto));
+					return result;
+				
+				}
 
 
 }
