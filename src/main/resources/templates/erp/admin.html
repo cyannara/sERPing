@@ -13,11 +13,11 @@
 	*  ======    =======    ==============================
 	*  2025.02.12  표하연          최초생성
 	*  2025.02.14  표하연          회사등록 및 검색기능 활성화
+	*  2025.02.26  표하연          회사구독정보, 구독내역, 세금계산서, 현금영수증, 거래명세서 활서오하
 	*
 	*  </pre>
 ======================================================== -->
 <html layout:decorate="~{/erp/layouts/main}">
-
 
 <div class="container w-100 mw-1600" layout:fragment="content">
 	<div class="d-flex flex-column mb-1">
@@ -339,6 +339,28 @@
 			</div>
 		</div>
 	</div>
+	
+	<!-- 통합 모달 -->
+	<div id="universalModal" class="modal fade" tabindex="-1" aria-hidden="true">
+	    <div class="modal-dialog modal-xl">
+	        <div class="modal-content">
+	            <div class="modal-header p-3">
+	                <h5 id="modalTitle" class="modal-title"></h5>
+	                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	            </div>
+	            <div class="modal-body">
+	                <div class="pdf-container">
+	                    <canvas id="pdfCanvas"></canvas>
+	                </div>
+	            </div>
+	            <div class="modal-footer p-2">
+                       <button type="button" class="btn btn-secondary" id="pdfDown">PDF</button>
+				    <button type="button" class="btn btn-secondary closemodal"  data-bs-dismiss="modal">닫기</button>
+                   </div>
+	        </div>
+	    </div>
+	</div>
+	<!-- 통합 모달 끝 -->
 
 		
 	
@@ -726,77 +748,237 @@
 		            { header: "구독형태", name: "subscriptionFormName", editor: 'text' },
 		            { header: "구독금액", name: "subscriptionAmount", editor: 'text', formatter: ({ value }) => value.toLocaleString() + '원' },
 		            { header: "구독일시", name: "subscriptionDate", editor: 'text',
-		              formatter: ({ value }) => {
-		                const utcDate = new Date(value);
-		                const options = { 
-		                    year: 'numeric', month: '2-digit', day: '2-digit',
-		                    hour: '2-digit', minute: '2-digit', second: '2-digit',
-		                    hour12: false, timeZone: "Asia/Seoul"
-		                };
-		                return new Intl.DateTimeFormat("ko-KR", options).format(utcDate)
-		                    .replace(/\./g, '-')
-		                    .replace(/ /g, '')
-		                    .trim();
-		              }
-		            },
-		            { header: "거래명세서", name: "transactionstatement", editor: 'text',
-		                formatter: ({ row }) => `<button class="btn btn-info btn-sm sub-bill" data-id="${row.subscriptionNum}">거래명세서</button>`
-		            },
-		            { header: "세금계산서", name: "taxinvoice", editor: 'text',
-		                formatter: ({ row }) => {
-		                    if (row.subscriptionMeanName === "카드" || row.subscriptionMeanName === "카카오페이" || row.subscriptionMeanName === "네이버페이") {
-		                        return row.billNum 
-		                            ? `<button class="btn btn-info btn-sm sub-tax" data-id="${row.subscriptionNum}_1">계산서보기</button>`
-		                            : `<button class="btn btn-info btn-sm sub-tax" data-id="${row.subscriptionNum}_2">발행하기</button>`;
-		                    }
-		                    return `발행불가`;
-		                }
-		            },
-		            { header: "현금영수증", name: "cashreceipt", editor: 'text',
-		                formatter: ({ row }) => {
-		                    if (row.subscriptionMeanName === "무통장" || row.subscriptionMeanName === "계좌이체") {
-		                        return row.billNum
-		                            ? `<button class="btn btn-info btn-sm sub-cash" data-id="${row.subscriptionNum}_1">영수증보기</button>`
-		                            : `<button class="btn btn-info btn-sm sub-cash" data-id="${row.subscriptionNum}_2">발행하기</button>`;
-		                    }
-		                    return `발행불가`;
-		                }
-		            }
+						formatter: function({ value }) {
+							return subscriptday(value);
+					    },
+					},
+					{ header: "거래명세서", name: "transactionstatement", editor: 'text',
+						formatter: function({ row }) {
+					        return `<button class="btn btn-info btn-sm sub-bill" data-id="${row.subscriptionNum}">거래명세서</button>`;
+					    },
+					},
+					{ header: "세금계산서", name: "taxinvoice", editor: 'text',
+						formatter: function({ row }) {
+							if(row.billForm=="EB01"){
+								return `발행불가`;
+							}else{
+								if(row.billNum){
+									return `<button class="btn btn-info btn-sm sub-tax" data-id="${row.subscriptionNum}_1">계산서보기</button>`;
+								}else{
+						        	return `<button class="btn btn-info btn-sm sub-tax" data-id="${row.subscriptionNum}_2">발행하기</button>`;							
+								}							
+							}
+					    },
+					},
+					{ header: "현금영수증", name: "cashreceipt", editor: 'text',
+						formatter: function({ row }) {
+							if(row.subscriptionMeanName=="무통장" || row.subscriptionMeanName=="계좌이체"){
+								if(row.billForm=="EB02"){
+									return `발행불가`;
+								}else{
+									if(row.billNum){
+										return `<button class="btn btn-info btn-sm sub-cash" data-id="${row.subscriptionNum}_1">영수증보기</button>`;
+									}else{
+							        	return `<button class="btn btn-info btn-sm sub-cash" data-id="${row.subscriptionNum}_2">발행하기</button>`;							
+									}								
+								}
+							}else{
+								return `발행불가`;
+							}
+					    },
+					},
 		        ],
 		        data: sublistdataSource
 		    });
-		  //명세서버튼 클릭
+		    
+		  	//날짜 변환함수
+			function subscriptday(value){
+				const utcDate = new Date(value);
+				// 한국 시간(KST)으로 변환 (24시간 형식 유지)
+				const options = { 
+				    year: 'numeric', month: '2-digit', day: '2-digit',
+				    hour: '2-digit', minute: '2-digit', second: '2-digit',
+				    hour12: false, timeZone: "Asia/Seoul"
+				};
+				// `toLocaleString` 사용하여 변환 후, 포맷을 `yyyy-MM-dd HH:mm:ss`로 조정
+				const kstDate = new Intl.DateTimeFormat("ko-KR", options).format(utcDate)
+				    .replace(/\./g, '-') // yyyy.MM.dd → yyyy-MM-dd 로 변환
+				    .replace(/ /g, '')    // 공백 제거
+				    .trim();
+				return kstDate;
+			}
+		  	
+		  	//명세서버튼 클릭
+			var variactionNum = 0;
+			//명세서버튼 클릭
 			document.getElementById('sublist').addEventListener('click', function(event) {
+				//거래명세서
 			    if (event.target.classList.contains('sub-bill')) {
 			       	//거래명세서 발행
 			        const subscriptionNum = event.target.getAttribute('data-id');
+			        variactionNum = subscriptionNum;
+			        const modalTitle = document.getElementById('modalTitle');
+			        const modal = new bootstrap.Modal(document.getElementById('universalModal'));
+			     	// (1) PDF 생성 엔드포인트 (Jasper → PDF)
 			       	const url = `/erp/report/report?companynum=${rowData.companyNum}&subscriptionnum=${subscriptionNum}`;
-			        window.open(url, '_blank');
+			       	let modalType = "거래명세서";
+			       	modalTitle.innerText = modalType;
+			        //window.open(url, '_blank');
+			       	// (2) PDF.js로 캔버스 렌더링
+		            renderPDF(url, 1, rowData.companyNum);
+		         	// (3) 모달 표시
+		         	modal.show();
+			    //세금계산서    
 			    }else if(event.target.classList.contains('sub-tax')){
 			    	//세금계산서 발행
 			    	const subscriptionNum = event.target.getAttribute('data-id');
+			    	const modalTitle = document.getElementById('modalTitle');
+			        const modal1 = new bootstrap.Modal(document.getElementById('universalModal'));
 			    	let tax = subscriptionNum.split("_");
+			    	
+			    	// (1) PDF 생성 엔드포인트 (Jasper → PDF)
+			       	const url = `/erp/report/taxinvoice?companynum=${rowData.companyNum}&subscriptionnum=${tax[0]}`;
+			       	let modalType = "세금계산서";
+			       	modalTitle.innerText = modalType;
+			       	// (2) PDF.js로 캔버스 렌더링
+		            renderPDF(url, 2, rowData.companyNum);
+			    	//세금계산서 발행
+			    	variactionNum = tax[0];
 			    	if(tax[1] == 2){
-			    		alert(subscriptionNum+"세금계산서를 PDF로 발행하기");
+			    		//그냥 DB에 데이터만 저장하는거임
+			    		//api 없어서 그냥 제스퍼 문서 하는걸 보여주는것뿐임
+			    		const requestData = {
+			    				subscriptionNum: tax[0],
+			    				employeeNum: rowData.companyNum,
+			    				billForm: "EB02",
+			    				pdfAddress: "준비중",
+			    				issueCompany: "EI02",
+			    				companyCode: "NODATA",
+			    				companyNum: rowData.companyNum,
+						};
+			    		console.log("aaaaaaaa",requestData);
+			    		const url = `/erp/rest/taxbillpublishing`;
+			    		//패치 시작
+						fetch(url, {
+							method:"post",
+							headers: {
+							      "Content-Type": "application/json",
+							      //'X-CSRF-TOKEN': document.querySelector('#csrfToken').value,
+							    },
+							body : JSON.stringify(requestData),
+						})
+						.then( result => result.text() )
+						.then( result => {
+							if(result==="OK"){
+								modal1.show();
+								sublistgrid.reloadData();
+							    setTimeout(() => {
+							        let allRows = sublistgrid.getData();
+							        let targetRowKey = allRows.findIndex(row => row.subscriptionNum == tax[0]); 
+							        
+							        if (targetRowKey !== -1) {
+							            sublistgrid.addRowClassName(targetRowKey, 'tui-grid-row-highlight');
+							            sublistgrid.focus(targetRowKey, 'subscriptionNum');  // 초점 이동
+							        }
+							    }, 500);
+							}else{
+								alert('계산서 저장에 실패 했습니다');
+							}
+						})
+					//기존에 있는거 보여줌	
 			    	}else if(tax[1] == 1){
-			    		alert(subscriptionNum+"세금계산서 DB에 있는 계산서 보여주기");
+			    		//아무 행위도 일어나지 않음
 			    	}
+			    	modal1.show();
+			    //현금 영수증	
 			    }else if(event.target.classList.contains('sub-cash')){
 			    	//현금영수증 발행
 			    	const subscriptionNum = event.target.getAttribute('data-id');
+			    	const modalTitle = document.getElementById('modalTitle');
+			    	const modal2 = new bootstrap.Modal(document.getElementById('universalModal'));
 			    	let cash = subscriptionNum.split("_");
+			    	
+			    	// (1) PDF 생성 엔드포인트 (Jasper → PDF)
+			       	const url = `/erp/report/cashinvoice?companynum=${rowData.companyNum}&subscriptionnum=${cash[0]}`;
+			       	console.log(url);
+			       	let modalType = "현금영수증";
+			       	modalTitle.innerText = modalType;
+			     	// (2) PDF.js로 캔버스 렌더링
+		            renderPDF(url, 3, rowData.companyNum);
+			       	
+			      	//현금영수증 발행
+			       	variactionNum = cash[0];
 			    	if(cash[1] == 2){
-			    		alert(subscriptionNum+"현금영수증 PDF로 발행하기");
+						//영수증 발행 객체 생성
+			    		const requestData = {
+			    				subscriptionNum: cash[0],
+			    				employeeNum: rowData.companyNum,
+			    				billForm: "EB01",
+			    				pdfAddress: "준비중",
+			    				issueCompany: "EI02",
+			    				companyCode: "NODATA",
+			    				companyNum: rowData.companyNum,
+						};
+			    		const url = `/erp/rest/taxbillpublishing`;
+			    		//패치 시작
+						fetch(url, {
+							method:"post",
+							headers: {
+							      "Content-Type": "application/json",
+							    },
+							body : JSON.stringify(requestData),
+						})
+						.then( result => result.text() )
+						.then( result => {
+							if(result==="OK"){
+								modal2.show();
+								sublistgrid.reloadData();
+							    setTimeout(() => {
+							        let allRows = sublistgrid.getData();
+							        let targetRowKey = allRows.findIndex(row => row.subscriptionNum == tax[0]); 
+							        if (targetRowKey !== -1) {
+							            sublistgrid.addRowClassName(targetRowKey, 'tui-grid-row-highlight');
+							            sublistgrid.focus(targetRowKey, 'subscriptionNum');  // 초점 이동
+							        }
+							    }, 500);
+							}else{
+								alert('현금영수증 저장에 실패 했습니다');
+							}
+						})
 			    	}else if(cash[1] == 1){
-			    		alert(subscriptionNum+"현금영수증 DB에 있는 계산서 보여주기");
+			    		//아무 행위도 일어나지 않음
 			    	}
-			    	alert(subscriptionNum+"현금영수증을 명세서를 PDF로 발행하기");
+			    	modal2.show();
 			    }
 			});
 			//명세서버튼 클릭 끝
 			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
 			//아무셀 클릭
 			sublistgrid.on('click', function (ev) {
+				//버튼 클릭이면 전체 클릭 이벤트 발생 안하게 하기
+				if (ev.nativeEvent.target.tagName.toLowerCase() === 'button') {
+			        return;
+			    }
 				if (ev.rowKey !== null) {
 					//현재 강조된 행 클래스 초기화
 					if (subselectedRowKey !== null) {
@@ -844,18 +1026,11 @@
 			            } else {
 			                alert("상세 구독 내역이 없습니다.");
 			            }
-				        
-				        
-				        
-				        
 				    })
 				    .catch(error => console.error("데이터 요청 실패:", error));
 				}
 			});
 		}
-		
-		
-		
 		
 		//구독정보 리스트 화면 보여주기
 		var subscriptionState;
@@ -866,9 +1041,7 @@
 			const requestData = {
 					companyNum: rowData.companyNum,	//회사번호
 			};
-			
 			const url = '/erp/rest/servicereturn/'+requestData.companyNum;
-			
 			fetch ( url, {
 				methmod:"get",
 				headers: {
@@ -1701,6 +1874,103 @@
 		        console.error("파일 업로드 중 오류 발생:", error);
 		    });
 		}
+		
+		
+		// (1) PDF.js로 PDF 파일을 캔버스에 렌더링
+		function renderPDF(reportUrl, categori, companyNum) {
+		  const canvas = document.getElementById("pdfCanvas");
+		  const context = canvas.getContext('2d');
+		  const pdfContainer = document.querySelector('.pdf-container');
+		  // PDF 로드
+		  pdfjsLib.getDocument(reportUrl).promise.then(pdf => {
+		    console.log('PDF loaded, total pages:', pdf.numPages);
+		    // 첫 페이지만 렌더링 (필요시 여러 페이지 지원 가능)
+		    pdf.getPage(1).then(page => {
+		      const scale = 1.5; // 확대/축소 비율
+		      const viewport = page.getViewport({ scale });
+		      // 캔버스 크기 설정
+		      canvas.width = viewport.width;
+		      canvas.height = viewport.height;
+		      // 페이지 렌더링
+		      const renderContext = {
+		        canvasContext: context,
+		        viewport: viewport
+		      };
+		      page.render(renderContext).promise.then(() => {
+		        console.log('Page rendered');
+		      });
+		      if(categori==2){
+	              setTimeout(() => {
+	                  pdfContainer.scrollTop = 75;
+	              }, 300);		    	  
+		      }else if(categori==1 || categori==2){
+		    	  setTimeout(() => {
+	                  pdfContainer.scrollTop = 25;
+	              }, 300);	
+		      }
+		    });
+		  }).catch(error => {
+		    console.error('PDF 로드 오류:', error);
+		  });
+		}
+		
+		//pdf다운
+		document.getElementById('pdfDown').addEventListener('click', function () {
+			const modalTitle = document.getElementById('modalTitle').innerHTML;
+			let billtype = 0;
+			if(modalTitle=="거래명세서"){
+				billtype = 1;
+			}else if(modalTitle=="세금계산서"){
+				billtype = 2;
+			}else{
+				billtype = 3;
+			}
+			// 다운로드 엔드포인트 URL 생성
+			const url = `/erp/report/taxinvoicedown?companynum=${companyNum}&subscriptionnum=${variactionNum}&billtype=${billtype}`;	
+		    // 브라우저를 해당 URL로 이동시켜 파일 다운로드 실행
+		    window.location.href = url;
+		});
+		
+		// 모달 닫기
+		document.addEventListener("DOMContentLoaded", function () {
+		    const modalElement = document.getElementById("universalModal"); // 통합 모달 ID
+		    if (!modalElement) {
+		        console.warn("❌ 모달 요소를 찾을 수 없습니다.");
+		        return;
+		    }
+		    const closeButton =  document.querySelector(".closemodal");
+		    if (closeButton) {
+		        closeButton.addEventListener("click", function () {
+		            console.log("✅ 모달 닫기 버튼 클릭됨!");
+		            try {
+		                let modalInstance = bootstrap.Modal.getInstance(modalElement);
+		                
+		                if (!modalInstance) {
+		                    modalInstance = new bootstrap.Modal(modalElement);
+		                }
+		                modalInstance.hide(); // ✅ Bootstrap 방식으로 모달 닫기
+		                setTimeout(() => {
+		                    modalElement.classList.remove("show");
+		                    modalElement.style.display = "none";
+		                    document.body.classList.remove("modal-open");
+		                    // 🔥 백그라운드 제거
+		                    document.querySelectorAll(".modal-backdrop").forEach((element) => element.remove());
+		                }, 300);
+		            } catch (error) {
+		                console.warn("❌ Bootstrap 5가 로드되지 않았음. 대체 방식 사용");
+		                modalElement.classList.remove("show");
+		                modalElement.style.display = "none";
+		                document.body.classList.remove("modal-open");
+		                setTimeout(() => {
+		                    document.querySelectorAll(".modal-backdrop").forEach((element) => element.remove()); // 백그라운드 제거
+		                }, 300);
+		            }
+		        });
+		    } else {
+		        console.warn("❌ 모달 닫기 버튼을 찾을 수 없습니다.");
+		    }
+		});
+		// 모달 닫기 끝
       
 	</script>
 </div>
