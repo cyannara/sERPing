@@ -37,11 +37,11 @@ public class DeptRestController {
         return deptService.getCompanyInfo(companyNum);
     }
     
-    // 부서 추가
-    @PostMapping("/dept/insert")
+    // 부서 추가 API
+    @PostMapping("/dept/add")
     public ResponseEntity<String> addDepartment(@RequestBody DeptDTO dept) {
-        deptService.insertDepartment(dept);
-        return ResponseEntity.ok("부서가 추가되었습니다.");
+        int result = deptService.insertDepartment(dept);
+        return result > 0 ? ResponseEntity.ok("부서 추가 성공") : ResponseEntity.badRequest().body("부서 추가 실패");
     }
 
 }

@@ -72,11 +72,10 @@ public class DeptServiceImpl implements DeptService {
         return result;
     }
 
-	@Override
-	public void insertDepartment(DeptDTO dto) {
-		// TODO Auto-generated method stub
-		deptMapper.insertDepartment(dto);
-	}
+    @Override
+    public int insertDepartment(DeptDTO dept) {
+        return deptMapper.insertDepartment(dept);
+    }
     
 
 }

@@ -16,6 +16,6 @@ public interface DeptMapper {
     DeptDTO getCompanyInfo(Long companyNum);
     
     // 부서 추가
-    void insertDepartment(DeptDTO dto);
+    int insertDepartment(DeptDTO dto);
 
 }

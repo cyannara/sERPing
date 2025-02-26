@@ -73,7 +73,9 @@
     <div class="header-section">
       <h5 class="fw-bold">인사 관리 / 조직도 관리</h5>
       <div class="d-flex gap-2">
-        <button class="btn btn-primary"><i class="fas fa-plus-circle"></i> 부서 추가</button>
+		<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#deptModal">
+		    <i class="fas fa-plus-circle"></i> 부서 추가
+		</button>
         <button class="btn btn-secondary" disabled><i class="fas fa-pencil-alt"></i>부서 수정</button>
         <button class="btn btn-danger"><i class="fas fa-trash"></i>부서 삭제</button>
       </div>
@@ -245,9 +247,14 @@
 </div>
     
   </div>
+  
+saveDeptBtn
+  
+  
 
   <script th:inline="javascript">
   let companyNumSJ = /*[[${company.companyNum}]]*/ null;
+  let companyNum = /*[[${session.companyNum}]]*/ null; 
   let departmentNumSJ = 0;
   
   
@@ -290,6 +297,34 @@
   }
 
       $(document).ready(function () {
+    	  
+    	    // ✅ 부서 추가 버튼 클릭 시 API 호출
+    	    $("#saveDeptBtn").click(function() {
+    	        let selectedParent = $("#deptParent option:selected");
+    	        let deptData = {
+    	            departmentName: $("#deptName").val(),
+    	            parentDepartmentNum: selectedParent.val(),  // 본사(1) or 지점(2)
+    	            companyNum: companyNum,  // 세션에서 가져오기
+    	            departmentType: selectedParent.data("type"),  // DT003 or DT004
+    	        };
+
+    	        $.ajax({
+    	            url: "/hr/rest/dept/add",
+    	            type: "POST",
+    	            contentType: "application/json",
+    	            data: JSON.stringify(deptData),
+    	            success: function(response) {
+    	                alert("✅ 부서 추가 성공!");
+    	                $("#deptModal").modal("hide");
+    	                location.reload();
+    	            },
+    	            error: function(xhr, status, error) {
+    	                alert("❌ 부서 추가 실패! " + xhr.responseText);
+    	            }
+    	        });
+    	    });
+    	  
+    	  
           $(".company-sub-list, .sub-list").show();
 
           // 부서 트리 토글 기능만 유지
@@ -379,7 +414,7 @@
       
   </script>
   
-  <!-- ✅ 부서 추가 모달 -->
+<!-- ✅ 부서 추가 모달 -->
 <div class="modal fade" id="deptModal" tabindex="-1" aria-labelledby="deptModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -392,17 +427,19 @@
       <!-- 모달 바디 -->
       <div class="modal-body">
         <form id="deptForm">
+          <!-- ✅ 본사/지점 선택 -->
+          <div class="mb-3">
+            <label class="fw-bold">소속</label>
+            <select class="form-select" id="deptParent">
+              <option value="1" data-type="DT003">본사</option>
+              <option value="2" data-type="DT004">지점</option>
+            </select>
+          </div>
+
+          <!-- ✅ 부서명 입력 -->
           <div class="mb-3">
             <label class="fw-bold">부서명</label>
             <input type="text" class="form-control" id="deptName" required>
-          </div>
-
-          <div class="mb-3">
-            <label class="fw-bold">상위 부서</label>
-            <select class="form-select" id="parentDept">
-              <option value="">최상위 부서</option>
-              <!-- 상위 부서 목록은 JavaScript에서 동적으로 채운다 -->
-            </select>
           </div>
         </form>
       </div>
