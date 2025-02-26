@@ -382,7 +382,7 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById("companyNum").value = rowData.companyNum;
 
         // 계약 유형 자동 선택
-        document.getElementById("contractType").value = rowData.employmentType;  
+        document.getElementById("contractType").value = rowData.employmentTypeCode;  
 
         let workLocation = rowData.parentDepartmentName ? `${rowData.parentDepartmentName} - ${rowData.departmentName}` : rowData.departmentName;
         document.getElementById("workLocation").value = workLocation;
