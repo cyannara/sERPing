@@ -40,6 +40,16 @@ public class purchaseServiceImpl implements purchaseService{
 	public int purchaseCount(PurchaseSearchDTO dto) {
 		return purchaseMapper.purchaseCount(dto);
 	}
+
+	@Override
+	public List<PurchaseDTO> nonWarehousinglist(PurchaseSearchDTO dto) {
+		return purchaseMapper.nonwarehousinglist(dto);
+	}
+
+	@Override
+	public int nonwarehousingCount(PurchaseSearchDTO dto) {
+		return purchaseMapper.nonwarehousingCount(dto);
+	}
 	
 	
 

@@ -14,4 +14,8 @@ public interface purchaseService {
 	//발주서 조회
 	public List<PurchaseDTO> getPurchaselist(PurchaseSearchDTO dto);
 	int purchaseCount(PurchaseSearchDTO dto);
+	
+	//미입고 발주서 조회 
+	public List<PurchaseDTO> nonWarehousinglist(PurchaseSearchDTO dto);
+	int nonwarehousingCount(PurchaseSearchDTO dto);
 }

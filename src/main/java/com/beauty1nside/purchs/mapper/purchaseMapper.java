@@ -13,4 +13,9 @@ public interface purchaseMapper {
 	//발주서 조회 
 	List<PurchaseDTO>purchaseList(PurchaseSearchDTO dto);
 	int purchaseCount(PurchaseSearchDTO dto);
+	
+	
+	//미입고발주서조회 
+	List<PurchaseDTO>nonwarehousinglist(PurchaseSearchDTO dto);
+	int nonwarehousingCount(PurchaseSearchDTO dto);
 }

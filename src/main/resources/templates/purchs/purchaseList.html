@@ -5,9 +5,6 @@
  
  <head>
 
-<!-- SweetAlert2 CSS/JS CDN 추가 (head 부분 혹은 body 최상단) -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <!-- pdf 캔버스 설정 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
@@ -346,7 +343,7 @@
       const purchaselistDataSource = {
           api: {
               readData: {
-                  url: 'http://localhost:81/purchs/rest/purchase/list',
+                  url: '/purchs/rest/purchase/list',
                   method: 'GET',
                   requestOptions: {
                       headers: { 'Content-Type': 'application/json' },

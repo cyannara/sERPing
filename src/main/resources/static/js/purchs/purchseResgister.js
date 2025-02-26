@@ -386,7 +386,7 @@ function purchaseRegister() {
 		    const csrfToken = document.querySelector('meta[name="_csrf"]').content;
 
 		    // 컨트롤러의 엔드포인트로 POST 요청 전송 (예: /purchs/rest/purchase/insert)
-		    fetch("http://localhost:81/purchs/rest/purchase/insert", {
+		    fetch("/purchs/rest/purchase/insert", {
 		        method: "POST",
 		        headers: {
 		            "Content-Type": "application/json",
