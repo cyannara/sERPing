@@ -34,4 +34,10 @@
 	
 	</select>
 
+	<update id="update" parameterType="com.beauty1nside.hr.dto.EmpDTO">
+		UPDATE hr_employee
+		set PROFILE_IMAGE = #{profileImage}
+		where employee_num = #{employeeNum} and company_num = #{companyNum}
+	</update>
+
 </mapper>

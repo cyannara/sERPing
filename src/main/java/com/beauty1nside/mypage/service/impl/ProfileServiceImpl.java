@@ -18,4 +18,9 @@ public class ProfileServiceImpl implements ProfileService {
 	public EmpDTO info(EmpDTO dto) {
 		return profileMapper.info(dto);
 	}
+	
+	@Override
+	public int update(EmpDTO dto) {
+		return profileMapper.update(dto);
+	}
 }

@@ -17,12 +17,9 @@ let bankName = document.getElementById('bankName')
 let accountNum = document.getElementById('accountNum')
 let imgUpdateBtn = document.getElementById('imgUpdateBtn')
 let profileImg = document.getElementById('profileImg')
-let imgUpdate = document.getElementById('imgUpdate')
-const profileImgContainer = document.querySelector(".profile-img");
+const fileInput = document.getElementById("imgUpdate");
 
 document.addEventListener("DOMContentLoaded", function () {
-    const fileInput = document.getElementById("imgUpdate");
-
     fileInput.addEventListener("change", function (event) {
         const file = event.target.files[0];
 
@@ -38,20 +35,34 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-
-
 imgUpdateBtn.addEventListener('click', () => {
-    const url = '/api/mypage/profile-img'
-    // fetch(url, {
-    //     method: 'post',
-    //     headers: {
-    //         headers: {
-    //             'header': header_csrf,
-    //             "Content-Type": "application/json",
-    //             'X-CSRF-Token': token_csrf
-    //         },
-    //     }
-    // })
+    const url = '/api/mypage/profile/img'
+
+    if(!fileInput) {
+        showAlert('사진을 업로드해주세요.', 'danger')
+        return
+    }
+
+    const file = fileInput.files[0];
+    const formData = new FormData();
+    formData.append("image", file);
+
+    fetch(url, {
+        method: 'post',
+        headers: {
+            'header': header_csrf,
+            'X-CSRF-Token': token_csrf
+        },
+        body: formData
+    }).then((result) => {
+        return result.json()
+    }).then((data) => {
+        if(data.message === 'success') {
+            showAlert('프로필 사진이 변경되었습니다.', 'success')
+        } else {
+            showAlert('프로필 사진 변경 실패', 'danger')
+        }
+    })
 })
 
 const setInfo = (data) => {
@@ -76,11 +87,7 @@ const setInfo = (data) => {
     salary.value = data.salary || '-'
     bankName.value = data.bankName
     accountNum.value = data.accountNum
-
-    if(!data.profileImage) {
-        profileImg.src = '/file/image/mypage/profile/noProfileImg.jpg'
-    }
-
+    profileImg.src = data.profileImage || '/file/image/mypage/profile/noProfileImg.jpg'
 }
 
 const getProfileInfo = () => {

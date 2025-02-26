@@ -12,9 +12,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Log4j2
 @RestController
@@ -24,6 +30,8 @@ public class MypageRestController {
   final ApprovalService approvalService;
   final ProfileService profileService;
   
+  private static final String UPLOAD_DIR = "src/main/resources/static/file/image/mypage/profile/";
+  
   @GetMapping("/profile")
   public EmpDTO getMyProfile(@AuthenticationPrincipal CustomerUser user) {
     EmpDTO empDTO = new EmpDTO();
@@ -31,6 +39,39 @@ public class MypageRestController {
     empDTO.setEmployeeNum(user.getUserDTO().getEmployeeNum());
     empDTO.setCompanyNum(user.getUserDTO().getCompanyNum());
     return profileService.info(empDTO);
+  }
+  
+  @PostMapping("/profile/img")
+  public ResponseEntity<Map<String, Object>> updateProfileImg(@RequestParam("image") MultipartFile file,
+                                                              @AuthenticationPrincipal CustomerUser user) {
+    EmpDTO empDTO = new EmpDTO();
+    empDTO.setEmployeeNum(user.getUserDTO().getEmployeeNum());
+    empDTO.setCompanyNum(user.getUserDTO().getCompanyNum());
+    
+    Map<String, Object> response = new HashMap<>();
+    
+    try {
+      String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+      Path uploadPath = Paths.get(UPLOAD_DIR + fileName);
+      
+      Files.createDirectories(uploadPath.getParent());
+      Files.write(uploadPath, file.getBytes());
+      
+      String imageUrl = "/file/image/mypage/profile/" + fileName;
+      empDTO.setProfileImage(imageUrl);
+      
+      int isSuccess = profileService.update(empDTO);
+      if (isSuccess == 1) {
+        response.put("message", "success");
+        return ResponseEntity.ok(response);
+      } else {
+        response.put("message", "fail");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
   }
   
   @PostMapping("/approval")
