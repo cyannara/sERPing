@@ -10,6 +10,7 @@ target/
 *.ipr
 *.iws
 .vscode/
+*.class
 
 # OS 관련 파일 무시
 .DS_Store
@@ -19,7 +20,22 @@ Thumbs.db
 *.log
 *.env
 *.local
-application.properties
+.env
+.envrc
+.env.example
+
+# 아래 설정은 운영 환경에서 환경 변수를 사용할 경우
+# application.properties
+# application.yml
 
 # IntelliJ IDEA / Eclipse 설정 무시
-*.class
+.classpath
+.factorypath
+.gitattributes
+.gitmessage.txt
+.project
+HELP.md
+mvnw
+mvnw.cmd
+.settings
+.mvn/wrapper

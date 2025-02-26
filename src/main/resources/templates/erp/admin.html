@@ -368,6 +368,8 @@
 		//클릭한 행의 정보를 담는 전역 변수
 		var rowData = false;
 		var subrowData = false;
+		//명세서 처리 정보를 담는 전역 변수
+		var variactionNum = 0;
 		
 		//현재 그리드에 강조된행을 기록할 변수
 		let selectedRowKey = null;
@@ -808,8 +810,6 @@
 				return kstDate;
 			}
 		  	
-		  	//명세서버튼 클릭
-			var variactionNum = 0;
 			//명세서버튼 클릭
 			document.getElementById('sublist').addEventListener('click', function(event) {
 				//거래명세서
@@ -1926,7 +1926,7 @@
 				billtype = 3;
 			}
 			// 다운로드 엔드포인트 URL 생성
-			const url = `/erp/report/taxinvoicedown?companynum=${companyNum}&subscriptionnum=${variactionNum}&billtype=${billtype}`;	
+			const url = `/erp/report/taxinvoicedown?companynum=${rowData.companyNum}&subscriptionnum=${variactionNum}&billtype=${billtype}`;	
 		    // 브라우저를 해당 URL로 이동시켜 파일 다운로드 실행
 		    window.location.href = url;
 		});
