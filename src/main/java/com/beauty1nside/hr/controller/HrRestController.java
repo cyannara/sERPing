@@ -17,14 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.beauty1nside.common.GridArray;
 import com.beauty1nside.common.Paging;
-import com.beauty1nside.hr.dto.EmpContractDTO;
 import com.beauty1nside.hr.dto.EmpDTO;
 import com.beauty1nside.hr.dto.EmpSearchDTO;
-import com.beauty1nside.hr.dto.SalaryDTO;
 import com.beauty1nside.hr.service.EmpService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;

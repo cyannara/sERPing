@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 7.2.0.final using JasperReports Library version 6.6.0  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="empContract" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="8d7c6187-e251-44da-a479-937b089fe754">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="sERPing"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<parameter name="p_employeeNum" class="java.lang.Long"/>
+	<queryString>
+		<![CDATA[WITH LATEST_CONTRACT AS (
+    SELECT 
+        CONTRACT_NUM, EMPLOYEE_NUM, COMPANY_NUM, DEPARTMENT_NUM, POSITION, 
+        CONTRACT_TYPE, CONTRACT_START_DATE, CONTRACT_END_DATE, 
+        WORK_LOCATION, JOB_DESCRIPTION, WORK_DAYS, MONTHLY_SALARY, BONUS, 
+        SALARY_PAYMENT_DATE, PAYMENT_METHOD, ANNUAL_LEAVE_POLICY, REGISTER_DATE,
+        ROW_NUMBER() OVER (PARTITION BY EMPLOYEE_NUM ORDER BY CONTRACT_START_DATE DESC) AS RN
+    FROM HR_EMPLOYEE_CONTRACT
+)
+SELECT 
+
+    C.COMPANY_NAME, C.COMPANY_ADDRESS, C.REPRESENTATION_NAME, C.REPRESENTATION_PHONE,
+
+    E.EMPLOYEE_NAME, E.ADDRESS AS EMPLOYEE_ADDRESS, E.PHONE AS EMPLOYEE_PHONE, 
+
+    TO_CHAR(LC.CONTRACT_START_DATE, 'YYYY"년" MM"월" DD"일"') AS CONTRACT_START_DATE,
+    TO_CHAR(LC.CONTRACT_END_DATE, 'YYYY"년" MM"월" DD"일"') AS CONTRACT_END_DATE,
+    LC.WORK_DAYS, 
+    LC.MONTHLY_SALARY, 
+    LC.BONUS, 
+    LC.SALARY_PAYMENT_DATE, 
+    LC.PAYMENT_METHOD, 
+    LC.ANNUAL_LEAVE_POLICY, 
+    TO_CHAR(LC.REGISTER_DATE, 'YYYY"년" MM"월" DD"일"') AS CONTRACT_REGISTER_DATE,
+
+    COALESCE(PD.DEPARTMENT_NAME || ' - ', '') || D.DEPARTMENT_NAME AS WORK_LOCATION,
+
+    COALESCE(LC.JOB_DESCRIPTION, (SELECT CMMN_NAME FROM CMMN WHERE CMMN_CODE = E.POSITION)) AS JOB_DESCRIPTION
+
+FROM LATEST_CONTRACT LC
+JOIN HR_EMPLOYEE E ON LC.EMPLOYEE_NUM = E.EMPLOYEE_NUM
+JOIN ERP_COMPANY C ON LC.COMPANY_NUM = C.COMPANY_NUM
+JOIN HR_DEPARTMENT D ON LC.DEPARTMENT_NUM = D.DEPARTMENT_NUM
+LEFT JOIN HR_DEPARTMENT PD ON D.PARENT_DEPARTMENT_NUM = PD.DEPARTMENT_NUM 
+WHERE LC.RN = 1 
+AND E.EMPLOYEE_NUM = $P{p_employeeNum} 
+]]>
+	</queryString>
+	<field name="COMPANY_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="COMPANY_NAME"/>
+	</field>
+	<field name="COMPANY_ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="COMPANY_ADDRESS"/>
+	</field>
+	<field name="REPRESENTATION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="REPRESENTATION_NAME"/>
+	</field>
+	<field name="REPRESENTATION_PHONE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="REPRESENTATION_PHONE"/>
+	</field>
+	<field name="EMPLOYEE_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYEE_NAME"/>
+	</field>
+	<field name="EMPLOYEE_ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYEE_ADDRESS"/>
+	</field>
+	<field name="EMPLOYEE_PHONE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYEE_PHONE"/>
+	</field>
+	<field name="CONTRACT_START_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="CONTRACT_START_DATE"/>
+	</field>
+	<field name="CONTRACT_END_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="CONTRACT_END_DATE"/>
+	</field>
+	<field name="WORK_DAYS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WORK_DAYS"/>
+	</field>
+	<field name="MONTHLY_SALARY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="MONTHLY_SALARY"/>
+	</field>
+	<field name="BONUS" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="BONUS"/>
+	</field>
+	<field name="SALARY_PAYMENT_DATE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="SALARY_PAYMENT_DATE"/>
+	</field>
+	<field name="PAYMENT_METHOD" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="PAYMENT_METHOD"/>
+	</field>
+	<field name="ANNUAL_LEAVE_POLICY" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ANNUAL_LEAVE_POLICY"/>
+	</field>
+	<field name="CONTRACT_REGISTER_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="CONTRACT_REGISTER_DATE"/>
+	</field>
+	<field name="WORK_LOCATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WORK_LOCATION"/>
+	</field>
+	<field name="JOB_DESCRIPTION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="JOB_DESCRIPTION"/>
+	</field>
+	<title>
+		<band height="802" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<image>
+				<reportElement x="0" y="0" width="549" height="802" uuid="a9f103fa-46e6-4d73-8170-83f48e1eea6a"/>
+				<imageExpression><![CDATA["images/contractBG.jpg"]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="50" y="80" width="100" height="30" uuid="0e56a082-69db-4241-bfc9-22744b737683"/>
+				<textFieldExpression><![CDATA[$F{COMPANY_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="280" y="90" width="100" height="30" uuid="2febfe4e-4d4b-4099-90a6-b00216007dd8"/>
+				<textFieldExpression><![CDATA[$F{EMPLOYEE_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="170" y="130" width="100" height="30" uuid="9237f792-e33d-4a01-8cf0-124d5154ca87"/>
+				<textFieldExpression><![CDATA[$F{CONTRACT_START_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="230" y="550" width="130" height="40" uuid="919c2622-51bd-4199-b73a-2d001c4ad05f"/>
+				<textFieldExpression><![CDATA[$F{CONTRACT_REGISTER_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="160" y="590" width="100" height="30" uuid="5631a6bd-b23e-467c-84bf-a0933f7534e1"/>
+				<textFieldExpression><![CDATA[$F{COMPANY_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="170" y="654" width="290" height="20" uuid="ef976a1c-b438-42b7-9e0b-db96892356d6"/>
+				<textFieldExpression><![CDATA[$F{EMPLOYEE_ADDRESS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="170" y="670" width="100" height="20" uuid="188057ad-1438-48d0-b0a0-611848174089"/>
+				<textFieldExpression><![CDATA[$F{EMPLOYEE_PHONE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="170" y="690" width="100" height="20" uuid="9c4efc5f-63ee-44ca-9d35-cfdb01acf7ca"/>
+				<textFieldExpression><![CDATA[$F{EMPLOYEE_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="170" y="630" width="100" height="23" uuid="f1bda299-0dcc-4456-88d4-b8a5bf75ed11"/>
+				<textFieldExpression><![CDATA[$F{COMPANY_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="170" y="620" width="270" height="15" uuid="210a487c-9a11-4a1f-840e-674455833b58"/>
+				<textFieldExpression><![CDATA[$F{COMPANY_ADDRESS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="310" y="590" width="100" height="30" uuid="b145422e-2c3d-45c8-a45b-9750fcfd6967"/>
+				<textFieldExpression><![CDATA[$F{REPRESENTATION_PHONE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="100" y="390" width="100" height="30" uuid="c1d65c52-f1cf-4778-87a9-e9181850f45a"/>
+				<textFieldExpression><![CDATA[$F{ANNUAL_LEAVE_POLICY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="150" y="320" width="100" height="30" uuid="abdafbd5-4ea4-41e7-b670-909b2b3c0a34"/>
+				<textFieldExpression><![CDATA[$F{PAYMENT_METHOD}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="130" y="210" width="100" height="30" uuid="bde0c189-4e3c-4e14-a3b0-2f82d1492fb6"/>
+				<textFieldExpression><![CDATA[$F{WORK_DAYS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="160" y="240" width="100" height="30" uuid="5f6e987b-a0b3-4724-b79d-5bb957d7168b"/>
+				<textFieldExpression><![CDATA[$F{MONTHLY_SALARY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="170" y="260" width="100" height="30" uuid="e99ef00e-1b60-493c-b14c-761291accd46"/>
+				<textFieldExpression><![CDATA[$F{BONUS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="310" y="130" width="100" height="30" uuid="41305a33-68de-4046-8ad9-6586fab762af"/>
+				<textFieldExpression><![CDATA[$F{CONTRACT_END_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="130" y="150" width="100" height="30" uuid="32b298e4-6b67-4e89-8d7e-ce27438ae56f"/>
+				<textFieldExpression><![CDATA[$F{WORK_LOCATION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="270" y="300" width="50" height="20" uuid="3c1773ec-57ed-4b73-8d7f-2469c2a4452b"/>
+				<textFieldExpression><![CDATA[$F{SALARY_PAYMENT_DATE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+</jasperReport>

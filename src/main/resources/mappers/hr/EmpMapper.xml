@@ -106,7 +106,6 @@
 						c.company_name,
 						c.company_eng_name,
 						e.department_num,
-						e.salary,
 						d.department_name,
 						d.parent_department_num,
 						d.department_type,
@@ -315,11 +314,11 @@
 	<insert id="insertEmployee" parameterType="com.beauty1nside.hr.dto.EmpDTO">
 	    INSERT INTO hr_employee (
 	        employee_num, employee_id, employee_pw, employee_name, email, phone, hire_date, 
-	        position, authority, status, employment_type, department_num, salary, bank_name, 
+	        position, authority, status, employment_type, department_num, bank_name, 
 	        account_num, register_date, ssn, address, zip_code, memo, company_num
 	    ) VALUES (
 	        HR_EMPLOYEE_SEQ.NEXTVAL, #{employeeId}, #{employeePw}, #{employeeName}, #{email}, #{phone}, #{hireDate},
-	        #{position}, #{authority}, #{status}, #{employmentType}, #{departmentNum}, #{salary}, #{bankName},
+	        #{position}, #{authority}, #{status}, #{employmentType}, #{departmentNum}, #{bankName},
 	        #{accountNum}, SYSDATE, #{ssn}, #{address}, #{zipCode}, #{memo}, #{companyNum}
 	    )
 	</insert>

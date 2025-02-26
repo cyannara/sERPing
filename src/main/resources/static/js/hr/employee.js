@@ -387,7 +387,6 @@ function registerEmployee() {
         position: document.getElementById("modalPosition")?.value || "",
         status: "ST001",
         employmentType: employmentValue || "",
-        salary: document.getElementById("salary")?.value || "",
         bankName: document.getElementById("bankSelect")?.options[document.getElementById("bankSelect").selectedIndex].text.trim() || "",
         accountNum: document.getElementById("accountNumber")?.value || "",
         zipCode: document.getElementById("zipcode")?.value || "",

@@ -166,6 +166,8 @@
     </form>
 </div>
 
+
+
 <!-- 사원 선택 모달 -->
 <div class="modal fade" id="employeeSelectModal" tabindex="-1" aria-labelledby="employeeSelectModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -315,6 +317,12 @@ document.addEventListener("DOMContentLoaded", function() {
         loadEmployees();
         grid.refreshLayout(); // 그리드가 모달 내에서 안 보이는 문제 해결
     });
+    
+ 	// Bootstrap 모달 닫힐 때 `backdrop` 제거
+    document.getElementById("employeeSelectModal").addEventListener("hidden.bs.modal", function () {
+        document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
+        document.body.classList.remove("modal-open");
+    });
 
     // 검색 버튼 클릭 시 실행
     document.getElementById("searchButton").addEventListener("click", function() {
@@ -389,10 +397,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // 모달 닫기
         setTimeout(function() {
-            const modal = bootstrap.Modal.getInstance(document.getElementById("employeeSelectModal"));
-            if (modal) {
-                modal.hide();
-            }
+            $("#employeeSelectModal").modal("hide");
         }, 100);
     });
 });
