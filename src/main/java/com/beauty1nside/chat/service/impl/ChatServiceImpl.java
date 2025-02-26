@@ -9,7 +9,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 @Log4j2
 @Service
 @RequiredArgsConstructor
@@ -24,22 +27,22 @@ public class ChatServiceImpl implements ChatService {
   @Override
   public List<MessageDTO> startChat(RoomDTO roomDTO) {
     RoomDTO dto = chatMapper.getChatRoom(roomDTO);
-
+    Map<Long, List<MessageDTO>> returnValue = new HashMap<>();
+    
+    log.info("startChat dto={}", dto);
+    
     if (dto == null) {
       try {
-        int isInserted = chatMapper.insertChatRoom(roomDTO);
-        if (isInserted == 1) {
-          return List.of(); // return empty list(immutable)
-        } else {
-          log.error("fail to make new chat room");
-          return null;
-        }
+        Long roomId = chatMapper.insertChatRoom(roomDTO);
+        
+        return returnValue.put(roomId, List.of());
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
-
     } else {
-      return chatMapper.getMsgList(dto.getRoomId());
+      log.info("dto.getRoomId(){}", dto.getRoomId());
+      log.info("returnValue={}", returnValue.put(dto.getRoomId(), chatMapper.getMsgList(dto.getRoomId())));
+      return returnValue.put(dto.getRoomId(), chatMapper.getMsgList(dto.getRoomId()));
     }
   }
 }

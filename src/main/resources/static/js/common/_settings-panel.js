@@ -1,6 +1,16 @@
 const empBox = document.getElementById('emp-box')
 const msgList = document.getElementById('msgList')
+const sendBtn = document.getElementsByClassName('send-btn')[0]
+const textContent = document.getElementById('textarea').textContent
 let sessionEmployeeNum = document.getElementById("sessionEmployeeNum").value;
+
+const sendMsg = () => {
+
+}
+
+sendBtn.addEventListener('click', () => {
+    sendMsg(textContent)
+})
 
 msgList.addEventListener('click', function (event) {
     event.preventDefault(); // 기본 이벤트 차단 방지
@@ -18,6 +28,7 @@ const startChat = (emp) => {
         },
         body: JSON.stringify(emp)
     }).then((result) => {
+        console.log('result', result)
         return result.json()
     }).then((data) => {
         console.log(data)

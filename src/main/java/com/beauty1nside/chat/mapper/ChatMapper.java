@@ -9,7 +9,7 @@ import java.util.List;
 public interface ChatMapper {
   List<EmpDTO> empList(Long companyNum);
   RoomDTO getChatRoom(RoomDTO roomDTO);
-  int insertChatRoom(RoomDTO roomDTO);
+  Long insertChatRoom(RoomDTO roomDTO);
   List<MessageDTO> getMsgList(Long roomId);
   
 }

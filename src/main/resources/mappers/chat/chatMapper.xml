@@ -16,18 +16,18 @@
     </select>
 
     <insert id="insertChatRoom" parameterType="com.beauty1nside.chat.dto.RoomDTO">
-        insert into grpwr_chat_room (
-                                     room_id,
-                                     company_num,
-                                     employee_num1,
-                                     employee_num2
-                                     )
-        values (
-                   GRPWR_CAHT_ROOM_SEQ.nextval,
-                #{companyNum},
-                #{employeeNum1},
-                #{employeeNum2}
-               )
+        INSERT INTO grpwr_chat_room (
+            room_id,
+            company_num,
+            employee_num1,
+            employee_num2
+        ) VALUES (
+                     GRPWR_CAHT_ROOM_SEQ.nextval,
+                     #{companyNum},
+                     #{employeeNum1},
+                     #{employeeNum2}
+                 )
+            RETURNING room_id INTO #{roomId}
     </insert>
 
     <select id="getMsgList">
