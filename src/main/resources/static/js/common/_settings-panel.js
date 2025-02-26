@@ -1,21 +1,19 @@
 const empBox = document.getElementById('emp-box')
 const msgList = document.getElementById('msgList')
 const sendBtn = document.getElementsByClassName('send-btn')[0]
-const textContent = document.getElementById('textarea').textContent
+
 let sessionEmployeeNum = document.getElementById("sessionEmployeeNum").value;
+let roomId = 0
 
 const sendMsg = () => {
-
+    console.log(roomId)
+    const textContent = document.getElementById('textarea').value
+    console.log(textContent)
 }
 
 sendBtn.addEventListener('click', () => {
-    sendMsg(textContent)
+    sendMsg()
 })
-
-msgList.addEventListener('click', function (event) {
-    event.preventDefault(); // 기본 이벤트 차단 방지
-    console.log("msgList 클릭됨!");
-});
 
 const startChat = (emp) => {
     const url = `/api/chat/start`
@@ -28,11 +26,9 @@ const startChat = (emp) => {
         },
         body: JSON.stringify(emp)
     }).then((result) => {
-        console.log('result', result)
         return result.json()
     }).then((data) => {
-        console.log(data)
-
+        roomId = Object.keys(data)[0]
         // Bootstrap의 탭 기능을 활용
         $(document).ready(function() {
             $('#room-tab').tab('show');

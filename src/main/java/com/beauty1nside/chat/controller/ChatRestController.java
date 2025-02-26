@@ -11,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Log4j2
 @RestController
@@ -26,13 +27,13 @@ public class ChatRestController {
   }
   
   @PostMapping("/start")
-  public List<MessageDTO> startChat(@RequestBody EmpDTO empDTO,
-                                    @AuthenticationPrincipal CustomerUser user) {
+  public Map<Long, List<MessageDTO>> startChat(@RequestBody EmpDTO empDTO,
+                                               @AuthenticationPrincipal CustomerUser user) {
     RoomDTO roomDTO = new RoomDTO();
     roomDTO.setCompanyNum(user.getUserDTO().getCompanyNum());
     roomDTO.setEmployeeNum1(user.getUserDTO().getCompanyNum());
     roomDTO.setEmployeeNum2(empDTO.getEmployeeNum());
-    log.info("roomDTO={}", roomDTO);
+    
     return chatService.startChat(roomDTO);
   }
 }

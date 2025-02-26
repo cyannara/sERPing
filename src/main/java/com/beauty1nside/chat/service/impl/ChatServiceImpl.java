@@ -25,24 +25,20 @@ public class ChatServiceImpl implements ChatService {
   }
   
   @Override
-  public List<MessageDTO> startChat(RoomDTO roomDTO) {
+  public Map<Long, List<MessageDTO>> startChat(RoomDTO roomDTO) {
     RoomDTO dto = chatMapper.getChatRoom(roomDTO);
     Map<Long, List<MessageDTO>> returnValue = new HashMap<>();
-    
-    log.info("startChat dto={}", dto);
     
     if (dto == null) {
       try {
         Long roomId = chatMapper.insertChatRoom(roomDTO);
-        
-        return returnValue.put(roomId, List.of());
+        return (Map<Long, List<MessageDTO>>) returnValue.put(roomId, List.of());
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
     } else {
-      log.info("dto.getRoomId(){}", dto.getRoomId());
-      log.info("returnValue={}", returnValue.put(dto.getRoomId(), chatMapper.getMsgList(dto.getRoomId())));
-      return returnValue.put(dto.getRoomId(), chatMapper.getMsgList(dto.getRoomId()));
+      returnValue.put(dto.getRoomId(), chatMapper.getMsgList(dto.getRoomId()));
+      return returnValue;
     }
   }
 }
