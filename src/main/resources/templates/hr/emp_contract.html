@@ -370,7 +370,7 @@ document.addEventListener("DOMContentLoaded", function() {
         selectedEmployee = { 
                 employeeNum: rowData.employeeNum, 
                 departmentNum: rowData.departmentNum || null,  // 사원 정보에서 부서번호 가져오기
-                position: rowData.positionCode || null,  // 사원 정보에서 직급 가져오기
+                position: rowData.position || null,  // 사원 정보에서 직급 가져오기
                 companyNum: rowData.companyNum,
                 companyName: rowData.companyName,
                 employeeName: rowData.employeeName
@@ -382,7 +382,7 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById("companyNum").value = rowData.companyNum;
 
         // 계약 유형 자동 선택
-        document.getElementById("contractType").value = rowData.employmentTypeCode;  
+        document.getElementById("contractType").value = rowData.employmentType;  
 
         let workLocation = rowData.parentDepartmentName ? `${rowData.parentDepartmentName} - ${rowData.departmentName}` : rowData.departmentName;
         document.getElementById("workLocation").value = workLocation;
