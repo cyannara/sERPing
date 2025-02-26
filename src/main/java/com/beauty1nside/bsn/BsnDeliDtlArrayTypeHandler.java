@@ -20,8 +20,8 @@ public class BsnDeliDtlArrayTypeHandler extends OrdDtlArrayTypeHandler{
 		OracleConnection conn = ps.getConnection().unwrap(OracleConnection.class); 
 		List<BsnDeliveryLotDTO> lotDetails = (List<BsnDeliveryLotDTO>)parameter;
 		
-		//배열의 크기 지정 : 5
-		Object[] filetype = new Object[5]; 
+		//배열의 크기 지정 : 6
+		Object[] filetype = new Object[6]; 
 	    Struct[] array = new Struct[lotDetails.size()];
 		
 	    int arrayIndex = 0;
@@ -31,11 +31,12 @@ public class BsnDeliDtlArrayTypeHandler extends OrdDtlArrayTypeHandler{
 	    	filetype[2] = detail.getGoodsLotNum();
 	    	filetype[3] = detail.getDeliveryPossibleQnt();
 	    	filetype[4] = detail.getDeliveryQnt();
+	    	filetype[5] = detail.getGoodsConsumptionDate(); // 필드 추가
 	    	
 	    	
 	    	array[arrayIndex++] = conn.createStruct("BSN_DLV_LOT_DTL_FILETYPE", filetype);//FILETYPE은 Oracle에서 지정한 배열타입 이름 
 	    }		
-		Array filearray = (Array)conn.createOracleArray("BSN_DLV_LOT_DTLArray", (Struct[]) array);//FILEARRAY는 Oracle에서 지정한 배열타입 이름		
+		Array filearray = (Array)conn.createOracleArray("BSN_DLV_LOT_DTLARRAY", (Struct[]) array);//FILEARRAY는 Oracle에서 지정한 배열타입 이름		
 		ps.setArray(i, filearray);
 	}
 }

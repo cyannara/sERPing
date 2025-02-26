@@ -142,7 +142,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	var Grid = tui.Grid;
 	const OrderListDataSource = {
 			api: {
-				readData: { url: 'http://localhost:81/bsn/rest/orderList', method: 'GET', initParams: { page: 1 }},
+				readData: { url: '/bsn/rest/orderList', method: 'GET', initParams: { page: 1 }},
 			},
 			contentType: 'application/json'
 	};
@@ -228,7 +228,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	        return;
 	    }
 		
-	    fetch(`http://localhost:81/bsn/rest/orderList/detail?orderId=${orderId}`)
+	    fetch(`/bsn/rest/orderList/detail?orderId=${orderId}`)
 	    	
 	        .then(response => {
 		            if (!response.ok) throw new Error(`HTTP 오류! 상태: ${response.status}`);

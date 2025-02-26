@@ -198,7 +198,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		
 		const dataSource = {
 				api: {
-					readData: { url: 'http://localhost:81/bsn/rest/bhfOrder', method: 'GET', 
+					readData: { url: '/bsn/rest/bhfOrder', method: 'GET', 
 						initParams: { page: 1 }},
 				},
 				contentType: 'application/json'
@@ -274,7 +274,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		        return;
 		    }
 
-		    fetch(`http://localhost:81/bsn/rest/bhfOrder/detail?orderCode=${orderCode}&perPage=5&page=1`)
+		    fetch(`/bsn/rest/bhfOrder/detail?orderCode=${orderCode}&perPage=5&page=1`)
 		        .then(response => {
 		            if (!response.ok) throw new Error(`HTTP 오류! 상태: ${response.status}`);
 		            return response.json();
@@ -404,7 +404,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		
 		    while (!isLastPage) {
 		        try {
-		            const response = await fetch(`http://localhost:81/bsn/rest/bhfOrder/detail?orderCode=${orderCode}&perPage=5&page=${page}`);
+		            const response = await fetch(`/bsn/rest/bhfOrder/detail?orderCode=${orderCode}&perPage=5&page=${page}`);
 		            if (!response.ok) throw new Error(`HTTP 오류! 상태: ${response.status}`);
 		            
 		            const data = await response.json();
@@ -436,85 +436,13 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		    console.log("등록할 주문:", orderDTO);
 		    
 		 	// 등록 함수 호출(실험하기 위해 막아둠)
-		    //registerOrder(orderDTO);
+		    registerOrder(orderDTO);
 		 	
 		 	//화면 초기화 함수
-		 	refreshOrderGrid();
+		 	//refreshOrderGrid();
 		 	
 		}
 
-		//구 코드
-		/*
-		function loadAllOrderDetails(orderCode) {
-		    if (!orderCode) {
-		        console.warn("유효하지 않은 주문 코드입니다.");
-		        return;
-		    }
-		
-		    let allDetails = [];
-		    let page = 1;
-		    let isLastPage = false;  // 마지막 페이지 확인 변수
-		
-		    // 모든 페이지의 데이터를 순차적으로 가져오는 함수
-		    function fetchPageData() {
-		        fetch(`http://localhost:81/bsn/rest/bhfOrder/detail?orderCode=${orderCode}&perPage=5&page=${page}`)
-		            .then(response => {
-		                if (!response.ok) throw new Error(`HTTP 오류! 상태: ${response.status}`);
-		                return response.json();
-		            })
-		            .then(data => {
-		                if (data && data.data && data.data.contents) {
-		                    allDetails = allDetails.concat(data.data.contents);  // 데이터를 누적
-		                    if (data.data.contents.length < 5) {
-		                        isLastPage = true;  // 마지막 페이지인지 확인
-		                    } else {
-		                        page++;  // 페이지 증가
-		                        fetchPageData();  // 다음 페이지 데이터를 요청
-		                    }
-		                } else {
-		                    console.warn("상세 데이터가 없습니다.");
-		                    isLastPage = true;  // 데이터가 없으면 마지막 페이지로 간주
-		                }
-		            })
-		            .catch(error => {
-		                console.error('Error:', error);
-		                isLastPage = true;  // 에러 발생 시 마지막 페이지로 간주
-		            });
-		    }
-		
-		    fetchPageData();  // 첫 번째 페이지 데이터 요청
-		
-		    // 페이지 로딩이 완료되면, 모든 데이터를 등록할 수 있음
-		    const waitForData = setInterval(() => {
-		        if (isLastPage) {
-		            clearInterval(waitForData);
-		            // 이제 allDetails 배열에 모든 상세 데이터가 들어있으므로 등록 작업을 진행
-		            console.log("선택된 주문:", selectedRow);
-		            console.log("모든 상세 데이터:", allDetails);
-		            // 여기서 등록 버튼 이벤트를 트리거하거나 필요한 작업을 처리
-		            let orderDTO = {
-		            		orderCode:      selectedRow.orderCode,
-		                    branchOfficeId: selectedRow.branchOfficeId,
-		                    orderDate:      selectedRow.orderDate,
-		                    dueDate:        selectedRow.dueDate,
-		                    remark:         selectedRow.remark,
-		                    companyNum:     selectedRow.companyNum,
-		            		employeeNum: 1234,
-		            		orderDetails:   allDetails
-		            }
-		            console.log(orderDTO);
-		            // 등록 함수 호출
-		            //registerOrder(orderDTO);
-		            
-		            
-		        }
-		    }, 100);  // 100ms 간격으로 데이터 로드 완료 여부 체크
-		}
-		*/ 
-		
-		
-		
-		
 		
 	    
 		// 주문 등록 함수
@@ -522,7 +450,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 			const header = document.querySelector('meta[name="_csrf_header"]').content;
 		    const token = document.querySelector('meta[name="_csrf"]').content;
 			
-		    fetch('http://localhost:81/bsn/rest/order/insert', {
+		    fetch('/bsn/rest/order/insert', {
 		        method: 'POST',
 		        headers: {
 		        	'header': header,
@@ -568,7 +496,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 			const header = document.querySelector('meta[name="_csrf_header"]').content;
 		    const token = document.querySelector('meta[name="_csrf"]').content;
 			
-		    fetch('http://localhost:81/bsn/rest/bhfOrder/cancel', {
+		    fetch('/bsn/rest/bhfOrder/cancel', {
 		        method: 'POST',
 		        headers: {
 		        	'header': header,

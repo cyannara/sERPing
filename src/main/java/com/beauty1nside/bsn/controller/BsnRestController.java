@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -275,4 +276,43 @@ public class BsnRestController {
 
 				return result;	
 	}
+	
+	//출고 LOT 등록(연결)
+	@PostMapping("/deli/lot/detail/insert")
+	public ResponseEntity<Map<String, Object>> deliveryLotDetailInsert(@RequestBody BsnDeliveryDetailDTO bsnDeliveryDetailDTO) {
+		Map<String, Object> response = new HashMap<>();
+		
+		try {
+			bsnOrderService.registerBsnDeliveryLotDetail(bsnDeliveryDetailDTO);
+			response.put("status", "success");
+	        response.put("message", "LOT 등록 성공");
+	        return ResponseEntity.ok(response); // JSON 형태 응답
+			
+		} catch (Exception e) {
+			log.error("LOT 등록 실패", e);
+	        response.put("status", "error");
+	        response.put("message", "LOT 등록 실패");
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+		}
+		
+	}
+	//출고 LOT 삭제
+	@DeleteMapping("/deli/lot/detail/delete")
+	public ResponseEntity<Map<String, Object>> deliveryLotDetailDelete(@RequestBody BsnDeliveryDetailDTO bsnDeliveryDetailDTO){
+		Map<String, Object> response = new HashMap<>();
+		try {
+			bsnOrderService.removeBsnDeliveryLotDetail(bsnDeliveryDetailDTO);
+			
+			response.put("status", "success");
+	        response.put("message", "LOT 삭제 성공");
+	        return ResponseEntity.ok(response); // JSON 형태 응답
+			
+		} catch (Exception e) {
+			log.error("LOT 삭제 실패", e);
+	        response.put("status", "error");
+	        response.put("message", "LOT 삭제 실패");
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+		}
+	}
+	
 }
