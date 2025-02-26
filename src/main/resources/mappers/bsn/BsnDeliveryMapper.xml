@@ -83,6 +83,7 @@ LEFT JOIN bsn_order_detail bod ON bdd.order_detail_id = bod.order_detail_id
 WHERE bdd.delivery_id = #{deliveryId}
 )
 WHERE RN BETWEEN #{start} AND #{end}
+
 </select>
 
 <!-- 출고 상세 목록 수량-->
