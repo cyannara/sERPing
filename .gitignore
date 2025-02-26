@@ -25,8 +25,8 @@ Thumbs.db
 .env.example
 
 # 아래 설정은 운영 환경에서 환경 변수를 사용할 경우
-# application.properties
-# application.yml
+application.properties
+application.yml
 
 # IntelliJ IDEA / Eclipse 설정 무시
 .classpath
