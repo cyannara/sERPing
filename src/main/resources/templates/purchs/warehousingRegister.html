@@ -121,6 +121,16 @@
         </div>
         <div id="warehousinglistGrid"></div>
     </div>
+    
+    	 
+	<!-- 상품 모달 -->
+	 <div th:include="purchs/ModalTemplate :: ModalTemplate (
+	  'goodsModal', 
+	  'modal-xl', 
+	  '상품 조회', 
+	  'purchs/goodsTable', 
+	  'purchs/brandFooter'
+	  )"></div> 
 
     <div class="text-center mt-4">
         <button type="button" class="btn btn-primary">등록</button>
@@ -163,6 +173,9 @@
 	          return this.el;
 	      }
 	  }
+	
+  let purchaselistGrid; 
+  let warehousinglistGrid; // ✅ 전역 변수로 선언
   let header = document.querySelector('meta[name="_csrf_header"]').content;
   let token = document.querySelector('meta[name="_csrf"]').content;
   // 페이지 로드 후 그리드 초기화
@@ -170,14 +183,14 @@
       console.log("✅ 발주서 그리드 초기화");
       initPurchaseGrid();
       initWarehouseModal(); // ✅ 창고 모달 초기화 추가
-      initwarehousingGrid();
+     
    
       
    // ✅ 구매리스트추가 버튼 클릭 이벤트 추가
       //document.querySelector("#addwarehousinglist").addEventListener("click", moveToPurchaseDetail);
   });
 
-  let purchaselistGrid;
+  
 
   function initPurchaseGrid() {
       const companyNum = [[${session.companyNum}]];
@@ -279,7 +292,6 @@
       purchaselistGrid.reloadData();
   }
   
-  let warehousinglistGrid;
   //구매리스트 그리드 
   function initwarehousingGrid(){
 
@@ -297,6 +309,7 @@
               { header: "상품명", name: "goodsName" },
               { header: "옵션코드", name: "optionCode" },
               { header: "옵션명", name: "optionName" },
+              { header: "옵션번호", name: "optionNum" },
               { header: "거래처명", name: "vendorName" },
               { header: "거래처번호", name: "vendorId" ,hidden: true},
               { header: "규격", name: "goodsStandard" },
@@ -444,6 +457,7 @@
 	            purchaseBodyNum : row.purchaseBodyNum || "",
 	            optionCode: row.optionCode || "", // 옵션코드
 	            optionName: row.optionName || "", // 옵션명
+	            optionNum : row.optionNum ,
 	            vendorName: row.vendorName || "", // 거래처명
 	            vendorId: row.vendorId || "", // 거래처번호 (hidden)
 	            goodsStandard: row.goodsStandard || "", // 규격
@@ -509,6 +523,48 @@
 	        console.warn("❌ productGrid가 정의되지 않았습니다.");
 	    }
 	});
+	
+	// ✅ 모달 닫힐 때 sessionStorage 값 가져와서 그리드에 저장
+	function setupModalCloseEvent() {
+		console.log("✅ 모달 닫힘 이벤트 실행");
+
+		 
+	  
+
+	 const rowKey = purchaseGrid.getFocusedCell()?.rowKey;
+	        if (rowKey === null || rowKey === undefined) {
+	            console.warn("❌ 먼저 행을 선택해야 합니다.");
+	            return;
+	        }
+			
+			
+	//✅ sessionStorage의 key와 그리드의 name을 매칭
+		 const dataMap = {
+		            selectedGoodsCode: "goodsCode",
+		            selectedGoodsName: "goodsName",
+		            selectedOptionCode: "optionCode",
+		            selectedOptionName: "optionName",
+					selectedOptionNum : "optionNum",
+		            selectedVendorName: "vendorName",
+					selectedVendorId: "vendorId",
+		            selectedGoodsStandard: "goodsStandard",
+		            selectedGoodsSupplyPrice: "purchaseUnitPrice"
+		        };
+
+		        Object.keys(dataMap).forEach(storageKey => {
+		            const gridColumn = dataMap[storageKey];
+		            const value = sessionStorage.getItem(storageKey);
+		            if (value) {
+		            	warehousinglistGrid.setValue(rowKey, gridColumn, value);
+		                sessionStorage.removeItem(storageKey); // ✅ 사용한 데이터 삭제
+		            }
+		        });
+		
+	
+
+        console.log("✅ 발주 그리드에 데이터 저장 완료");
+	  
+	}
 
 
  
