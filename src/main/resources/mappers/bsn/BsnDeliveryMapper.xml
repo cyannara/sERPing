@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.beauty1nside.bsn.mapper.BsnOrderMapper">
 
-<!-- 출고 목록 조회 -->
+<!-- 출고 목록 조회(준비중만) -->
 <select id="selectBsnDelivery">
 SELECT 
        delivery_id, 
@@ -37,7 +37,8 @@ SELECT ROW_NUMBER() OVER (
 
 FROM bsn_delivery bd
 LEFT JOIN bsn_order bo ON bo.order_id = bd.order_id
-WHERE bd.company_num = 1
+WHERE bd.company_num = #{companyNum}
+AND   bd.delivery_status = 'DS01'
 <include refid="searchInfoBsnDLV"></include>
 )
 WHERE RN BETWEEN #{start} AND #{end}
@@ -87,7 +88,7 @@ WHERE RN BETWEEN #{start} AND #{end}
 <!-- 출고 상세 목록 수량-->
 
 <!-- 출고 LOT 상세 목록-->
-<select id="selectBsnDeliveryLotDTO">
+<select id="selectBsnDeliveryLotDetail">
 SELECT delivery_lot_detail_num, 
        delivery_detail_id, 
        goods_lot_num, 
@@ -154,7 +155,7 @@ WHERE RN BETWEEN #{start} AND #{end}
 	</if>
 </sql>
 
-<!-- 임시 -->
+<!-- 창고 LOT별 조회(임시) -->
 <select id="selectGoodsWarehouseLot">
 SELECT ROW_NUMBER() OVER (
               ORDER BY pwb.goods_consumption_date ASC
@@ -201,5 +202,19 @@ WHERE pwb.company_num = 1
 ORDER BY pwb.goods_consumption_date ASC
 
 </select>
+
+<insert id="insertBsnDeliveryLotDetail" statementType="CALLABLE">
+call insert_Bsn_dlv_lot( 
+       #{deliveryDetailId},
+       #{lotDetails, typeHandler=com.beauty1nside.bsn.BsnDeliDtlArrayTypeHandler}  
+) 
+</insert>
+
+<delete id="deleteBsnDeliveryLotDetail" statementType="CALLABLE">
+call DELETE_BSN_DLV_LOT(
+       #{deliveryDetailId},
+       #{lotDetails, typeHandler=com.beauty1nside.bsn.BsnDeliDtlArrayTypeHandler}
+)
+</delete>
 
 </mapper>

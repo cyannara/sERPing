@@ -19,9 +19,9 @@
     <h2 class="mb-4">근로계약 등록</h2>
 
     <form id="contractForm">
-        <!-- 📌 (1) 기본 정보 -->
+        <!-- (1) 기본 정보 -->
         <div class="card mb-4">
-            <div class="card-header">📌 기본 정보</div>
+            <div class="card-header">기본 정보</div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">
@@ -50,9 +50,9 @@
             </div>
         </div>
 
-        <!-- 📌 (2) 근로 조건 -->
+        <!-- (2) 근로 조건 -->
         <div class="card mb-4">
-            <div class="card-header">📌 근로 조건</div>
+            <div class="card-header">근로 조건</div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">
@@ -104,14 +104,14 @@
             </div>
         </div>
 
-        <!-- 📌 (3) 급여 정보 -->
+        <!-- (3) 급여 정보 -->
         <div class="card mb-4">
-            <div class="card-header">📌 급여 정보 (연봉제 기준)</div>
+            <div class="card-header">급여 정보 (연봉제 기준)</div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">
                         <label class="form-label">연봉 (원)</label>
-                        <input type="number" class="form-control" id="annualSalary" required oninput="calculateMonthlySalary()">
+                        <input type="text" class="form-control" id="annualSalary" required oninput="calculateMonthlySalary()">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">월 기본급 (자동 계산)</label>
@@ -143,6 +143,22 @@
                         </select>
                     </div>
                 </div>
+                
+                <div class="row mt-3">
+					<div class="col-md-6">
+					    <label class="form-label">연차</label>
+					    <input type="text" class="form-control" placeholder="근로기준법에 따라 자동 부여됩니다."
+					        readonly>
+					</div>
+					<div class="col-md-6">
+					    <label class="form-label">사회보험 가입</label><br>
+					    <input type="checkbox" class="social-insurance" value="고용보험"> 고용보험
+					    <input type="checkbox" class="social-insurance" value="산재보험"> 산재보험
+					    <input type="checkbox" class="social-insurance" value="국민연금"> 국민연금
+					    <input type="checkbox" class="social-insurance" value="건강보험"> 건강보험
+					</div>
+                </div>
+                
             </div>
         </div>
 
@@ -181,64 +197,96 @@
 </script>
 
 <script>
+
+const header = document.querySelector('meta[name="_csrf_header"]').content;
+const token = document.querySelector('meta[name="_csrf"]').content;
+
+let selectedEmployee = {}; // 선택된 사원 정보 저장
+
+//숫자에 3자리마다 콤마(,)를 추가하는 함수
+function formatNumberWithCommas(num) {
+    if (!num) return "0"; // 값이 없을 때 기본값 0
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
 document.addEventListener("DOMContentLoaded", function() {
 	
-    // ✅ 테스트용 변수 설정
-    let testContractData = {
-        employeeNum: "49",
-        companyNum: "1",
-        departmentNum: "101",  // ✅ 부서 번호 추가 (예시: IT 부서)
-        position: "PO001",      // ✅ 직급 추가 (예시: 주임)
-        contractType: "ET002",
-        contractStartDate: "2025-02-25",
-        contractEndDate: "2025-02-26",
-        workLocation: "본사 - IT팀",
-        jobDescription: "백엔드 개발 업무 수행",
-        workStartTime: "09:00",
-        workEndTime: "18:00",
-        breakStartTime: "15:46",
-        breakEndTime: "15:47",
-        annualSalary: "40000000",
-        bonus: "0",
-        additionalPay: "0",
-        salaryPaymentDate: "25",
-        paymentMethod: "BANK"
-    };
+	// 연봉 입력 후 월급 계산 시 소수점 반올림 처리
+	document.getElementById("annualSalary").addEventListener("input", function () {
+	    let value = this.value.replace(/,/g, "").replace(/[^0-9]/g, ""); // 숫자 외 문자 제거
+	    if (value === "") value = "0"; // 빈 값일 경우 0으로 처리
+	    value = parseInt(value, 10) || 0; // NaN 방지
 
-    // ✅ 테스트 버튼 추가
+	    this.value = formatNumberWithCommas(value); // 다시 포맷 적용
+
+	    // 월급 자동 계산 (연봉 / 12, 반올림)
+	    let monthlySalary = Math.round(value / 12); 
+	    document.getElementById("monthlyBaseSalary").value = formatNumberWithCommas(monthlySalary);
+	});
+	
+    // 테스트용 변수 설정
+	let testContractData = {
+		    employeeNum: 3, // EMPLOYEE_ID 250102006에 해당하는 EMPLOYEE_NUM 값 (조회한 값 사용)
+		    companyNum: 2, // 실제 COMPANY_NUM
+		    departmentNum: 2, // 실제 DEPARTMENT_NUM
+		    position: "PO001",
+		    contractType: "ET001",
+		    contractStartDate: "2025-02-26",
+		    contractEndDate: "2026-02-25",
+		    workLocation: "서울시 강남구",
+		    jobDescription: "백엔드 개발",
+		    workStartTime: "09:00",
+		    workEndTime: "18:00",
+		    breakStartTime: "12:00",
+		    breakEndTime: "13:00",
+		    probationPeriod: 3,
+		    contractStatus: "CS001",
+		    annualSalary: 50000000,
+		    bonus: 1000000,
+		    additionalPay: 500000,
+		    salaryPaymentDate: 25,
+		    paymentMethod: "BANK",
+		    socialInsurance: "고용보험, 산재보험, 국민연금, 건강보험"
+	};
+
+    // 테스트 버튼 추가
     let testButton = document.createElement("button");
     testButton.textContent = "📋 테스트 계약 등록";
     testButton.className = "btn btn-warning w-100 mt-3";
-    testButton.onclick = function() {
-        console.log("📋 테스트 데이터 전송:", testContractData);
-
-        fetch("/hr/rest/contract/register", {
+    testButton.onclick = function () {
+    	
+        fetch("/hr/rest/contract/register", { // API 경로 앞에 `/` 추가
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "X-CSRF-Token": token
             },
             body: JSON.stringify(testContractData)
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert("✅ 테스트 계약 등록 성공!");
-                window.location.reload();
-            } else {
-                alert("❌ 테스트 계약 등록 실패: " + data.message);
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    throw new Error("❌ 서버 응답 오류: " + text);
+                });
             }
+            return response.json();
+        })
+        .then(data => {
+            alert("테스트 계약 등록 성공!");
+            window.location.reload();
         })
         .catch(error => {
             console.error("❌ 테스트 계약 등록 오류:", error);
-            alert("서버 오류로 인해 테스트 계약을 등록할 수 없습니다.");
+            alert("서버 오류: " + error.message);
         });
     };
 
-    // 버튼을 폼 아래 추가
-    document.getElementById("contractForm").appendChild(testButton);
+
+    // 버튼을 폼 아래 추가(테스트 시에만)
+    //document.getElementById("contractForm").appendChild(testButton);
 	
 
-    // ✅ Toast Grid 설정 (사원 목록)
+    // Toast Grid 설정 (사원 목록)
     const grid = new tui.Grid({
         el: document.getElementById('employeeGrid'),
         scrollX: false,
@@ -250,29 +298,37 @@ document.addEventListener("DOMContentLoaded", function() {
             { header: "부서번호", name: "departmentNum", align: "center" },
             { header: "직급", name: "position", align: "center" },
             { header: "회사번호", name: "companyNum", align: "center" },
-            { header: "회사명", name: "companyName", align: "center" }
+            { header: "회사명", name: "companyName", align: "center" },
+            { 
+                header: "연봉", 
+                name: "annualSalary", 
+                align: "right",
+                formatter: function({ value }) {
+                    return formatNumberWithCommas(value);
+                }
+            }
         ]
     });
 
-    // ✅ 모달이 열릴 때 자동으로 사원 목록 불러오기
+    // 모달이 열릴 때 자동으로 사원 목록 불러오기
     document.getElementById("employeeSelectModal").addEventListener("shown.bs.modal", function () {
         loadEmployees();
-        grid.refreshLayout(); // ✅ 그리드가 모달 내에서 안 보이는 문제 해결
+        grid.refreshLayout(); // 그리드가 모달 내에서 안 보이는 문제 해결
     });
 
-    // ✅ 검색 버튼 클릭 시 실행
+    // 검색 버튼 클릭 시 실행
     document.getElementById("searchButton").addEventListener("click", function() {
         loadEmployees();
     });
 
-    // ✅ 엔터키 입력 시 검색 실행
+    // 엔터키 입력 시 검색 실행
     document.getElementById("searchKeyword").addEventListener("keypress", function(event) {
         if (event.key === "Enter") {
             loadEmployees();
         }
     });
 
-    // ✅ 사원 목록 불러오기 (검색 포함)
+    // 사원 목록 불러오기 (검색 포함)
     function loadEmployees() {
         let searchKeyword = document.getElementById("searchKeyword").value; // 검색어 가져오기
 
@@ -281,7 +337,7 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
 
-        // ✅ API 요청
+        // API 요청
         fetch(`/hr/rest/emp/list-by-company?companyNum=${companyNum}&searchKeyword=${searchKeyword}`)
             .then(response => response.json())
             .then(data => {
@@ -299,8 +355,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 alert("사원 목록을 불러오는 데 실패했습니다.");
             });
     }
-
-    let selectedEmployee = {}; // ✅ 전역 변수 추가 (선택된 사원 정보 저장)
     
     grid.on('click', function(ev) {
         const rowData = grid.getRow(ev.rowKey);
@@ -310,13 +364,13 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
         
-        // ✅ 데이터 확인 로그
+        // 데이터 확인 로그
         console.log("📊 선택된 사원 데이터:", rowData);
 
         selectedEmployee = { 
                 employeeNum: rowData.employeeNum, 
-                departmentNum: rowData.departmentNum || null,  // ✅ 사원 정보에서 부서번호 가져오기
-                position: rowData.position || null,  // ✅ 사원 정보에서 직급 가져오기
+                departmentNum: rowData.departmentNum || null,  // 사원 정보에서 부서번호 가져오기
+                position: rowData.position || null,  // 사원 정보에서 직급 가져오기
                 companyNum: rowData.companyNum,
                 companyName: rowData.companyName,
                 employeeName: rowData.employeeName
@@ -327,13 +381,13 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById("companyName").value = rowData.companyName;
         document.getElementById("companyNum").value = rowData.companyNum;
 
-        // ✅ 계약 유형 자동 선택
-        document.getElementById("contractType").value = rowData.employmentTypeCode;  
+        // 계약 유형 자동 선택
+        document.getElementById("contractType").value = rowData.employmentType;  
 
         let workLocation = rowData.parentDepartmentName ? `${rowData.parentDepartmentName} - ${rowData.departmentName}` : rowData.departmentName;
         document.getElementById("workLocation").value = workLocation;
 
-        // ✅ 모달 닫기
+        // 모달 닫기
         setTimeout(function() {
             const modal = bootstrap.Modal.getInstance(document.getElementById("employeeSelectModal"));
             if (modal) {
@@ -343,51 +397,82 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
-function submitContract() {
+
+/** 체크된 사회보험 목록을 가져오는 함수 **/
+function getSelectedInsurance() {
+    let selected = [];
+    document.querySelectorAll('.social-insurance:checked').forEach((checkbox) => {
+        selected.push(checkbox.value);
+    });
+    return selected.length > 0 ? selected.join(',') : null;  // 선택된 값이 없으면 `null` 반환
+}
+
+//계약 등록 데이터에 추가
+function submitContract(event) {
+	
+    if (!selectedEmployee || !selectedEmployee.employeeNum) {
+        alert("⚠️ 먼저 사원을 선택해주세요!");
+        return;
+    }
+	
     let contractData = {
-        employeeNum: document.getElementById("employeeNum").value,
-        companyNum: document.getElementById("companyNum").value,
-        departmentNum: selectedEmployee.departmentNum || null, // ✅ 전역 변수에서 가져오기
-        position: selectedEmployee.position || null, // ✅ 전역 변수에서 가져오기
-        contractType: document.getElementById("contractType").value,
-        contractStartDate: document.getElementById("contractStartDate").value,
-        contractEndDate: document.getElementById("contractEndDate").value,
-        workLocation: document.getElementById("workLocation").value,
-        jobDescription: document.getElementById("jobDescription").value,
-        workStartTime: document.getElementById("workStartTime").value,
-        workEndTime: document.getElementById("workEndTime").value,
-        breakStartTime: document.getElementById("breakStartTime").value,
-        breakEndTime: document.getElementById("breakEndTime").value,
-        annualSalary: document.getElementById("annualSalary").value,
-        bonus: document.getElementById("bonus").value,
-        additionalPay: document.getElementById("additionalPay").value,
-        salaryPaymentDate: document.getElementById("salaryPaymentDate").value,
-        paymentMethod: document.getElementById("salaryPaymentMethod").value
+            employeeNum: document.getElementById("employeeNum").value,
+            companyNum: document.getElementById("companyNum").value,
+            departmentNum: selectedEmployee.departmentNum || null,
+            position: selectedEmployee.position || null,
+            contractType: document.getElementById("contractType").value,
+            contractStartDate: document.getElementById("contractStartDate").value,
+            contractEndDate: document.getElementById("contractEndDate").value || null,
+            workLocation: document.getElementById("workLocation").value,
+            jobDescription: document.getElementById("jobDescription").value,
+            workStartTime: document.getElementById("workStartTime").value,
+            workEndTime: document.getElementById("workEndTime").value,
+            breakStartTime: document.getElementById("breakStartTime").value || null,
+            breakEndTime: document.getElementById("breakEndTime").value || null,
+
+            // 숫자 값으로 변환
+            annualSalary: parseFloat(document.getElementById("annualSalary").value.replace(/,/g, "")) || 0,
+            bonus: parseFloat(document.getElementById("bonus").value) || 0,
+            additionalPay: parseFloat(document.getElementById("additionalPay").value) || 0,
+
+            salaryPaymentDate: document.getElementById("salaryPaymentDate").value,
+            paymentMethod: document.getElementById("salaryPaymentMethod").value,
+            socialInsurance: getSelectedInsurance(),
+            workDays: "월~금",
+            annualLeavePolicy: "근로기준법에 따라 자동 부여됩니다."
     };
 
     console.log("📋 계약 등록 데이터:", contractData);
-
-    // ✅ 유효성 검사 (필수 필드 체크)
+    
+    // 유효성 검사 (필수 필드 체크)
     if (!contractData.employeeNum || !contractData.companyNum || !contractData.contractStartDate || !contractData.annualSalary) {
         alert("⚠️ 필수 정보를 입력해주세요.");
         return;
     }
 
-    // ✅ AJAX 요청 (근로계약 + 급여 등록 API 호출)
-    fetch(`http://localhost:81/hr/rest/contract/register`, {
+    // AJAX 요청 (근로계약 + 급여 등록 API 호출)
+    fetch("/hr/rest/contract/register", { 
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "X-CSRF-Token": token
         },
         body: JSON.stringify(contractData)
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => {
+                throw new Error("❌ 서버 응답 오류: " + text);
+            });
+        }
+        return response.json().catch(() => ({ success: true })); // JSON 파싱 실패 시 성공 처리
+    })
     .then(data => {
         if (data.success) {
-            alert("✅ 근로계약이 성공적으로 등록되었습니다!");
-            window.location.reload(); // 페이지 새로고침
+            alert("근로계약이 성공적으로 등록되었습니다!");
+            window.location.reload();
         } else {
-            alert("❌ 계약 등록 실패: " + data.message);
+            alert("❌ 계약 등록 실패: " + (data.message || "알 수 없는 오류"));
         }
     })
     .catch(error => {
@@ -395,6 +480,7 @@ function submitContract() {
         alert("서버 오류로 인해 계약을 등록할 수 없습니다.");
     });
 }
+
 
 </script>
 

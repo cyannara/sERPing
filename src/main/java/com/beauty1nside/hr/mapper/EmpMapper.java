@@ -48,6 +48,8 @@ public interface EmpMapper {
     
     // ✅ 계약 정보 삽입 (계약번호 자동 생성)
     void insertContract(EmpContractDTO contractDTO);
+    
+    Long getLastInsertedContractNum(Long employeeNum);  // 추가
 
     // ✅ 급여 정보 삽입
     void insertSalary(SalaryDTO salaryDTO);

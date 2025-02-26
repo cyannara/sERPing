@@ -37,7 +37,7 @@ FROM
        company_num,
        remark
 FROM bsn_order
-WHERE company_num = 1
+WHERE company_num = #{companyNum}
 <include refid="searchInfoBsnOrder"></include>
 )
 WHERE RN BETWEEN #{start} AND #{end}
@@ -46,7 +46,7 @@ WHERE RN BETWEEN #{start} AND #{end}
 <!-- 주문조회- 카운팅 -->
 <select id="getCountOfBsnOrder" resultType="int">
 SELECT COUNT(*) FROM BSN_ORDER
-WHERE   company_num = 1
+WHERE   company_num = #{companyNum}
 <include refid="searchInfoBsnOrder"></include>
 </select>
 

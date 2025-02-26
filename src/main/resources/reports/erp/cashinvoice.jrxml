@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 7.2.0.final using JasperReports Library version 6.6.0  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="cashinvoice" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a8bea6de-722c-4f6f-b31f-b1f8af927657">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="sERPing"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<style name="han_font" fontName="맑은"/>
+	<parameter name="p_subscriptionnum" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[SELECT
+    TO_CHAR(l.subscription_date, 'yyyymmdd') || l.subscription_num as paynum,
+    TO_CHAR(l.subscription_date, 'yyyy-mm-dd HH24:MI:SS') as subscription_date,
+    TO_CHAR(l.subscription_amount, '999,999,999') AS subscription_amount,
+    TO_CHAR(l.subscription_amount*0.9, '999,999,999') AS amount_bill,
+    TO_CHAR(l.subscription_amount*0.1, '999,999,999') AS amount_tax,
+    '지출증빙' AS count
+FROM erp_subscription_list l
+WHERE l.subscription_num =  $P{p_subscriptionnum}]]>
+	</queryString>
+	<field name="PAYNUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="PAYNUM"/>
+	</field>
+	<field name="SUBSCRIPTION_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SUBSCRIPTION_DATE"/>
+	</field>
+	<field name="SUBSCRIPTION_AMOUNT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SUBSCRIPTION_AMOUNT"/>
+	</field>
+	<field name="AMOUNT_BILL" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="AMOUNT_BILL"/>
+	</field>
+	<field name="AMOUNT_TAX" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="AMOUNT_TAX"/>
+	</field>
+	<field name="COUNT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="COUNT"/>
+	</field>
+	<background>
+		<band height="620" splitType="Stretch">
+			<image>
+				<reportElement style="han_font" x="90" y="0" width="382" height="620" uuid="9dc6c500-20ae-4c4d-9538-5ef4e1d69c44">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA["reports/cashinvoice.png"]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement style="han_font" x="222" y="132" width="241" height="23" uuid="e51f9d1b-d7b4-4236-9c30-0bd2564694fb"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAYNUM}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="han_font" x="356" y="290" width="107" height="30" uuid="db868d57-3960-425d-987c-5c61a4e8d086"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="15" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SUBSCRIPTION_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="han_font" x="90" y="290" width="120" height="30" uuid="a65f0fb1-39c1-4c1b-8f76-9e4ed1f0c988"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="15" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AMOUNT_BILL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="han_font" x="210" y="290" width="78" height="30" uuid="fdc4275c-461c-4c58-99dd-39708969c784"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AMOUNT_TAX}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="han_font" x="222" y="160" width="241" height="23" uuid="c507bd59-ef65-4955-9508-9b72bcb5822c">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="han_font" x="222" y="105" width="241" height="23" uuid="f35fa205-4532-4155-933f-e3e7c00e2051">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SUBSCRIPTION_DATE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</background>
+</jasperReport>

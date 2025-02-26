@@ -35,7 +35,7 @@
             <div class="col-md-3">
                 <label class="form-label">상태</label>
                 <div class="d-flex">
-                    <button class="btn btn-outline-primary me-2 filter-btn" data-status="WAITING">대기중</button>
+                    <button class="btn btn-outline-secondary me-2 filter-btn" data-status="WAITING">대기중</button>
                     <button class="btn btn-outline-danger me-2 filter-btn" data-status="REJECTED">반려</button>
                     <button class="btn btn-outline-success filter-btn" data-status="APPROVED">승인</button>
                 </div>
@@ -73,7 +73,7 @@
     </div>
 </div>
     <input type="hidden" id="sessionEmployeeNum" th:value="${session.employeeNum}"/>
-    <script src="/js/mypage/mypage.js"></script>
+    <script src="/js/mypage/approvalList.js"></script>
 </body>
 </html>
 

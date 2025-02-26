@@ -8,13 +8,13 @@ import com.beauty1nside.hr.dto.EmpContractSearchDTO;
 
 public interface EmpContractService {
 	
-    // 계약 등록
-    void insertContract(EmpContractDTO dto);
+    // 근로계약 등록
+    int registerContract(EmpContractDTO contract);
 
-    // 계약 리스트 조회
-    List<EmpContractDTO> getContracts(EmpContractSearchDTO dto);
+    // 특정 사원의 최근 계약 조회
+    EmpContractDTO getLastContract(Long employeeNum);
 
-    // 계약 상세 조회
-    EmpContractDTO info(Long contractNum);
+    // 전체 계약 목록 조회
+    List<EmpContractDTO> getAllContracts();
 
 }

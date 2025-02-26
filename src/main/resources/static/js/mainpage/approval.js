@@ -3,7 +3,7 @@ let Grid = tui.Grid;
 const dataSource = {
     api: {
         readData: {
-            url: 'http://localhost:81/api/mainpage/approval/list',
+            url: '/api/mainpage/approval/list',
             method: 'GET',
             initParams: { page: 1 }
         },
@@ -80,6 +80,10 @@ const grid = new Grid({
         }  ],
     data : dataSource,
 });
+
+document.getElementById('approval-tab').addEventListener('click', () => {
+    grid.refreshLayout()
+}, {once: true})
 
 document.addEventListener("click", function (event) {
     let buttonApprove = event.target.closest(".btn-approve");

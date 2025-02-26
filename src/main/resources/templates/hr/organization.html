@@ -254,7 +254,7 @@
   const dataSource = {
 	        api: {
 	            readData: {
-	                url: 'http://localhost:81/hr/rest/emp/organization',
+	                url: '/hr/rest/emp/organization',
 	                method: 'GET',
 	                initParams: { companyNum:companyNumSJ , departmentNum:departmentNumSJ  }
 	            }
@@ -352,9 +352,8 @@
         	        
         	    } else if (departmentId !== undefined) {
         	        departmentNumSJ = departmentId;
-                 //http://localhost:81/hr/rest/emp/organization?perPage=5&companyNum=1&departmentNum=0&page=1
-                //http://localhost:81/hr/rest/emp/organization??perPage=5&companyNum=${companyNumSJ}&departmentNum=${departmentNumSJ}&page=1
-        	     // 옵션조회 쿼리 호출(goodsCode)
+
+        	     // 쿼리 호출
                     fetch(`/hr/rest/emp/organization?perPage=5&companyNum=${companyNumSJ}&departmentNum=${departmentNumSJ}&page=1`, {
                         method: 'GET',
                         headers: {

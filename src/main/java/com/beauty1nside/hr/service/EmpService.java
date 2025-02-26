@@ -47,11 +47,11 @@ public interface EmpService {
  // ✅ 특정 회사(companyNum)의 사원 목록 (검색 & 페이징 적용)
     List<EmpDTO> getEmployeesByCompanyWithSearch(EmpSearchDTO searchDTO);
 
-    // ✅ 특정 회사(companyNum)의 사원 개수 조회
+    // ✅ 특정 회사(companyNum)의 사원수 조회
     int countEmployeesByCompany(EmpSearchDTO searchDTO);
     
     // ✅ 근로계약과 급여 정보를 함께 등록
-    void registerContractWithSalary(EmpContractDTO contractDTO);
+    void registerContractWithSalary(EmpContractDTO contractDTO, SalaryDTO salaryDTO);
 
     // ✅ 특정 사원의 계약 목록 조회
     List<EmpContractDTO> getContractsByEmployee(Long employeeNum);
