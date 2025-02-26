@@ -177,49 +177,11 @@ public class EmpServiceImpl implements EmpService {
     @Transactional
     @Override
     public void registerContractWithSalary(EmpContractDTO contractDTO, SalaryDTO salaryDTO) {
-        try {
-            // ✅ 1. 근로계약 정보 저장
+
+            // 근로계약 정보 저장
             empMapper.insertContract(contractDTO);
             log.info("📌 계약 등록 완료! 계약 정보: {}", contractDTO);
-
-            // ✅ 2. 방금 삽입된 계약번호 조회
-            Long contractNum = empMapper.getLastInsertedContractNum(contractDTO.getEmployeeNum());
-            if (contractNum == null) {
-                throw new RuntimeException("❌ 계약번호가 생성되지 않았습니다!");
-            }
-            contractDTO.setContractNum(contractNum);
-            log.info("📌 조회된 계약번호: {}", contractNum);
-
-            // ✅ 3. 급여 정보 설정
-            salaryDTO.setEmployeeNum(contractDTO.getEmployeeNum());
-            salaryDTO.setContractNum(contractNum);
-            salaryDTO.setCompanyNum(contractDTO.getCompanyNum());
-
-            // ✅ 4. 급여 계산
-            double monthlySalary = contractDTO.getAnnualSalary() / 12;
-            double deduction = monthlySalary * 0.19;
-            double netSalary = monthlySalary + contractDTO.getBonus() + contractDTO.getAdditionalPay() - deduction;
-
-            salaryDTO.setMonthlySalary(monthlySalary);
-            salaryDTO.setBonus(contractDTO.getBonus());
-            salaryDTO.setAdditionalPay(contractDTO.getAdditionalPay());
-            salaryDTO.setDeduction(deduction);
-            salaryDTO.setNetSalary(netSalary);
-
-            log.info("📌 급여 계산 완료: {}", salaryDTO);
-
-            // ✅ 5. 급여 정보 저장
-            empMapper.insertSalary(salaryDTO);
-            log.info("✅ 급여 등록 완료!");
-
-        } catch (Exception e) {
-            log.error("❌ 근로계약 및 급여 등록 실패: ", e);
-            throw new RuntimeException("계약 및 급여 등록 중 오류 발생: " + e.getMessage());
-        }
     }
-
-
-
 
 
 	@Override

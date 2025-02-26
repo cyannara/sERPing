@@ -17,7 +17,6 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 @Builder
-@Alias("EmpContractDTO")  // MyBatis 별칭
 public class EmpContractDTO {
     
     private Long contractNum;  // 계약번호
@@ -35,6 +34,7 @@ public class EmpContractDTO {
     
     private String workLocation; // 근무지
     private String jobDescription; // 업무 내용
+    private String workDays; // 근무일
     
     private String workStartTime; // 근무 시작 시간
     private String workEndTime;   // 근무 종료 시간
@@ -53,9 +53,13 @@ public class EmpContractDTO {
     private Date updateDate; // 수정일
 
     private Double annualSalary;  // 연봉
+    private Double monthlySalary;  // 월급
     private Double bonus; // 상여금
     private Double additionalPay; // 추가 수당
     
     private Integer salaryPaymentDate;  // ✅ 급여 지급일 (1~31)
     private String paymentMethod;  // ✅ 급여 지급 방식 (BANK / CASH)
+    
+    private String annualLeavePolicy = "근로기준법에 따라 부여";  
+    private String socialInsurance = "고용보험, 산재보험, 국민연금, 건강보험 가입";  
 }

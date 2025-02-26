@@ -17,7 +17,6 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 @Builder
-@Alias("SalaryDTO")  // MyBatis 별칭
 public class SalaryDTO {
     
     private Long salaryNum; // 급여번호 (PK)

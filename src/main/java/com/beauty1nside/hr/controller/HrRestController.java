@@ -211,41 +211,38 @@ public class HrRestController {
         return ResponseEntity.ok(result);
     }
 
-    
-    // ✅ 근로계약 및 급여 등록 API
-    @PostMapping("/contract/register")
-    public ResponseEntity<String> registerContract(@RequestBody Map<String, Object> requestData) {
-        log.info("📥 계약 정보 수신: {}", requestData);
-
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-
-            // ✅ 1. 근로 계약 정보 변환
-            EmpContractDTO contractDTO = objectMapper.convertValue(requestData, EmpContractDTO.class);
-            log.info("📌 변환된 계약 DTO: {}", contractDTO);
-
-            // ✅ 2. 급여 정보 추출 (필요한 필드만 포함하도록 별도 생성)
-            SalaryDTO salaryDTO = new SalaryDTO();
-            salaryDTO.setEmployeeNum(contractDTO.getEmployeeNum());
-            salaryDTO.setContractNum(contractDTO.getContractNum());
-            salaryDTO.setCompanyNum(contractDTO.getCompanyNum());
-            salaryDTO.setMonthlySalary(contractDTO.getAnnualSalary() / 12);
-            salaryDTO.setBonus(contractDTO.getBonus());
-            salaryDTO.setAdditionalPay(contractDTO.getAdditionalPay());
-            salaryDTO.setSalaryPaymentDate(contractDTO.getSalaryPaymentDate());
-            salaryDTO.setPaymentMethod(contractDTO.getPaymentMethod());
-
-            log.info("📌 변환된 급여 DTO: {}", salaryDTO);
-
-            // ✅ 3. 서비스 호출 (근로계약 + 급여 함께 저장)
-            empService.registerContractWithSalary(contractDTO, salaryDTO);
-
-            return ResponseEntity.ok("✅ 계약 등록 완료!");
-        } catch (Exception e) {
-            log.error("❌ 계약 등록 실패:", e);
-            return ResponseEntity.status(500).body("계약 등록 중 오류 발생: " + e.getMessage());
-        }
-    }
+	/*
+	 * // ✅ 근로계약 및 급여 등록 API
+	 * 
+	 * @PostMapping("/contract/register") public ResponseEntity<String>
+	 * registerContract(@RequestBody Map<String, Object> requestData) {
+	 * log.info("📥 계약 정보 수신: {}", requestData);
+	 * 
+	 * try { ObjectMapper objectMapper = new ObjectMapper();
+	 * 
+	 * // ✅ 1. 근로 계약 정보 변환 EmpContractDTO contractDTO =
+	 * objectMapper.convertValue(requestData, EmpContractDTO.class);
+	 * log.info("📌 변환된 계약 DTO: {}", contractDTO);
+	 * 
+	 * // ✅ 2. 급여 정보 추출 (필요한 필드만 포함하도록 별도 생성) SalaryDTO salaryDTO = new SalaryDTO();
+	 * salaryDTO.setEmployeeNum(contractDTO.getEmployeeNum());
+	 * salaryDTO.setContractNum(contractDTO.getContractNum());
+	 * salaryDTO.setCompanyNum(contractDTO.getCompanyNum());
+	 * salaryDTO.setMonthlySalary(contractDTO.getAnnualSalary() / 12);
+	 * salaryDTO.setBonus(contractDTO.getBonus());
+	 * salaryDTO.setAdditionalPay(contractDTO.getAdditionalPay());
+	 * salaryDTO.setSalaryPaymentDate(contractDTO.getSalaryPaymentDate());
+	 * salaryDTO.setPaymentMethod(contractDTO.getPaymentMethod());
+	 * 
+	 * log.info("📌 변환된 급여 DTO: {}", salaryDTO);
+	 * 
+	 * // ✅ 3. 서비스 호출 (근로계약 + 급여 함께 저장)
+	 * empService.registerContractWithSalary(contractDTO, salaryDTO);
+	 * 
+	 * return ResponseEntity.ok("✅ 계약 등록 완료!"); } catch (Exception e) {
+	 * log.error("❌ 계약 등록 실패:", e); return
+	 * ResponseEntity.status(500).body("계약 등록 중 오류 발생: " + e.getMessage()); } }
+	 */
 
 
 
