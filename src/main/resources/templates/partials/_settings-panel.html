@@ -1,5 +1,5 @@
 <body th:fragment="panel">
-
+<input type="hidden" id="sessionEmployeeNum" th:value="${session.employeeNum}"/>
 
 <div class="theme-setting-wrapper">
   <div id="settings-trigger"><i class="ti-settings"></i></div>
@@ -19,95 +19,25 @@
     </div>
   </div>
 </div>
-<div id="right-sidebar" class="settings-panel">
+<!--테스트 끝나면 open class 삭제-->
+<div id="right-sidebar" class="settings-panel open">
   <i class="settings-close ti-close"></i>
   <ul class="nav nav-tabs border-top" id="setting-panel" role="tablist">
-    <li class="nav-item">
-      <a class="nav-link active" id="todo-tab" data-toggle="tab" href="#todo-section" role="tab" aria-controls="todo-section" aria-expanded="true">TO DO LIST</a>
+    <li class="nav-item" id="empList">
+      <a class="nav-link active" id="todo-tab" data-toggle="tab" href="#todo-section" role="tab" aria-controls="todo-section" aria-expanded="true">직원목록</a>
     </li>
-    <li class="nav-item">
-      <a class="nav-link" id="chats-tab" data-toggle="tab" href="#chats-section" role="tab" aria-controls="chats-section">CHATS</a>
+    <li class="nav-item" id="roomList">
+      <a class="nav-link" id="chats-tab" data-toggle="tab" href="#chats-section" role="tab" aria-controls="chats-section">채팅</a>
+    </li>
+    <li class="nav-item chatroom" id="msgList">
+      <a class="nav-link" id="room-tab" data-toggle="tab" href="#room-section" role="tab" aria-controls="room-section"><i class="mdi mdi-message-text"></i></a>
     </li>
   </ul>
   <div class="tab-content" id="setting-content">
     <div class="tab-pane fade show active scroll-wrapper" id="todo-section" role="tabpanel" aria-labelledby="todo-section">
-      <div class="add-items d-flex px-3 mb-0">
-        <form class="form w-100">
-          <div class="form-group d-flex">
-            <input type="text" class="form-control todo-list-input" placeholder="Add To-do">
-            <button type="submit" class="add btn btn-primary todo-list-add-btn" id="add-task">Add</button>
-          </div>
-        </form>
-      </div>
-      <div class="list-wrapper px-3">
-        <ul class="d-flex flex-column-reverse todo-list">
-          <li>
-            <div class="form-check">
-              <label class="form-check-label">
-                <input class="checkbox" type="checkbox">
-                Team review meeting at 3.00 PM
-              </label>
-            </div>
-            <i class="remove ti-close"></i>
-          </li>
-          <li>
-            <div class="form-check">
-              <label class="form-check-label">
-                <input class="checkbox" type="checkbox">
-                Prepare for presentation
-              </label>
-            </div>
-            <i class="remove ti-close"></i>
-          </li>
-          <li>
-            <div class="form-check">
-              <label class="form-check-label">
-                <input class="checkbox" type="checkbox">
-                Resolve all the low priority tickets due today
-              </label>
-            </div>
-            <i class="remove ti-close"></i>
-          </li>
-          <li class="completed">
-            <div class="form-check">
-              <label class="form-check-label">
-                <input class="checkbox" type="checkbox" checked>
-                Schedule meeting for next week
-              </label>
-            </div>
-            <i class="remove ti-close"></i>
-          </li>
-          <li class="completed">
-            <div class="form-check">
-              <label class="form-check-label">
-                <input class="checkbox" type="checkbox" checked>
-                Project review
-              </label>
-            </div>
-            <i class="remove ti-close"></i>
-          </li>
-        </ul>
-      </div>
-      <h4 class="px-3 text-muted mt-5 font-weight-light mb-0">Events</h4>
-      <div class="events pt-4 px-3">
-        <div class="wrapper d-flex mb-2">
-          <i class="ti-control-record text-primary mr-2"></i>
-          <span>Feb 11 2018</span>
-        </div>
-        <p class="mb-0 font-weight-thin text-gray">Creating component page build a js</p>
-        <p class="text-gray mb-0">The total number of sessions</p>
-      </div>
-      <div class="events pt-4 px-3">
-        <div class="wrapper d-flex mb-2">
-          <i class="ti-control-record text-primary mr-2"></i>
-          <span>Feb 7 2018</span>
-        </div>
-        <p class="mb-0 font-weight-thin text-gray">Meeting with Alisa</p>
-        <p class="text-gray mb-0 ">Call Sarah Graves</p>
-      </div>
+      <div id="emp-box"></div>
     </div>
-    <!-- To do section tab ends -->
-    <div class="tab-pane fade" id="chats-section" role="tabpanel" aria-labelledby="chats-section">
+    <div class="tab-pane fade scroll-wrapper" id="chats-section" role="tabpanel" aria-labelledby="chats-section">
       <div class="d-flex align-items-center justify-content-between border-bottom">
         <p class="settings-heading border-top-0 mb-3 pl-3 pt-0 border-bottom-0 pb-0">Friends</p>
         <small class="settings-heading border-top-0 mb-3 pt-0 border-bottom-0 pb-0 pr-3 font-weight-normal">See All</small>
@@ -166,7 +96,34 @@
         </li>
       </ul>
     </div>
-    <!-- chat tab ends -->
+    <div class="tab-pane fade scroll-wrapper" id="room-section" role="tabpanel" aria-labelledby="room-section">
+      <div class="chat-messages">
+        <div class="chat-message received">
+          <span class="sender-name">김채채</span>
+          <div class="message-box yellow">
+            안녕하세요~^^<br>설날 잘 보내세요!
+          </div>
+          <span class="message-time">2025-02-03 10:34</span>
+        </div>
+
+        <div class="chat-message sent">
+          <span class="sender-name">홍길동</span>
+          <div class="message-box dark">
+            네🧡🧡💛💛💚💚
+          </div>
+          <span class="message-time">2025-02-03 10:35</span>
+        </div>
+      </div>
+
+      <div class="chat-input">
+        <label>
+          <textarea placeholder="메시지를 입력하세요..."></textarea>
+        </label>
+        <button class="send-btn">📎</button>
+        <button class="send-btn"> <i class="mdi mdi-send"></i></button>
+      </div>
+    </div>
+
   </div>
 </div>
 </body>

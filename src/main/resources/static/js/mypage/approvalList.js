@@ -6,7 +6,7 @@ if(employeeNum) {
     mypageDataSource = {
         api: {
             readData: {
-                url: `http://localhost:81/api/mainpage/approval/list/${employeeNum}`,
+                url: `/api/mainpage/approval/list/${employeeNum}`,
                 method: 'GET',
                 initParams: { page: 1 }
             },

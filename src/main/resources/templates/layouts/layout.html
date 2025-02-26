@@ -27,6 +27,7 @@
 	 
     <link rel="stylesheet" href="/vendors/mdi/css/materialdesignicons.min.css">
     <link rel="stylesheet" href="/common/_navbar.css">
+    <link rel="stylesheet" href="/common/_settings-panel.css">
 
     <!-- TOAST UI Editor CSS -->
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
@@ -91,7 +92,7 @@
 <div class="container-scroller">
     <div th:replace="~{partials/_navbar :: navbar}"></div>
 
-    <div class="container-fluid page-body-wrapper">
+    <div class="container-fluid page-body-wrapper pl-0">
         <div th:replace="~{partials/_settings-panel :: panel}"></div>
         <div th:replace="~{partials/_sidebar :: sidebar}"></div>
         <div class="main-panel">
@@ -155,6 +156,7 @@
     </div>
 </div>
 <script src="/js/common/common.js"></script>
+<script src="/js/common/_settings-panel.js"></script>
 <!-- plugins:js -->
 <script src="/vendors/js/vendor.bundle.base.js"></script>
 <!-- endinject -->
