@@ -429,7 +429,7 @@
 </select>
 
 
-<insert id="insertContract" parameterType="com.beauty1nside.hr.dto.EmpContractDTO" useGeneratedKeys="true" keyProperty="contractNum">
+<insert id="insertContract" parameterType="com.beauty1nside.hr.dto.EmpContractDTO">
     INSERT INTO HR_EMPLOYEE_CONTRACT (
         CONTRACT_NUM, EMPLOYEE_NUM, COMPANY_NUM, DEPARTMENT_NUM, POSITION, CONTRACT_TYPE,
         CONTRACT_START_DATE, CONTRACT_END_DATE, WORK_LOCATION, JOB_DESCRIPTION, 
@@ -444,8 +444,15 @@
         #{probationPeriod}, 'CS001', SYSDATE, SYSDATE,
         #{annualSalary}, #{bonus}, #{additionalPay}
     )
-    RETURNING CONTRACT_NUM INTO #{contractNum} 
 </insert>
+
+<select id="getLastInsertedContractNum" resultType="java.lang.Long">
+    SELECT CONTRACT_NUM FROM (
+        SELECT CONTRACT_NUM FROM HR_EMPLOYEE_CONTRACT 
+        WHERE EMPLOYEE_NUM = #{employeeNum}
+        ORDER BY REGISTER_DATE DESC
+    ) WHERE ROWNUM = 1
+</select>
 
 <insert id="insertSalary" parameterType="com.beauty1nside.hr.dto.SalaryDTO">
     INSERT INTO HR_SALARY (
@@ -455,11 +462,9 @@
     ) VALUES (
         HR_SALARY_SEQ.NEXTVAL,
         #{employeeNum}, #{contractNum}, #{companyNum}, #{monthlySalary}, 
-        #{bonus}, #{additionalPay}, 0, 0, #{netSalary},
+        #{bonus}, #{additionalPay}, #{overtimePay}, #{deduction}, #{netSalary},
         #{salaryPaymentDate}, #{paymentMethod}, SYSDATE, SYSDATE, SYSDATE
     )
 </insert>
-
-
 
 </mapper>

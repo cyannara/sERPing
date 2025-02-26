@@ -176,32 +176,13 @@ public class EmpServiceImpl implements EmpService {
     
     @Transactional
     @Override
-    public void registerContractWithSalary(EmpContractDTO contractDTO) {
-        // ✅ 1. 근로계약 정보 저장 (contractNum 자동 생성 후 DTO에 저장됨)
-        empMapper.insertContract(contractDTO);
-        
-        // ✅ 2. 급여 정보 생성
-        SalaryDTO salaryDTO = new SalaryDTO();
-        salaryDTO.setEmployeeNum(contractDTO.getEmployeeNum());
-        salaryDTO.setContractNum(contractDTO.getContractNum());  // ✅ 방금 생성된 계약번호 사용
-        salaryDTO.setCompanyNum(contractDTO.getCompanyNum());
+    public void registerContractWithSalary(EmpContractDTO contractDTO, SalaryDTO salaryDTO) {
 
-        // ✅ 3. 급여 계산
-        double monthlySalary = contractDTO.getAnnualSalary() / 12;
-        double deduction = monthlySalary * 0.19; // 세금(10%) + 보험(9%)
-        double netSalary = monthlySalary + contractDTO.getBonus() + contractDTO.getAdditionalPay() - deduction;
-
-        salaryDTO.setMonthlySalary(monthlySalary);
-        salaryDTO.setBonus(contractDTO.getBonus());
-        salaryDTO.setAdditionalPay(contractDTO.getAdditionalPay());
-        salaryDTO.setDeduction(deduction);
-        salaryDTO.setNetSalary(netSalary);
-        salaryDTO.setSalaryPaymentDate(new Date());
-        salaryDTO.setPaymentMethod("BANK"); // 기본값
-
-        // ✅ 4. 급여 정보 저장
-        empMapper.insertSalary(salaryDTO);
+            // 근로계약 정보 저장
+            empMapper.insertContract(contractDTO);
+            log.info("📌 계약 등록 완료! 계약 정보: {}", contractDTO);
     }
+
 
 	@Override
 	public List<EmpContractDTO> getContractsByEmployee(Long employeeNum) {

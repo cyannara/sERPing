@@ -76,7 +76,7 @@ function initializeGrid() {
     const dataSource = {
         api: {
             readData: {
-                url: 'http://localhost:81/hr/rest/emp/list',
+                url: '/hr/rest/emp/list',
                 method: 'GET',
                 initParams: { page: 1 }
             }
@@ -119,7 +119,7 @@ function initializeGrid() {
 // 공통 코드 목록 불러오기 (동적 적용)
 let commonCodes = {}; // 🔹 공통 코드 저장 변수
 function loadCommonCodes() {
-    fetch("http://localhost:81/hr/rest/emp/common-codes")
+    fetch("/hr/rest/emp/common-codes")
         .then(response => response.json())
         .then(data => {
             commonCodes = data;
