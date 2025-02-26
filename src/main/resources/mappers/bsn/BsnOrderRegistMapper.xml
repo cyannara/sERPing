@@ -27,7 +27,7 @@ SELECT /*+ INDEX_ASC(BHF_ORDER PK_BHF_ORDER) */
       ,company_num
 FROM BHF_ORDER
 WHERE progress_status = '신청'
--- AND   company_num = 1
+  AND   company_num = #{companyNum}
 <include refid="searchInfoBhfOrder"></include>
 
 ) WHERE RN BETWEEN #{start} AND #{end}

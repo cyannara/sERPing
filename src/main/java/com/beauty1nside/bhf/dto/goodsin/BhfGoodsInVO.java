@@ -11,7 +11,7 @@ public class BhfGoodsInVO {
 	private String branchOfficeId;
 	private Date dueDate;
 	private int companyNum;
-	private String orderId;
+	private String deliveryId;
 	private String orderCode;
 	private List<BhfGoodsInDtlVO> files;
 	

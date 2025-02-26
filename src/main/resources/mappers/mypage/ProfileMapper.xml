@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beauty1nside.mypage.mapper.ProfileMapper">
+	<select id="info" resultType="com.beauty1nside.hr.dto.EmpDTO">
+		SELECT e.EMPLOYEE_NUM,
+			   e.EMPLOYEE_ID,
+			   e.EMPLOYEE_PW,
+			   e.EMPLOYEE_NAME,
+			   e.SSN,
+			   e.EMAIL,
+			   e.PHONE,
+			   e.HIRE_DATE,
+			   e.AUTHORITY,
+			   e.STATUS,
+			   e.QUIT_DATE,
+			   e.ADDRESS,
+			   e.ZIP_CODE,
+			   e.EMPLOYMENT_TYPE,
+			   e.BANK_NAME,
+			   e.ACCOUNT_NUM,
+			   e.PROFILE_IMAGE,
+			   e.MEMO,
+			   e.REGISTER_DATE,
+			   e.UPDATE_DATE,
+			   e.COMPANY_NUM,
+			   e.DEPARTMENT_NUM,
+			   e.SALARY,
+			   d.department_name AS departmentName,
+			   fn_get_cmmn_name(e.POSITION) AS position
+		FROM hr_employee e
+				 LEFT JOIN hr_department d ON
+			e.department_num = d.department_num
+		WHERE e.EMPLOYEE_NUM = #{employeeNum} and e.company_num = #{companyNum}
+	
+	</select>
+
+	<update id="update" parameterType="com.beauty1nside.hr.dto.EmpDTO">
+		UPDATE hr_employee
+		set PROFILE_IMAGE = #{profileImage}
+		where employee_num = #{employeeNum} and company_num = #{companyNum}
+	</update>
+
+</mapper>

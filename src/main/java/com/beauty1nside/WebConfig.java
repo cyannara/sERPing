@@ -13,5 +13,9 @@ public class WebConfig implements WebMvcConfigurer {
     registry.addResourceHandler("/file/image/stdr/document/**")
       .addResourceLocations("file:src/main/resources/static/file/image/stdr/document/") // 업로드 경로 설정
       .setCacheControl(CacheControl.noCache()); // 캐시 없이 즉시 반영
+    
+    registry.addResourceHandler("/file/image/mypage/profile/**")
+      .addResourceLocations("file:src/main/resources/static/file/image/mypage/profile/")
+      .setCacheControl(CacheControl.noCache());
   }
 }

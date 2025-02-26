@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beauty1nside.chat.mapper.ChatMapper">
+
+    <select id="empList" resultType="com.beauty1nside.hr.dto.EmpDTO">
+        select *
+        from HR_EMPLOYEE
+        where company_num = #{companyNum}
+    </select>
+
+    <select id="getChatRoom" parameterType="com.beauty1nside.chat.dto.RoomDTO">
+        SELECT *
+        FROM grpwr_chat_room
+        WHERE (employee_num1 = #{employeeNum1} AND employee_num2 = #{employeeNum2})
+           OR (employee_num1 = #{employeeNum2} AND employee_num2 = #{employeeNum1})
+    </select>
+
+    <insert id="insertChatRoom" parameterType="com.beauty1nside.chat.dto.RoomDTO">
+        INSERT INTO grpwr_chat_room (
+            room_id,
+            company_num,
+            employee_num1,
+            employee_num2
+        ) VALUES (
+                     GRPWR_CAHT_ROOM_SEQ.nextval,
+                     #{companyNum},
+                     #{employeeNum1},
+                     #{employeeNum2}
+                 )
+            RETURNING room_id INTO #{roomId}
+    </insert>
+
+    <select id="getMsgList">
+        select *
+        from grpwr_chat_message
+        where room_id = #{roomId}
+    </select>
+</mapper>

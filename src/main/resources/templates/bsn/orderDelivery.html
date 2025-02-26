@@ -17,6 +17,10 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		margin-bottom: 20px;
 	
 	}
+	.grid-row-selected {
+    	background-color: #e86f6f;  
+	}
+	
   </style>
 
 </head>
@@ -72,7 +76,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         </div>
         <div class="row">
           	<div class="d-flex justify-content-center gap-3 mt-3">
-			                <button type="button" class="btn btn-primary px-4">상품 출고 확정</button>
+			            <button type="button" class="btn btn-primary px-4" id="confirmButton">상품 출고 확정</button>
 			</div>
         </div>
 	</div>
@@ -96,16 +100,48 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 						    	'LOT 연결 삭제', 
 						    	'bsn/modal/bsnLotDelete', 
 						    	'bsn/modal/bsnModalFooter')">
-     </div>	
+     </div>
+     
+     <div th:include="bsn/modal/bsnModalTemplate :: ModalTemplate(
+						    	'confirmModal', 
+						    	'modal-md', 
+						    	'출고 확정', 
+						    	'bsn/modal/bsnDlivConfirm', 
+						    	'bsn/modal/bsnModalFooter')">
+     </div>
+  <!-- 세션정보 -->
+  	  <script th:inline="javascript">
+	  	let companyNum = [[${session.companyNum}]];
+	  	//let employeeNum = [[${session.employeeNum}]];
+	  </script>    
+	   
 <script>
 var Grid = tui.Grid;
-var selectedRow = null; // 선택된 상품 상세
-var detailData = [];    // 상세 LOT정보
 
+tui.Grid.applyTheme('default', {
+	  cell: {
+	    
+	    selectedHead: {
+	      background: '#0b3f73',
+	    },
+	    
+	  }
+	});
+
+let selectDlivyId;
+var selectedRow = null; // 선택된 상품 상세
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    search();  // DOMContentLoaded 이벤트 후 자동으로 검색 실행
+});
+
+
+    
 
 const OrderListDataSource = {
 		api: {
-			readData: { url: 'http://localhost:81/bsn/rest/deli', method: 'GET', initParams: { page: 1 }},
+			readData: { url: '/bsn/rest/deli', method: 'GET', initParams: { page: 1 }},
 		},
 		contentType: 'application/json'
 };
@@ -164,8 +200,30 @@ function formatStatus(status) {
     
     	
 }
+function search(){
+	//let selectedOption = document.querySelector('input[name="optionsRadios"]:checked').value; // 라디오 버튼 선택 값
+    //let startDate = document.getElementById("startDate").value; // 시작 날짜
+    //let endDate = document.getElementById("endDate").value; // 끝 날짜
+    //let selectedBhf = document.getElementById("selectBhf").value; // 발주지점 선택 값
+    
+    //console.log(selectedOption, startDate, endDate, selectedBhf);
+    
+    let params = {
+    		//"companyNum": companyNum,
+    		//"deteOption": selectedOption,
+            //"startDate": startDate,
+            //"endDate": endDate,
+            //"branch": selectedBhf,
+            "companyNum": companyNum
+            
+    };
+    console.log("검색 조건:", params);
+    
+    orderList.readData(1, params, true);
+}
 
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //출고 클릭 시 상세 불러오기
 orderList.on('click', (ev) => {
@@ -177,7 +235,9 @@ orderList.on('click', (ev) => {
     
     //console.log(rowKey);
     const rowData = orderList.getRow(rowKey); // 클릭한 행 데이터 가져오기
-    console.log(rowData.deliveryId);
+    selectDlivyId = rowData.deliveryId;
+    
+    console.log("선택한 출고(주문) : " + rowData.deliveryId);
     
 	 // 주문 상세, LOT 상세 초기화
     deliveryDetailGrid.resetData([]);
@@ -197,7 +257,7 @@ function loadDeliveryDetail(deliveryId) {
         return;
     }
 	
-    fetch(`http://localhost:81/bsn/rest/deli/detail?deliveryId=${deliveryId}`)
+    fetch(`/bsn/rest/deli/detail?deliveryId=${deliveryId}`)
     	
         .then(response => {
 	            if (!response.ok) throw new Error(`HTTP 오류! 상태: ${response.status}`);
@@ -238,7 +298,7 @@ pageOptions: {
 }
 });
 
-////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //출고 클릭 시 LOT상세 불러오기
 deliveryDetailGrid.on('click', (ev) => {
@@ -250,7 +310,7 @@ deliveryDetailGrid.on('click', (ev) => {
     }
     
     const rowData = deliveryDetailGrid.getRow(rowKey); // 클릭한 행 데이터 가져오기
-    console.log(rowData.deliveryDetailId);
+    console.log("선택한 출고 상세 ID : " + rowData.deliveryDetailId);
     
  	// LOT 상세 초기화
     deliveryLotDetailGrid.resetData([]);
@@ -267,7 +327,7 @@ function loadDeliveryLotDetail(deliveryDetailId) {
         return;
     }
 	
-    fetch(`http://localhost:81/bsn/rest/deli/lot/detail?deliveryDetailId=${deliveryDetailId}`)
+    fetch(`/bsn/rest/deli/lot/detail?deliveryDetailId=${deliveryDetailId}`)
     	
         .then(response => {
 	            if (!response.ok) throw new Error(`HTTP 오류! 상태: ${response.status}`);
@@ -308,14 +368,199 @@ pageOptions: {
 }
 });
 
-////////////////////////////////////
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function refreshGrid() {
+
+		    // 그리드 데이터 갱신
+		    orderList.reloadData();
+
+		 	// 등록 후 상세 데이터 새로 불러오기
+		    //loadDeliveryDetail(selectedRow.deliveryId); // 주문 상세 새로 불러오기
+		    
+
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//LOT등록(연결) 처리
+function registerLotData() {
+	   	  registerGrid.finishEditing();
+       // 출고 수량 합계 초기화
+          let qntSum = 0; 
+       
+       // 모든 행 데이터 가져오기(LOT상세의 수량들 합)
+          const allData = deliveryLotDetailGrid.getData(); 
+          let totalSum = allData.reduce((sum, row) => sum + Number(row.deliveryQnt || 0), 0);
+
+         
+          
+          const selectedRows = registerGrid.getCheckedRows(); // 선택된 행 가져오기(모달창에서 체크한 것만)
+          if(selectedRows.length == 0){
+          	showAlert('선택한 LOT가 없습니다.', 'danger');
+          	registerModal.hide();
+          	return;
+          }
+		    const requestData = selectedRows.map(row => ({
+		    	goodsLotNum: row.goodsLotNum,
+		        deliveryQnt: Number(row.deliveryQnt),
+		    }));
+		 // 유효성 검사 (출고 수량이 출고 가능 수량보다 많지 않게)
+		    for (let item of requestData) {
+		    	if (isNaN(item.deliveryQnt) || !Number.isInteger(item.deliveryQnt) || item.deliveryQnt <= 0) {
+		            showAlert('올바르지 않은 출고 수량입니다.(원인:0, 공백, 글자...)', 'danger');
+		            return;
+		        }
+		    	
+		        if (item.deliveryQnt > selectedRows.find(row => row.goodsLotNum === item.goodsLotNum).warehousingRemainingQuantity) {
+		            showAlert('출고 수량이 가능 수량을 초과할 수 없습니다.', 'danger');
+		            return;
+		        } 
+		        
+		        qntSum += item.deliveryQnt; // 숫자로 변환한 후 더하기
+
+		        if (selectedRow.deliveryDemandQnt <totalSum + qntSum) { 
+		            showAlert('연결된 출고 수량들의 합이 요구 수량을 초과할 수 없습니다.', 'danger');
+		            return;
+		        }
+		        
+		        
+		    }
+		 	//console.log(selectedRow.deliveryDemandQnt);
+			//console.log(requestData);
+			//console.log(totalSum);
+			let dlvyDTO = {
+				deliveryDetailId: selectedRow.deliveryDetailId,
+				optionCode: selectedRow.optionCode,
+				lotDetails: requestData
+		    };
+			//console.log(dlvyDTO);
+			registerLot(dlvyDTO);
+			registerModal.hide();
+}
+
+//LOT등록 fetch
+function registerLot(dlvyDTO) {
+	const header = document.querySelector('meta[name="_csrf_header"]').content;
+    const token = document.querySelector('meta[name="_csrf"]').content;
+	
+    fetch('/bsn/rest/deli/lot/detail/insert', {
+        method: 'POST',
+        headers: {
+        	'header': header,
+        	'X-CSRF-Token': token,
+            'Content-Type': 'application/json'  // JSON 형식으로 보내기
+        },
+        body: JSON.stringify(dlvyDTO)  // 객체를 JSON으로 변환하여 전송
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === "success") {
+            showAlert('LOT 등록(연결) 성공', 'success');
+         	// 값 초기화 + 값 초기화
+            refreshGrid();
+            loadDeliveryDetail(selectedRow.deliveryId);
+        	loadDeliveryLotDetail(dlvyDTO.deliveryDetailId); // 상세 정보 불러오기
+
+         	
+           
+        } else {
+            showAlert('LOT 등록(연결) 실패:'+ data.message, 'danger');
+        }
+
+
+    }) 
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//LOT 연결 제거
+function deleteLotData() {
+		const selectedDeleteRows = deliveryLotDetailGrid.getCheckedRows(); // 선택된 행 가져오기(모달창에서 체크한 것만)
+  		if(selectedDeleteRows.length == 0){
+  			showAlert('선택한 LOT가 없습니다. 체크를 확인해주세요.', 'danger');
+  			return;
+		}
+
+	   	const requestData = selectedDeleteRows.map(row => ({
+	   		   deliveryLotDetailNum:Number(row.deliveryLotDetailNum),
+	   	}));
+	   	
+		 //console.log(requestData);
+		 let dlvyDTO = {
+			deliveryDetailId: selectedRow.deliveryDetailId,
+			lotDetails: requestData
+		 };
+		 console.log("삭제 정보 : " + dlvyDTO);
+		 deleteLot(dlvyDTO);
+		 deleteModal.hide();
+}
+
+function deleteLot(dlvyDTO) {
+	const header = document.querySelector('meta[name="_csrf_header"]').content;
+    const token = document.querySelector('meta[name="_csrf"]').content;
+	
+    fetch('/bsn/rest/deli/lot/detail/delete', {
+        method: 'DELETE',
+        headers: {
+        	'header': header,
+        	'X-CSRF-Token': token,
+            'Content-Type': 'application/json'  // JSON 형식으로 보내기
+        },
+        body: JSON.stringify(dlvyDTO)  // 객체를 JSON으로 변환하여 전송
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === "success") {
+            showAlert('LOT 삭제 성공', 'success');
+         	// 값 초기화 + 값 초기화
+            refreshGrid();
+            loadDeliveryDetail(selectedRow.deliveryId);
+        	loadDeliveryLotDetail(dlvyDTO.deliveryDetailId); // 상세 정보 불러오기
+
+         	
+           
+        } else {
+            showAlert('LOT 삭제 실패:'+ data.message, 'danger');
+        }
+
+
+    }) 
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//출고 확정
+function confirmDelivery() {
+	//출고 확정지을 주문ID
+	console.log("출고 확정지을 주문ID: " + selectDlivyId);
+	//const deliveryDetailData = deliveryDetailGrid.getData();
+	
+	
+	//const requestData = deliveryDetailData.map(row => ({
+	//	   deliveryDetailId:Number(row.deliveryDetailId),
+	//}));
+	//console.log(requestData);
+	//let dlvyDTO = {
+			
+	//		deliveryId: selectDlivyId,
+	//		deliveryDetails: requestData
+	//};
+	//console.log(dlvyDTO);
+	
+	
+}
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //모달 인스턴스 생성
+
 const registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
 const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal')); 
 
-// 주문 선택 확인 함수
-function checkOrderSelection(modal) {
+// 상품 선택 확인 함수
+function checkGoodsSelection(modal) {
     if (selectedRow && selectedRow.optionCode) {
         modal.show();
     } else {
@@ -325,77 +570,90 @@ function checkOrderSelection(modal) {
 
 // 주문 등록 버튼 클릭 이벤트
 document.getElementById('registerButton').addEventListener('click', () => {
-    checkOrderSelection(registerModal); // 등록 모달 띄우기
+	checkGoodsSelection(registerModal); // 등록 모달 띄우기
 });
 
 // 주문 거부 버튼 클릭 이벤트
 document.getElementById('deleteButton').addEventListener('click', () => {
-    checkOrderSelection(deleteModal); // 삭제 모달 띄우기
+	
+	// 먼저 상품이 선택되었는지 확인
+    if (!selectedRow || !selectedRow.optionCode) {
+        // 상품이 선택되지 않았다면 checkGoodsSelection을 호출하여 상품 선택을 유도
+        checkGoodsSelection(deleteModal);
+        return;
+    }
+
+    // 상품이 선택되었으면, LOT 체크된 행이 있는지 확인
+    const selectedDeleteRows = deliveryLotDetailGrid.getCheckedRows(); // 체크된 행 가져오기
+
+    if (selectedDeleteRows.length === 0) {
+        // 체크된 행이 없으면 경고 메시지 표시
+        showAlert('선택한 LOT가 없습니다. 체크를 확인해주세요.', 'danger');
+        return;
+    }
+    
+ 	// 삭제 모달 띄우기
+    deleteModal.show(); 
 });
 
 
+// 출고 확정 버튼 클릭 이벤트
+document.getElementById('confirmButton').addEventListener('click', () => {
+	const deliveryDetailData = deliveryDetailGrid.getData(); 
+	if(deliveryDetailData.length === 0){
+		showAlert('출고할 주문을 선택하세요.', 'danger');
+		return;
+	}
+	
+	
+	const isAllSufficient = deliveryDetailData.every(row => row.sufficiencyStatus === 1);
+
+    if (!isAllSufficient) {
+        showAlert('출고할 주문 중 수량이 충족되지 않은 상품이 있습니다.', 'danger');
+        return;
+    }
+    console.log(deliveryDetailData);
+    
+	confirmModal.show();
+});
+
+
+//
 // 공통된 버튼을 다루되, 모달에 따라 다르게 동작하도록 설정
 document.querySelectorAll('.modal-footer #btn-register').forEach(button => {
     button.addEventListener('click', () => {
-        if (selectedRow && selectedRow.optionCode) {
-            // 현재 show 클래스가 있는 모달 찾기
-            const activeModal = document.querySelector('.modal.show');
+    	// 현재 show 클래스가 있는 모달 찾기
+        const activeModal = document.querySelector('.modal.show');
+    	
+    	//모달 ID별로 처리
+    	if (activeModal.id === 'confirmModal') {
+			//출고 확정 처리///////////////
+			confirmDelivery();
+			
+			/////////////////////////////
+            confirmModal.hide();
+        } 
+    	else if (selectedRow && selectedRow.optionCode) {
+            
 			
             if (activeModal) {
                 if (activeModal.id === 'registerModal') {
                 	
                 	
-                    // 주문 등록 처리///////////////
-                    
-                    registerGrid.finishEditing();
-                 // 출고 수량 합계 초기화
-                    let qntSum = 0; 
+                    // LOT 등록 처리///////////////
+                    registerLotData();
                  
-                 // 모든 행 데이터 가져오기(LOT상세의 수량들 합)
-                    const allData = deliveryLotDetailGrid.getData(); 
-                    let totalSum = allData.reduce((sum, row) => sum + Number(row.deliveryQnt || 0), 0);
-                    
-                    const selectedRows = registerGrid.getCheckedRows(); // 선택된 행 가져오기(모달창에서 체크한 것만)
-                    
-				    const requestData = selectedRows.map(row => ({
-				    	goodsLotNum: row.goodsLotNum,
-				        deliveryQnt: Number(row.deliveryQnt),
-				        warehousingRemainingQuantity: Number(row.warehousingRemainingQuantity)
-				    }));
-				 // 유효성 검사 (출고 수량이 출고 가능 수량보다 많지 않게)
-				    for (let item of requestData) {
-				        if (item.deliveryQnt > item.warehousingRemainingQuantity) {
-				            showAlert('출고 수량이 가능 수량을 초과할 수 없습니다.', 'danger');
-				            return;
-				        } 
-				        
-				        qntSum += item.deliveryQnt; // 숫자로 변환한 후 더하기
-
-				        if (selectedRow.deliveryDemandQnt <totalSum + qntSum) { 
-				            showAlert('연결된 출고 수량들의 합이 요구 수량을 초과할 수 없습니다.', 'danger');
-				            return;
-				        }
-				        
-				        
-				    }
-				 	//console.log(selectedRow.deliveryDemandQnt);
-					//console.log(requestData);
-					//console.log(totalSum);
-					let dlvyDTO = {
-						deliveryDetailId: selectedRow.deliveryDetailId,
-						optionCode: selectedRow.optionCode,
-				        lotDetails: requestData
-				    };
-					console.log(dlvyDTO);
 
 					/////////////////////////
-                    registerModal.hide();
-                    registerGrid.reloadData();
+                    
                 } else if (activeModal.id === 'deleteModal') {
-
-
+					//LOT 제거 처리 ///////////////
+					deleteLotData();
+					
+					/////////////////////////////
                     deleteModal.hide();
-                }
+                } 
+                
             }
         } else {
             showAlert('상품을 선택해주세요!', 'danger');
@@ -405,24 +663,27 @@ document.querySelectorAll('.modal-footer #btn-register').forEach(button => {
 
 
 
+
 document.querySelectorAll('.modal-footer .btn-secondary').forEach(button => {
     button.addEventListener('click', () => {
         // 현재 활성화된 모달 찾기
         const activeModal = document.querySelector('.modal.show');
 
         if (activeModal) {
-        	//console.log(activeModal);
+
         	if (activeModal.id === 'registerModal') {
-        		
                 registerModal.hide();
                 registerGrid.reloadData();
             } else if (activeModal.id === 'deleteModal') {
-            	
                 deleteModal.hide();
+            } else if (activeModal.id === 'confirmModal') {
+            	confirmModal.hide();
             }
+        	
         }
     });
 });
+/////////////////////////////////////////////////////////////////////////////////////////
 
 
 </script>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8">
+<style>
+#goodsName{
+	border-right: none;
+	border-width: 0.8px;
+}
+
+#searchBtn{
+	background-color: #fff;
+	border-left: none;
+	border-width: 0.8px;
+}
+</style>
+</head>
+<body>    
+    <div class="container">
+			<div class="row">
+				<span class="col-3">상품명</span>
+				<input type="text" name="goodsName" id="goodsName" class="col-8">
+				<button type="button" class="mdi mdi-magnify col-1" id="searchBtn" onclick="searchOpt()"></button>
+			</div>
+			<div class="row">
+				<span class="col-3">옵션명</span>
+				<select name="optName" id="optName" class="col-9" onchange="returnValue()">
+					<option value="">상품을 먼저 검색해주세요</option>
+
+				</select>
+			</div>
+	</div>
+<script>
+	function searchOpt(){
+		const header = document.querySelector('meta[name="_csrf_header"]').content;
+        const token = document.querySelector('meta[name="_csrf"]').content;
+        
+		let goods = document.querySelector("#goodsName");
+		fetch(`http://localhost:81/accnut/rest/option/list?goodsName=${goods.value}`, {
+				method: "GET",
+				headers: {
+						 	'header': header,
+   			                "Content-Type": "application/json",
+   			                'X-CSRF-Token': token				
+				 		}
+			})
+			 .then(response => response.json())
+			 .then(data => { 
+				 let optSelect = document.querySelector("#optName");
+				 // 원래 있던 옵션 태그 삭제
+				 optSelect.querySelectorAll("option").forEach(a=>{ a.remove(); })
+				 // 결과 값 없으면 상품 정보 없다고 표시
+				 if(data.result.length == 0){
+					 let html = `<option value="">상품정보가 없습니다.</option>`;
+				 	 optSelect.insertAdjacentHTML("beforeend", html);
+				 }
+				 // 상품 정보가 있으면 옵션태그 생성
+				 for(opt of data.result){
+				 	let html = `<option value="${opt.optionCode}">${opt.optionName}</option>`;
+				 	optSelect.insertAdjacentHTML("beforeend", html);
+				 }
+				 // 옵션태그 처음 생성되었을 때 onchange 실행 안되서 강제로 실행
+				 returnValue();
+			 });
+	}
+
+	function returnValue() {
+		document.querySelector("#optCode").value = document.querySelector("#optName").value;
+	}
+	
+	
+
+</script>
+</body>
+</html>

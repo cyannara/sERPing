@@ -12,13 +12,13 @@ public class BhfReturnInsertDtlVO {
 	private int quantity;
 	private String exchangeReturningChoice;
 	private String returningReason;
-	private String goodsBarcode;
+	private String optionBarcode;
 	private String goodsLotNum;
 	
 	public BhfReturnInsertDtlVO() {}
 
 	public BhfReturnInsertDtlVO(String goodsCode, String goodsName, String optionCode, String optionName, int quantity,
-			String exchangeReturningChoice, String returningReason, String goodsBarcode, String goodsLotNum) {
+			String exchangeReturningChoice, String returningReason, String optionBarcode, String goodsLotNum) {
 		super();
 		this.goodsCode = goodsCode;
 		this.goodsName = goodsName;
@@ -27,7 +27,7 @@ public class BhfReturnInsertDtlVO {
 		this.quantity = quantity;
 		this.exchangeReturningChoice = exchangeReturningChoice;
 		this.returningReason = returningReason;
-		this.goodsBarcode = goodsBarcode;
+		this.optionBarcode = optionBarcode;
 		this.goodsLotNum = goodsLotNum;
 	}
 	

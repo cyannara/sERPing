@@ -6,7 +6,7 @@ if(employeeNum) {
     mypageDataSource = {
         api: {
             readData: {
-                url: `http://localhost:81/api/mainpage/approval/list/${employeeNum}`,
+                url: `/api/mainpage/approval/list/${employeeNum}`,
                 method: 'GET',
                 initParams: { page: 1 }
             },
@@ -96,8 +96,13 @@ let inApprovalStatus = ''
 let filterBtns = document.getElementsByClassName('filter-btn')
 filterBtns = Array.from(filterBtns)
 filterBtns.forEach((btn) => {
+
     btn.addEventListener('click', (event) => {
+        filterBtns.forEach((btn) => {
+            btn.classList.remove('active')
+        })
         inApprovalStatus = event.target.dataset.status
+        event.target.classList.add('active')
     })
 })
 function reset(){

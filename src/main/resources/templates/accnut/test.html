@@ -7,12 +7,27 @@
 <meta charset="UTF-8">
 <title>거래대장 등록</title>
 <link rel="stylesheet" href="/vendors/mdi/css/materialdesignicons.min.css">
+<style type="text/css">
+.tui-datepicker{
+	z-index: 100;
+}
+</style>
 </head>
 <body layout:fragment="content">
   <div class="container">
     <!-- 메뉴이름 -->
 		<div>
 			<h2>거래대장 등록</h2>
+			<h3>달</h3>
+			<h5>연</h5>
+			<div class="col-8">
+		        <div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+            		<input type="text" id="datepicker-input" aria-label="Date-Time">
+            		<span class="tui-ico-date"></span>
+        		</div>	
+       			<div id="wrapper" style="margin-top: -1px; z-index: 100; position: static"></div>
+			</div>
+        	
 		</div>
 
     <!-- 등록 grid -->
@@ -53,7 +68,54 @@
     document.addEventListener("DOMContentLoaded",()=>{
       addRow();
       delRow();
+
     })
+    
+       var datepicker = new tui.DatePicker('#wrapper', {
+            date: new Date(),
+            type:'year',
+            input: {
+                element: '#datepicker-input',
+                format: 'yyyy'
+            }
+        });    
+    
+	document.querySelector('h2').addEventListener('click', ()=>{
+		datepicker.setType('date');
+		datepicker.setDateFormat('yyyy-MM-dd');
+		datepicker.setDate(new Date());
+		
+
+	})
+    document.querySelector('h3').addEventListener('click', ()=>{
+		datepicker.setType('month');
+		datepicker.setDateFormat('yyyy-MM');
+		datepicker.setDate(new Date());
+
+	})
+	document.querySelector('h5').addEventListener('click', ()=>{
+		datepicker.setType('year');
+		datepicker.setDateFormat('yyyy');
+		datepicker.setDate(new Date());
+
+	})
+	
+	datepicker.on('change', () => {
+		let date = datepicker.getDate();
+		let type = datepicker.getType();
+		let result = "";
+		
+		switch(type.toString()){
+		case "date"  : result = "-" + ("0" + date.getDate()).slice(-2) + result;
+		case "month" : result = "-" + ("0" + (date.getMonth()+1)).slice(-2) + result;
+		case "year"  : result = date.getFullYear() + result;
+					   break;
+		default      : break;
+		}
+		
+    	console.log(result);
+	});
+    
     var Grid = tui.Grid;
     
     const header = document.querySelector('meta[name="_csrf_header"]').content;

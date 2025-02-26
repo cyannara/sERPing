@@ -36,7 +36,7 @@ public class GoodsInArrayStructHandler implements TypeHandler<Object> {
 		
 		List<BhfGoodsInDtlVO> files = (List<BhfGoodsInDtlVO>)parameter;
 		
-		Object[] goodsInFileType = new Object[12]; 
+		Object[] goodsInFileType = new Object[15]; 
 	    Struct[] goodsInArray = new Struct[files.size()];
 
 	    int goodsInIndex = 0;
@@ -53,6 +53,9 @@ public class GoodsInArrayStructHandler implements TypeHandler<Object> {
 	    	goodsInFileType[9] = file.getInQuantity();
 	    	goodsInFileType[10] = file.getReorder();
 	    	goodsInFileType[11] = file.getReturnNum();
+	    	goodsInFileType[12] = file.getGoodsLotNum();
+	    	goodsInFileType[13] = file.getOptionBarcode();
+	    	goodsInFileType[14] = file.getGoodsConsumptionDate();
 	        goodsInArray[goodsInIndex++] = conn.createStruct("GOODSINFILETYPE", goodsInFileType);
 	    }		
 	    Array goodsInFileArray = (Array)conn.createOracleArray("GOODSINFILEARRAY", (Struct[]) goodsInArray); 		
