@@ -5,7 +5,21 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
 <meta charset="UTF-8">
-<title>매출 조회</title>    
+<title>매출 조회</title>
+<style>
+.tui-datepicker-input{
+	padding: 0;
+}
+.tui-datepicker{
+	z-index: 100;
+}
+#datepicker-input{
+	padding-left: 18px;
+	padding-top: 0;
+	padding-bottom: 0; 
+	font-size: 16px;
+}
+</style>
 </head>
 <body layout:fragment="content">
 	<div class="container">
@@ -22,7 +36,7 @@
 				<!-- 자산명 인풋 -->
 				<div class="col-5 row ">
 					<span class="label-search col-4">지점</span>
-					<select name="section" id="section" class="col-8 input-box">
+					<select name="officeId" id="officeId" class="col-8 input-box">
 						<option value="" selected>전체</option>
 
 					</select>
@@ -31,8 +45,10 @@
 				<!-- 구분 인풋 -->
 				<div class="col-5 row ">
 					<span class="label-search col-4">주기</span>
-					<select name="section" id="section" class="col-8 input-box">
-						<option value="" selected>일별</option>
+					<select name="perdate" id="perdate" class="col-8 input-box">
+						<option value="date" selected>일별</option>
+						<option value="month">월별</option>
+						<option value="year">년별</option>
 
 					</select>
 				</div>
@@ -43,17 +59,22 @@
 				<!-- 금융기관 인풋 -->
 				<div class="col-5 row ">
 					<span class="label-search col-4">상품</span>
-					<input type="text" name="financialInstitution" id="financialInstitution" class="col-8 input-box">
+					<input type="text" name="optCode" id="optCode" class="col-8 input-box" data-bs-toggle="modal" data-bs-target="#optSearchModal">
 				</div>
 				<div class="col-1"></div>
-				<!-- 그리드 표시 수량 인풋 -->
+				
 				<div class="col-5 row ">
 					<span class="label-search col-4">날짜</span>
-					<input type="date" name="perdate" id="perdate" class="col-8 input-box">
+				        <div class="tui-datepicker-input tui-datetime-input tui-has-focus col-8">
+		            		<input type="text" id="datepicker-input" name="resultDate" aria-label="Date-Time" class="input-box">
+		            		<span class="tui-ico-date"></span>
+		        		</div>	
+		       			<div id="wrapper" style="margin-top: -1px; z-index: 100; position: static"></div>
 				</div>
 			</div>
 			<div class="row 4row">
 				<div class="col-1"></div>
+				<!-- 그리드 표시 수량 인풋 -->
 				<div class="col-5 row ">
 					<span class="label-search col-4">표시수량</span>
 					<select name="display_amount" id="display_amount" class="col-8 input-box" onchange="changeDisplay()">
@@ -88,11 +109,11 @@
 		</div>
 		<!-- 상품 검색 모달 -->
 		<div th:replace="purchs/ModalTemplate :: ModalTemplate (
-						    	'goodsSearchModal', 
-						    	'modal-xl', 
+						    	'optSearchModal', 
+						    	'', 
 						    	'상품 검색', 
-						    	'accnut/assetDetail', 
-						    	'accnut/assetFooter'
+						    	'accnut/optSearchBody', 
+						    	'accnut/optSearchFooter'
 						    )"></div>
 		
 	</div>
@@ -100,8 +121,21 @@
 	document.addEventListener("DOMContentLoaded",()=>{
 		getInfo();
 		downExcel();
+		changeDate();
+		getBhf();
 	});
-
+	
+	// 데이트피커
+	var datepicker = new tui.DatePicker('#wrapper', {
+        //date: new Date(),
+        type:'date',
+        input: {
+            element: '#datepicker-input',
+            format: 'yyyy-MM-dd'
+        }
+    });
+	
+	// 그리드
 	var Grid = tui.Grid;
 	
 	const dataSource = {
@@ -131,7 +165,8 @@
 		],
 		data : dataSource,
 	});
-
+	
+	// 함수
 	function changeDisplay() {
 		let gap = parseInt(document.querySelector('#display_amount').value);
 		grid.setPerPage(gap,dataSource);
@@ -185,7 +220,48 @@
 	     })
 	}
 	
+	function changeDate(){
+		document.querySelector("#perdate").addEventListener("change", (e)=>{
+			// 데이트피커 타입 변경
+			datepicker.setType(e.target.value);
+			let result = "";
+			
+			// perdate의 값에 따라 데이트피커 변경할 포맷 설정
+			switch(e.target.value){
+			case "date"  : result = "-dd";
+			case "month" : result = "-MM" + result;
+			case "year"  : result = "yyyy" + result;
+						   break;
+			default      : break;
+			
+			}
+			// 데이트피커 포맷 변경, 값도 변경
+			datepicker.setDateFormat(result);
+			datepicker.setDate(null);
+		})
+	}
 	
+	function getBhf(){
+		const header = document.querySelector('meta[name="_csrf_header"]').content;
+        const token = document.querySelector('meta[name="_csrf"]').content;
+		
+		fetch(`http://localhost:81/accnut/rest/bhf/list?companyNum=1`, {
+			method: "GET",
+			headers: {
+					 	'header': header,
+			                "Content-Type": "application/json",
+			                'X-CSRF-Token': token				
+			 		}
+		}).then(response => response.json())
+		.then(data => {
+			console.log(data);
+			let officeId = document.querySelector("#officeId");
+			for(bhf of data.result){
+				let html = `<option value="${bhf.bhfId}">${bhf.bhfName}</option>`;
+				officeId.insertAdjacentHTML("beforeend", html);
+			}
+		});
+	}
 	
 
 </script>

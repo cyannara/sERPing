@@ -38,6 +38,7 @@ import com.beauty1nside.accnut.service.DebtService;
 import com.beauty1nside.accnut.service.EtcBookService;
 import com.beauty1nside.accnut.service.IncidentalCostService;
 import com.beauty1nside.accnut.service.JsonQueryService;
+import com.beauty1nside.accnut.service.OtherService;
 import com.beauty1nside.accnut.service.SalaryBookService;
 import com.beauty1nside.common.GridArray;
 import com.beauty1nside.common.GridData;
@@ -65,6 +66,7 @@ public class AccnutRestController {
 	final IncidentalCostService incidentalCostService;
 	final JsonQueryService jsonQueryService;
 	RestTemplate restTemplate;
+	final OtherService otherService;
 	
 	
 	// 목록 조회 ------------------------------------------------------------------------------------------
@@ -247,6 +249,41 @@ public class AccnutRestController {
             return jsonNode;
     }
 	
+    @GetMapping("option/list")
+    public ResponseEntity<Map<String, Object>> optionList(@RequestParam String goodsName) {
+    	Map<String, Object> response = new HashMap<>();
+    	try {
+    		List<Map<String, Object>> result = otherService.optionList(goodsName, 1);
+	        response.put("status", "success");
+	        response.put("message", "조회 성공");
+	        response.put("result", result);
+	        return ResponseEntity.ok(response); // JSON 형태 응답
+	    } catch (Exception e) {
+	        log.error("조회 실패", e);
+	        response.put("status", "error");
+	        response.put("message", "조회 실패");
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+	    }
+    }
+    
+    @GetMapping("bhf/list")
+    public ResponseEntity<Map<String, Object>> bhfList(@RequestParam int companyNum) {
+    	Map<String, Object> response = new HashMap<>();
+    	try {
+    		List<Map<String, Object>> result = otherService.bhfList(companyNum);
+	        response.put("status", "success");
+	        response.put("message", "조회 성공");
+	        response.put("result", result);
+	        return ResponseEntity.ok(response); // JSON 형태 응답
+	    } catch (Exception e) {
+	        log.error("조회 실패", e);
+	        response.put("status", "error");
+	        response.put("message", "조회 실패");
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+	    }
+    	
+    }
+    
 	// 삽입 ----------------------------------------------------------------------------------------------
 	
 	
@@ -329,12 +366,12 @@ public class AccnutRestController {
 	    	nh.withdraw(finAcno, String.valueOf(total));
 	    	
 	        response.put("status", "success");
-	        response.put("message", "등록 성공");
+	        response.put("message", "수정 성공");
 	        return ResponseEntity.ok(response); // JSON 형태 응답
 	    } catch (Exception e) {
 	        log.error("등록 실패", e);
 	        response.put("status", "error");
-	        response.put("message", "등록 실패");
+	        response.put("message", "수정 실패");
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 	    }
 	}
