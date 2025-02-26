@@ -1,5 +1,7 @@
 package com.beauty1nside.bsn.dto.delivery;
 
+import java.util.List;
+
 import com.beauty1nside.bsn.dto.OrderSearchDTO;
 
 import lombok.AllArgsConstructor;
@@ -23,4 +25,6 @@ public class BsnDeliveryDetailDTO extends OrderSearchDTO {
 	private String goodsName;
 	private String optionName;
 	private String goodsStandard;
+	
+	private List<BsnDeliveryLotDTO> lotDetails;
 }
