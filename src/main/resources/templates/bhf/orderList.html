@@ -84,6 +84,9 @@
 	<script>
 		var Grid = tui.Grid;
 		
+		const header = document.querySelector('meta[name="_csrf_header"]').content; //서버에서 요구하는 CSRF 헤더이름
+	    const token = document.querySelector('meta[name="_csrf"]').content; //서버에서 생성한 CSRF 토큰 값
+		
 		// 발주서 취소시 필요한 발주서코드,클릭된 행의 키 담기 위해 변수선언
 		let cancelOrdCd = null;
 		let cancelKey = null;
@@ -202,7 +205,10 @@
     		    fetch('http://localhost:81/bhf/rest/order/cancel', {
  		        method: 'POST',
  		        headers: {
- 		            'Content-Type': 'application/json'
+ 		            'Content-Type': 'application/json',
+ 		         	//위에 변수로 저장한 헤더이름,토큰값 넣어주기
+		        	'header': header, 
+		            'X-CSRF-Token': token
  		        },
  		        body: JSON.stringify({
 	            	orderCode: orderCode,

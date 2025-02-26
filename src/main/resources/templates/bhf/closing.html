@@ -203,6 +203,12 @@
 		});
 		
 		function sendToServer() {
+			let close = grid.getData();
+			
+			if (close.length === 0) {
+		        alert("엑셀을 넣어서 값을 추가해주세요.");
+		        return;
+		    }
 			
 			let closingDate = document.getElementById('closingDate').value;
 			
