@@ -71,11 +71,18 @@ public class PurchsSampleController {
 	};
 	
 	
+	//발주 리스트 이동 
+    @GetMapping("/purchaseList")
+    public String purchaseList() {
+        return "purchs/purchaseList"; // templates/purchs/purchaseList.html을 반환
+    }
+    
+    //입고등록 이동 
+    @GetMapping("/warehousingRegister")
+    public String warehousingRegister() {
+        return "purchs/warehousingRegister"; // templates/purchs/purchaseList.html을 반환
+    }
 
-	    @GetMapping("/purchaseList")
-	    public String purchaseList() {
-	        return "purchs/purchaseList"; // templates/purchs/purchaseList.html을 반환
-	    }
 
 
 

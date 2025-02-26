@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.beauty1nside.bsn.mapper.BsnOrderMapper">
 
-<!-- 출고 목록 조회 -->
+<!-- 출고 목록 조회(준비중만) -->
 <select id="selectBsnDelivery">
 SELECT 
        delivery_id, 
@@ -37,13 +37,12 @@ SELECT ROW_NUMBER() OVER (
 
 FROM bsn_delivery bd
 LEFT JOIN bsn_order bo ON bo.order_id = bd.order_id
-WHERE bd.company_num = 1
+WHERE bd.company_num = #{companyNum}
+AND   bd.delivery_status = 'DS01'
 <include refid="searchInfoBsnDLV"></include>
-<![CDATA[
-AND ROWNUM <= #{end}
-]]>
 )
-WHERE RN >= #{start}
+WHERE RN BETWEEN #{start} AND #{end}
+
 </select>
 
 <!-- 출고 목록 수량 -->
@@ -82,38 +81,47 @@ bod.goods_standard
 FROM bsn_delivery_detail bdd
 LEFT JOIN bsn_order_detail bod ON bdd.order_detail_id = bod.order_detail_id
 WHERE bdd.delivery_id = #{deliveryId}
-<![CDATA[
-AND ROWNUM <= #{end}
-]]>
 )
-WHERE RN >= #{start}
+WHERE RN BETWEEN #{start} AND #{end}
 </select>
 
 <!-- 출고 상세 목록 수량-->
 
 <!-- 출고 LOT 상세 목록-->
-<select id="selectBsnDeliveryLotDTO">
+<select id="selectBsnDeliveryLotDetail">
 SELECT delivery_lot_detail_num, 
        delivery_detail_id, 
        goods_lot_num, 
        delivery_possible_qnt, 
-       delivery_qnt
+       delivery_qnt,
+       goods_consumption_date
 FROM
 (
 SELECT /*+ INDEX_ASC(bsn_delivery_lot_detail PK_BSN_DELIVERY_LOT_DETAIL) */
        ROWNUM rn,
-       delivery_lot_detail_num, 
-       delivery_detail_id, 
-       goods_lot_num, 
-       delivery_possible_qnt, 
-       delivery_qnt
-FROM bsn_delivery_lot_detail
-WHERE delivery_detail_id = #{deliveryDetailId}
-<![CDATA[
-AND ROWNUM <= #{end}
-]]>
+       bdl.delivery_lot_detail_num, 
+       bdl.delivery_detail_id, 
+       bdl.goods_lot_num, 
+       --  여기서 delivery_possible_qnt를 다시 계산
+       TRUNC((pwb.warehousing_remaining_quantity)
+       - COALESCE((
+           SELECT SUM(delivery_qnt) 
+           FROM bsn_delivery_lot_detail bdl2
+           JOIN bsn_delivery_detail bdd2 ON bdl2.delivery_detail_id = bdd2.delivery_detail_id
+           JOIN bsn_delivery bd2 ON bdd2.delivery_id = bd2.delivery_id
+           WHERE bdl2.goods_lot_num = bdl.goods_lot_num
+           AND bd2.delivery_status = 'DS01'
+           <![CDATA[
+           AND bdl2.delivery_detail_id < #{deliveryDetailId}
+       )*6, 0))/ 6 AS delivery_possible_qnt,
+       ]]>
+       bdl.delivery_qnt,
+       pwb.goods_consumption_date
+FROM bsn_delivery_lot_detail bdl
+JOIN purchs_warehousing_body pwb ON bdl.goods_lot_num = pwb.goods_lot_num
+WHERE bdl.delivery_detail_id = #{deliveryDetailId}
 )
-WHERE RN >= #{start}
+WHERE RN BETWEEN #{start} AND #{end}
 </select>
 <!-- 출고 LOT 상세 목록 수량-->
 
@@ -147,26 +155,66 @@ WHERE RN >= #{start}
 	</if>
 </sql>
 
-<!-- 임시 -->
+<!-- 창고 LOT별 조회(임시) -->
 <select id="selectGoodsWarehouseLot">
 SELECT ROW_NUMBER() OVER (
-              ORDER BY goods_consumption_date asc
+              ORDER BY pwb.goods_consumption_date ASC
        ) AS RN, 
        pwb.warehousing_body_num,
        pwb.option_num,
        po.option_code,
        pwb.goods_lot_num,
-       TRUNC(pwb.warehousing_remaining_quantity / 6) AS warehousing_remaining_quantity
-      ,pwb.goods_consumption_date
-
+       -- 기존 수량에서 "출고대기" 상태의 LOT 수량 빼기
+       TRUNC(pwb.warehousing_remaining_quantity / 6) - 
+       COALESCE((
+           SELECT SUM(bdl.delivery_qnt) 
+           FROM BSN_DELIVERY_LOT_DETAIL bdl
+           JOIN BSN_DELIVERY_DETAIL bdd ON bdl.delivery_detail_id = bdd.delivery_detail_id
+           JOIN BSN_DELIVERY bd ON bdd.delivery_id = bd.delivery_id
+           WHERE bdl.goods_lot_num = pwb.goods_lot_num
+             -- 출고대기 상태인 것만 합산
+             AND bd.delivery_status = 'DS01'
+       ), 0) AS warehousing_remaining_quantity,
+       pwb.goods_consumption_date
        
-
 FROM purchs_warehousing_body pwb
 LEFT JOIN purchse_option po ON pwb.option_num = po.option_num
 WHERE pwb.company_num = 1
   AND po.option_code = #{optionCode}
-ORDER by rn
+  
+  AND (TRUNC(pwb.warehousing_remaining_quantity / 6) - 
+       COALESCE((
+           SELECT SUM(bdl.delivery_qnt) 
+           FROM BSN_DELIVERY_LOT_DETAIL bdl
+           JOIN BSN_DELIVERY_DETAIL bdd ON bdl.delivery_detail_id = bdd.delivery_detail_id
+           JOIN BSN_DELIVERY bd ON bdd.delivery_id = bd.delivery_id
+           WHERE bdl.goods_lot_num = pwb.goods_lot_num
+             AND bd.delivery_status = 'DS01'
+  <![CDATA[
+       ), 0) > 0) 
+  ]]>
+  AND NOT EXISTS (
+      SELECT 1 
+      FROM BSN_DELIVERY_LOT_DETAIL bdl
+      WHERE bdl.goods_lot_num = pwb.goods_lot_num
+        AND bdl.delivery_detail_id = #{deliveryDetailId}
+  )
+ORDER BY pwb.goods_consumption_date ASC
 
 </select>
+
+<insert id="insertBsnDeliveryLotDetail" statementType="CALLABLE">
+call insert_Bsn_dlv_lot( 
+       #{deliveryDetailId},
+       #{lotDetails, typeHandler=com.beauty1nside.bsn.BsnDeliDtlArrayTypeHandler}  
+) 
+</insert>
+
+<delete id="deleteBsnDeliveryLotDetail" statementType="CALLABLE">
+call DELETE_BSN_DLV_LOT(
+       #{deliveryDetailId},
+       #{lotDetails, typeHandler=com.beauty1nside.bsn.BsnDeliDtlArrayTypeHandler}
+)
+</delete>
 
 </mapper>

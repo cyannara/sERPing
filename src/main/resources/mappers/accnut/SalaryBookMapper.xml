@@ -28,6 +28,7 @@
 	</select>
 	<sql id="searchInfo">
 		company_num = #{companyNum}
+		AND payment_alternative = 'PY01'
 		<if test="employeeName != null and ! employeeName.equals('')">
 			AND employee_name LIKE '%' || #{employeeName} || '%'
 		</if>
@@ -35,9 +36,11 @@
 			AND department = #{department}
 		</if>	
 	</sql>
-
-
-
+	<update id="update" parameterType="com.beauty1nside.accnut.dto.SalaryBookDTO">
+	UPDATE accnut_salary_account_book
+	SET payment_alternative = 'PY02', payer = #{payer}
+	WHERE salary_account_book_code = #{salaryAccountBookCode}
+	</update>
 
 
 

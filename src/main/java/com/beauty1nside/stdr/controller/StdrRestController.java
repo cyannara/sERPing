@@ -100,9 +100,8 @@ public class StdrRestController {
   
   
   @GetMapping("dept")
-  public Object getHqDeptList(DocumentDTO dto, @AuthenticationPrincipal CustomerUser user) {
+  public Object getHqDeptList(@AuthenticationPrincipal CustomerUser user) {
     Long companyNum = user.getUserDTO().getCompanyNum();
-    dto.setCompanyNum(companyNum);
-    return stdrDeptService.hqDeptList(dto);
+    return stdrDeptService.hqDeptList(companyNum);
   }
 }

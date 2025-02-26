@@ -86,7 +86,86 @@
     </if>
 </sql>
 
+<!-- 입고될 발주서 조회  -->
+<select id="nonwarehousinglist" resultType="PurchaseDTO">
+    SELECT * FROM (
+        SELECT /*+index_desc(purchs_purchase_header PK_PURCHS_PURCHASE_HEADER)*/
+                ROWNUM RN, 
+                h.purchase_num,
+			    h.purchase_date,
+			    h.purchase_due_date,
+			    h.purchase_status,
+			    h.purchase_vat_flag,
+			    b.purchase_body_num,
+			    b.goods_standard,
+			    b.purchase_quantity,
+			    nvl(b.purchase_quantity - nvl(wb.total_warehousing_quantity,0),0) as non_Warehousing_Num,
+			    b.purchase_unit_price,
+			    b.purchase_supply_price,
+			    b.purchase_vat,
+			    v.vendor_name,
+			    v.vendor_id,
+			    c.company_num,
+			    g.goods_name,
+			    g.goods_code,
+			    o.option_name,
+			    o.option_code
+			FROM purchs_purchase_header h
+			JOIN purchs_purchase_body b ON h.purchase_num = b.purchase_num
+			JOIN grpwr_vendor v ON h.vendor_id = v.vendor_id
+			JOIN erp_company c ON h.company_num = c.company_num
+			JOIN hr_employee e ON h.employee_num = e.employee_num
+			JOIN purchse_option o ON o.option_num = b.option_num 
+			JOIN purchse_goods g ON o.goods_num = g.goods_num
+			LEFT JOIN (
+			   select purchase_body_num,
+			          sum(warehousing_standard_quantity) AS total_warehousing_quantity
+			   from purchs_warehousing_body
+			   group by purchase_body_num 
+			   )wb ON wb.purchase_body_num = b.purchase_body_num 
+			WHERE h.company_num = #{companyNum}
+			AND h.purchase_status = fn_get_cmmn_name('VS001')
+			AND NVL(b.purchase_quantity - NVL(wb.total_warehousing_quantity,0),0) > 0
+        <include refid="searchNonwarehousingListInfo"/>  <!-- ✅ 추가 검색 조건 -->
+        ORDER BY h.purchase_num DESC
+    ) 
+    WHERE RN BETWEEN #{start} AND #{end}  <!-- ✅ 페이징 조건 추가 -->
+</select>
+<select id="nonwarehousingCount" resultType="int">
+    SELECT COUNT(*) 
+    FROM purchs_purchase_header h
+	JOIN purchs_purchase_body b ON h.purchase_num = b.purchase_num
+	JOIN grpwr_vendor v ON h.vendor_id = v.vendor_id
+	JOIN erp_company c ON h.company_num = c.company_num
+	JOIN hr_employee e ON h.employee_num = e.employee_num
+	JOIN purchse_option o ON o.option_num = b.option_num 
+	JOIN purchse_goods g ON o.goods_num = g.goods_num
+	LEFT JOIN (
+	   select purchase_body_num,
+	          sum(warehousing_standard_quantity) AS total_warehousing_quantity
+	   from purchs_warehousing_body
+	   group by purchase_body_num 
+	   )wb ON wb.purchase_body_num = b.purchase_body_num 
+	WHERE h.company_num = #{companyNum}
+	AND h.purchase_status = fn_get_cmmn_name('VS001')
+	AND NVL(b.purchase_quantity - NVL(wb.total_warehousing_quantity,0),0) > 0
+    <include refid="searchPurchaseListInfo"/>  <!-- ✅ 추가 검색 조건 -->
+</select>
 
+<sql id="searchNonwarehousingListInfo">
+	<if test="vendorName != null and vendorName != ''">
+        AND v.vendor_name = #{vendorName}
+    </if>
+    <if test="purchaseNum != null and purchaseNum != ''">
+        AND h.purchase_num = #{purchaseNum}
+    </if>
+    <if test="startDate != null">
+        AND h.purchase_date >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+    </if>
+    <if test="endDate != null">
+        AND h.purchase_date <![CDATA[ <=  ]]>  TO_DATE(#{endDate}, 'YYYY-MM-DD')
+    </if>
+</sql>
 
 
 

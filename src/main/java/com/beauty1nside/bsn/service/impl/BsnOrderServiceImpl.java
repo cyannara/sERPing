@@ -93,13 +93,24 @@ public class BsnOrderServiceImpl implements BsnOrderService {
 	//출고 LOT 상세
 	@Override
 	public List<BsnDeliveryLotDTO> getBsnDeliveryLotDetail(BsnDeliveryDetailDTO bsnDeliveryDetailDTO) {
-		return bsnOrderMapper.selectBsnDeliveryLotDTO(bsnDeliveryDetailDTO);
+		return bsnOrderMapper.selectBsnDeliveryLotDetail(bsnDeliveryDetailDTO);
 	}
 	
 	//(임시) 상품 재고 LOT별 조회
 	@Override
-	public List<BsnGoodsLOTDTO> getGoodsWarehouseLot(BsnOrderDetailDTO bsnOrderDetailDTO) {
-		return bsnOrderMapper.selectGoodsWarehouseLot(bsnOrderDetailDTO);
+	public List<BsnGoodsLOTDTO> getGoodsWarehouseLot(BsnDeliveryDetailDTO bsnDeliveryDetailDTO) {
+		return bsnOrderMapper.selectGoodsWarehouseLot(bsnDeliveryDetailDTO);
+	}
+	
+	//출고 LOT 등록
+	@Override
+	public void registerBsnDeliveryLotDetail(BsnDeliveryDetailDTO bsnDeliveryDetailDTO) {
+		bsnOrderMapper.insertBsnDeliveryLotDetail(bsnDeliveryDetailDTO);
+	}
+	@Override
+	public void removeBsnDeliveryLotDetail(BsnDeliveryDetailDTO bsnDeliveryDetailDTO) {
+		bsnOrderMapper.deleteBsnDeliveryLotDetail(bsnDeliveryDetailDTO);
+		
 	}
 	
 	

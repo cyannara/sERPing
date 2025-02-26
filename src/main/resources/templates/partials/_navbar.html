@@ -12,17 +12,17 @@
       <span class="icon-menu"></span>
     </button>
     <nav class="menu">
-      <a th:href="@{/(menu='standard')}" data="standard"
+      <a th:href="@{/standard/doc(menu='standard')}" data="standard"
          th:classappend="${#strings.equals('standard', param.menu)} ? 'selected' : ''">기준정보</a>
-      <a th:href="@{/(menu='sales')}" data="sales"
+      <a th:href="@{/bsn/orderList(menu='sales')}" data="sales"
          th:classappend="${#strings.equals('sales', param.menu)} ? 'selected' : ''">영업</a>
-      <a th:href="@{/(menu='inventory')}" data="inventory"
+      <a th:href="@{/purchs/goodsRegister(menu='inventory')}" data="inventory"
          th:classappend="${#strings.equals('inventory', param.menu)} ? 'selected' : ''">재고</a>
-      <a th:href="@{/(menu='hr')}" data="hr"
+      <a th:href="@{/hr/employee(menu='hr')}" data="hr"
          th:classappend="${#strings.equals('hr', param.menu)} ? 'selected' : ''">인사</a>
       <a th:href="@{/(menu='account')}" data="account"
          th:classappend="${#strings.equals('account', param.menu)} ? 'selected' : ''">회계</a>
-      <a th:href="@{/(menu='branch')}" data="branch"
+      <a th:href="@{/bhf/order(menu='branch')}" data="branch"
          th:classappend="${#strings.equals('branch', param.menu)} ? 'selected' : ''">지점</a>
     </nav>
 
@@ -77,11 +77,11 @@
       </li>
       <li class="nav-item nav-profile dropdown">
         <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="profileDropdown">
-          <img src="/images/faces/face28.jpg" alt="profile"/>
+          <img th:src="${session.profileImage}" alt="profile"/>
         </a>
-        <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
+        <div class="dropdown-menu dropdown-menu-right navbar-dropdown" style="padding-top: 20px" aria-labelledby="profileDropdown">
           <span th:inline="text" sec:authentication="name" class="empId"></span>
-          <a class="dropdown-item mymenu mypage" href="/mypage">
+          <a class="dropdown-item mymenu mypage" data="mypage" th:href="@{/mypage/profile(menu='mypage')}">
             <i class="mdi mdi-account-circle"></i>
             마이페이지
           </a>

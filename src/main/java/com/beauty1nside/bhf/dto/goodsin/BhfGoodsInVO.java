@@ -10,7 +10,9 @@ public class BhfGoodsInVO {
 
 	private String branchOfficeId;
 	private Date dueDate;
-	private String companyNum;
+	private int companyNum;
+	private String deliveryId;
+	private String orderCode;
 	private List<BhfGoodsInDtlVO> files;
 	
 }

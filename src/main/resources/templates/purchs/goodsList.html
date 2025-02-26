@@ -171,7 +171,7 @@ function initProductGrid() {
     const productDataSource = {
             api: {  
                 readData: { 
-                    url: 'http://localhost:81/purchs/rest/product/list', 
+                    url: '/purchs/rest/product/list', 
                     method: 'GET',
                     requestOptions: { // ✅ 명확한 옵션 추가
                         headers: { 'Content-Type': 'application/json' },
@@ -312,7 +312,7 @@ class CustomTextRenderer {
         const el = document.createElement('div');
         el.style.textAlign = 'center';
         if (props.value) {
-            el.innerHTML = `<img src="http://localhost:81/images/${props.value}" alt="상품 이미지" width="50" height="50" style="border-radius: 5px;">`;
+            el.innerHTML = `<img src="/images/${props.value}" alt="상품 이미지" width="50" height="50" style="border-radius: 5px;">`;
         } else {
             el.innerText = "이미지 없음";
         }

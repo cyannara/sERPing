@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beauty1nside.mainpage.mapper.ScheduleMapper">
+
+    <select id="scheduleList" resultType="com.beauty1nside.mainpage.dto.ScheduleDTO">
+        select SCHEDULE_ID,
+               SCHEDULE_TYPE,
+               SCHEDULE_CONTENT,
+               SCHEDULE_START,
+               SCHEDULE_END,
+               EMPLOYEE_NUM,
+               COMPANY_NUM,
+               DEPT_NO,
+               IS_ALLDAY,
+               IS_PRIVATE,
+               LOCATION
+        from GRPWR_SCHEDULE
+        where company_num = #{companyNum}
+    </select>
+
+    <delete id="deleteSchedule">
+        delete GRPWR_SCHEDULE
+        where schedule_id = #{scheduleId}
+    </delete>
+
+    <insert id="insert" parameterType="com.beauty1nside.mainpage.dto.ScheduleDTO">
+        INSERT INTO GRPWR_SCHEDULE (
+                    SCHEDULE_ID,
+                    SCHEDULE_TYPE,
+                    SCHEDULE_CONTENT,
+                    SCHEDULE_START,
+                    SCHEDULE_END,
+                    EMPLOYEE_NUM,
+                    COMPANY_NUM,
+                    DEPT_NO,
+                    IS_ALLDAY,
+                    IS_PRIVATE,
+                    LOCATION
+        ) VALUES (
+            GRPWR_SCHEDULE_SEQ.NEXTVAL,
+            #{scheduleType},
+            #{scheduleContent},
+            #{scheduleStart},
+            #{scheduleEnd},
+            #{employeeNum},
+            #{companyNum},
+            #{deptNo},
+            #{isAllday},
+            #{isPrivate},
+            #{location}
+        )
+    </insert>
+
+    <update id="updateSchedule" parameterType="com.beauty1nside.mainpage.dto.ScheduleDTO">
+        update GRPWR_SCHEDULE
+        set SCHEDULE_TYPE = #{scheduleType},
+            SCHEDULE_CONTENT = #{scheduleContent},
+            SCHEDULE_START = #{scheduleStart},
+            SCHEDULE_END = #{scheduleEnd},
+            EMPLOYEE_NUM = #{employeeNum},
+            COMPANY_NUM = #{companyNum},
+            DEPT_NO = #{deptNo},
+            IS_ALLDAY = #{isAllday},
+            IS_PRIVATE = #{isPrivate},
+            LOCATION = #{location}
+        where schedule_id = #{scheduleId}
+    </update>
+</mapper>

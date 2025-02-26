@@ -50,7 +50,10 @@
 		if(checkArray.length > 0) {
 			document.querySelector('#payString').insertAdjacentText("beforeend", `${checkArray[0].employeeName} 외 ${checkArray.length - 1}명, ${total}원`);		
 		}
-		
+		salgrid.appendRow({"employeeName": "총합", "paymentAmount": total},{"at": 0});
+		salgrid.on("click",(ev)=>{
+			console.log(salgrid.getRow(ev.rowKey));
+		})
 		
 	});
 	

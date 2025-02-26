@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="/vendors/ti-icons/css/themify-icons.css">
 </head>
 <body layout:fragment="content">
-
+<input type="hidden" id="sessionEmployeeNum" th:value="${session.employeeNum}"/>
   <div class="row">
     <div class="col-md-12 grid-margin">
       <div class="row">
@@ -18,7 +18,6 @@
           <div sec:authorize="isAuthenticated()">
             환영합니다. <span sec:authentication="name" class="h4"></span>님!
           </div>
-          <h3 class="font-weight-bold">결재문서</h3>
         </div>
       </div>
     </div>
@@ -29,11 +28,11 @@
       <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">일정</button>
     </li>
     <li class="nav-item" role="presentation">
-      <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">결재</button>
+      <button class="nav-link" id="approval-tab" data-bs-toggle="tab" data-bs-target="#approval-tab-pane" type="button" role="tab" aria-controls="approval-tab-pane" aria-selected="false">결재</button>
     </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">Contact</button>
-    </li>
+<!--    <li class="nav-item" role="presentation">-->
+<!--      <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">Contact</button>-->
+<!--    </li>-->
   <!--  <li class="nav-item" role="presentation">-->
   <!--    <button class="nav-link" id="disabled-tab" data-bs-toggle="tab" data-bs-target="#disabled-tab-pane" type="button" role="tab" aria-controls="disabled-tab-pane" aria-selected="false" disabled>Disabled</button>-->
   <!--  </li>-->
@@ -47,7 +46,7 @@
 
       </div>
     </div>
-    <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+    <div class="tab-pane fade" id="approval-tab-pane" role="tabpanel" aria-labelledby="approval-tab" tabindex="0">
       <div class="row approval">
         <div class="container">
           <div class="search-grid">

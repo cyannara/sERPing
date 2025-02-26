@@ -13,14 +13,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @AllArgsConstructor
 @RequestMapping("/mypage")
 public class MypageController {
-  @GetMapping({"/", ""})
+  @GetMapping("/profile")
   public String mypage() {
-    return "mypage/mypage";
+    return "mypage/profile";
+  }
+  
+  @GetMapping("/approval")
+  public String approval() {
+    return "mypage/myApproval";
   }
   
   @GetMapping("/approval/{documentId}")
-  public String approvalWhite(@PathVariable(name="documentId") Long documentId, Model model) {
+  public String approvalWrite(@PathVariable(name="documentId") Long documentId, Model model) {
     model.addAttribute("documentId", documentId);
-    return "mypage/approval";
+    return "mypage/approvalWrite";
   }
 }

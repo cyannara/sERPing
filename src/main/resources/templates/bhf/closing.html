@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layouts/layout}"
+      lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<title>마감 정산</title>
+
+<!-- 엑셀 파일을 읽어서 json형식으로 바꾸기 위해서 필요 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+.custom-file-upload {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.custom-file-upload:hover {
+    background-color: #0056b3;
+}
+</style>
+</head>
+<body layout:fragment="content">
+	<div class="container">
+		<div class="row">
+			<h3 class="mt-2 mb-2">마감 정산</h3>
+			<hr>
+			<div class="col-md-6 mt-2 mb-5">
+				<div class="row">
+					<label class="col-sm-4">마감 일자</label> 
+					<input type="date"class="col-sm-7" id="closingDate"> 
+				</div>
+			</div>
+			<div class="col-md-6 mt-2 mb-5">
+				<div class="row">
+					<label class="col-sm-4">주문 지점</label> 
+					<input type="text"class="col-sm-7" id="branchOfficeId">
+				</div>
+			</div>
+			<div class="col-md-12 stretch-card mt-2 mb-2">
+				<div class="card">
+					<div class="card-body" id="drop-area" style="border: 2px dashed #ccc; padding: 20px; text-align: center;">
+			            <label for="fileInput" class="custom-file-upload mt-3">파일 찾기</label>
+						<input type="file" id="fileInput" style="display: none;">
+			            <h5 class="mt-3 mb-3">또는 엑셀 파일을 여기로 드래그 하세요</h5>
+			        </div>
+				</div>
+			</div>
+			<div class="col-md-6 stretch-card mt-3 mb-2">
+				<div class="card">
+					<div class="card-body">
+						<div class="row mt-3 mb-3">
+							<label class="col-sm-4">영업 준비금</label> 
+							<input type="text"class="col-sm-7" id="businessReserves">
+						</div>
+						<div class="row mt-3 mb-3">
+							<label class="col-sm-4">현금 금액</label> 
+							<input type="text"class="col-sm-7" id="cashAmount">
+						</div>
+						<div class="row mt-3 mb-3">
+							<label class="col-sm-4">현금 시재</label> 
+							<input type="text"class="col-sm-7" id="cashPresent">
+						</div>
+						<div class="row mt-3 mb-3">
+							<label class="col-sm-4">카드 금액</label> 
+							<input type="text"class="col-sm-7" id="cardAmount">
+						</div>
+						<div class="row mt-3 mb-3">
+							<label class="col-sm-4">매출 금액</label> 
+							<input type="text"class="col-sm-7" id="saleAmount">
+						</div>
+						<div class="row mt-3 mb-3">
+							<label class="col-sm-4">이체 금액</label> 
+							<input type="text"class="col-sm-7" id="transferAmount">
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6 stretch-card mt-3 mb-2">
+				<div class="card">
+					<div class="card-body">
+						<h6 class="mb-4">판매량</h6>
+						<div id="salesNum"></div>
+						<div id="pagination" class="tui-pagination"></div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-12 mt-2 mb-2">
+				<div class="row">
+					<div class="col-sm-5"></div>
+					<button class="col-sm-2" onclick="sendToServer()">마감정산 등록</button>
+					<div class="col-sm-5"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script>
+		var Grid = tui.Grid;
+		
+		const header = document.querySelector('meta[name="_csrf_header"]').content; //서버에서 요구하는 CSRF 헤더이름
+	    const token = document.querySelector('meta[name="_csrf"]').content; //서버에서 생성한 CSRF 토큰 값
+	
+		const grid = new Grid({
+			el: document.getElementById('salesNum'), 
+			pageOptions: {
+				useClient: true,
+				perPage: 5,
+			},
+			columns: [ 
+				{ header : "상품코드", name : "goodsCode"},
+				{ header : "상품명", name : "goodsName"},
+				{ header : "옵션코드", name : "optionCode"},
+				{ header : "옵션명", name : "optionName"},
+				{ header : "판매량", name : "bnfSleQy"}
+			],
+			data: ""
+		});
+		
+		document.addEventListener("DOMContentLoaded", function() {
+		    const dropArea = document.getElementById("drop-area");
+		    const fileInput = document.getElementById("fileInput");
+
+		    // 드래그 이벤트 처리
+		    dropArea.addEventListener("dragover", (event) => {
+		        event.preventDefault();
+		        dropArea.style.backgroundColor = "#f0f0f0";
+		    });
+
+		    dropArea.addEventListener("dragleave", () => {
+		        dropArea.style.backgroundColor = "white";
+		    });
+
+		    // 드롭된 파일 처리
+		    dropArea.addEventListener("drop", (event) => {
+		        event.preventDefault();
+		        dropArea.style.backgroundColor = "white";
+
+		        const file = event.dataTransfer.files[0];
+		        if (file) {
+		            processExcel(file);
+		        }
+		    });
+
+		    // 파일 선택 이벤트 처리
+		    fileInput.addEventListener("change", (event) => {
+		        const file = event.target.files[0];
+		        if (file) {
+		            processExcel(file);
+		        }
+		    });
+
+		    function processExcel(file) {
+		    	if (!file.name.endsWith(".xlsx")) {
+	                alert("엑셀 파일만 업로드 가능합니다.");
+	                return;
+	            }
+	    	
+		        const reader = new FileReader();
+		        reader.readAsArrayBuffer(file);
+
+		        reader.onload = function(e) {
+		            const data = new Uint8Array(e.target.result);
+		            const workbook = XLSX.read(data, { type: "array" });
+
+		            const sheetName = workbook.SheetNames[0];  // 첫 번째 시트 선택
+		            const worksheet = workbook.Sheets[sheetName];
+
+		            const jsonData = XLSX.utils.sheet_to_json(worksheet);
+		            console.log("엑셀 데이터: ", jsonData);
+
+		            if (jsonData.length > 0) {
+		            	 // 첫 번째 행을 input 박스에 채우기 (한 번만)
+		                fillInputBoxes(jsonData[0]);
+
+		                // 상품 관련된 데이터만 그리드에 채우기
+		                const gridData = jsonData.map(row => ({
+		                    goodsCode: row["상품코드"] || "",   // VO와 매칭될 키 값 사용
+		                    goodsName: row["상품명"] || "",
+		                    optionCode: row["옵션코드"] || "",
+		                    optionName: row["옵션명"] || "",
+		                    bnfSleQy: row["판매량"] || ""
+		                }));
+
+		                grid.resetData(gridData);  // 기존 데이터 지우고 새 데이터 적용
+		            }
+		        };
+		    }
+
+		    function fillInputBoxes(row) {
+		        document.getElementById("businessReserves").value = row["영업 준비금"] || "";
+		        document.getElementById("cashAmount").value = row["현금 금액"] || "";
+		        document.getElementById("cashPresent").value = row["현금 시재"] || "";
+		        document.getElementById("cardAmount").value = row["카드 금액"] || "";
+		        document.getElementById("saleAmount").value = row["매출 금액"] || "";
+		        document.getElementById("transferAmount").value = row["이체 금액"] || "";
+		    }
+		    
+		});
+		
+		function sendToServer() {
+			
+			let closingDate = document.getElementById('closingDate').value;
+			
+			if(!closingDate){
+				 alert("마감일자를 선택해주세요.");
+			     return;
+			}
+			
+		    const requestData = {
+		    	branchOfficeId: document.getElementById("branchOfficeId").value,
+		    	closingDate: document.getElementById("closingDate").value,
+		        businessReserves: document.getElementById("businessReserves").value,
+		        cashAmount: document.getElementById("cashAmount").value,
+		        cashPresent: document.getElementById("cashPresent").value,
+		        cardAmount: document.getElementById("cardAmount").value,
+		        saleAmount: document.getElementById("saleAmount").value,
+		        transferAmount: document.getElementById("transferAmount").value,
+		        companyNum: 1,
+		        files: grid.getData()  // Grid 데이터 포함
+		    };
+
+		    fetch("http://localhost:81/bhf/rest/close/insert", {
+		        method: "POST",
+		        headers: { 
+		        	"Content-Type": "application/json" ,
+		        	//위에 변수로 저장한 헤더이름,토큰값 넣어주기
+		        	'header': header, 
+		            'X-CSRF-Token': token
+		        },
+		        body: JSON.stringify(requestData)
+		    })
+		    .then(response => response.json())
+		    .then(data => {
+		    	if (data.status === "success") {
+		            alert("마감 정산 등록 성공");
+		         	// 등록 후 초기화
+		         	document.getElementById('branchOfficeId').value = "";
+					document.getElementById('closingDate').value = "";
+					document.getElementById("businessReserves").value = ""
+			        document.getElementById("cashAmount").value = ""
+			        document.getElementById("cashPresent").value = ""
+			        document.getElementById("cardAmount").value = ""
+			        document.getElementById("saleAmount").value = ""
+			        document.getElementById("transferAmount").value = ""
+		            grid.resetData([]); 
+		           
+		        } else {
+		            alert("마감 정산 등록 실패: " + data.message);
+		        }
+		    })
+		    .catch(error => console.error("업로드 실패", error));
+		}
+		
+	</script>
+	
+</body>
+</html>

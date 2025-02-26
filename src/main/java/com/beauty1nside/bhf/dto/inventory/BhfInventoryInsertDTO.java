@@ -10,6 +10,7 @@ public class BhfInventoryInsertDTO {
 	private String optionCode;
 	private String optionName;
 	private String goodsStandard;
+	private int quantity;
 	private int mediationQuantity;
 	private String mediationReason;
 	private String branchOfficeId;

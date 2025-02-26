@@ -83,7 +83,7 @@ const submitApproval = () => {
         .then(data => {
             if(data.message === 'success') {
                 showAlert('결제서를 제출했습니다.', 'success')
-                window.location = '/mypage'
+                window.location = '/mypage/approval?menu=mypage'
             } else {
                 showAlert('결제서를 제출 실패', 'danger')
             }

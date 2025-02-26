@@ -233,11 +233,6 @@ update (select a.quantity as asd, b.quantity as def
         where a.option_code = b.option_code) c
 set c.asd = (c.asd - c.def);
 
-UPDATE (SELECT e.salary AS emp_salary, d.bonus AS dept_bonus
-        FROM employees e
-        JOIN departments d ON e.dept_id = d.dept_id)
-SET emp_salary = emp_salary + dept_bonus;
-
 UPDATE (SELECT a.quantity as asd, b.quantity as def, a.warehouse_code, b.returning_detail_code
         FROM bhf_warehouse a
         JOIN bhf_returning_detail b ON a.option_code = b.option_code)
@@ -246,7 +241,7 @@ SET asd = (asd - def);
 -- 2025-02-20
 
 select * from accnut_assets order by 1;
-select * from cmmn where upper_cmmn_code like '%AC%';
+select * from cmmn where upper_cmmn_code like '%FI%';
 
 select * from accnut_dealings_account_book order by 1;
 
@@ -262,3 +257,248 @@ select * from hr_employee;
 
 select * from cmmn;
 select * from hr_department;
+
+
+SELECT c.* , d.*
+FROM bhf_closing c RIGHT JOIN bhf_closing_detail d
+ON (c.closing_code = d.closing_code);
+
+SET SERVEROUTPUT ON;
+
+CREATE OR REPLACE FUNCTION test_json
+RETURN CLOB
+IS
+    v_json_closing CLOB;
+    v_json_returning CLOB;
+    v_json_order CLOB;
+    v_final_json CLOB;
+BEGIN
+    -- BHF_CLOSING 데이터를 JSON 형식으로 변환
+    v_json_closing := '[';
+    FOR rec IN (SELECT closing_code, branch_office_id, closing_date FROM bhf_closing) LOOP
+        v_json_closing := v_json_closing || 
+                          '{"closing_code":"' || rec.closing_code || 
+                          '","branch_office_id":"' || rec.branch_office_id || 
+                          '","closing_date":"' || rec.closing_date || '"},';
+    END LOOP;
+    IF LENGTH(v_json_closing) > 1 THEN
+        v_json_closing := SUBSTR(v_json_closing, 1, LENGTH(v_json_closing) - 1);
+    END IF;
+    v_json_closing := v_json_closing || ']';
+
+    -- BHF_RETURNING 데이터를 JSON 형식으로 변환
+    v_json_returning := '[';
+    FOR rec IN (SELECT returning_code, progress_status, request_date FROM bhf_returning) LOOP
+        v_json_returning := v_json_returning || 
+                            '{"returning_code":"' || rec.returning_code || 
+                            '","progress_status":"' || rec.progress_status || 
+                            '","request_date":"' || rec.request_date || '"},';
+    END LOOP;
+    IF LENGTH(v_json_returning) > 1 THEN
+        v_json_returning := SUBSTR(v_json_returning, 1, LENGTH(v_json_returning) - 1);
+    END IF;
+    v_json_returning := v_json_returning || ']';
+
+    -- BHF_ORDER 데이터를 JSON 형식으로 변환
+    v_json_order := '[';
+    FOR rec IN (SELECT order_code, order_date FROM bhf_order) LOOP
+        v_json_order := v_json_order || 
+                        '{"order_code":"' || rec.order_code || 
+                        '","order_date":"' || rec.order_date || '"},';
+    END LOOP;
+    IF LENGTH(v_json_order) > 1 THEN
+        v_json_order := SUBSTR(v_json_order, 1, LENGTH(v_json_order) - 1);
+    END IF;
+    v_json_order := v_json_order || ']';
+
+    -- 최종 JSON 데이터 조합
+    v_final_json := '{"bhf_closing": ' || v_json_closing || ', "bhf_returning": ' || v_json_returning || ', "bhf_order": ' || v_json_order || '}';
+
+    RETURN v_final_json;
+END test_json;
+/
+
+select test_json() from dual;
+
+SELECT bc.* , bcd.*
+FROM bhf_closing bc JOIN bhf_closing_detail bcd
+ON (bc.closing_code = bcd.closing_code);
+
+SELECT bo.*, bod.*
+FROM bhf_order bo JOIN bhf_order_detail bod
+ON (bo.order_code = bod.order_code);
+
+SELECT br.*, brd.*
+FROM bhf_returning br JOIN bhf_returning_detail brd
+ON (br.returning_code = brd.returning_code);
+
+select * from accnut_assets where financial_institution LIKE '%FI%' AND section = 'AC02';
+select * from accnut_assets where section = 'AC02';
+update accnut_assets set assets_name = '월급급여통장', amount=0, quantity=null, fixtures_amount=0 where assets_code = '01';
+update accnut_assets set rgno = '20250224000002849' where assets_code = '121';
+commit;
+delete from accnut_assets where assets_code = '124';
+alter table accnut_assets add rgno varchar2(1000);
+
+-- 2025-02-25
+
+select * from accnut_salary_account_book;
+update accnut_salary_account_book set payment_alternative = 'PY02', payer = '';
+commit;
+select * from cmmn where cmmn_code LIKE 'PY%';
+
+-- 매출 조회 => 마감 정산, 반품량, 재품 재고 조정
+SELECT bc.*, bcd.*
+FROM bhf_closing bc JOIN bhf_closing_detail bcd
+ON (bc.closing_code = bcd.closing_code);
+
+SELECT *
+FROM bhf_goods_mediation;
+update bhf_goods_mediation set company_num = 100 WHERE mediation_code = 'medaiation81';
+commit;
+
+SELECT br.*, brd.*
+FROM bhf_returning br JOIN bhf_returning_detail brd
+ON (br.returning_code = brd.returning_code)
+WHERE brd.returning_reason IN ('파손', '찌그러짐');
+
+SELECT  -- br.request_date,
+        TO_CHAR(br.request_date, 'YYYY-MM-DD') request_date,
+        --'2월' AS requst_date,
+        br.branch_office_id,
+        brd.option_code,
+        brd.goods_name || '-' || brd.option_name option_name,
+        sum( brd.quantity )
+FROM bhf_returning br JOIN bhf_returning_detail brd
+ON (br.returning_code = brd.returning_code)
+WHERE brd.returning_reason IN ('파손', '찌그러짐')
+--AND TO_CHAR(br.request_date, 'YYYY-MM-DD') LIKE '2025-02-%'
+GROUP BY  
+TO_CHAR(br.request_date, 'YYYY-MM-DD'),
+-- br.request_date, 
+br.branch_office_id, 
+brd.option_code, 
+(brd.goods_name || '-' || brd.option_name)
+--HAVING br.request_date BETWEEN '2025-02-01' AND '2025-02-20'
+HAVING brd.goods_code = 'P002'
+ORDER BY br.branch_office_id;
+
+SELECT TO_CHAR(result_date, 'YYYY-MM-DD') result_date,
+       a.office_id, 
+       a.option_code, 
+       a.option_name, 
+       SUM(a.qy)
+FROM (SELECT br.request_date result_date, 
+             br.branch_office_id office_id,
+             brd.option_code  option_code,
+             brd.goods_name || '-' || brd.option_name AS option_name ,
+             brd.quantity AS qy
+      FROM bhf_returning br JOIN bhf_returning_detail brd
+             ON (br.returning_code = brd.returning_code)
+      WHERE brd.returning_reason IN ('파손', '찌그러짐') )a
+GROUP BY TO_CHAR(result_date, 'YYYY-MM-DD'),
+         office_id, 
+         option_code, 
+         option_name
+-- HAVING option_code = 'LH0011'
+ORDER BY result_date desc, 
+         office_id, 
+         option_code 
+
+;
+UNION ALL
+
+SELECT TO_CHAR(result_date, 'YYYY-MM-DD') as result_date,
+       b.office_id,
+       b.option_code,
+       b.option_name,
+       SUM(b.qy)
+FROM (SELECT mediation_date result_date, 
+            branch_office_id as office_id, 
+            option_code, 
+            goods_name || '-' || option_name as option_name, 
+            NVL(quantity, 0) - NVL(mediation_quantity, 0) as qy
+      FROM bhf_goods_mediation) b
+GROUP BY TO_CHAR(result_date, 'YYYY-MM-DD'),
+         office_id, 
+         option_code, 
+         option_name
+-- HAVING option_code = 'LH0011'
+ORDER BY result_date desc, 
+         office_id, 
+         option_code 
+;
+
+
+-- 유니온으로 두 테이블 합칠거
+
+SELECT TO_CHAR(c.result_date, 'YYYY-MM') as result_date,
+       c.office_id,
+       c.option_code,
+       c.option_name,
+       SUM(c.qy)
+FROM (SELECT br.request_date AS result_date, 
+             br.branch_office_id AS office_id,
+             brd.option_code,
+             brd.goods_name || '-' || brd.option_name AS option_name,
+             0 - NVL(brd.quantity, 0) AS qy
+      FROM bhf_returning br JOIN bhf_returning_detail brd
+             ON (br.returning_code = brd.returning_code)
+      WHERE brd.returning_reason IN ('파손', '찌그러짐')
+UNION ALL
+      SELECT mediation_date AS result_date, 
+            branch_office_id AS office_id, 
+            option_code, 
+            goods_name || '-' || option_name AS option_name, 
+            NVL(quantity, 0) - NVL(mediation_quantity, 0) AS qy
+      FROM bhf_goods_mediation ) c
+GROUP BY TO_CHAR(result_date, 'YYYY-MM'),
+         office_id, 
+         option_code, 
+         option_name
+--HAVING option_code = 'LH0011'
+ORDER BY result_date desc, 
+         office_id, 
+         option_code 
+;
+
+
+create or replace FUNCTION fn_get_goods_code(p_option_code number)
+    RETURN number
+IS
+    v_result number;
+BEGIN
+    SELECT pg.goods_num
+    INTO v_result
+    FROM purchse_goods pg JOIN purchse_option po
+    ON (pg.goods_num = po.goods_num)
+    WHERE option_num = p_option_code;
+
+    RETURN v_result;
+END;
+/
+
+-- 2025-02-26
+
+select fn_get_cmmn_code('취소')
+from dual;
+
+select fn_get_cmmn_code_ver2('승인', '상태')
+from dual;
+
+select * from cmmn where cmmn_name = '승인';
+
+SELECT option_code, option_name
+FROM purchse_option po JOIN purchse_goods pg
+            ON (po.goods_num = pg.goods_num)
+WHERE pg.company_num = 1 -- #{companyNum}
+-- AND pg.goods_name LIKE '%' || null || '%'
+ORDER BY 2;
+
+
+select * from bsn_bhf;
+
+select fn_get_cmmn_name(rental_type)
+FROM bsn_bhf;
+
+select * from cmmn;

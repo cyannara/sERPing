@@ -4,6 +4,18 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
  
  <head>
+
+
+<!-- pdf 캔버스 설정 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
+<script>
+  // PDF.js 워커 경로 설정
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.worker.min.js';
+</script>
+
+
+
  	<style>
     /* ✅ 컨테이너 스타일 */
     #custom-container {
@@ -47,6 +59,26 @@
         text-align: center;
         margin-top: 15px;
     }
+    
+	    .pdf-container {
+	  max-width: 800px;       /* 최대 너비 800px */
+	  margin: 0 auto;         /* 수평 중앙 정렬 */
+	  display: flex;
+	  justify-content: center;/* 가로 중앙 정렬 (내부 콘텐츠 중앙 배치) */
+	  align-items: center;    /* 세로 중앙 정렬 */
+	  height: 1000px;          /* 원하는 높이 (예: 600px) */
+	  border: 1px solid #ccc; /* 필요 시 테두리 추가 */
+	  background-color: #f9f9f9;
+	}
+	
+	#pdfCanvas {
+	  width: 100%;            /* 컨테이너 너비에 맞춤 */
+	  height: auto;           /* 비율 유지 */
+	  max-height: 100%;       /* 컨테이너 높이 내에서 제한 */
+	}
+    
+    
+   
 </style>
  	
  </head>     
@@ -54,201 +86,413 @@
 
 
 <div class="container mt-4">
-    <h2 class="mb-4">발주서 조회</h2>
-    
-    <!-- ✅ 검색 필터 -->
-    <div class="search-grid" id="custom-container">
-        <div class="d-flex flex-wrap align-items-center gap-3">
-            <div class="d-flex align-items-center">
-                <span class="label-search me-2">상품명</span>
-                <input type="text" id="searchGoodsName" class="form-control w-auto">
-            </div>
-            <div class="d-flex align-items-center">
-                <span class="label-search me-2">발주번호</span>
-                <input type="text" id="searchPurchaseNum" class="form-control w-auto">
-            </div>
-            <div class="d-flex align-items-center">
-                <span class="label-search me-2">발주일자</span>
-                <input type="date" id="searchStartDate" class="form-control w-auto">
-                <span class="mx-2">~</span>
-                <input type="date" id="searchEndDate" class="form-control w-auto">
-            </div>
-            <div class="d-flex align-items-center">
-	            <span class="label-search me-2">표시수량</span>
-	            <select name="display_amount" id="purchase_display_amount" class="form-control w-auto" onchange="changeProductDisplay()">
-	                <option value="10" selected>10</option>
-	                <option value="20">20</option>
-	                <option value="50">50</option>
-	                <option value="100">100</option>
-	            </select>
-	        </div>
-            <button type="button" class="btn btn-primary ms-auto" onclick="purchaseSearch()">검색</button>
-            <button type="button" class="btn btn-secondary" onclick="resetFilters()">초기화</button>
+  <h2 class="mb-4">발주서 조회</h2>
+  <!-- 검색 바 한 줄 정렬 -->
+  <div id="custom-container" class="mb-3">
+    <div class="row g-2 align-items-center">
+      <div class="col-auto">
+        <label for="searchGoodsName" class="form-label">상품명</label>
+        <input type="text" id="searchGoodsName" class="form-control" placeholder="상품명을 입력하세요">
+      </div>
+      <div class="col-auto">
+        <label for="searchPurchaseNum" class="form-label">발주번호</label>
+        <input type="text" id="searchPurchaseNum" class="form-control" placeholder="발주번호 입력">
+      </div>
+      <div class="col-auto">
+        <label class="form-label">발주일자</label>
+        <div class="input-group">
+          <input type="date" id="searchStartDate" class="form-control">
+          <span class="input-group-text">~</span>
+          <input type="date" id="searchEndDate" class="form-control">
         </div>
+      </div>
+      <div class="col-auto">
+        <label for="purchase_display_amount" class="form-label">표시수량</label>
+        <select id="purchase_display_amount" class="form-select" onchange="changeProductDisplay()">
+          <option value="10" selected>10</option>
+          <option value="20">20</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+      </div>
+      <div class="col-auto ">
+        <button type="button" class="btn btn-primary" onclick="purchaseSearch()">검색</button>
+      </div>
+      <div class="col-auto">
+        <button type="button" class="btn btn-secondary" onclick="resetFilters()">초기화</button>
+      </div>
     </div>
-    
-    <!-- ✅ 발주서 리스트 테이블 -->
+  </div>
+  
+  <!-- 나머지 페이지 내용... -->
+  
+   <!-- ✅ 발주서 리스트 테이블 -->
     <div id="table-container" class="mt-3">
         <div id="purchaselistGrid"></div>
         <div id="pagination" class="tui-pagination"></div>
     </div>
     
+    <!--  발주서 모달 -->
+		    <div th:include="purchs/ModalTemplate :: ModalTemplate (
+		    'printModal', 
+		    'modal-xl', 
+		    '발주서 조회', 
+		    'purchs/purchaseForm', 
+		    'purchs/purchaseFooter'
+		    )"></div>
+    <!--  메일 모달 -->
+		    <div th:include="purchs/ModalTemplate :: ModalTemplate (
+		    'mailsenderModal', 
+		    'modal-xl', 
+		    'EMAIL', 
+		    'purchs/mailsender', 
+		    'purchs/mailFooter'
+		    )"></div>
+    
+    
     <!-- 발주서 등록 버튼 -->
     <div class="text-end">
-        <button class="btn btn-register">발주서 등록</button>
+        <button class="btn btn-primary">발주서 등록</button>
     </div>
+  
 </div>
+
+    
+   
+
 
 
 
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    console.log("✅ 발주서 그리드 초기화");
-    initPurchaseGrid();
-});
-
-let purchaselistGrid;
-
-function initPurchaseGrid() {
-    
-	const companyNum = [[${session.companyNum}]];
+// (1) PDF.js로 PDF 파일을 캔버스에 렌더링
+	function renderPDF(reportUrl) {
+	  const canvas = document.getElementById('pdfCanvas');
+	  const context = canvas.getContext('2d');
 	
-    if (!companyNum) {
-        console.error("❌ 세션에서 companyNum 값을 찾을 수 없음.");
-        return; // companyNum이 없으면 요청을 하지 않음
-    } 
-    const purchaselistDataSource = {
-        api: {
-            readData: {
-                url: 'http://localhost:81/purchs/rest/purchase/list',
-                method: 'GET',
-                requestOptions: {
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'same-origin' // ✅ CORS 문제 방지
-                },
-                initParams: {
-                    page: 1,
-                    perPage: 10,
-                    companyNum: companyNum
-                },
-                beforeRequest: function(request) {
-                    console.log("📢 서버로 요청 보내기 전 requestParams:", request.params);
-                },
-                afterResponse: function(response) {
-                    console.log("📢 서버 응답:", response);
+	  // PDF 로드
+	  pdfjsLib.getDocument(reportUrl).promise.then(pdf => {
+	    console.log('PDF loaded, total pages:', pdf.numPages);
+	    // 첫 페이지만 렌더링 (필요시 여러 페이지 지원 가능)
+	    pdf.getPage(1).then(page => {
+	      const scale = 1.5; // 확대/축소 비율
+	      const viewport = page.getViewport({ scale });
+	      // 캔버스 크기 설정
+	      canvas.width = viewport.width;
+	      canvas.height = viewport.height;
+	
+	      // 페이지 렌더링
+	      const renderContext = {
+	        canvasContext: context,
+	        viewport: viewport
+	      };
+	      page.render(renderContext).promise.then(() => {
+	        console.log('Page rendered');
+	      });
+	    });
+	  }).catch(error => {
+	    console.error('PDF 로드 오류:', error);
+	  });
+	}
+	
+  // 2. 커스텀 렌더러 클래스 정의 (최상단)
+  class CustomTextRenderer {
+      constructor(props) {
+          const el = document.createElement('div');
+          el.innerText = props.value;
+          el.style.padding = '10px';
+          el.style.fontWeight = 'bold';
+          el.style.textAlign = 'left';
+          this.el = el;
+      }
+      getElement() {
+          return this.el;
+      }
+  }
+	//사용자 정의 이메일 버튼 렌더러 정의
+  class EmailRenderer {
+      constructor(props) {
+          const el = document.createElement('button');
+          el.textContent = 'EMAIL';
+          el.className = 'btn btn-danger btn-sm';
+          el.addEventListener('click', () => {
+              console.log("메일 전송 버튼 클릭");
+              const focusedCell = purchaselistGrid.getFocusedCell();
+              if (!focusedCell) {
+                  alert("먼저 발주 행을 선택하세요.");
+                  return;
+              }
+              const rowData = purchaselistGrid.getRow(focusedCell.rowKey);
+              if (!rowData) {
+                  alert("선택된 행의 데이터가 없습니다.");
+                  return;
+              }
+              
+              // vendor_email과 employee_email 컬럼명이 실제 데이터에 맞게 조정하세요.
+              const vendorEmail = rowData.vendor_email || rowData.vendorEmail;
+              const employeeEmail = rowData.employee_email || rowData.employeeEmail;
+              
+              if (!vendorEmail || !employeeEmail) {
+                  alert("메일 전송에 필요한 이메일 정보가 없습니다.");
+                  return;
+              }
+              
+              // sessionStorage에 저장
+              sessionStorage.setItem("vendorEmail", vendorEmail);
+              sessionStorage.setItem("employeeEmail", employeeEmail);
+              console.log("vendorEmail:", vendorEmail, "employeeEmail:", employeeEmail);
+              
+              // mailsender 모달 표시
+              const mailSenderModalEl = document.getElementById("mailsenderModal");
+              if (mailSenderModalEl) {
+                  const mailSenderModal = new bootstrap.Modal(mailSenderModalEl);
+                  mailSenderModal.show();
+              } else {
+                  console.error("메일 전송 모달(mailsenderModal)을 찾을 수 없습니다.");
+              }
+          });
+          this.el = el;
+      }
+      getElement() {
+          return this.el;
+      }
+  }
 
-                    if (response.data && response.data.contents) {
-                        console.log("✅ 변환된 데이터:", response.data.contents);
-                        return { data: response.data.contents, totalCount: response.data.pagination.totalCount };
-                    }
+  // (3) PrintRenderer 수정 → PDF.js 렌더링
+  class PrintRenderer {
+      constructor(props = {}) {
+          this.props = props; // 전달받은 props 저장
+          const el = document.createElement('a');
+          el.innerText = "인쇄";
+          el.style.color = "#007bff";
+          el.style.cursor = "pointer";
+          el.style.textDecoration = "underline";
+          el.addEventListener("click", (e) => {
+              e.preventDefault();
+              // 현재 행의 데이터
+              const rowData = this.props.grid.getRow(this.props.rowKey);
+              const purchaseNum = rowData ? rowData.purchaseNum : null;
 
-                    console.warn("⚠️ 서버 응답에 contents가 없습니다.");
-                    return { data: [], totalCount: 0 };
-                }
-            }
-        },
-        contentType: 'application/json',
-        serverSidePagination: true
-    };
+              if (purchaseNum) {
+                  sessionStorage.setItem("purchaseNum", purchaseNum);
+                  console.log("sessionStorage 저장 완료:", purchaseNum);
+              } else {
+                  console.warn("발주번호 데이터가 없습니다.");
+              }
 
-    purchaselistGrid = new tui.Grid({
-        el: document.getElementById('purchaselistGrid'),
-        data: purchaselistDataSource,
-        pageOptions: {
-            useClient: false,
-            perPage: 10
-        },
-        bodyHeight: 'auto',
-        columns: [
-            { header: "발주번호", name: "purchaseNum", rowSpan: true, renderer: { type: CustomTextRenderer } },
-            { header: "거래처명", name: "vendorName" },
-            { header: "담당자", name: "employeeName" },
-            { header: "상품명", name: "goodsName" },
-            { header: "옵션명", name: "optionName" },
-            { header: "금액", name: "purchaseTotalAmount" },
-            { header: "발주상태", name: "purchaseStatus" },
-            { header: "인쇄", name: "print", renderer: { type: PrintRenderer } }
-        ]
-    });
+              // Thymeleaf에서 렌더링된 회사번호
+              const companyNum = [[${session.companyNum}]];
 
-    console.log("✅ Toast Grid 초기화 완료");
-}
+              // (1) PDF 생성 엔드포인트 (Jasper → PDF)
+              //     예: '/purchs/report/report?companynum=...&purchasenum=...'
+              //     (HTML이 아니라 PDF 바이너리를 반환해야 함)
+              const reportUrl = `/purchs/report/report?companynum=${companyNum}&purchasenum=${purchaseNum}`;
+              console.log("PDF URL:", reportUrl);
 
-// ✅ 검색 실행
-function purchaseSearch() {
-    let goodsName = document.querySelector('#searchGoodsName').value.trim();
-    let purchaseNum = document.querySelector('#searchPurchaseNum').value.trim();
-    let startDate = document.querySelector('#searchStartDate').value;
-    let endDate = document.querySelector('#searchEndDate').value;
+              // (2) PDF.js로 캔버스 렌더링
+              renderPDF(reportUrl);
 
-    purchaselistGrid.setRequestParams({
-        "companyNum": [[${session.companyNum}]],
-        "goodsName": goodsName,
-        "purchaseNum": purchaseNum,
-        "startDate": startDate,
-        "endDate": endDate
-    });
+              // (3) 모달 표시
+              const printModalEl = document.getElementById('printModal');
+              if (printModalEl) {
+                  const printModal = new bootstrap.Modal(printModalEl);
+                  printModal.show();
+              } else {
+                  console.error("모달 요소(printModal)를 찾을 수 없습니다.");
+              }
+          });
+          this.el = el;
+      }
+      getElement() {
+          return this.el;
+      }
+  }
+  //pdf다운
+  document.getElementById('pdfDown').addEventListener('click', function() {
+	  // Thymeleaf로 렌더링된 회사번호 (예: 1)
+	  const companyNum = [[${session.companyNum}]];
+	  // 그리드나 PrintRenderer를 통해 sessionStorage에 저장된 발주번호 사용
+	  const purchaseNum = sessionStorage.getItem("purchaseNum");
+	  if (!purchaseNum) {
+	    alert("발주번호가 존재하지 않습니다.");
+	    return;
+	  }
+	  // 다운로드 엔드포인트 URL 구성 (/purchs/report/reportDownload 엔드포인트 사용)
+	  const downloadUrl = `/purchs/report/reportDownload?companynum=${companyNum}&purchasenum=${purchaseNum}`;
+	  console.log("Download URL:", downloadUrl);
+	  // 브라우저를 해당 URL로 이동시켜 파일 다운로드를 유도
+	  window.location.href = downloadUrl;
+	});
 
-    purchaselistGrid.reloadData();
-}
+  
+  
+  // 2. 페이지 로드 후 그리드 초기화
+  document.addEventListener("DOMContentLoaded", function () {
+      console.log("✅ 발주서 그리드 초기화");
+      initPurchaseGrid();
+  });
 
-//표시 수량 변경
-function changeProductDisplay() {
-    let gap = parseInt(document.querySelector('#purchase_display_amount').value);
-    purchaselistGrid.setPerPage(gap);
-    purchaselistGrid.reloadData();
-}
+  let purchaselistGrid;
 
-// ✅ 필터 초기화
-function resetFilters() {
-    document.querySelector('#searchGoodsName').value = '';
-    document.querySelector('#searchPurchaseNum').value = '';
-    document.querySelector('#searchStartDate').value = '';
-    document.querySelector('#searchEndDate').value = '';
-    document.querySelector('#purchase_display_amount').value='';
+  function initPurchaseGrid() {
+      const companyNum = [[${session.companyNum}]];
+      if (!companyNum) {
+          console.error("❌ 세션에서 companyNum 값을 찾을 수 없음.");
+          return;
+      }
+      const purchaselistDataSource = {
+          api: {
+              readData: {
+                  url: '/purchs/rest/purchase/list',
+                  method: 'GET',
+                  requestOptions: {
+                      headers: { 'Content-Type': 'application/json' },
+                      credentials: 'same-origin'
+                  },
+                  initParams: {
+                      page: 1,
+                      perPage: 10,
+                      companyNum: companyNum
+                  },
+                  beforeRequest: function(request) {
+                      console.log("📢 서버로 요청 보내기 전 requestParams:", request.params);
+                  },
+                  afterResponse: function(response) {
+                      console.log("📢 서버 응답:", response);
+                      if (response.data && response.data.contents) {
+                          console.log("✅ 변환된 데이터:", response.data.contents);
+                          return { data: response.data.contents, totalCount: response.data.pagination.totalCount };
+                      }
+                      console.warn("⚠️ 서버 응답에 contents가 없습니다.");
+                      return { data: [], totalCount: 0 };
+                  }
+              }
+          },
+          contentType: 'application/json',
+          serverSidePagination: true
+      };
 
-    purchaselistGrid.setRequestParams({
-        "companyNum": companyNum,
-        "goodsName": '',
-        "purchaseNum": '',
-        "startDate": '',
-        "endDate": ''
-    });
+      purchaselistGrid = new tui.Grid({
+          el: document.getElementById('purchaselistGrid'),
+          data: purchaselistDataSource,
+          pageOptions: {
+              useClient: false,
+              perPage: 10
+          },
+          bodyHeight: 'auto',
+          columns: [
+              { header: "발주번호", name: "purchaseNum", rowSpan: true, renderer: { type: CustomTextRenderer } },
+              { header: "거래처명", name: "vendorName" },
+              { header: "담당자", name: "employeeName" },
+              { header: "상품명", name: "goodsName" },
+              { header: "옵션명", name: "optionName" },
+              { header: "금액", name: "purchaseTotalAmount" },
+              { header: "발주상태", name: "purchaseStatus" },
+              { header: "인쇄", name: "print", renderer: { type: PrintRenderer } },
+              { header: "EMAIL", name: "email", renderer: { type: EmailRenderer }, cellStyle: { textAlign: "center" } }
+          ]
+      });
 
-    purchaselistGrid.reloadData();
-}
+      console.log("✅ Toast Grid 초기화 완료");
+  }
 
-// ✅ 텍스트 정렬 & 강조 렌더러
-class CustomTextRenderer {
-    constructor(props) {
-        const el = document.createElement('div');
-        el.innerText = props.value;
-        el.style.padding = '10px';
-        el.style.fontWeight = 'bold';
-        el.style.textAlign = 'left';
-        this.el = el;
-    }
-    getElement() {
-        return this.el;
-    }
-}
+  // 3. 기타 함수들 (검색, 필터 초기화, 표시 수량 변경 등)
+  function purchaseSearch() {
+      let goodsName = document.querySelector('#searchGoodsName').value.trim();
+      let purchaseNum = document.querySelector('#searchPurchaseNum').value.trim();
+      let startDate = document.querySelector('#searchStartDate').value;
+      let endDate = document.querySelector('#searchEndDate').value;
+      purchaselistGrid.setRequestParams({
+          "companyNum": [[${session.companyNum}]],
+          "goodsName": goodsName,
+          "purchaseNum": purchaseNum,
+          "startDate": startDate,
+          "endDate": endDate
+      });
+      purchaselistGrid.reloadData();
+  }
 
-// ✅ 인쇄 버튼 렌더러
-class PrintRenderer {
-    constructor(props) {
-        const el = document.createElement('a');
-        el.innerText = "인쇄";
-        el.href = `/purchase/print/${props.value}`;
-        el.style.color = "#007bff";
-        el.style.cursor = "pointer";
-        el.style.textDecoration = "underline";
-        this.el = el;
-    }
-    getElement() {
-        return this.el;
-    }
-}
+  function changeProductDisplay() {
+      let gap = parseInt(document.querySelector('#purchase_display_amount').value);
+      purchaselistGrid.setPerPage(gap);
+      purchaselistGrid.reloadData();
+  }
+
+  function resetFilters() {
+      document.querySelector('#searchGoodsName').value = '';
+      document.querySelector('#searchPurchaseNum').value = '';
+      document.querySelector('#searchStartDate').value = '';
+      document.querySelector('#searchEndDate').value = '';
+      document.querySelector('#purchase_display_amount').value = '';
+      purchaselistGrid.setRequestParams({
+          "companyNum": companyNum,
+          "goodsName": '',
+          "purchaseNum": '',
+          "startDate": '',
+          "endDate": ''
+      });
+      purchaselistGrid.reloadData();
+  }
+  const modalElement = document.getElementById("printModal");
+  const closeButton = modalElement.querySelector('[data-bs-dismiss="modal"]');
+  if (closeButton) {
+      closeButton.addEventListener("click", function () {
+          console.log("✅ 인쇄 모달 닫기 버튼 클릭됨!");
+
+          try {
+          	let modalInstance = bootstrap.Modal.getInstance("#printModal") || new bootstrap.Modal("#printModal");
+              modalInstance.hide(); // ✅ Bootstrap 방식으로 모달 닫기
+              
+          } catch (error) {
+              console.warn("❌ Bootstrap 5가 로드되지 않았음. 대체 방식 사용");
+              modalElement.classList.remove("show");
+              modalElement.style.display = "none";
+              document.body.classList.remove("modal-open");
+
+              setTimeout(() => {
+                  document.querySelectorAll(".modal-backdrop").forEach((element) => element.remove()); // 백그라운드 제거
+              }, 300);
+           
+          }
+      });
+  } else {
+      console.warn("❌ 인쇄 모달 닫기 버튼을 찾을 수 없습니다.");
+  }
+  
+	//PDF 모달 닫힘 시 sessionStorage의 발주번호 삭제 (예: printModal)
+	  modalElement.addEventListener("hidden.bs.modal", function () {
+	      console.log("PDF 모달이 닫혔습니다. 발주번호 삭제");
+	      sessionStorage.removeItem("purchaseNum");
+	  });
+	
+	// 메일 모달 요소 가져오기 (id가 "mailsenderModal"인 모달)
+	  const emailModal = document.getElementById("mailsenderModal");
+	  if (emailModal) {
+	    // 모달 내부에서 닫기 버튼(예: data-bs-dismiss="modal" 속성)을 찾기
+	    const emailCloseBtn = emailModal.querySelector('[data-bs-dismiss="modal"]');
+	    if (emailCloseBtn) {
+	      emailCloseBtn.addEventListener("click", function () {
+	        console.log("✅ 메일 모달 닫기 버튼 클릭됨!");
+	        // 직접 클래스 제거 방식으로 모달 숨기기
+	        emailModal.classList.remove("show");
+	        emailModal.style.display = "none";
+	        document.body.classList.remove("modal-open");
+	        // 만약 모달 백드롭(overlay)이 있다면 제거
+	        document.querySelectorAll(".modal-backdrop").forEach((element) => element.remove());
+	      });
+	    } else {
+	      console.warn("❌ 메일 모달 닫기 버튼을 찾을 수 없습니다.");
+	    }
+	    
+	    // 모달이 완전히 닫힌 후 sessionStorage에서 이메일 관련 값을 삭제
+	    emailModal.addEventListener("hidden.bs.modal", function () {
+	      console.log("✅ 메일 모달이 닫혔습니다. 이메일 sessionStorage 값 삭제");
+	      sessionStorage.removeItem("vendorEmail");
+	      sessionStorage.removeItem("employeeEmail");
+	    });
+	  } else {
+	    console.warn("❌ 메일 모달(mailsenderModal)을 찾을 수 없습니다.");
+	  }
 </script>
 
 </body>

@@ -2,63 +2,34 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.beauty1nside.bhf.mapper.BhfGoodsInMapper">
 	
-	<!-- MERGE문 사용해서 창고에 상품입고 하기 -->
-	<insert id="goodsIn" parameterType="java.util.List">
-		MERGE  INTO bhf_warehouse b
-		USING(
-			<!-- collection="list" item="item" 이거는 디폴트, dual을 여러개 반복할때는 separator="UNION" 넣기 -->
-			<foreach collection="list" item="item" open="" close="" index="idx" separator="UNION">
-				select 
-					 #{item.branchOfficeId} as branchOfficeId,
-		             #{item.goodsCode} as goodsCode,
-		             #{item.goodsName} as goodsName,
-		             #{item.optionCode} as optionCode,
-		             #{item.optionName} as optionName,
-		             #{item.goodsStandard} as goodsStandard,
-		             #{item.stockQuantity} as stockQuantity,
-		             #{item.companyNum} as companyNum
-		        from dual
-			</foreach>       
-		        )m
-		 ON (b.option_code = m.optionCode)
-		 WHEN MATCHED THEN
-		      UPDATE
-		         SET b.stock_quantity = (b.stock_quantity + m.stockQuantity)
-		 WHEN NOT MATCHED THEN
-		      INSERT (b.warehouse_code, 
-		              b.branch_office_id,   
-		              b.goods_code, 
-		              b.goods_name, 
-		              b.option_code, 
-		              b.option_name, 
-		              b.goods_standard, 
-		              b.stock_quantity, 
-		              b.company_num)
-		      VALUES ('bhf_home' || WAREHOUSE_CODE_SEQ.nextval, 
-		              m.branchOfficeId, 
-		              m.goodsCode, 
-		              m.goodsName, 
-		              m.optionCode, 
-		              m.optionName, 
-		              m.goodsStandard, 
-		              m.stockQuantity, 
-		              m.companyNum)
+	<!-- 상품입고 등록 프로시저(수량에 따라 재발주 및 반품 자동등록) -->
+	<insert id="goodsIn" statementType="CALLABLE">
+		call bhf_goods_in(
+		  #{branchOfficeId},
+		  #{dueDate},
+		  #{companyNum},
+		  #{deliveryId},
+		  #{orderCode},
+		  #{files, typeHandler=com.beauty1nside.bhf.GoodsInArrayStructHandler} 
+		)
 	</insert>
 	
 	<!-- 주문서 조회 -->
 	<select id="goodsOrdList" resultType="BhfGoodsOrdDTO" parameterType="BhfGoodsOrdSearchDTO">
-		select  order_id, 
+		select  delivery_id, 
 	   			order_code, 
-	  			order_date, 
-	   			due_date, 
+	  			delivery_date, 
+	   			order_date, 
+	   			due_date,
 	   			remark
 		from ( 	select  rownum rn,
-						order_id, 
-			   			order_code, 
-			  			order_date, 
-			   			due_date, 
-			   			remark
-				from   	bsn_order
+						d.delivery_id,
+				        o.order_code,
+				        d.delivery_date,
+				        o.order_date,
+				        o.due_date,
+				        d.remark
+				from    bsn_delivery d join bsn_order o on d.order_id = o.order_id
 		<![CDATA[
 				where rownum <= #{end}
 		]]>
@@ -69,8 +40,8 @@
 	
 	<!-- 페이징에 전체숫자 알려주기 위해서 -->
 	<select id="count" parameterType="BhfGoodsOrdSearchDTO">
-		SELECT COUNT(order_id)
-		FROM bsn_order
+		SELECT COUNT(d.delivery_id)
+		FROM bsn_delivery d join bsn_order o on d.order_id = o.order_id
 		<where>
 			<include refid="searchInfo"></include>
 		</where>
@@ -78,34 +49,45 @@
 	
 	<!-- 검색조건(검색을 안하면 그냥 조회가 되게) -->
 	<sql id="searchInfo">
-		company_num = 1<!-- #{companyNum}  --> AND order_status = 'VS002'<!-- 완료 상태인 주문서만 조회 -->
+		<!-- #{companyNum} --><!-- 완료 상태인 주문서만 조회 -->     <!-- #{branchOfficeId} -->
+		d.company_num = 1 AND d.delivery_status = 'DS02' and o.branch_office_id = 'yedam'
 		<if test="orderDate != null and ! orderDate.equals('')">
-			AND TO_CHAR(order_date, 'yyyy-mm-dd') = #{orderDate}
+			AND TO_CHAR(o.order_date, 'yyyy-mm-dd') = #{orderDate}
 		</if>
 	</sql>
 	
 	<!-- 주문서 상세조회 -->
 	<select id="goodsOrdDtlList" resultType="BhfGoodsOrdDTO" parameterType="BhfGoodsOrdSearchDTO">
-		select  branch_office_id,
+		select  goods_code,
 				goods_name, 
-				goods_code,
 				option_code, 
 				option_name, 
 				goods_standard, 
-				quantity
+				quantity,
+				goods_lot_num,
+				option_barcode,
+				goods_consumption_date
 		from(	select 	rownum rn,
-						o.branch_office_id,
-				        d.goods_name, 
-				        d.goods_code,
-				        d.option_code, 
-				        d.option_name, 
-				        d.goods_standard, 
-				        d.quantity
-				from 	bsn_order_detail d join bsn_order o on d.order_id = o.order_id
+						o.goods_code,
+				        o.goods_name,
+				        o.option_code,
+				        o.option_name,
+				        o.goods_standard,
+				        o.quantity,
+						l.goods_lot_num,
+				        d.option_barcode,
+				        w.goods_consumption_date
+				from    bsn_delivery_detail d 
+				join    bsn_order_detail o
+				ON      d.order_detail_id = o.order_detail_id
+				join    bsn_delivery_lot_detail l
+				on      d.delivery_detail_id = l.delivery_detail_id
+				join    purchs_warehousing_body w
+				on      l.goods_lot_num = w.goods_lot_num
 				<![CDATA[
 				where rownum <= #{end}
 		]]>
-				and d.order_id = #{orderId}
+				and d.delivery_id = #{deliveryId}
 				)
 		where rn >= #{start}
 	</select>

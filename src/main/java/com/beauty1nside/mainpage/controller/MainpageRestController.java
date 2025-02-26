@@ -4,9 +4,13 @@ import com.beauty1nside.common.GridArray;
 import com.beauty1nside.common.Paging;
 import com.beauty1nside.mainpage.dto.ApprovalDTO;
 import com.beauty1nside.mainpage.dto.ApprovalSearchDTO;
+import com.beauty1nside.mainpage.dto.ScheduleDTO;
+import com.beauty1nside.mainpage.service.ScheduleService;
 import com.beauty1nside.stdr.dto.DocumentDTO;
 import com.beauty1nside.mainpage.service.ApprovalService;
 import com.beauty1nside.security.service.CustomerUser;
+import com.beauty1nside.stdr.dto.StdrDeptDTO;
+import com.beauty1nside.stdr.service.StdrDeptService;
 import com.beauty1nside.utils.DateTimeUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
@@ -24,6 +28,8 @@ import java.util.Map;
 @RequestMapping("/api/mainpage/*")
 public class MainpageRestController {
   final ApprovalService approvalService;
+  final StdrDeptService stdrDeptService;
+  final ScheduleService scheduleService;
   
   @GetMapping("/approval/list")
   public Object approvalList(@RequestParam(name = "perPage", defaultValue = "20", required = false) int perPage,
@@ -105,10 +111,62 @@ public class MainpageRestController {
     return ResponseEntity.ok(response);
   }
   
+  @PostMapping("/schedule")
+  public ResponseEntity<Map<String, Object>> addEvent(@RequestBody ScheduleDTO dto,
+                                                             @AuthenticationPrincipal CustomerUser user) {
+    Long companyNum = user.getUserDTO().getCompanyNum();
+    dto.setCompanyNum(companyNum);
+    
+    Long employeeNum = user.getUserDTO().getEmployeeNum();
+    dto.setEmployeeNum(employeeNum);
+    
+    Map<String, Object> response = new HashMap<>();
+    int isSuccess = scheduleService.insert(dto);
+    response.put("message", isSuccess == 1 ? "success" : "fail");
+    return ResponseEntity.ok(response);
+  }
+  
+  @PutMapping("/schedule/{scheduleId}")
+  public ResponseEntity<Map<String, Object>> updateSchedule(@RequestBody ScheduleDTO dto,
+                                                            @PathVariable(name="scheduleId") Long scheduleId,
+                                                            @AuthenticationPrincipal CustomerUser user) {
+    Long companyNum = user.getUserDTO().getCompanyNum();
+    dto.setCompanyNum(companyNum);
+    
+    Long employeeNum = user.getUserDTO().getEmployeeNum();
+    dto.setEmployeeNum(employeeNum);
+    
+    dto.setScheduleId(scheduleId);
+    
+    Map<String, Object> response = new HashMap<>();
+    int isSuccess = scheduleService.updateSchedule(dto);
+    response.put("message", isSuccess == 1 ? "success" : "fail");
+    return ResponseEntity.ok(response);
+  }
+  
+  @GetMapping("/schedule")
+  public List<ScheduleDTO> getScheduleList(@AuthenticationPrincipal CustomerUser user) {
+    Long companyNum = user.getUserDTO().getCompanyNum();
+    return scheduleService.scheduleList(companyNum);
+  }
+  
+  @DeleteMapping("/schedule/{scheduleId}")
+  public ResponseEntity<Map<String, Object>> deleteSchedule(@PathVariable(name="scheduleId") Long scheduleId) {
+    Map<String, Object> response = new HashMap<>();
+    int isSuccess = scheduleService.deleteSchedule(scheduleId);
+    response.put("message", isSuccess == 1 ? "success" : "fail");
+    return ResponseEntity.ok(response);
+  }
+  
   @GetMapping("/approval/type")
   public List<DocumentDTO> getApprovalType(@AuthenticationPrincipal CustomerUser user) {
     Long companyNum = user.getUserDTO().getCompanyNum();
     return approvalService.documentList(companyNum);
   }
   
+  @GetMapping("/dept")
+  public List<StdrDeptDTO> getDeptList(@AuthenticationPrincipal CustomerUser user) {
+    Long companyNum = user.getUserDTO().getCompanyNum();
+    return stdrDeptService.deptList(companyNum);
+  }
 }

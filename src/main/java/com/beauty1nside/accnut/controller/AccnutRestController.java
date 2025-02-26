@@ -15,6 +15,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,6 +30,7 @@ import com.beauty1nside.accnut.dto.DebtDTO;
 import com.beauty1nside.accnut.dto.DebtSearchDTO;
 import com.beauty1nside.accnut.dto.EtcBookSearchDTO;
 import com.beauty1nside.accnut.dto.IncidentalCostSearchDTO;
+import com.beauty1nside.accnut.dto.SalaryBookDTO;
 import com.beauty1nside.accnut.dto.SalaryBookSearchDTO;
 import com.beauty1nside.accnut.service.AssetService;
 import com.beauty1nside.accnut.service.DealBookService;
@@ -36,13 +38,14 @@ import com.beauty1nside.accnut.service.DebtService;
 import com.beauty1nside.accnut.service.EtcBookService;
 import com.beauty1nside.accnut.service.IncidentalCostService;
 import com.beauty1nside.accnut.service.JsonQueryService;
+import com.beauty1nside.accnut.service.OtherService;
 import com.beauty1nside.accnut.service.SalaryBookService;
 import com.beauty1nside.common.GridArray;
 import com.beauty1nside.common.GridData;
 import com.beauty1nside.common.Paging;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -53,13 +56,18 @@ import lombok.extern.log4j.Log4j2;
 @RequestMapping("/accnut/rest/*")
 public class AccnutRestController {
 
+	
+	
 	final AssetService assetService;
 	final DebtService debtService;
 	final DealBookService dealBookService;
 	final SalaryBookService salaryBookService;
 	final EtcBookService etcBookService;
 	final IncidentalCostService incidentalCostService;
-	JsonQueryService jsonQueryService;
+	final JsonQueryService jsonQueryService;
+	RestTemplate restTemplate;
+	final OtherService otherService;
+	
 	
 	// 목록 조회 ------------------------------------------------------------------------------------------
 	
@@ -80,9 +88,36 @@ public class AccnutRestController {
 		// 페이징 처리
 		paging.setTotalRecord(assetService.count(dto));
 		
+		// 농협 api 호출
+		List<AssetDTO> list = assetService.list(dto);
+		
+		for (AssetDTO asset : list) {
+			// 구분이 통장일 때
+	        if ("통장".equals(asset.getSection())) {
+				// 금융기관이 농협일 때 
+				if(  "농협".equals(asset.getFinancialInstitution() ) ) {
+					
+					// 핀어카운트 조회
+					NHService nh = new NHService();
+					String finAcno = nh.getFinAcno(asset);
+					
+					// 실제 통장 잔고 조회
+					nh = new NHService();
+					String amount = nh.getAmount(finAcno);
+					// 통장잔고로 금액 변경
+					if(amount != null) {
+						asset.setAmount(Integer.parseInt(amount));						
+					}
+					
+				} // 농협일때 if문
+			} // 통장일때 if문
+		} // for 문
+		
+		
+		//log.info(list);
 		// grid 배열 처리
 		GridArray grid = new GridArray();
-		Object result = grid.getArray( paging.getPage(), assetService.count(dto), assetService.list(dto) );
+		Object result = grid.getArray( paging.getPage(), assetService.count(dto), list );
 		return result;
 	}
 	
@@ -202,29 +237,68 @@ public class AccnutRestController {
 	}
 	
 	
-	// String => json으로 출력
+	// String => json => [{},{},{}]  으로 출력
     @GetMapping("/json/test")
     public Object jsonTest() throws JsonMappingException, JsonProcessingException{
     	
             String jsonString = jsonQueryService.jsonTest();
             GridArray grid = new GridArray();
             
-            JsonNode jsonNode = grid.getJson(jsonString);
-            log.info(jsonNode.get("bhf_order").isArray());
-            log.info(jsonNode.fieldNames());
-            
-            
-            
-            
+            List<ObjectNode> jsonNode = grid.getNewList(jsonString);
             
             return jsonNode;
     }
 	
+    @GetMapping("option/list")
+    public ResponseEntity<Map<String, Object>> optionList(@RequestParam String goodsName) {
+    	Map<String, Object> response = new HashMap<>();
+    	try {
+    		List<Map<String, Object>> result = otherService.optionList(goodsName, 1);
+	        response.put("status", "success");
+	        response.put("message", "조회 성공");
+	        response.put("result", result);
+	        return ResponseEntity.ok(response); // JSON 형태 응답
+	    } catch (Exception e) {
+	        log.error("조회 실패", e);
+	        response.put("status", "error");
+	        response.put("message", "조회 실패");
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+	    }
+    }
+    
+    @GetMapping("bhf/list")
+    public ResponseEntity<Map<String, Object>> bhfList(@RequestParam int companyNum) {
+    	Map<String, Object> response = new HashMap<>();
+    	try {
+    		List<Map<String, Object>> result = otherService.bhfList(companyNum);
+	        response.put("status", "success");
+	        response.put("message", "조회 성공");
+	        response.put("result", result);
+	        return ResponseEntity.ok(response); // JSON 형태 응답
+	    } catch (Exception e) {
+	        log.error("조회 실패", e);
+	        response.put("status", "error");
+	        response.put("message", "조회 실패");
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+	    }
+    	
+    }
+    
 	// 삽입 ----------------------------------------------------------------------------------------------
 	
 	
 	@PostMapping("/asset/insert")
 	public ResponseEntity<Map<String, Object>> assetsInsert(@RequestBody AssetDTO dto) {
+		log.info(dto);
+		if("AC02".equals(dto.getSection())) {
+			if("FI01".equals(dto.getFinancialInstitution())) {
+				NHService nh = new NHService();
+				String rgno = nh.getRgno(dto);
+				log.info(rgno);
+				dto.setRgno(rgno);
+				log.info(dto);
+			}
+		}
 	    Map<String, Object> response = new HashMap<>();
 	    try {
 	    	assetService.insert(dto);
@@ -256,7 +330,7 @@ public class AccnutRestController {
 	}
 	
 	@PostMapping("/book/insert")
-	public Map register(@RequestBody GridData<DealBookDTO> dto) {
+	public Map bookInsert(@RequestBody GridData<DealBookDTO> dto) {
 		dto.getCreatedRows().forEach(dtos -> {
 			log.info("list: " + dtos);
 			if(dtos.getSection() != null) {
@@ -269,6 +343,38 @@ public class AccnutRestController {
 	
 	
 	
+	
+	
+	// 수정 ----------------------------------------------------------------------------------------------
+	
+	@PutMapping("/salary/update")
+	public ResponseEntity<Map<String, Object>> salaryUpdate(@RequestBody List<SalaryBookDTO> dtoList) {
+		int total = 0;
+		for(SalaryBookDTO dto : dtoList) {
+			total += dto.getPaymentAmount();
+		}
+		
+	    Map<String, Object> response = new HashMap<>();
+	    try {
+	    	salaryBookService.update(dtoList);
+	    	// 급여통장에서 빠짐
+	    	NHService nh = new NHService();
+	    	// 급여통장 조회
+	    	AssetDTO assetDTO = assetService.info("01");
+	    	// 급여통장 핀어카운트 조회
+	    	String finAcno = nh.getFinAcno(assetDTO);
+	    	nh.withdraw(finAcno, String.valueOf(total));
+	    	
+	        response.put("status", "success");
+	        response.put("message", "수정 성공");
+	        return ResponseEntity.ok(response); // JSON 형태 응답
+	    } catch (Exception e) {
+	        log.error("등록 실패", e);
+	        response.put("status", "error");
+	        response.put("message", "수정 실패");
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+	    }
+	}
 	
 	
 	

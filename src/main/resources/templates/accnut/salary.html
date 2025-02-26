@@ -74,7 +74,7 @@
 		<!-- 자산 등록 -->
 		<div th:replace="purchs/ModalTemplate :: ModalTemplate (
 						    	'salaryModal', 
-						    	'modal-xl', 
+						    	'modal-lg', 
 						    	'일괄 처리', 
 						    	'accnut/salaryBody',
 						    	'accnut/salaryFooter'
@@ -94,14 +94,14 @@
 	
 	const dataSource = {
 		api: {
-			readData: { url: 'http://localhost:81/accnut/rest/salary/list', method: 'GET', initParams: { page: 1 } },
+			readData: { url: 'http://localhost:81/accnut/rest/salary/list', method: 'GET', initParams: { page: 1 , } },
 			
 		},
 		contentType: 'application/json'
 			
 	};
 	
-	const grid = new Grid({
+	var grid = new Grid({
 		el : document.querySelector('#grid'),
 		pageOptions: {
 			useClient : false,
@@ -177,7 +177,7 @@
 	})
 	
 	function btndisabled() {
-	console.log(checkArray.length);
+	//console.log(checkArray.length);
 		if(checkArray.length > 0){
 			document.querySelector('.btnPayment').removeAttribute('disabled');	
 		} else {

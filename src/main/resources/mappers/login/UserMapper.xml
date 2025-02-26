@@ -16,6 +16,7 @@
         <result property="companyEngName" column="company_eng_name"/>
         <result property="departmentNum" column="department_num"/>
         <result property="authority" column="authority"/>
+        <result property="profileImage" column="profile_image"/>
         <collection
                 property="roles"
                 ofType="RoleDTO"
@@ -24,9 +25,19 @@
         />
     </resultMap>
     <select id="getUser" resultMap="userMap">
-        SELECT employee_num, employee_id, employee_pw, employee_name, email, phone, position, company_num, department_num, authority, company_eng_name
+        SELECT employee_num,
+               employee_id,
+               employee_pw,
+               employee_name,
+               email,
+               phone,
+               position,
+               company_num,
+               company_eng_name,
+               department_num,
+               authority,
+               profile_image
         FROM (
-                 -- hr_employee에서 가져오기
                  SELECT h.employee_num,
                         h.employee_id,
                         h.employee_pw,
@@ -35,9 +46,10 @@
                         h.phone,
                         h.position,
                         h.company_num,
+                        e.company_eng_name,
                         h.department_num,
                         h.authority,
-                        e.company_eng_name
+                        h.profile_image
                  FROM hr_employee h
                           JOIN erp_company e ON h.company_num = e.company_num
                  WHERE h.employee_id = #{employeeId}
@@ -53,9 +65,10 @@
                         NULL AS phone,
                         NULL AS position,
                         u.company_num,
+                        NULL AS company_eng_name,
                         NULL AS department_num,
                         u.authority,
-                        NULL AS company_eng_name
+                        NULL AS profile_image
                  FROM erp_user_accounts u
                           JOIN erp_company e ON u.company_num = e.company_num
                  WHERE u.employee_id = #{employeeId}

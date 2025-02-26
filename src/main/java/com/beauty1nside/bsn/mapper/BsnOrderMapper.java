@@ -56,8 +56,13 @@ public interface BsnOrderMapper {
 	List<BsnDeliveryDetailDTO> selectBsnDeliveryDetail(BsnDeliveryDTO bsnDeliveryDTO);
 	
 	//출고 LOT 상세 조회
-	List<BsnDeliveryLotDTO> selectBsnDeliveryLotDTO(BsnDeliveryDetailDTO bsnDeliveryDetailDTO);
+	List<BsnDeliveryLotDTO> selectBsnDeliveryLotDetail(BsnDeliveryDetailDTO bsnDeliveryDetailDTO);
 	
 	//상품 재고 LOT별 조회(임시)
-	List<BsnGoodsLOTDTO> selectGoodsWarehouseLot(BsnOrderDetailDTO bsnOrderDetailDTO);
+	List<BsnGoodsLOTDTO> selectGoodsWarehouseLot(BsnDeliveryDetailDTO bsnDeliveryDetailDTO);
+	
+	//출고 LOT 상세 등록(연결)
+	void insertBsnDeliveryLotDetail(BsnDeliveryDetailDTO bsnDeliveryDetailDTO);
+	//출고 LOT 제거
+	void deleteBsnDeliveryLotDetail(BsnDeliveryDetailDTO bsnDeliveryDetailDTO);
 }

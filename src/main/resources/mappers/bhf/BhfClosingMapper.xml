@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beauty1nside.bhf.mapper.BhfClosingMapper">
+	
+	<!-- 마감정산 요청 프로시져 호출 -->
+	<insert id="bhf_close" statementType="CALLABLE">
+		call bhf_close(
+		  #{branchOfficeId},
+		  #{closingDate},
+		  #{businessReserves},
+		  #{cashAmount},
+		  #{cashPresent},
+		  #{cardAmount},
+		  #{saleAmount},
+		  #{transferAmount},
+		  #{companyNum},
+		  #{files, typeHandler=com.beauty1nside.bhf.ClosingArrayStructHandler} 
+		)
+	</insert>
+	
+</mapper>

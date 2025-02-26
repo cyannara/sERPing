@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.beauty1nside.stdr.mapper.StdrDeptMapper">
-	<select id="hqDeptList" resultType="com.beauty1nside.stdr.dto.StdrDeptDTO" parameterType="com.beauty1nside.stdr.dto.StdrDeptDTO">
+	<select id="hqDeptList" resultType="com.beauty1nside.stdr.dto.StdrDeptDTO">
 		SELECT /*+ INDEX_DESC(stdr_dept pk_stdr_dept) */
 		    dept_no,
 		dept_name,
@@ -10,6 +10,18 @@
 		company_num
 		<![CDATA[
 			FROM stdr_dept where company_num = #{companyNum} and dept_name <> '지점'
+		]]>
+	</select>
+
+	<select id="deptList" resultType="com.beauty1nside.stdr.dto.StdrDeptDTO">
+		SELECT /*+ INDEX_DESC(stdr_dept pk_stdr_dept) */
+			dept_no,
+			dept_name,
+			branch,
+			address,
+			company_num
+		<![CDATA[
+		FROM stdr_dept where company_num = #{companyNum}
 		]]>
 	</select>
 </mapper>

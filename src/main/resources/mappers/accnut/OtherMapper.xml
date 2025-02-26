@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beauty1nside.accnut.mapper.OtherMapper">
+	<select id="optionList" resultType="map">
+		SELECT option_code AS "optionCode", option_name AS "optionName"
+		FROM purchse_option po JOIN purchse_goods pg
+		            ON (po.goods_num = pg.goods_num)
+		WHERE pg.company_num = #{companyNum}
+		AND pg.goods_name LIKE '%' || #{goodsName} || '%'
+		ORDER BY 2
+	</select>
+
+	<select id="bhfList" resultType="map">
+		SELECT bhf_id AS "bhfId", bhf_name AS "bhfName"
+		FROM bsn_bhf
+		WHERE company_num = #{companyNum}
+		ORDER BY 2
+	</select>
+	
+</mapper>
