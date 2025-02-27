@@ -12,7 +12,7 @@ let phone1 = document.getElementById('phone1')
 let phone2 = document.getElementById('phone2')
 let phone3 = document.getElementById('phone3')
 let position = document.getElementById('position')
-let salary = document.getElementById('salary')
+// let salary = document.getElementById('salary')
 let bankName = document.getElementById('bankName')
 let accountNum = document.getElementById('accountNum')
 let imgUpdateBtn = document.getElementById('imgUpdateBtn')
@@ -86,7 +86,7 @@ const setInfo = (data) => {
     phone2.value = data.phone.slice(3, 7)
     phone3.value = data.phone.slice(7, 11)
     position.value = data.position
-    salary.value = data.salary || '-'
+    // salary.value = data.salary || '-'
     bankName.value = data.bankName
     accountNum.value = data.accountNum
     profileImg.src = data.profileImage || '/file/image/mypage/profile/noProfileImg.jpg'
