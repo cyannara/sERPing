@@ -25,22 +25,40 @@
 			<div class="collapse" id="ui-basic-1">
 					<ul class="nav flex-column sub-menu">
 						<li class="nav-item"><a class="nav-link"
-							th:href="@{/bsn/orderList(menu='sales')}">주문조회</a></li>
+							th:href="@{/bsn/order/List(menu='sales')}">주문조회</a></li>
 						<li class="nav-item"><a class="nav-link"
-							th:href="@{/bsn/orderRegist(menu='sales')}">주문등록</a></li>
-						<li class="nav-item"><a class="nav-link"
-							th:href="@{/bsn/order(menu='sales')}">상품재고조회</a></li>
+							th:href="@{/bsn/order/Regist(menu='sales')}">주문등록</a></li>
+
 					</ul>
 				</div>
 			</li>
 			<li class="nav-item"><a class="nav-link"
-				th:href="@{/bsn/order(menu='sales')}"> <i class="icon-grid menu-icon"></i> <span
-					class="menu-title">출고관리</span>
-			</a></li>
+				th:href="@{/bsn/delivery(menu='sales')}"> <i class="icon-grid menu-icon"></i> <span
+					class="menu-title">이동출고</span>
+			</a>
+			<div class="collapse" id="ui-basic-1">
+					<ul class="nav flex-column sub-menu">
+						<li class="nav-item"><a class="nav-link"
+							th:href="@{/bsn/delivery(menu='sales')}">이동출고관리</a></li>
+						<li class="nav-item"><a class="nav-link"
+							th:href="@{/bsn/delivery(menu='sales')}">이동출고조회(미완)</a></li>
+					</ul>
+				</div>
+			
+			</li>
 			<li class="nav-item"><a class="nav-link"
-				th:href="@{/bsn/order(menu='sales')}"> <i class="icon-grid menu-icon"></i> <span
+				th:href="@{/bsn/order/cs(menu='sales')}"> <i class="icon-grid menu-icon"></i> <span
 					class="menu-title">CS관리</span>
-			</a></li>
+			</a>
+			<div class="collapse" id="ui-basic-1">
+					<ul class="nav flex-column sub-menu">
+						<li class="nav-item"><a class="nav-link"
+							th:href="@{/bsn/order/cs/returning(menu='sales')}">CS관리</a></li>
+						<li class="nav-item"><a class="nav-link"
+							th:href="@{/bsn/order/cs/returning(menu='sales')}">CS조회</a></li>
+					</ul>
+				</div>
+			</li>
 		</ul>
 	</div>
 	<!-- 재고관리 사이드 바 -->

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beauty1nside.bsn.mapper.BsnCsMapper">
+    
+<!-- 교환및반품 조회 -->
+	<select id="selectBhfReturningList" resultType="BhfReturnListDTO" parameterType="BhfReturnListSearchDTO">
+		select returning_code, 
+			   request_date, 
+			   progress_status, 
+			   return_remark
+		from ( SELECT ROW_NUMBER() OVER (
+                         ORDER BY TO_NUMBER(REGEXP_SUBSTR(returning_code, '\d+')) desc
+                      ) AS RN,
+					  returning_code, 
+					  request_date, 
+					  progress_status, 
+					  return_remark
+		from  bhf_returning
+		
+	    WHERE <include refid="searchInfo"></include>
+		)
+		WHERE RN BETWEEN #{start} AND #{end}
+	</select>
+	
+	<!-- 페이징에 전체숫자 알려주기 위해서 -->
+	<select id="countBhfReturningList" parameterType="BhfReturnListSearchDTO">
+		SELECT COUNT(returning_code)
+		FROM bhf_returning
+		<where>
+			<include refid="searchInfo"></include>
+		</where>
+	</select>
+	
+	<!-- 검색조건(검색을 안하면 그냥 조회가 되게), 신청만 조회 -->
+	<sql id="searchInfo">
+		company_num = 1
+		AND progress_status = '신청'
+		<if test="requestDate != null and ! requestDate.equals('')">
+			AND TO_CHAR(request_date, 'yyyy-mm-dd') = #{requestDate}
+		</if>
+		<if test="branchOfficeId != null and ! branchOfficeId.equals('')">
+			AND branch_office_id LIKE '%' || #{branchOfficeId} || '%'
+		</if>
+	</sql>
+	
+	
+
+</mapper>
