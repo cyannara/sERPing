@@ -21,6 +21,7 @@ import com.beauty1nside.common.GridArray;
 import com.beauty1nside.common.Paging;
 import com.beauty1nside.common.dto.ComDTO;
 import com.beauty1nside.common.mapper.ErpComMapper;
+import com.beauty1nside.erp.dto.ContactRequestDTO;
 import com.beauty1nside.erp.dto.CustomerServiceDTO;
 import com.beauty1nside.erp.dto.ErpSearchDTO;
 import com.beauty1nside.erp.dto.ServiceReturnDTO;
@@ -378,6 +379,13 @@ public class ErpAdminRestController {
             response.put("message", "예상치 못한 오류 발생: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
+    }
+    
+    
+	@PostMapping("/phpcontact")
+    public String phpcontact(@RequestBody ContactRequestDTO dto) {
+		log.info(dto);
+       return null;
     }
     
 }

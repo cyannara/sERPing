@@ -2,7 +2,55 @@
 <html layout:decorate="~{/erp/layouts/usermain}">
 
 <main class="main" layout:fragment="usercontent">
+	<script>
+	document.addEventListener("DOMContentLoaded", function () {
+		  let form = document.getElementById("contactForm");
 
+		  form.addEventListener("submit", function (event) {
+		    event.preventDefault();
+
+		    let formData = new FormData(form);
+
+		    let loadingElement = document.querySelector(".loading");
+		    let errorMessageElement = document.querySelector(".error-message");
+		    let sentMessageElement = document.querySelector(".sent-message");
+
+		    loadingElement.style.display = "block";
+		    errorMessageElement.style.display = "none";
+		    sentMessageElement.style.display = "none";
+
+		    fetch("/templates/erp/forms/contact.php", {
+		      method: "POST",
+		      body: formData,
+		      headers: {
+		        "Accept": "application/json"
+		      },
+		      redirect: "manual" // 리다이렉트 방지
+		    })
+		      .then(response => {
+		        loadingElement.style.display = "none";
+
+		        if (response.status === 302) {
+		          throw new Error("서버에서 리다이렉트가 발생했습니다. 요청 URL을 확인하세요.");
+		        }
+
+		        return response.json();
+		      })
+		      .then(data => {
+		        if (data.status === "OK") {
+		          sentMessageElement.style.display = "block";
+		          form.reset();
+		        } else {
+		          throw new Error("문의 전송 실패: " + data.message);
+		        }
+		      })
+		      .catch(error => {
+		        errorMessageElement.innerHTML = error;
+		        errorMessageElement.style.display = "block";
+		      });
+		  });
+		});
+	</script>
     <!-- Page Title -->
     <div class="page-title accent-background">
       <div class="container d-lg-flex justify-content-between align-items-center">
@@ -62,7 +110,7 @@
           </div>
 
           <div class="col-lg-8">
-            <form action="forms/contact.php" method="post" role="form" class="php-email-form">
+            <form action="" method="post" role="form" id="contactForm" class="email-form">
               <div class="row">
                 <div class="col-md-6 form-group">
                   <input type="text" name="companyName" class="form-control" id="companyName" placeholder="회사명" required="">
@@ -82,6 +130,9 @@
               <div class="form-group mt-3">
                 <textarea class="form-control" id="inquiryContent" name="inquiryContent" placeholder="Message" required=""></textarea>
               </div>
+              <div class="loading" style="display: none;">전송 중...</div>
+			    <div class="error-message" style="display: none; color: red;"></div>
+			    <div class="sent-message" style="display: none; color: green;">문의가 성공적으로 전송되었습니다!</div>
               <div class="text-center"><button type="submit"><b>문의하기</b></button></div>
             </form>
           </div><!-- End Contact Form -->
