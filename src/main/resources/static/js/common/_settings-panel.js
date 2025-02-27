@@ -52,6 +52,13 @@ const setEmpList = (empList) => {
         // 이미지 태그 생성
         const img = document.createElement("img");
         img.src = emp.profileImage || '/file/image/mypage/profile/noProfileImg.jpg';
+
+        // when emp.profileImage has a value but no image existed
+        img.onerror = function () {
+            this.onerror = null; // 무한 루프 방지
+            this.src = "/file/image/mypage/profile/noProfileImg.jpg";
+        };
+
         img.alt = emp.employeeName;
 
         // 이름 태그 생성

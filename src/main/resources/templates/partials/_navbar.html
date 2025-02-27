@@ -77,7 +77,8 @@
       </li>
       <li class="nav-item nav-profile dropdown">
         <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="profileDropdown">
-          <img th:src="${session.profileImage}" alt="profile"/>
+          <img th:src="${session.profileImage}" alt="profile"
+               onerror="this.onerror=null; this.src='/file/image/mypage/profile/noProfileImg.jpg';"/>
         </a>
         <div class="dropdown-menu dropdown-menu-right navbar-dropdown" style="padding-top: 20px" aria-labelledby="profileDropdown">
           <span th:inline="text" sec:authentication="name" class="empId"></span>
