@@ -1,5 +1,6 @@
 package com.beauty1nside.security;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,11 +44,11 @@ public class WebSecurityConfig {
         .anyRequest().authenticated()
       )
 //    인증되지 않은 사용자가 API 호출 시 401 Unauthorized 반환.
-//      .exceptionHandling(ex -> ex
-//        .authenticationEntryPoint((request, response, authException) -> {
-//          response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-//        })
-//      )
+      .exceptionHandling(ex -> ex
+        .authenticationEntryPoint((request, response, authException) -> {
+          response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+        })
+      )
       .csrf(csrf -> csrf.ignoringRequestMatchers("/erp/rest/**"))  // /erp/rest/**` 경로의 CSRF 보호 해제 표하연 202502181029 추가
       .formLogin((form) -> form
         .loginPage("/login")

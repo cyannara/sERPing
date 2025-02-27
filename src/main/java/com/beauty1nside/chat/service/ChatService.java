@@ -10,4 +10,5 @@ import java.util.Map;
 public interface ChatService {
   List<EmpDTO> empList(Long companyNum);
   Map<Long, List<MessageDTO>> startChat(RoomDTO roomDTO);
+  MessageDTO sendMsg(MessageDTO messageDTO);
 }

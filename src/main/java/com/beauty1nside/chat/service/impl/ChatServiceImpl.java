@@ -8,6 +8,7 @@ import com.beauty1nside.hr.dto.EmpDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -40,5 +41,12 @@ public class ChatServiceImpl implements ChatService {
       returnValue.put(dto.getRoomId(), chatMapper.getMsgList(dto.getRoomId()));
       return returnValue;
     }
+  }
+  
+  @Override
+  @Transactional
+  public MessageDTO sendMsg(MessageDTO messageDTO) {
+    chatMapper.insertMsg(messageDTO);
+    return chatMapper.getMsgJustSent(messageDTO.getRoomId());
   }
 }

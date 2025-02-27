@@ -76,9 +76,11 @@
 
     .received {
         align-self: flex-start;
+        align-items: start;
     }
 
     .sent {
+        align-items: end;
         align-self: flex-end;
         text-align: right;
     }
