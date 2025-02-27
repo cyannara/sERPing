@@ -1,6 +1,6 @@
 package com.beauty1nside.purchs.dto;
 
-import java.util.Date;
+import java.sql.Date;
 
 import lombok.Data;
 

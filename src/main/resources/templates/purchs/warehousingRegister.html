@@ -828,19 +828,21 @@ function warehousingRegister(){
         }
         
         // ✅ orderPlanBodyNum이 없으면 null 처리
-        const purchaseBodyNum = item.purchaseBodyNum ? parseInt(item.purchaseBodyNum) : null;
+        const purchaseBodyNum = item.purchaseBodyNum;
 
         // ✅ 발주서 바디 추가 (숫자로 변환)
         groupedData[vendorId].files.push({
-            goodsStandard: item.goodsStandard,
-            warehouseId: parseInt(document.getElementById("warehouseId").value)||0,
-            warehousingStandardQuantity: parseInt(item.warehousingStandardQuantity)||0,
-            warehousingUnitPrice: parseInt(item.warehousingUnitPrice)||0,
+        	optionNum: parseInt(item.optionNum)||0,
+        	manufactureDate: item.manufactureDate,
+        	warehousingStandardQuantity: parseInt(item.warehousingStandardQuantity)||0,
+        	warehousingUnitPrice: parseInt(item.warehousingUnitPrice)||0,
             warehousingSupplyPrice: item.warehousingSupplyPrice,
             warehousingVat: item.warehousingVat,
-            optionNum: parseInt(item.optionNum)||0,
-            purchaseBodyNum: purchaseBodyNum,
-            manufactureDate: item.manufactureDate,
+            goodsStandard: item.goodsStandard,
+            warehouseId: parseInt(document.getElementById("warehouseId").value)||0,
+            purchaseBodyNum: (typeof purchaseBodyNum === 'string' ? parseInt(purchaseBodyNum.replace(/,/g, '')) : purchaseBodyNum) || null
+
+           
            
         });
     });
@@ -848,6 +850,34 @@ function warehousingRegister(){
  // groupedData를 배열로 변환 (각 그룹별 발주 데이터)
     const warehousingArray = Object.values(groupedData);
     console.log("서버로 전송할 데이터:", warehousingArray);
+    
+ // CSRF 토큰 및 헤더 정보 (meta 태그에서 미리 읽어옴)
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+    const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+
+    // 컨트롤러의 엔드포인트로 POST 요청 전송 (예: /purchs/rest/purchase/insert)
+    fetch("/purchs/rest/warehouse/insert", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            [csrfHeader]: csrfToken
+        },
+        body: JSON.stringify(warehousingArray)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === "success") {
+            showAlert("입고 등록 성공", "success");
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showAlert("입고 등록 실패", "danger");
+        }
+    })
+    .catch(error => {
+        console.error("입고 등록 오류:", error);
+        showAlert("서버 오류: " + error, "danger");
+    });
+
 
 }
 	

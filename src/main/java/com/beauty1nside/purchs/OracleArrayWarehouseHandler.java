@@ -39,7 +39,7 @@ public class OracleArrayWarehouseHandler implements TypeHandler<Object> {
 	    
 	    // parameter가 null이면 명시적으로 null 설정
 	    if (parameter == null) {
-	        ps.setNull(i, java.sql.Types.ARRAY, "purchs_warehouse_file_array");
+	        ps.setNull(i, java.sql.Types.ARRAY, "PURCHS_WAREHOUSE_FILE_ARRAY");
 	        return;
 	    }
 	    
@@ -47,7 +47,7 @@ public class OracleArrayWarehouseHandler implements TypeHandler<Object> {
 	    
 	    // 빈 리스트인 경우 빈 ARRAY 생성
 	    if (files.isEmpty()) {
-	        Array emptyArray = conn.createOracleArray("purchs_warehouse_file_array", new Struct[0]);
+	        Array emptyArray = conn.createOracleArray("PURCHS_WAREHOUSE_FILE_ARRAY", new Struct[0]);
 	        ps.setArray(i, emptyArray);
 	        return;
 	    }
@@ -57,20 +57,20 @@ public class OracleArrayWarehouseHandler implements TypeHandler<Object> {
 	    try {
 	        for (WarehouseInsertDtlVO file : files) {
 	            Object[] filetype = new Object[9];
-	            filetype[0] = file.getGoodsStandard();
-	            filetype[1] = new BigDecimal(file.getWarehouseId());
-	            filetype[2] = new BigDecimal(file.getWarehousingStandardQuantity());
-	            filetype[3] = new BigDecimal(file.getWarehousingUnitPrice());
-	            filetype[4] = new BigDecimal(file.getWarehousingSupplyPrice());
-	            filetype[5] = new BigDecimal(file.getWarehousingVat());
-	            filetype[6] = new BigDecimal(file.getOptionNum());
-	            filetype[7] = new BigDecimal(file.getPurchaseBodyNum());// null이면 그대로 null 전송
-	            filetype[7] = file.getManufactureDate();
+	            filetype[0] = new BigDecimal(file.getOptionNum());
+	            filetype[1] = new BigDecimal(file.getWarehousingStandardQuantity());
+	            filetype[2] = new BigDecimal(file.getWarehousingUnitPrice());
+	            filetype[3] = new BigDecimal(file.getWarehousingSupplyPrice());
+	            filetype[4] = new BigDecimal(file.getWarehousingVat());
+	            filetype[5] = new BigDecimal(file.getWarehouseId());
+	            filetype[6] = file.getManufactureDate();
+	            filetype[7] = file.getPurchaseBodyNum();// null이면 그대로 null 전송
+	            filetype[8] = file.getGoodsStandard();
 	            // Oracle 내부 타입은 "PURCHS_ORDER_FILE_TYPE" (대문자, 언더바 포함)
-	            array[arrayIndex++] = conn.createStruct("purchs_warehouse_file_type", filetype);
+	            array[arrayIndex++] = conn.createStruct("PURCHS_WAREHOUSE_FILE_TYPE", filetype);
 	        }
 	        // Oracle 내부 타입 배열 이름은 "PURCHS_ORDER_FILE_ARRAY"
-	        Array filearray = conn.createOracleArray("purchs_warehouse_file_Array", array);
+	        Array filearray = conn.createOracleArray("PURCHS_WAREHOUSE_FILE_ARRAY", array);
 	        ps.setArray(i, filearray);
 	    } catch (SQLException e) {
 	        e.printStackTrace();
