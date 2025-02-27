@@ -89,6 +89,10 @@ const getEmpList = () => {
     }).then((result) => {
         return result.json()
     }).then((data) => {
+        // when no other employees in the same company
+        if(!data.length) {
+            return
+        }
         const me = data.find(emp => emp.employeeNum === Number(sessionEmployeeNum))
         const notMe = data.filter(emp => emp.employeeNum !== Number(sessionEmployeeNum))
 
