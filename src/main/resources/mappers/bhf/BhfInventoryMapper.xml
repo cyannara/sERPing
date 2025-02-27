@@ -48,6 +48,7 @@
 				OPTION_CODE,
 				OPTION_NAME,
 				GOODS_STANDARD,
+				QUANTITY,
 				MEDIATION_QUANTITY,
 				MEDIATION_REASON
 		from  ( select	rownum rn,
@@ -56,6 +57,7 @@
 						OPTION_CODE,
 						OPTION_NAME,
 						GOODS_STANDARD,
+						QUANTITY,
 						MEDIATION_QUANTITY,
 						MEDIATION_REASON
 				from 	bhf_goods_mediation
@@ -102,7 +104,7 @@
 	
 	<!-- 검색조건(검색을 안하면 그냥 조회가 되게) -->
 	<sql id="searchInfo">
-		company_num = 1<!-- #{companyNum}  --> 
+		company_num = #{companyNum} AND branch_office_id = #{branchOfficeId}
 		<if test="goodsName != null and ! goodsName.equals('')">
 			AND goods_name Like '%' || #{goodsName} || '%'
 		</if>

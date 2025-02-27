@@ -43,7 +43,7 @@
 	
 	<!-- 검색조건(검색을 안하면 그냥 조회가 되게) -->
 	<sql id="searchInfo">
-			g.company_num = 1<!-- #{companyNum}  -->
+			g.company_num = #{companyNum}
 			<if test="goodsCode != null and ! goodsCode.equals('')">
 				AND goods_code Like '%' || #{goodsCode} || '%'
 			</if>

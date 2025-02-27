@@ -39,7 +39,7 @@
 		<![CDATA[
 			where rownum <= #{end}
 		]]>
-			and w.option_code = bhf_option_code(#{optionBarcode}) and w.company_num = 1 and w.branch_office_id = 'YEDAM'
+			and w.option_code = bhf_option_code(#{optionBarcode}) and w.company_num = #{companyNum} and w.branch_office_id = #{branchOfficeId}
 			)
 		where rn >= #{start}
 	</select>

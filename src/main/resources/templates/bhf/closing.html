@@ -38,7 +38,7 @@
 			<div class="col-md-6 mt-2 mb-5">
 				<div class="row">
 					<label class="col-sm-4">주문 지점</label> 
-					<input type="text"class="col-sm-7" id="branchOfficeId">
+					<input type="text"class="col-sm-7" id="branchOfficeId" readonly>
 				</div>
 			</div>
 			<div class="col-md-12 stretch-card mt-2 mb-2">
@@ -55,27 +55,27 @@
 					<div class="card-body">
 						<div class="row mt-3 mb-3">
 							<label class="col-sm-4">영업 준비금</label> 
-							<input type="text"class="col-sm-7" id="businessReserves">
+							<input type="text"class="col-sm-7" id="businessReserves" style="text-align: right">
 						</div>
 						<div class="row mt-3 mb-3">
 							<label class="col-sm-4">현금 금액</label> 
-							<input type="text"class="col-sm-7" id="cashAmount">
+							<input type="text"class="col-sm-7" id="cashAmount" style="text-align: right">
 						</div>
 						<div class="row mt-3 mb-3">
 							<label class="col-sm-4">현금 시재</label> 
-							<input type="text"class="col-sm-7" id="cashPresent">
+							<input type="text"class="col-sm-7" id="cashPresent" style="text-align: right">
 						</div>
 						<div class="row mt-3 mb-3">
 							<label class="col-sm-4">카드 금액</label> 
-							<input type="text"class="col-sm-7" id="cardAmount">
+							<input type="text"class="col-sm-7" id="cardAmount" style="text-align: right">
 						</div>
 						<div class="row mt-3 mb-3">
 							<label class="col-sm-4">매출 금액</label> 
-							<input type="text"class="col-sm-7" id="saleAmount">
+							<input type="text"class="col-sm-7" id="saleAmount" style="text-align: right">
 						</div>
 						<div class="row mt-3 mb-3">
 							<label class="col-sm-4">이체 금액</label> 
-							<input type="text"class="col-sm-7" id="transferAmount">
+							<input type="text"class="col-sm-7" id="transferAmount" style="text-align: right">
 						</div>
 					</div>
 				</div>
@@ -99,12 +99,32 @@
 		</div>
 	</div>
 	
-	<script>
+	<script th:inline="javascript">
+		
 		var Grid = tui.Grid;
 		
 		const header = document.querySelector('meta[name="_csrf_header"]').content; //서버에서 요구하는 CSRF 헤더이름
 	    const token = document.querySelector('meta[name="_csrf"]').content; //서버에서 생성한 CSRF 토큰 값
-	
+
+		//회사번호 땡겨오기
+		let sessioCompanyNum = [[${session.companyNum}]];
+		let departmentNum = [[${session.departmentNum}]];
+		
+		function getDeptName() {
+			fetch(`/deptName/${departmentNum}`)
+	        .then(response => {
+	            return response.text(); // 서버에서 문자열(부서명) 응답을 받음
+	        })
+	        .then(data => {
+	            document.getElementById("branchOfficeId").value = data; // 부서명 필드에 값 넣기
+	        })
+	        .catch(error => console.error("부서명 가져오기 실패:", error)); 
+        }
+		
+		document.addEventListener("DOMContentLoaded",()=>{
+			getDeptName();
+		})
+
 		const grid = new Grid({
 			el: document.getElementById('salesNum'), 
 			pageOptions: {
@@ -112,11 +132,11 @@
 				perPage: 5,
 			},
 			columns: [ 
-				{ header : "상품코드", name : "goodsCode"},
-				{ header : "상품명", name : "goodsName"},
-				{ header : "옵션코드", name : "optionCode"},
-				{ header : "옵션명", name : "optionName"},
-				{ header : "판매량", name : "bnfSleQy"}
+				{ header : "상품코드", name : "goodsCode", align: 'center'},
+				{ header : "상품명", name : "goodsName", align: 'center'},
+				{ header : "옵션코드", name : "optionCode", align: 'center'},
+				{ header : "옵션명", name : "optionName", align: 'center'},
+				{ header : "판매량", name : "bnfSleQy", align: 'center'}
 			],
 			data: ""
 		});
@@ -226,11 +246,11 @@
 		        cardAmount: document.getElementById("cardAmount").value,
 		        saleAmount: document.getElementById("saleAmount").value,
 		        transferAmount: document.getElementById("transferAmount").value,
-		        companyNum: 1,
+		        companyNum: sessioCompanyNum,
 		        files: grid.getData()  // Grid 데이터 포함
 		    };
 
-		    fetch("http://localhost:81/bhf/rest/close/insert", {
+ 		    fetch("http://localhost:81/bhf/rest/close/insert", {
 		        method: "POST",
 		        headers: { 
 		        	"Content-Type": "application/json" ,
@@ -259,7 +279,7 @@
 		            alert("마감 정산 등록 실패: " + data.message);
 		        }
 		    })
-		    .catch(error => console.error("업로드 실패", error));
+		    .catch(error => console.error("업로드 실패", error)); 
 		}
 		
 	</script>

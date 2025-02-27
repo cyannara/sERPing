@@ -41,7 +41,7 @@
 			<div class="col-md-6 mt-2 mb-2">
 				<div class="row">
 					<label class="col-sm-4">주문 지점</label> 
-					<input type="text"class="col-sm-7" id="branchOfficeId"> <!-- 원래 readonly하고 주문지점이 자동으로 들어가야하나 지금 가져올떄가 없음 -->
+					<input type="text"class="col-sm-7" id="branchOfficeId" readonly>
 				</div>
 			</div>
 			<div class="col-md-6 mt-2 mb-2">
@@ -95,23 +95,40 @@
 		</div>
 	</div>
 	
-	<script>
+	<script th:inline="javascript">
+	
 		// layout.html <meta>태그에 있는 값 불러오기
 		const header = document.querySelector('meta[name="_csrf_header"]').content; //서버에서 요구하는 CSRF 헤더이름
 	    const token = document.querySelector('meta[name="_csrf"]').content; //서버에서 생성한 CSRF 토큰 값
 		
 		var Grid = tui.Grid;
 		
+		//회사번호랑 지점 땡겨오기
+		let sessioCompanyNum = [[${session.companyNum}]];
+		let departmentNum = [[${session.departmentNum}]];
+		
+		function getDeptName() {
+			fetch(`/deptName/${departmentNum}`)
+	        .then(response => {
+	            return response.text(); // 서버에서 문자열(부서명) 응답을 받음
+	        })
+	        .then(data => {
+	            document.getElementById("branchOfficeId").value = data; // 부서명 필드에 값 넣기
+	        })
+	        .catch(error => console.error("부서명 가져오기 실패:", error)); 
+        }
+		
 		//페이지가 로드되면 테이블에 데이터가 없을때 뜨는 문구 함수 실행
 		document.addEventListener("DOMContentLoaded",()=>{
 			OPnodata();
 			ODnodata();
+			getDeptName();
 		})
 		
 		// 상품조회 쿼리 호출
 		const dataSource = {
 			api: {
-				readData: { url: 'http://localhost:81/bhf/rest/goods/list', method: 'GET', initParams: { page: 1 }},
+				readData: { url: 'http://localhost:81/bhf/rest/goods/list', method: 'GET', initParams: { page: 1, companyNum: sessioCompanyNum }},
 			},
 			contentType: 'application/json'
 			
@@ -124,9 +141,9 @@
 				perPage: 5,
 			},
 			columns: [ 
-				{ header : "상품코드", name : "goodsCode"},
-				{ header : "상품명", name : "goodsName"},
-				{ header : "규격", name : "goodsStandard"}
+				{ header : "상품코드", name : "goodsCode", align: 'center'},
+				{ header : "상품명", name : "goodsName", align: 'center'},
+				{ header : "규격", name : "goodsStandard", align: 'center'}
 			],
 			data: dataSource
 		});
@@ -137,7 +154,7 @@
 				const rowData = grid.getRow(rowKey);  //해당 행의 데이터 가져오기
 				const goodsCode = rowData.goodsCode;  //url의 보내기 위해서 변수담기	
 				// 옵션조회 쿼리 호출(goodsCode)
-			    fetch('http://localhost:81/bhf/rest/option/list?goodsCode=' + goodsCode, {
+			    fetch(`http://localhost:81/bhf/rest/option/list?goodsCode=${goodsCode}&companyNum=${sessioCompanyNum}`, {
 			        method: 'GET',
 			        headers: {
 			            'Content-Type': 'application/json'
@@ -158,9 +175,9 @@
 				perPage: 5
 			},
 			columns: [ 
-				{ header : "상품코드", name : "goodsCode"},
-				{ header : "옵션코드", name : "optionCode"},
-				{ header : "옵션명", name : "optionName"}
+				{ header : "상품코드", name : "goodsCode", align: 'center'},
+				{ header : "옵션코드", name : "optionCode", align: 'center'},
+				{ header : "옵션명", name : "optionName", align: 'center'}
 			],
 			data: "",
 		});
@@ -202,14 +219,15 @@
 				perPage: 5
 			}, */
 			columns: [ 
-				{ header : "상품코드", name : "goodsCode"},
-				{ header : "상품명", name : "goodsName"},
-				{ header : "옵션코드", name : "optionCode"},
-				{ header : "옵션명", name : "optionName"},
-				{ header : "규격", name : "goodsStandard"},
+				{ header : "상품코드", name : "goodsCode", align: 'center'},
+				{ header : "상품명", name : "goodsName", align: 'center'},
+				{ header : "옵션코드", name : "optionCode", align: 'center'},
+				{ header : "옵션명", name : "optionName", align: 'center'},
+				{ header : "규격", name : "goodsStandard", align: 'center'},
 				{ 
 					header : "발주수량", 
 					name : "quantity", 
+					align: 'center',
 					editor: 'text',
 					onAfterChange: function(ev) { // onAfterChange는 해당 열에 변경이 있을때마다 호출되는 이벤트
 		                // ev.value:사용자가 입력한 값, ev.rowkey:변경된 셀이 어떤 행인지 알려주는 키
@@ -255,7 +273,7 @@
 		        branchOfficeId: document.querySelector('#branchOfficeId').value, //주문 지점
 		        dueDate: document.querySelector('#dueDate').value,  // 납기 일자
 		        remark: document.querySelector('#remark').value,  // 비고
-		        companyNum: 1 // 아직 회사번호를 가져올떄가 없어서 1로 넣었놨음
+		        companyNum: sessioCompanyNum
 		    };
 	 	    fetch("http://localhost:81/bhf/rest/order/insert", {
 		        method: "POST",
@@ -289,7 +307,6 @@
 		
 		// 초기화 버튼 함수
 		function orderReset(){
-			document.getElementById('branchOfficeId').value = "";
 			document.getElementById('dueDate').value = "";
 			document.getElementById('remark').value = "";
 			grid2.resetData([]);
@@ -305,6 +322,8 @@
 			let goodsName = document.querySelector('#goodsName').value;
 			grid.setRequestParams({"goodsName" : goodsName})
 			grid.readData();
+			grid2.resetData([]);
+			OPnodata();
 		}
 		
 		// 옵션 테이블 데이터 없을때 나오는 문구

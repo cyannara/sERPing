@@ -40,10 +40,7 @@
 	
 	<!-- 검색조건(검색을 안하면 그냥 조회가 되게) -->
 	<sql id="searchInfo">
-		company_num = 1<!-- #{companyNum}  -->
-		<if test="branchOfficeId != null and ! branchOfficeId.equals('')">
-			AND branch_office_id LIKE '%' || #{branchOfficeId} || '%'
-		</if>
+		company_num = #{companyNum} AND branch_office_id = #{branchOfficeId}
 		<if test="progressStatus != null and ! progressStatus.equals('')">
 			AND progress_status = #{progressStatus}
 		</if>

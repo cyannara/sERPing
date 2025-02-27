@@ -11,6 +11,8 @@ public class BhfInventoryListDTO {
 	private String optionName;
 	private String goodsStandard;
 	private int stockQuantity;
+	private int quantity;
+	private int mediationQuantity;
 	
 	private String warehouseCode;
 	private String branchOfficeId;
