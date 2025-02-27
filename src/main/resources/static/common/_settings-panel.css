@@ -126,5 +126,10 @@
         cursor: pointer;
     }
 
+    .file-btn {
+        border: none;
+        background: none;
+    }
+
 }
 

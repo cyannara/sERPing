@@ -1,5 +1,6 @@
 <body th:fragment="panel">
 <input type="hidden" id="sessionEmployeeNum" th:value="${session.employeeNum}"/>
+<input type="hidden" id="sessionEmployeeName" th:value="${session.sessionEmployeeName}"/>
 
 <div class="theme-setting-wrapper">
   <div id="settings-trigger"><i class="ti-settings"></i></div>
@@ -97,24 +98,7 @@
       </ul>
     </div>
     <div class="tab-pane fade scroll-wrapper" id="room-section" role="tabpanel" aria-labelledby="room-section">
-      <div class="chat-messages">
-        <div class="chat-message received">
-          <span class="sender-name">김채채</span>
-          <div class="message-box yellow">
-            안녕하세요~^^<br>설날 잘 보내세요!
-          </div>
-          <span class="message-time">2025-02-03 10:34</span>
-        </div>
-
-        <div class="chat-message sent">
-          <span class="sender-name">홍길동</span>
-          <div class="message-box dark">
-            네🧡🧡💛💛💚💚
-          </div>
-          <span class="message-time">2025-02-03 10:35</span>
-        </div>
-      </div>
-
+      <div class="chat-messages" id="chatMessages"></div>
       <div class="chat-input">
         <label>
           <textarea id="textarea" placeholder="메시지를 입력하세요..."></textarea>
