@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beauty1nside.bhf.mapper.BhfInventoryListMapper">
+	
+	<!-- 조정 내역 조회 -->
+	<select id="invenHistory" resultType="BhfInventoryInsertDTO" parameterType="BhfInventoryListSearchDTO">
+		select  GOODS_CODE,
+				GOODS_NAME,
+				OPTION_CODE,
+				OPTION_NAME,
+				GOODS_STANDARD,
+				QUANTITY,
+				MEDIATION_QUANTITY,
+				MEDIATION_REASON
+		from  ( select	rownum rn,
+						GOODS_CODE,
+						GOODS_NAME,
+						OPTION_CODE,
+						OPTION_NAME,
+						GOODS_STANDARD,
+						QUANTITY,
+						MEDIATION_QUANTITY,
+						MEDIATION_REASON
+				from 	bhf_goods_mediation
+		<![CDATA[
+				where rownum <= #{end}
+		]]>
+				and <include refid="searchInfo"></include>
+				)
+		where rn >= #{start}
+	</select>
+	
+	<!-- 페이징에 전체숫자 알려주기 위해서 -->
+	<select id="count" parameterType="BhfInventoryListSearchDTO">
+		SELECT COUNT(mediation_code)
+		FROM bhf_goods_mediation
+		<where>
+			<include refid="searchInfo"></include>
+		</where>
+	</select>
+	
+	<!-- 검색조건(검색을 안하면 그냥 조회가 되게) -->
+	<sql id="searchInfo">
+		company_num = #{companyNum} AND branch_office_id = #{branchOfficeId}
+		<if test="goodsName != null and ! goodsName.equals('')">
+			AND goods_name Like '%' || #{goodsName} || '%'
+		</if>
+	</sql>
+	
+</mapper>

@@ -12,25 +12,20 @@
 		<div class="row">
 			<h3 class="mt-2 mb-2">재고 조정 내역</h3>
 			<hr>
-			<div id="rayout-container" class="row">
-			<div class="col-9"></div>
-			<!-- 그리드 표시 수량 인풋 -->
-			<div class="col-3 row ">
-				<div class="col-3"></div>
-				<span class="label-search col-5" style="font-size: 1em">표시수량</span>
-				<select name="display_amount" id="display_amount" class="col-4 input-box" onchange="changeDisplay()">
-					<option value="5" selected>5</option>
-					<option value="10">10</option>
-					<option value="20">20</option>
-					<option value="50">50</option>
-					<option value="100">100</option>
-				</select>
-				</div>
-			</div>
 			<div class="col-md-12 stretch-card mt-5 mb-5">
 				<div class="card">
 					<div class="card-body">
-						<h6 class="mb-4">조정 내역 조회</h6>
+						<div id="rayout-container" class="row mb-3">
+							<h6 class=" col-sm-9">조정 내역 조회</h6>
+							<span class="label-search col-sm-1" style="font-size: 1em">표시수량</span>
+							<select name="display_amount" id="display_amount" class="col-sm-1 input-box" onchange="changeDisplay()">
+								<option value="5" selected>5</option>
+								<option value="10">10</option>
+								<option value="20">20</option>
+								<option value="50">50</option>
+								<option value="100">100</option>
+							</select>
+						</div>
 						<div id="invenHistory"></div>
 						<div id="pagination" class="tui-pagination"></div>
 						<div style="text-align : right">

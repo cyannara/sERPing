@@ -15,9 +15,6 @@ public interface BhfInventoryMapper {
 	// 조정 등록 후 창고 수량더하기
 	int quantityPlus(BhfInventoryInsertDTO dto);
 	
-	// 조정 내역 조회
-	List<BhfInventoryInsertDTO> invenHistory(BhfInventoryListSearchDTO dto);
-	
 	// 창고 재고 조회
     List<BhfInventoryListDTO> warehouseList(BhfInventoryListSearchDTO dto);
     

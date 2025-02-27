@@ -41,34 +41,6 @@
 	    WHERE 	option_code = #{optionCode}
 	</update>
 	
-	<!-- 조정 내역 조회 -->
-	<select id="invenHistory" resultType="BhfInventoryInsertDTO" parameterType="BhfInventoryListSearchDTO">
-		select  GOODS_CODE,
-				GOODS_NAME,
-				OPTION_CODE,
-				OPTION_NAME,
-				GOODS_STANDARD,
-				QUANTITY,
-				MEDIATION_QUANTITY,
-				MEDIATION_REASON
-		from  ( select	rownum rn,
-						GOODS_CODE,
-						GOODS_NAME,
-						OPTION_CODE,
-						OPTION_NAME,
-						GOODS_STANDARD,
-						QUANTITY,
-						MEDIATION_QUANTITY,
-						MEDIATION_REASON
-				from 	bhf_goods_mediation
-		<![CDATA[
-				where rownum <= #{end}
-		]]>
-				and <include refid="searchInfo"></include>
-				)
-		where rn >= #{start}
-	</select>
-	
 	<!-- 창고 재고 조회 -->
 	<select id="warehouseList" resultType="BhfInventoryListDTO" parameterType="BhfInventoryListSearchDTO">
 		select  goods_code, 
@@ -95,7 +67,7 @@
 	
 	<!-- 페이징에 전체숫자 알려주기 위해서 -->
 	<select id="count" parameterType="BhfInventoryListSearchDTO">
-		SELECT COUNT(warehouse_code)
+		SELECT COUNT(option_code)
 		FROM bhf_warehouse
 		<where>
 			<include refid="searchInfo"></include>

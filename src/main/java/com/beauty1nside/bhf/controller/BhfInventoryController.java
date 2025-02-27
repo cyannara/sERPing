@@ -86,29 +86,5 @@ public class BhfInventoryController {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 	    }
 	} 
-	
-	// 조정 내역 조회
-	@GetMapping("/inventory/history")
-	public Object invenHistory(@RequestParam(name = "perPage", defaultValue = "2", required = false) int perPage, 
-							@RequestParam(name = "page", defaultValue = "1", required = false) int page, 
-							BhfInventoryListSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
-		// 페이징 유닛 수
-		paging.setPageUnit(perPage);
-		paging.setPage(page);
-		
-		log.info(dto);
-		
-		// 페이징 조건
-		dto.setStart(paging.getFirst());
-		dto.setEnd(paging.getLast());
-		
-		// 페이징 처리
-		paging.setTotalRecord(service.count(dto));
-		
-		// grid 배열 처리
-		GridArray grid = new GridArray();
-		Object result = grid.getArray( paging.getPage(), service.count(dto), service.invenHistory(dto) );
-		return result;
-	}
 
 }
