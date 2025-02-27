@@ -406,7 +406,7 @@ ORDER BY result_date desc,
          option_code 
 
 ;
-UNION ALL
+-- UNION ALL
 
 SELECT TO_CHAR(result_date, 'YYYY-MM-DD') as result_date,
        b.office_id,
@@ -430,37 +430,7 @@ ORDER BY result_date desc,
 ;
 
 
--- À¯´Ï¿ÂÀ¸·Î µÎ Å×ÀÌºí ÇÕÄ¥°Å
 
-SELECT TO_CHAR(c.result_date, 'YYYY-MM') as result_date,
-       c.office_id,
-       c.option_code,
-       c.option_name,
-       SUM(c.qy)
-FROM (SELECT br.request_date AS result_date, 
-             br.branch_office_id AS office_id,
-             brd.option_code,
-             brd.goods_name || '-' || brd.option_name AS option_name,
-             0 - NVL(brd.quantity, 0) AS qy
-      FROM bhf_returning br JOIN bhf_returning_detail brd
-             ON (br.returning_code = brd.returning_code)
-      WHERE brd.returning_reason IN ('ÆÄ¼Õ', 'Âî±×·¯Áü')
-UNION ALL
-      SELECT mediation_date AS result_date, 
-            branch_office_id AS office_id, 
-            option_code, 
-            goods_name || '-' || option_name AS option_name, 
-            NVL(quantity, 0) - NVL(mediation_quantity, 0) AS qy
-      FROM bhf_goods_mediation ) c
-GROUP BY TO_CHAR(result_date, 'YYYY-MM'),
-         office_id, 
-         option_code, 
-         option_name
---HAVING option_code = 'LH0011'
-ORDER BY result_date desc, 
-         office_id, 
-         option_code 
-;
 
 
 create or replace FUNCTION fn_get_goods_code(p_option_code number)
@@ -502,3 +472,132 @@ select fn_get_cmmn_name(rental_type)
 FROM bsn_bhf;
 
 select * from cmmn;
+
+-- 2025-02-27
+
+SELECT
+    * FROM bsn_bhf;
+
+select * from hr_employee;
+
+-- À¯´Ï¿ÂÀ¸·Î µÎ Å×ÀÌºí ÇÕÄ¥°Å
+SELECT b.result_date, b.office_id, b.sell_qy, b.minus_qy, b.total_price
+FROM (  SELECT rownum rn, a.*
+        FROM (  SELECT -- 'asd' AS result_date,
+                       TRUNC(c.result_date) result_date,
+                       c.office_id,
+                       SUM(c.sell_qy) AS sell_qy,
+                       SUM(c.qy) AS minus_qy,
+                       SUM(c.total_price) AS total_price
+                FROM (SELECT br.branch_office_id AS office_id,
+                             brd.option_code,
+                             brd.goods_name || '-' || brd.option_name AS option_name,
+                             br.request_date AS result_date, 
+                             0 - NVL(brd.quantity, 0) AS qy,
+                             0 AS sell_qy,
+                             company_num,
+                             fn_get_option_price(brd.option_code) * (0 - NVL(brd.quantity, 0)) AS total_price
+                      FROM bhf_returning br JOIN bhf_returning_detail brd
+                             ON (br.returning_code = brd.returning_code)
+                      WHERE brd.returning_reason IN ('ÆÄ¼Õ', 'Âî±×·¯Áü')
+                UNION ALL
+                      SELECT branch_office_id AS office_id, 
+                             option_code, 
+                             goods_name || '-' || option_name AS option_name, 
+                             mediation_date AS result_date, 
+                             NVL(quantity, 0) - NVL(mediation_quantity, 0) AS qy,
+                             0 AS sell_qy,
+                             company_num ,
+                             fn_get_option_price(option_code) * (NVL(quantity, 0) - NVL(mediation_quantity, 0)) AS total_price
+                      FROM bhf_goods_mediation
+                UNION ALL
+                        SELECT bc.branch_office_id AS office_id,
+                               bcd.option_code,
+                               bcd.goods_name || '-' ||bcd.option_name AS option_name,
+                               bc.closing_date AS result_date,
+                               0 AS qy,
+                               bcd.bnf_sle_qy AS sell_qy,
+                               company_num,
+                               fn_get_option_price(bcd.option_code) * (bcd.bnf_sle_qy) AS total_price
+                        FROM bhf_closing bc JOIN bhf_closing_detail bcd
+                        ON (bc.closing_code = bcd.closing_code)
+                      ) c
+                WHERE c.company_num = 1
+                GROUP BY TRUNC(result_date),
+                         office_id 
+                -- HAVING SUM(c.sell_qy) > 0
+                ORDER BY result_date desc, 
+                         office_id 
+                         ) a ) b
+WHERE b.rn >= 1
+AND b.rn < 41
+;
+
+SELECT goods_price
+FROM purchse_goods pg JOIN  purchse_option po
+ON (pg.goods_num = po.goods_num)
+WHERE po.option_code = 'LH0011';
+
+create or replace function fn_get_option_price(p_option_code varchar2)
+return int
+is
+ v_result number;
+begin
+    SELECT goods_price
+    INTO v_result
+    FROM purchse_goods pg JOIN  purchse_option po
+    ON (pg.goods_num = po.goods_num)
+    WHERE po.option_code = p_option_code;
+    
+    return v_result;
+end;
+/
+
+SELECT -- 'asd' AS result_date,
+                       TRUNC(c.result_date) result_date,
+                       c.office_id,
+                       SUM(c.sell_qy) AS sell_qy,
+                       SUM(c.qy) AS minus_qy,
+                       SUM(c.total_qy) AS total_qy
+                FROM (SELECT br.branch_office_id AS office_id,
+                             brd.option_code,
+                             brd.goods_name || '-' || brd.option_name AS option_name,
+                             br.request_date AS result_date, 
+                             0 - NVL(brd.quantity, 0) AS qy,
+                             0 AS sell_qy,
+                             company_num,
+                             fn_get_option_price(brd.option_code) * (0 - NVL(brd.quantity, 0)) AS total_price
+                      FROM bhf_returning br JOIN bhf_returning_detail brd
+                             ON (br.returning_code = brd.returning_code)
+                      WHERE brd.returning_reason IN ('ÆÄ¼Õ', 'Âî±×·¯Áü')
+                UNION ALL
+                      SELECT branch_office_id AS office_id, 
+                             option_code, 
+                             goods_name || '-' || option_name AS option_name, 
+                             mediation_date AS result_date, 
+                             NVL(quantity, 0) - NVL(mediation_quantity, 0) AS qy,
+                             0 AS sell_qy,
+                             company_num ,
+                             fn_get_option_price(option_code) * (NVL(quantity, 0) - NVL(mediation_quantity, 0)) AS total_price
+                      FROM bhf_goods_mediation
+                UNION ALL
+                        SELECT bc.branch_office_id AS office_id,
+                               bcd.option_code,
+                               bcd.goods_name || '-' ||bcd.option_name AS option_name,
+                               bc.closing_date AS result_date,
+                               0 AS qy,
+                               bcd.bnf_sle_qy AS sell_qy,
+                               company_num,
+                               fn_get_option_price(bcd.option_code) * (bcd.bnf_sle_qy) AS total_price
+                        FROM bhf_closing bc JOIN bhf_closing_detail bcd
+                        ON (bc.closing_code = bcd.closing_code)
+                      ) c
+                WHERE c.company_num = 1
+                GROUP BY TRUNC(result_date),
+                         office_id 
+                -- HAVING SUM(c.sell_qy) > 0
+                ORDER BY result_date desc, 
+                         office_id
+;
+
+select To_DATE('2025-02-25') - 2 from dual;

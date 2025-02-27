@@ -32,6 +32,7 @@ import com.beauty1nside.accnut.dto.EtcBookSearchDTO;
 import com.beauty1nside.accnut.dto.IncidentalCostSearchDTO;
 import com.beauty1nside.accnut.dto.SalaryBookDTO;
 import com.beauty1nside.accnut.dto.SalaryBookSearchDTO;
+import com.beauty1nside.accnut.dto.SellingSearchDTO;
 import com.beauty1nside.accnut.service.AssetService;
 import com.beauty1nside.accnut.service.DealBookService;
 import com.beauty1nside.accnut.service.DebtService;
@@ -40,6 +41,7 @@ import com.beauty1nside.accnut.service.IncidentalCostService;
 import com.beauty1nside.accnut.service.JsonQueryService;
 import com.beauty1nside.accnut.service.OtherService;
 import com.beauty1nside.accnut.service.SalaryBookService;
+import com.beauty1nside.accnut.service.SellingService;
 import com.beauty1nside.common.GridArray;
 import com.beauty1nside.common.GridData;
 import com.beauty1nside.common.Paging;
@@ -67,6 +69,7 @@ public class AccnutRestController {
 	final JsonQueryService jsonQueryService;
 	RestTemplate restTemplate;
 	final OtherService otherService;
+	final SellingService sellingService;
 	
 	
 	// 목록 조회 ------------------------------------------------------------------------------------------
@@ -250,10 +253,10 @@ public class AccnutRestController {
     }
 	
     @GetMapping("option/list")
-    public ResponseEntity<Map<String, Object>> optionList(@RequestParam String goodsName) {
+    public ResponseEntity<Map<String, Object>> optionList(@RequestParam String goodsName, @RequestParam int companyNum) {
     	Map<String, Object> response = new HashMap<>();
     	try {
-    		List<Map<String, Object>> result = otherService.optionList(goodsName, 1);
+    		List<Map<String, Object>> result = otherService.optionList(goodsName, companyNum);
 	        response.put("status", "success");
 	        response.put("message", "조회 성공");
 	        response.put("result", result);
@@ -283,6 +286,53 @@ public class AccnutRestController {
 	    }
     	
     }
+    
+    @GetMapping("/selling/list")
+	public Object sellinglList(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage, 
+			@RequestParam(name = "page", defaultValue = "1", required = false) int page, 
+			SellingSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
+		// 페이징 유닛 수
+		paging.setPageUnit(perPage);
+		paging.setPage(page);
+		
+		log.info(dto);
+		
+		// 페이징 조건
+		dto.setStart(paging.getFirst());
+		dto.setEnd(paging.getLast());
+		
+		// 페이징 처리
+		paging.setTotalRecord(sellingService.listCount(dto));
+		
+		// grid 배열 처리
+		GridArray grid = new GridArray();
+		Object result = grid.getArray( paging.getPage(), sellingService.listCount(dto), sellingService.list(dto) );
+		return result;
+	}
+    
+    @GetMapping("/selling/info")
+	public Object sellinglInfo(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage, 
+			@RequestParam(name = "page", defaultValue = "1", required = false) int page, 
+			SellingSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
+		// 페이징 유닛 수
+		paging.setPageUnit(perPage);
+		paging.setPage(page);
+		
+		log.info(dto);
+		
+		// 페이징 조건
+		dto.setStart(paging.getFirst());
+		dto.setEnd(paging.getLast());
+		
+		// 페이징 처리
+		paging.setTotalRecord(sellingService.infoCount(dto));
+		
+		// grid 배열 처리
+		GridArray grid = new GridArray();
+		Object result = grid.getArray( paging.getPage(), sellingService.infoCount(dto), sellingService.info(dto) );
+		return result;
+	}
+    
     
 	// 삽입 ----------------------------------------------------------------------------------------------
 	
