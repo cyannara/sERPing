@@ -3,6 +3,7 @@ package com.beauty1nside.hr.dto;
 import java.util.Date;
 
 import org.apache.ibatis.type.Alias;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,6 +25,7 @@ public class EmpDTO {
     private String ssn; // 주민등록번호 (암호화 필요)
     private String email; // 이메일
     private String phone; // 연락처
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date hireDate; // 입사일
     private String position; // 직급 (공통코드: PO)
     private String positionCode;  // ✅ 직급 코드 (계약유형 자동 선택)

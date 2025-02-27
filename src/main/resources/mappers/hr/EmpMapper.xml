@@ -315,11 +315,11 @@
 	    INSERT INTO hr_employee (
 	        employee_num, employee_id, employee_pw, employee_name, email, phone, hire_date, 
 	        position, authority, status, employment_type, department_num, bank_name, 
-	        account_num, register_date, ssn, address, zip_code, memo, company_num
+	        account_num, register_date, ssn, address, zip_code, memo, company_num, profile_image
 	    ) VALUES (
 	        HR_EMPLOYEE_SEQ.NEXTVAL, #{employeeId}, #{employeePw}, #{employeeName}, #{email}, #{phone}, #{hireDate},
 	        #{position}, #{authority}, #{status}, #{employmentType}, #{departmentNum}, #{bankName},
-	        #{accountNum}, SYSDATE, #{ssn}, #{address}, #{zipCode}, #{memo}, #{companyNum}
+	        #{accountNum}, SYSDATE, #{ssn}, #{address}, #{zipCode}, #{memo}, #{companyNum}, #{profileImage}
 	    )
 	</insert>
 

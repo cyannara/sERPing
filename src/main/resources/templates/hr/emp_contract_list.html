@@ -5,7 +5,7 @@
       xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <title>근로계약 관리</title>
+    <title>근로계약조회</title>
     
     <!-- TOAST UI -->
     <link rel="stylesheet" href="https://uicdn.toast.com/tui.grid/latest/tui-grid.css">
@@ -19,55 +19,11 @@
 <body layout:fragment="content">
 
 <div class="container mt-3">
-    <h2 class="mb-4">근로계약 관리</h2>
+    <h2 class="mb-4">근로계약 조회</h2>
 
     <div class="row">
-        <!-- 왼쪽: 근로 계약 등록 -->
-        <div class="col-md-6">
-            <h4>📥 근로 계약 등록</h4>
-            <form id="contractForm">
-                <!-- 사원 선택 -->
-                <div class="mb-3">
-                    <label class="form-label">사원 번호</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" id="employeeNum" required readonly>
-                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#employeeSelectModal">사원 선택</button>
-                    </div>
-                </div>
-
-                <!-- 계약 정보 입력 -->
-                <div class="row">
-                    <div class="col-md-6">
-                        <label class="form-label">계약 유형</label>
-                        <select class="form-select" id="contractType">
-                            <option value="CT001">정규직</option>
-                            <option value="CT002">계약직</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">계약 시작일</label>
-                        <input type="date" class="form-control" id="contractStartDate" required>
-                    </div>
-                </div>
-
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <label class="form-label">계약 종료일</label>
-                        <input type="date" class="form-control" id="contractEndDate">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">급여</label>
-                        <input type="number" class="form-control" id="salary" required min="1000000">
-                    </div>
-                </div>
-
-                <button type="button" class="btn btn-primary mt-3" onclick="submitContract()">등록</button>
-            </form>
-        </div>
-
         <!-- 오른쪽: 근로 계약 조회 -->
-        <div class="col-md-6">
-            <h4>📑 근로 계약 조회</h4>
+        <div class="col-md-12">
             <div class="mb-3">
                 <input type="text" class="form-control" id="searchKeyword" placeholder="사원명 검색">
                 <button class="btn btn-primary mt-2" onclick="loadContracts()">검색</button>
@@ -131,7 +87,7 @@ function submitContract() {
         salary: document.getElementById("salary").value
     };
 
-    fetch("/contract/register", {
+    fetch("/hr/rest/contract/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(contractData)
@@ -146,7 +102,7 @@ function submitContract() {
 
 // ✅ 계약 목록 조회
 function loadContracts() {
-    fetch("/contract/list")
+    fetch("/hr/rest/contract/list")
         .then(response => response.json())
         .then(data => contractGrid.resetData(data))
         .catch(() => alert("계약 목록 불러오기 실패"));
@@ -157,12 +113,13 @@ const contractGrid = new tui.Grid({
     el: document.getElementById('contractGrid'),
     columns: [
         { header: "사원번호", name: "employeeNum" },
+        { header: "이름", name: "employeeName" },
         { header: "계약 유형", name: "contractType" },
         { header: "계약 시작일", name: "contractStartDate" },
         { header: "급여", name: "salary" }
     ]
 });
-</script>
+</script> 
 
 </body>
 </html>

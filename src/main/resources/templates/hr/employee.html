@@ -48,31 +48,30 @@
 	            </select>
 	        </div>
 	        <div class="col-md-5">
-	            <input type="text" class="form-control" placeholder="검색어 입력" id="searchKeyword">
+	            <input type="text" class="form-control" placeholder="검색어 입력 후 [Enter]" id="searchKeyword">
 	        </div>
 	    </div>
 	
-	    <!-- 부서 & 하위 부서 -->
-	    <div class="row align-items-center">
-	        <div class="col-md-2 text-end"><label class="fw-bold">부서</label></div>
-	        <div class="col-md-4">
-	            <select class="form-select" id="searchDepartment">
-	                <option value="">선택</option>
-	            </select>
-	        </div>
-	        <div class="col-md-2 text-end"><label class="fw-bold">하위 부서</label></div>
-	        <div class="col-md-4">
-	            <select class="form-select" id="searchSubDepartment">
-	                <option value="">선택</option>
-	            </select>
-	        </div>
-	    </div>
+		<!-- 부서 & 하위 부서 -->
+		<div class="row align-items-center">
+		    <div class="col-md-2 text-end"><label class="fw-bold">부서</label></div>
+		    <div class="col-md-6 d-flex">
+		        <select class="form-select w-50 pe-1" id="searchDepartment">
+		            <option value="">선택</option>
+		        </select>
+		        <div class="col-md-1">
+		        </div>
+		        <select class="form-select w-50" id="searchSubDepartment">
+		            <option value="">선택</option>
+		        </select>
+		    </div>
+		</div>
 	
 	    <!-- 직급 -->
 	    <div class="row align-items-center">
 	        <div class="col-md-2 text-end"><label class="fw-bold">직급</label></div>
 	        <div class="col-md-6">
-	            <select class="form-select" id="searchPosition">
+	            <select class="form-select w-50" id="searchPosition">
 	                <option value="">선택</option>
 	            </select>
 	        </div>
@@ -105,7 +104,13 @@
 
 
     <!-- 사원 검색 영역 끝 -->
-
+    <!-- 버튼 영역 -->
+    <div class="row mt-3">
+        <div class="col text-end">
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#empRegisterModal">사원 등록</button>
+            <!-- <button class="btn btn-danger" onclick="deleteEmployee()">삭제</button> -->
+        </div>
+    </div>
     <!-- 토스트 그리드 영역 -->
     <div class="row mt-3">
         <div class="col">
@@ -114,14 +119,9 @@
         </div>
     </div>
 
-    <!-- 버튼 영역 -->
-    <div class="row mt-3">
-        <div class="col text-start">
-            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#empRegisterModal">사원 등록</button>
-            <button class="btn btn-danger" onclick="deleteEmployee()">삭제</button>
-        </div>
-    </div>
 </div>
+
+<div th:replace="~{hr/emp_register_modal :: empRegisterModal}"></div>
 
 <!-- 사원 관리 및 Toast Grid 설정 -->
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
@@ -129,7 +129,6 @@
 <script src="/js/hr/common-codes.js"></script>
 <script src="/js/hr/emp_register_modal.js"></script>
 
-<div th:replace="~{hr/emp_register_modal :: empRegisterModal}"></div>
 
 </body>
 </html>

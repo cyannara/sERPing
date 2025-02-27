@@ -69,6 +69,13 @@ public class HrController {
 	public String emp_contract() {
 		return "hr/emp_contract";
 	};
+	
+	  //인사관리-근로계약관리
+		@GetMapping("/emp_contract_list")
+		public String emp_contract_list() {
+			return "hr/emp_contract_list";
+		};
+	
     
   //근태관리-출퇴근기록관리
 	@GetMapping("/attendance")

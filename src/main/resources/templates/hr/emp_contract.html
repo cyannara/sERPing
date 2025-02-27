@@ -111,7 +111,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <label class="form-label">연봉 (원)</label>
-                        <input type="text" class="form-control" id="annualSalary" required oninput="calculateMonthlySalary()">
+                        <input type="text" class="form-control" id="annualSalary" required onfocus="resetValue(this)" onblur="restoreDefaultValue(this)" oninput="calculateMonthlySalary()">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">월 기본급 (자동 계산)</label>
@@ -122,24 +122,24 @@
                 <div class="row mt-3">
                     <div class="col-md-6">
                         <label class="form-label">상여금</label>
-                        <input type="number" class="form-control" id="bonus" value="0">
+                        <input type="text" class="form-control" id="bonus" value="0" onfocus="resetValue(this)" onblur="restoreDefaultValue(this)" oninput="formatAndSetCursor(this)">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">기타 수당</label>
-                        <input type="number" class="form-control" id="additionalPay" value="0">
+                        <input type="text" class="form-control" id="additionalPay" value="0" onfocus="resetValue(this)" onblur="restoreDefaultValue(this)" oninput="formatAndSetCursor(this)">
                     </div>
                 </div>
 
                 <div class="row mt-3">
                     <div class="col-md-6">
                         <label class="form-label">급여 지급일</label>
-                        <input type="number" class="form-control" id="salaryPaymentDate" required placeholder="매월 몇 일">
+                        <input type="number" class="form-control" id="salaryPaymentDate" required placeholder="매월 몇 일" value="25">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">급여 지급 방식</label>
                         <select class="form-select" id="salaryPaymentMethod">
-                            <option value="BANK">계좌이체</option>
-                            <option value="CASH">직접지급</option>
+                            <option value="계좌이체">계좌이체</option>
+                            <option value="직접지급">직접지급</option>
                         </select>
                     </div>
                 </div>
@@ -204,12 +204,53 @@ const header = document.querySelector('meta[name="_csrf_header"]').content;
 const token = document.querySelector('meta[name="_csrf"]').content;
 
 let selectedEmployee = {}; // 선택된 사원 정보 저장
+let salaryPaymentDateValue = document.getElementById("salaryPaymentDate").value;
+salaryPaymentDateValue = salaryPaymentDateValue ? parseInt(salaryPaymentDateValue, 10) : 25; // 빈 값이면 25로 설정
 
+//input 필드를 클릭하면 값 초기화
+function resetValue(inputElement) {
+    if (inputElement.value === "0") {
+        inputElement.value = "";
+    }
+}
+
+// 포커스를 벗어나면 값이 없을 경우 기본값 "0" 설정
+function restoreDefaultValue(inputElement) {
+    if (inputElement.value.trim() === "") {
+        inputElement.value = "0";
+    }
+}
+
+// 숫자 입력 시 3자리마다 콤마 추가하면서 커서 위치 유지하는 함수
+function formatAndSetCursor(inputElement) {
+    let cursorPosition = inputElement.selectionStart; // 현재 커서 위치 저장
+    let originalLength = inputElement.value.length; // 기존 문자열 길이 저장
+
+    // 입력된 값에서 숫자만 남기고, 나머지 문자 제거
+    let value = inputElement.value.replace(/,/g, "").replace(/[^0-9]/g, "");
+    if (value === "") value = "0"; // 빈 값 방지
+
+    // 콤마 추가된 값 설정
+    inputElement.value = formatNumberWithCommas(value);
+
+    // 커서 위치 조정 (콤마 추가로 인해 변한 길이를 고려)
+    let newLength = inputElement.value.length;
+    cursorPosition += (newLength - originalLength);
+
+    // 커서 위치 복원
+    inputElement.setSelectionRange(cursorPosition, cursorPosition);
+}
+
+// 3자리마다 콤마 추가하는 함수
+function formatNumberWithCommas(num) {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
 //숫자에 3자리마다 콤마(,)를 추가하는 함수
 function formatNumberWithCommas(num) {
     if (!num) return "0"; // 값이 없을 때 기본값 0
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
+
 
 document.addEventListener("DOMContentLoaded", function() {
 	
@@ -247,7 +288,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		    bonus: 1000000,
 		    additionalPay: 500000,
 		    salaryPaymentDate: 25,
-		    paymentMethod: "BANK",
+		    paymentMethod: "계좌이체",
 		    socialInsurance: "고용보험, 산재보험, 국민연금, 건강보험"
 	};
 
@@ -437,10 +478,10 @@ function submitContract(event) {
 
             // 숫자 값으로 변환
             annualSalary: parseFloat(document.getElementById("annualSalary").value.replace(/,/g, "")) || 0,
-            bonus: parseFloat(document.getElementById("bonus").value) || 0,
-            additionalPay: parseFloat(document.getElementById("additionalPay").value) || 0,
+            bonus: parseFloat(document.getElementById("bonus").value.replace(/,/g, "")) || 0,
+            additionalPay: parseFloat(document.getElementById("additionalPay").value.replace(/,/g, "")) || 0,
 
-            salaryPaymentDate: document.getElementById("salaryPaymentDate").value,
+            salaryPaymentDate: salaryPaymentDateValue,
             paymentMethod: document.getElementById("salaryPaymentMethod").value,
             socialInsurance: getSelectedInsurance(),
             workDays: "월~금",

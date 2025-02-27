@@ -55,6 +55,29 @@
 	        SYSDATE, NULL, #{companyNum}
 	    )
 	</insert>
+	
+	<select id="getDepartmentByNum" resultType="com.beauty1nside.hr.dto.DeptDTO">
+	    SELECT *
+	    FROM HR_DEPARTMENT
+	    WHERE DEPARTMENT_NUM = #{departmentNum}
+	</select>
+	
+	<!-- 부서 수정 -->
+	<update id="updateDepartment" parameterType="com.beauty1nside.hr.dto.DeptDTO">
+	    UPDATE HR_DEPARTMENT
+	    SET 
+	        DEPARTMENT_NAME = #{departmentName}, 
+	        DEPARTMENT_STATUS = #{departmentStatus}, 
+	        UPDATE_DATE = SYSDATE
+	    WHERE DEPARTMENT_NUM = #{departmentNum}
+	</update>
+	
+	<!-- 부서 내 직원수 -->
+	<select id="countEmployeesByDepartment" parameterType="long" resultType="int">
+	    SELECT COUNT(*) 
+	    FROM HR_EMPLOYEE 
+	    WHERE DEPARTMENT_NUM = #{departmentNum}
+	</select>
 
 
 </mapper>

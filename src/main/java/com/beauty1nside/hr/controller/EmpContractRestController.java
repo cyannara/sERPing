@@ -61,7 +61,7 @@ public class EmpContractRestController {
      * ✅ 전체 계약 목록 조회 API
      * @return 근로계약 목록
      */
-    @GetMapping("/list")
+    @GetMapping("/contract/list")
     public ResponseEntity<List<EmpContractDTO>> getAllContracts() {
         List<EmpContractDTO> contracts = empContractService.getAllContracts();
         return ResponseEntity.ok(contracts);

@@ -74,8 +74,29 @@ public class DeptServiceImpl implements DeptService {
 
     @Override
     public int insertDepartment(DeptDTO dept) {
-        return deptMapper.insertDepartment(dept);
+        int result = deptMapper.insertDepartment(dept);
+        System.out.println("📌 INSERT 실행 결과: " + result); // 🔥 로그 확인
+        return result;
     }
     
+    
+    // 특정 부서 조회 (부모 부서 존재 여부 확인용)
+    @Override
+    public DeptDTO getDepartmentByNum(Long departmentNum) {
+        return deptMapper.getDepartmentByNum(departmentNum);
+    }
+    
+    
+    // 부서 수정
+    @Override
+    public int updateDepartment(DeptDTO dept) {
+        return deptMapper.updateDepartment(dept);
+    }
+    
+    // 부서에 속한 직원 수 조회
+    @Override
+    public int getEmployeeCountByDept(Long departmentNum) {
+        return deptMapper.countEmployeesByDepartment(departmentNum);
+    }
 
 }
