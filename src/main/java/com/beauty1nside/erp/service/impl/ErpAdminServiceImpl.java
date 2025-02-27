@@ -104,7 +104,7 @@ public class ErpAdminServiceImpl implements ErpAdminService {
      */
 	@Override
 	public boolean comenname(String companyEngName) {
-		return erpAdminMapper.comenname(companyEngName) == 1 ? true : false;
+		return erpAdminMapper.comenname(companyEngName) >= 1 ? true : false;
 	}
 
 	/**
@@ -140,7 +140,7 @@ public class ErpAdminServiceImpl implements ErpAdminService {
 		csDTO.setCustomerServiceContent(customerServiceContent);
 		csDTO.setCustomerServiceDivision(customerServiceDivision);
 		
-		return erpAdminMapper.insertNewCS(csDTO) == 1 ? true : false;
+		return erpAdminMapper.insertNewCS(csDTO) >= 1 ? true : false;
 	}
 
 	/**
@@ -151,7 +151,7 @@ public class ErpAdminServiceImpl implements ErpAdminService {
      */
 	@Override
 	public boolean insertNewCS(CustomerServiceDTO csDTO) {
-		return erpAdminMapper.insertNewCS(csDTO) == 1 ? true : false;
+		return erpAdminMapper.insertNewCS(csDTO) >= 1 ? true : false;
 	}
 
 	/**
@@ -189,7 +189,7 @@ public class ErpAdminServiceImpl implements ErpAdminService {
 	    }
 	    
 	    //서비스 기간을 변경함
-		return erpAdminMapper.updateServiceInfo(requestData) == 1 ? true : false;
+		return erpAdminMapper.updateServiceInfo(requestData) >= 1 ? true : false;
 	}
 	
 	/**
@@ -204,7 +204,7 @@ public class ErpAdminServiceImpl implements ErpAdminService {
 	}
 
 	/**
-     * ERP 사용회사의 서비스 기간을 변경한다 (모든 서비스)
+     * ERP 사용회사의 서비스 기간을 변경한다 (전체 서비스)
      *
      * @param Map<String, Object>
      * @return boolean
@@ -230,6 +230,8 @@ public class ErpAdminServiceImpl implements ErpAdminService {
 	    if ("EC03".equals(requestData.get("serviceState"))) {
 	    	servicecontent += "[변경] : 1010-10-10\n";
 	    	updatedDate = "1010-10-10";
+	    	//기본서비스 제외 모든 서비스를 삭제한다
+		    erpAdminMapper.ServiceDelete(requestData);
 	    }else {
 	    	servicecontent += "[변경] : " + updatedDate + "\n";
 	    }
@@ -247,8 +249,9 @@ public class ErpAdminServiceImpl implements ErpAdminService {
 	    erpAdminMapper.updateCompnayInfo(comdto);
 	    
 	    requestData.put("subscriptionEndDate", updatedDate);
+	    
 	    //구독 정보를 변경
-		return erpAdminMapper.allUpdateServiceInfo(requestData) == 1 ? true : false;
+		return erpAdminMapper.allUpdateServiceInfo(requestData) >= 1 ? true : false;
 	}
 
 	/**
@@ -273,7 +276,7 @@ public class ErpAdminServiceImpl implements ErpAdminService {
 		erpAdminMapper.insertNewCS(csDTO);
 		
 		//회사 정보 수정
-		return erpAdminMapper.upsertCompanyInfo(dto) == 1 ? true : false;
+		return erpAdminMapper.upsertCompanyInfo(dto) >= 1 ? true : false;
 	}
 
 	/**

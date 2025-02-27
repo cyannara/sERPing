@@ -226,6 +226,14 @@
         setTimeout(async () => {
             console.log("여기는 사용하는곳:", window.subscriptionState);
             
+            if(window.subscriptionState.subObjdate <= -10){
+            	showAlert('고객센터에 문의후 사용 해주세요', 'danger');
+            	//console.log(document.querySelector(".periodpaygo").parentElement);
+            	document.querySelector(".periodpaygo").style.display = "none";
+            	let tag = `<span style="color:red;"><b>[장기 미사용 고객]<br>고객센터에 문의 해주세요</b></span>`;
+            	document.querySelector(".periodpaygo").parentElement.insertAdjacentHTML("beforeend", tag);
+            }
+            
             //구독기간에 맞게 가격 다 변경시켜 주겠어
             remake_date(0);
             

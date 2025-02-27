@@ -40,7 +40,7 @@ function hideLoadingIndicator() {
 
 // UI 업데이트 함수
 function updateUI() {
-    console.log("구독 정보:", subscriptionState);
+    //console.log("구독 정보:", subscriptionState);
     // 화면 업데이트 로직 추가 가능
 }
 
@@ -204,6 +204,195 @@ function subManagement(data) {
             subscriptionState[dateKey] = remainingDays;
         }
     });
+    console.log("최종 구독 상태:", subscriptionState);
 
-    //console.log("최종 구독 상태:", subscriptionState);
+	/*============ 구독에 따른 권한 처리 ===============*/
+	setTimeout(function(){
+		console.log("현재주소 : "+window.location.href);
+		console.log(sessionData);
+		
+	    //계약정보가 없을경우 페이지로 리다액션
+	    if(!window.location.href.includes("erp/usercontact")){
+			//마스터계정아니라도 갈수있음 이유는 계정 생성하면 다른계정이 없고 그계정이 서명해야지만 사용가능
+			if(subscriptionState.subcon != "1"){
+				showAlert('사용계약 서명을 해주세요.', 'danger');
+				window.location.href = "/erp/usercontact?menu=mypage";
+			}
+		}
+		
+		//최고 관리자인 경우에만
+		if(sessionData.authority == "AU001"){
+			//서비스 계약 만료 된 최고 관리자
+			if(!window.location.href.includes("erp/fppay")){
+				if(parseInt(subscriptionState.subObjdate) <= -10){
+					showAlert('결제 후 이용가능합니다.', 'danger');
+					window.location.href = "/erp/fppay?menu=mypage";
+				}
+			}
+			
+			//지점 관리 기능
+			if(window.location.href.includes("/bhf/")){
+				if(parseInt(subscriptionState.pointObjdate) <= -10){
+					showAlert('결제 후 이용가능합니다.', 'danger');
+					window.location.href = "/erp/fppay?menu=mypage";
+				}
+			}
+			
+			//인사 관리 기능
+			if(window.location.href.includes("/hr/")){
+				if(!window.location.href.includes("/hr/employee")){
+					if(parseInt(subscriptionState.hrObjdate) <= 0){
+						showAlert('결제 후 이용가능합니다.', 'danger');
+						window.location.href = "/erp/fppay?menu=mypage";
+					}
+				}
+			}
+			//회계처리
+    		//아직 메뉴 없음
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			//지점
+			if(parseInt(subscriptionState.pointObjdate) <= 0){
+				console.log('abc');
+			    let branchLink = document.querySelector('nav.menu a[data="branch"]');
+			    if (branchLink) {
+			        branchLink.removeAttribute("href");
+			    }
+		    }
+		    
+		    var currentUrl = window.location.href;
+		    //인사관리
+		    if(parseInt(subscriptionState.hrObjdate) <= 0){
+				console.log('def');
+			    if (currentUrl.includes("/hr/")) {
+				    document.querySelectorAll(".nav-item a.nav-link").forEach(link => {
+				        let href = link.getAttribute("href");
+				        if (href && href.includes("/hr/") && !href.includes("/hr/employee")) {
+				            link.removeAttribute("href");
+				            link.style.pointerEvents = "none";
+				            link.style.color = "#aaa";
+				            link.style.cursor = "default";
+				        }
+				    });
+			    }
+		    }
+		    
+		    //회계처리
+		    //아직 메뉴 없음
+		    
+		    
+		    
+			
+			
+		//일반 사용자인 경우에만
+		}else{
+			//서비스 계약 만료된 일반 사용자
+			if (window.location.href !== window.location.origin + "/") { 
+			    if (parseInt(subscriptionState.subObjdate) <= -10) {
+			        showAlert('결제 후 이용가능합니다.', 'danger');
+			        window.location.href = "/";
+			    }
+			}
+			
+			//지점 관리 기능
+			if(window.location.href.includes("/bhf/")){
+				if(parseInt(subscriptionState.pointObjdate) <= 0){
+					showAlert('결제 후 이용가능합니다.', 'danger');
+					window.location.href = "/";
+				}
+			}
+			
+			//인사 관리 기능
+			if(window.location.href.includes("/hr/")){
+				if(!window.location.href.includes("/hr/employee")){
+					if(parseInt(subscriptionState.hrObjdate) <= 0){
+						showAlert('결제 후 이용가능합니다.', 'danger');
+						window.location.href = "/";
+					}
+				}
+			}
+			//회계처리
+    		//아직 메뉴 없음
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			//지점
+			if(parseInt(subscriptionState.pointObjdate) <= 0){
+				console.log('abc');
+			    let branchLink = document.querySelector('nav.menu a[data="branch"]');
+			    if (branchLink) {
+			        branchLink.removeAttribute("href");
+			    }
+		    }
+		    
+		    var currentUrl = window.location.href;
+		    //인사관리
+		    if(parseInt(subscriptionState.hrObjdate) <= 0){
+				console.log('def');
+			    if (currentUrl.includes("/hr/")) {
+				    document.querySelectorAll(".nav-item a.nav-link").forEach(link => {
+				        let href = link.getAttribute("href");
+				        if (href && href.includes("/hr/") && !href.includes("/hr/employee")) {
+				            link.removeAttribute("href");
+				            link.style.pointerEvents = "none";
+				            link.style.color = "#aaa";
+				            link.style.cursor = "default";
+				        }
+				    });
+			    }
+		    }
+		    
+		    //회계처리
+		    //아직 메뉴 없음
+			
+			
+		}
+	}, 500);
+    
 }
+document.addEventListener("DOMContentLoaded", function () {
+    //관리자이면서 마이페이지이면 메뉴 생기게
+    var currentUrl = window.location.href;
+    if(sessionData.authority != "AU001"){
+		console.log("aaaaaaaaaaaaaa");
+		if ( currentUrl.includes("/mypage/") || currentUrl.includes("/erp/erpsubinfo") || currentUrl.includes("/erp/usercontact") 
+		 || currentUrl.includes("/erp/fppay") ) {
+			let adminDomTag = `
+	        <li class="nav-item"><a class="nav-link" href="/erp/usercontact?menu=mypage">
+	            <i class="icon-grid menu-icon"></i> <span class="menu-title">사용계약서</span></a>
+	        </li>
+	        <li class="nav-item">
+	            <a class="nav-link" href="/erp/erpsubinfo?menu=mypage">
+	                <i class="icon-grid menu-icon"></i>
+	                <span class="menu-title">구독</span>
+	            </a>
+	        <div class="collapse" id="ui-basic-1">
+	                <ul class="nav flex-column sub-menu rounded-3">
+	                    <li class="nav-item"><a class="nav-link" href="/erp/erpsubinfo?menu=mypage">구독조회</a></li>
+	                    <li class="nav-item"><a class="nav-link" href="/erp/fppay?menu=mypage">구독결제</a></li>
+	                    <li class="nav-item"><a class="nav-link" href="/erp/subpay?menu=mypage">결제수단</a></li>
+	                </ul>
+	            </div>
+	        </li>
+	        `;
+			document.querySelector(".admin").insertAdjacentHTML("beforeend", adminDomTag);
+		}
+	}
+});

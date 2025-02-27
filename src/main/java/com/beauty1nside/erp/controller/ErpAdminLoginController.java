@@ -75,7 +75,7 @@ public class ErpAdminLoginController {
             return "redirect:/erp/admin"; // ✅ 로그인한 상태에서는 관리자 페이지로 이동
         }
         
-        return "erp/login"; // 관리자 페이지 반환
+        return "/erp/login"; // 관리자 페이지 반환
 	}
 	
 	/**
@@ -97,17 +97,20 @@ public class ErpAdminLoginController {
 		//employeePw = passwordEncoder.encode(employeePw);
 		//log.info(employeePw);
 		
-		ErpEmployeeDTO dto = erpAdminLoginService.loginConfig(employeeId);
-		
-		if (passwordEncoder.matches(employeePw, dto.getEmployeePw())) {
-			log.info("로그인 성공: {}", employeeId);
-			session.setAttribute("ErpEmployeeInfo", dto);
-	        return "/erp/admin"; // 로그인 성공 시 DTO 반환
-	    } else {
-	        log.warn("비밀번호 불일치: {}", employeeId);
-	        model.addAttribute("loginResult", "실패");
-	        return "erp/login";
-	    }
+		if(erpAdminLoginService.loginCount(employeeId)) {
+			ErpEmployeeDTO dto = erpAdminLoginService.loginConfig(employeeId);
+			if (passwordEncoder.matches(employeePw, dto.getEmployeePw())) {
+				log.info("로그인 성공: {}", employeeId);
+				session.setAttribute("ErpEmployeeInfo", dto);
+		        return "/erp/admin"; // 로그인 성공 시 DTO 반환
+		    } else {
+		        log.warn("비밀번호 불일치: {}", employeeId);
+		        model.addAttribute("loginResult", "실패");
+		        return "/erp/login";
+		    }
+		}else {
+			return "/erp/login";
+		}
 	}
 	
 	/**

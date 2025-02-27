@@ -112,6 +112,22 @@ public interface ErpAdminMapper {
 	public int allUpdateServiceInfo(Map<String, Object> requestData);
 	
 	/**
+     * ERP 사용회사 그룹웨서 서비스를 초기화 시킨다
+     *
+     * @param Map<String, Object>
+     * @return int
+     */
+	public int gropServiceUpdate(Map<String, Object> requestData);
+	
+	/**
+     * ERP 사용회사 기본서비스 제외 모든구독을 삭제 시킴
+     *
+     * @param Map<String, Object>
+     * @return int
+     */
+	public int ServiceDelete(Map<String, Object> requestData);
+	
+	/**
      * ERP 사용회사 성보를 변경한다
      *
      * @param ComDTO

@@ -53,7 +53,7 @@
 }
 
 .accent-background {
-  --background-color: #1bbd36;
+  --background-color: #cfe2ff;
   --default-color: #ffffff;
   --heading-color: #ffffff;
   --accent-color: #ffffff;
@@ -733,6 +733,14 @@ h6 {
   padding-right: 10px;
   color: color-mix(in srgb, var(--default-color), transparent 70%);
 }
+
+.breadcrumbs ol li a,
+.breadcrumbs ol li a:visited,
+.breadcrumbs ol li a:hover,
+.breadcrumbs ol li a:active {
+  color: blue !important;
+}
+
 
 /*--------------------------------------------------------------
 # Global Sections

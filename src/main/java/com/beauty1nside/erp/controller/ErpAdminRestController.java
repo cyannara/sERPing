@@ -149,7 +149,7 @@ public class ErpAdminRestController {
 	}
 	
 	/**
-     * 회사 서비스 상태를 변경 한다
+     * 회사 기본 서비스 상태를 변경 한다
      * @param Map<String, Object>
      * @return String
      */

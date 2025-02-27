@@ -19,13 +19,25 @@
 <mapper namespace="com.beauty1nside.erp.mapper.ErpAdminLoginMapper">
 
 	<!-- 
-     * 신규회사 등록시 회사 코드 중복 확인
+     * 로그인 정보를 가져간다
      *
      * @param String
      * @return ErpEmployeeDTO
 	-->
 	<select id="loginConfig" resultType="ErpEmployeeDTO">
 		select *
+		from erp_employees
+		where employee_id = #{employeeId}
+	</select>
+	
+	<!-- 
+     * 로그인 할 수있는 계정이 있는지 갯수를 확인한다
+     *
+     * @param String
+     * @return int
+	-->
+	<select id="loginCount">
+		select count(*)
 		from erp_employees
 		where employee_id = #{employeeId}
 	</select>

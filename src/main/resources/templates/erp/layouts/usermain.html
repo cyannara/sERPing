@@ -41,6 +41,20 @@
 	 *
 	 *  </pre>
   ======================================================== -->
+	<script>
+	document.addEventListener("DOMContentLoaded", function () {
+	    const currentPath = window.location.pathname;
+	    let navLinks = document.querySelectorAll("#navmenu ul li a");
+	    navLinks.forEach(link => {
+	        let linkPath = new URL(link.href, window.location.origin).pathname;
+	        if (currentPath === linkPath) {
+	            link.classList.add("active");
+	        } else {
+	            link.classList.remove("active");
+	        }
+	    });
+	});
+	</script>
 </head>
 
 <body class="index-page">
@@ -57,7 +71,7 @@
         <ul>
           <li><a href="/erp/main" class="active">홈</a></li>
           <li><a href="/erp/team">개발진</a></li>
-          <li><a href="/erp/pricing">가격</a></li>
+          <li><a href="/erp/pricing">금액</a></li>
           <li><a href="/erp/contact">문의</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>

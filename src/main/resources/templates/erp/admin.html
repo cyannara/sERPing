@@ -1262,10 +1262,10 @@
 					.then( result => result.text() )
 					.then( result => {
 						console.log("서비스변경결과 " + result);
-						if(result==="OK"){
+						if(result=="OK"){
 							//재선택 효과 주기위해 값을 담음
 							let selectedRowKey = rowData ? rowData.rowKey : null;
-							grid.readData();
+							grid.reloadData();
 							document.querySelector("#customerServiceContent").value = "";
 							if(document.querySelector(".custom-select").value=="EC03"){
 								document.querySelector("#subscriptionEndDate").value = "1010-10-10";
@@ -1341,7 +1341,7 @@
 						if(result==="OK"){
 							//재선택 효과 주기위해 값을 담음
 							let selectedRowKey = rowData ? rowData.rowKey : null;
-							grid.readData();
+							grid.reloadData();
 							cslistfun();
 							document.querySelector("#customerServiceContent").value = "";
 							setTimeout(() => {
@@ -1694,7 +1694,7 @@
 						if(result==="OK"){
 							//재선택 효과 주기위해 값을 담음
 							let selectedRowKey = rowData ? rowData.rowKey : null;
-							grid.readData();
+							grid.reloadData();
 							document.querySelector("#customerServiceContent").value = "";
 							cslistfun();
 							setTimeout(() => {
@@ -1748,7 +1748,7 @@
 						console.log("회사 수정 결과" + result);
 						if(result==="OK"){
 							allCanceinbtn.click();
-							grid.readData();
+							grid.reloadData();
 						}else{
 							alert("회사 등록중 심각한 오류 발생 관리자 문의");
 						}
@@ -1792,7 +1792,7 @@
 						console.log("회사등록결과" + result);
 						if(result==="OK"){
 							allCanceinbtn.click();
-							grid.readData();
+							grid.reloadData();
 						}else{
 							alert("회사 등록중 심각한 오류 발생 관리자 문의");
 						}
