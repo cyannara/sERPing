@@ -1,10 +1,285 @@
 <!DOCTYPE html>
-<html>
+<html layout:decorate="~{layouts/layout}"
+      lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
 <meta charset="UTF-8">
 <title>세금계산서 발행</title>
-</head>
-<body>
+<style>
+	.tax {
+		table-layout: fixed;
+		margin-bottom: 0;
+	}
+	.tax td {
+		word-wrap: break-word;
+	}
+	.tax .sero {
+		font-weight: bold;
+		width: 2.5%;
+		text-align: center;
+	}
+	.tax .realLeft {
+		color: red;
+		background-color: #fcbaba;
+	}
+	.tax .left {
+		background-color: #faeded;
+		border: 1px solid rgb(255, 126, 126);
+	}
+	.tax .fontRed {
+		color: #cc5858;
+	}
+	.tax .menuTh {
+		width: 5%;
+		text-align: center;
+	}
+	.tax .inputTh {
+		width: 12.5%;
+	}
+	.tax .realRight {
+		color: blue;
+		background-color: rgb(190, 210, 252);
+	}
+	.tax .right {
+		background-color: #edf1fa;
+		border: 1px solid rgb(157, 199, 255);
+	}
+	.tax .fontBlue {
+		color:rgb(69, 158, 218);
+	}
+	.tax .longTh {
+		width: 25%;
+	}
+	.table .star {
+		color: red;
+	}
+	.table .totals {
+		border: 1px solid #ddd;
+	}
+	.total {
+		table-layout: fixed;
+	}
+	.total .menuTh{
+		width: 16.67%
+	}
+	.total .nopadding {
+		padding: 0 8px;
+	}
+	.nomargin {
+		margin: 0;
+	}
+	.row {
+		padding: 0 15px;
+	}
 
+</style>
+</head>
+<body layout:fragment="content">
+	<div class="container">
+		<!-- 메뉴이름 -->
+		 <div>
+			 <h2>세금계산서 발행</h2>
+		 </div>
+		 <!-- 계산서 등록 -->
+	 	<table class="table tax">
+			<tr>
+				<th rowspan="6" class="sero realLeft">공<br><br><br>급<br><br><br>자</th>
+				<th class="left fontRed menuTh"><span class="star">*</span> 등록<br>번호</th>
+				<td class="left inputTh" id="bsnNum1"></td>
+				<th class="left fontRed menuTh">종사업장<br>번호</th>
+				<td class="left inputTh"></td>
+				
+				<th rowspan="6" class="sero realRight">공<br><br>급<br><br>받<br><br>는<br><br>자</th>
+				<th class="right fontBlue menuTh"><span class="star">*</span> 등록<br>번호</th>
+				<td class="right inputTh"></td>
+				<th class="right fontBlue menuTh">종사업장<br>번호</th>
+				<td class="right inputTh"></td>
+			</tr>
+			<tr>
+				<th class="left fontRed menuTh"><span class="star">*</span> 상호</th>
+				<td class="left inputTh" id="coName1"></td>
+				<th class="left fontRed menuTh"><span class="star">*</span> 성명</th>
+				<td class="left inputTh" id="representor1"></td>
+				
+				<th class="right fontBlue menuTh"><span class="star">*</span> 상호</th>
+				<td class="right inputTh"></td>
+				<th class="right fontBlue menuTh"><span class="star">*</span> 성명</th>
+				<td class="right inputTh"></td>
+			</tr>
+			<tr>
+				<th class="left fontRed menuTh">사업장</th>
+				<td colspan="3" class="left longTh" id="address1"></td>
+				
+				<th class="right fontBlue menuTh">사업장</th>
+				<td colspan="3" class="right longTh"></td>
+			</tr>
+			<tr>
+				<th class="left fontRed menuTh">업태</th>
+				<td class="left inputTh" id="status1"></td>
+				<th class="left fontRed menuTh">종목</th>
+				<td class="left inputTh" id="cate1"></td>
+				
+				<th class="right fontBlue menuTh">업태</th>
+				<td class="right inputTh"></td>
+				<th class="right fontBlue menuTh">종목</th>
+				<td class="right inputTh"></td>
+			</tr>
+			<tr>
+				<th rowspan="2" class="left fontRed menuTh">이메일</th>
+				<td colspan="3" rowspan="2" class="left longTh" id="email1"></td>
+				
+				<th class="right fontBlue menuTh">이메일</th>
+				<td colspan="3" class="right longTh"></td>
+			</tr>
+			<tr>
+				<th class="right fontBlue menuTh">이메일</th>
+				<td colspan="3" class="right longTh"></td>
+			</tr>
+		</table>
+		<!-- 합계 테이블 -->
+		<table class="table total">
+			<tr>
+				<th class="menuTh totals"><span class="star">*</span> 작성일자</th>
+				<td colspan="2" class="totals longTd nopadding"><input type="date" name="regiserDate" id="regiserDate" class="form-control form-control-sm" onchange="gridmonthchange()"></td>
+				<th class="menuTh totals" >비고</th>
+				<td colspan="2" class="totals longTd"></td>
+			</tr>
+			<tr>
+				<th class="menuTh totals">&nbsp;&nbsp;합계금액</th>
+				<td class="totals "></td>
+				<th class="menuTh totals">공급가액</th>
+				<td class="totals"></td>
+				<th class="menuTh totals">세액</th>
+				<td class="totals"></td>
+			</tr>
+		</table>
+		<!-- 품목 추가 버튼 -->
+		<p class="nomargin">※품목의 월은 작성일자의 월이 표시되고 변경은 작성일자 수정시 자동 반영됨</p>
+		<div class="row">
+			<button type="button" onclick="addgrid()" class="btn btn-outline-secondary btn-inverse-secondary btn-fw btn-sm col-2">품목추가</button>
+		</div>
+		<!-- 그리드로 정보 입력 -->
+		<div id="taxgrid"></div>
+		 <!-- 상품 검색 모달 -->
+		<div th:replace="purchs/ModalTemplate :: ModalTemplate (
+						    	'optSearchModal', 
+						    	'', 
+						    	'상품 검색', 
+						    	'accnut/optSearchBody', 
+						    	'accnut/optSearchFooter'
+						    )"></div>
+	</div>
+	
+<script>
+	var session = sessionData;
+	var result = {};
+	var rowData = {};
+	
+	document.addEventListener("DOMContentLoaded", ()=> {
+		getCompanyInfo(session.companyNum);
+		delRow();
+	})
+	
+	function getCompanyInfo(coNum){
+		const header = document.querySelector('meta[name="_csrf_header"]').content;
+		const token = document.querySelector('meta[name="_csrf"]').content;
+		
+		fetch(`http://localhost:81/accnut/rest/company/info?companyNum=${coNum}`, {
+			method: "GET",
+			headers: {
+				'header': header,
+				"Content-Type": "application/json",
+				'X-CSRF-Token': token				
+			}
+		}).then(response => response.json())
+		.then(data => {
+			console.log(data);
+			result.from = data.result;
+
+			// 배열로 값이랑 데이터 for문 사용하기 위함
+			let array = ['address', 'bsnNum', 'cate', 'coName', 'email', 'representor', 'status'];
+			
+			for(key of array){
+				document.querySelector(`#${key}1`).innerHTML = data.result[key]	;
+			}
+		})
+	}
+	
+	const grid = new tui.Grid({
+		el : document.querySelector('#taxgrid'),
+		columns: [
+			{ header : "월", name : "month", width: 10, align:"center"},
+			{ header : "일", name : "day", width: 10, editor:"text", align:"center"},
+			{ header : "품목", name : "optionCode", editor:"text", align:"center"},
+			{ header : "규격", name : "standard", align:"center"},
+			{ header : "수량", name : "quantity", editor:"text", align:"center", width: 50},
+			{ header : "단가", name : "amount", align:"center"},
+			{ header : "합계", name : "total", align:"center"},
+			{ header : "공급가액", name : "supplyPrice", align:"center"},
+			{ header : "세액", name : "tax", align:"center"},
+			{ header : "비고", name : "note", editor:"text", align:"center"},
+			{ header : "삭제", name : "del", formatter : () => '<button class="btn btn-danger btn-sm btnDel"><i class="mdi mdi-delete" style="line-height: 15px;"></i></button>', align: 'center', width: '40'},
+			
+		],
+		data : [{}],
+	});
+
+	function addgrid(){
+		let value = document.querySelector("#regiserDate").value;
+		let month = value.substr(5, 2);
+		month = month < 10 ? month.slice(-1) : month;
+		grid.appendRow({"month": month});
+	}
+
+	function gridmonthchange(){
+		let value = document.querySelector("#regiserDate").value;
+		let month = value.substr(5, 2);
+		month = month < 10 ? month.slice(-1) : month;	
+		grid.setColumnValues("month", month)
+	}
+	
+	function delRow() {
+      grid.on("click", (ev)=>{
+        if(ev.columnName == 'del'){
+        	grid.removeRow(ev.rowKey);
+        }
+        if(ev.columnName == 'optionCode'){
+        	rowData = grid.getRow(ev.rowKey);
+        	const modalElement = document.getElementById('optSearchModal');
+        	const modalInstance = new bootstrap.Modal(modalElement);
+            modalInstance.show();
+            
+        }
+      })
+    }
+	
+	// 모달 열렸을 때 닫기 버튼 찾아서 닫기 할 함수
+	document.getElementById('optSearchModal').addEventListener('shown.bs.modal', function () {
+		const modalElement = document.getElementById("optSearchModal");
+	    const closeButton = modalElement.querySelector('[data-bs-dismiss="modal"]');
+	    console.log('닫기',closeButton);
+	    if (closeButton) {
+	        closeButton.addEventListener("click", function () {
+	        	try {
+	            	let modalInstance = bootstrap.Modal.getInstance("#optSearchModal") || new bootstrap.Modal("#optSearchModal");
+	                modalInstance.hide(); // ✅ Bootstrap 방식으로 모달 닫기
+	                
+	            } catch (error) {
+	                console.warn("❌ Bootstrap 5가 로드되지 않았음. 대체 방식 사용");
+	                modalElement.classList.remove("show");
+	                modalElement.style.display = "none";
+	                document.body.classList.remove("modal-open");
+
+	                setTimeout(() => {
+	                    document.querySelectorAll(".modal-backdrop").forEach((element) => element.remove()); // 백그라운드 제거
+	                }, 300);
+	                
+	            }   	
+	        })
+	    }    
+	})
+		
+</script>
 </body>
 </html>

@@ -333,6 +333,24 @@ public class AccnutRestController {
 		return result;
 	}
     
+    @GetMapping("company/info")
+    public ResponseEntity<Map<String, Object>> companyInfo(@RequestParam int companyNum) {
+    	Map<String, Object> response = new HashMap<>();
+    	try {
+    		Map<String, Object> result = otherService.companyInfo(companyNum);
+	        response.put("status", "success");
+	        response.put("message", "조회 성공");
+	        response.put("result", result);
+	        return ResponseEntity.ok(response); // JSON 형태 응답
+	    } catch (Exception e) {
+	        log.error("조회 실패", e);
+	        response.put("status", "error");
+	        response.put("message", "조회 실패");
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+	    }
+    	
+    }
+    
     
 	// 삽입 ----------------------------------------------------------------------------------------------
 	
