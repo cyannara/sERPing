@@ -9,7 +9,8 @@ import java.util.List;
 public interface ChatMapper {
   List<EmpDTO> empList(Long companyNum);
   RoomDTO getChatRoom(RoomDTO roomDTO);
-  Long insertChatRoom(RoomDTO roomDTO);
+  void insertChatRoom(RoomDTO roomDTO);
+  RoomDTO getRoomJustMade();
   List<MessageDTO> getMsgList(Long roomId);
   void insertMsg(MessageDTO messageDTO);
   MessageDTO getMsgJustSent(Long roomId);
