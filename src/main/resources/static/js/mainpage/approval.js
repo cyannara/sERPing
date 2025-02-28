@@ -1,5 +1,5 @@
 let Grid = tui.Grid;
-
+let sessionAuthority = document.getElementById("sessionAuthority").value;
 const dataSource = {
     api: {
         readData: {
@@ -81,7 +81,13 @@ const grid = new Grid({
     data : dataSource,
 });
 
-document.getElementById('approval-tab').addEventListener('click', () => {
+const approvalTab = document.getElementById('approval-tab')
+// !최고관리자 && !관리자
+if(sessionAuthority !== 'AU001' && sessionAuthority !== 'AU002') {
+    approvalTab.classList.add('lock')
+}
+
+approvalTab.addEventListener('click', () => {
     grid.refreshLayout()
 }, {once: true})
 

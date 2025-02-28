@@ -4,12 +4,12 @@ const chatContainer = document.getElementById("chatMessages");
 const textarea = document.getElementById('textarea')
 let sessionEmployeeNum = document.getElementById("sessionEmployeeNum").value;
 let empList = document.getElementById("empList")
-
+let settingsClose = document.getElementById("settingsClose")
 let sessionEmployeeName = document.getElementById("sessionEmployeeName").value;
 let roomId = 0
 let goback = document.getElementById("goback")
-goback.addEventListener('click', () => {
-    console.log(goback)
+
+const backToEmpList = () => {
     $(document).ready(function() {
         $('#todo-tab').tab('show');
         empList.classList.add('show')
@@ -17,8 +17,9 @@ goback.addEventListener('click', () => {
         goback.classList.add('hide')
         goback.classList.remove('show')
     });
-})
-
+}
+settingsClose.addEventListener('click', backToEmpList)
+goback.addEventListener('click', backToEmpList)
 
 const addMsg = (sentMsg) => {
     const messageDiv = document.createElement("div");
