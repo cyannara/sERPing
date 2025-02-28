@@ -25,8 +25,8 @@ fetch(deptListUrl, {
 
     let scheduleType = data.map((dept, idx) => {
         return {
-            id: dept.deptNo,
-            name: `${dept.deptName}-${dept.branch}`,
+            id: dept.departmentNum,
+            name: dept.departmentName,
             backgroundColor: color[idx]
         }
     })
@@ -258,8 +258,8 @@ const getDeptName = (deptList, scheduleDeptNo) => {
         return ['나']
     }
 
-    let dept = deptList.find((dept) => dept.deptNo === scheduleDeptNo)
-    return [dept.deptName + '-' + dept.branch]
+    let dept = deptList.find((dept) => dept.departmentNum === scheduleDeptNo)
+    return [dept.departmentName]
 }
 
 function formatTime(time) {

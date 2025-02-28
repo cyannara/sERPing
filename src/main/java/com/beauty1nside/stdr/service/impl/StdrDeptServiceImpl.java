@@ -1,6 +1,6 @@
 package com.beauty1nside.stdr.service.impl;
 
-import com.beauty1nside.stdr.dto.StdrDeptDTO;
+import com.beauty1nside.hr.dto.DeptDTO;
 import com.beauty1nside.stdr.mapper.StdrDeptMapper;
 import com.beauty1nside.stdr.service.StdrDeptService;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +17,7 @@ public class StdrDeptServiceImpl implements StdrDeptService {
 	private final StdrDeptMapper stdrDeptMapper;
 	
 	@Override
-	public List<StdrDeptDTO> hqDeptList(Long companyNum) {
+	public List<DeptDTO> hqDeptList(Long companyNum) {
 		return stdrDeptMapper.hqDeptList(companyNum);
-	}
-	
-	@Override
-	public List<StdrDeptDTO> deptList(Long companyNum) {
-		return stdrDeptMapper.deptList(companyNum);
 	}
 }

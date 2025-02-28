@@ -17,7 +17,7 @@ const makeDeptList = (data) => {
     const dropdownMenu = document.getElementById('dropdownMenu')
     let deptList = ''
     data.forEach((dept) => {
-        deptList += `<li><a class="dropdown-item" data-dept-id="${dept.deptNo}">${dept.deptName}</a></li>`
+        deptList += `<li><a class="dropdown-item" data-dept-id="${dept.departmentNum}">${dept.departmentName}</a></li>`
     })
     dropdownMenu.insertAdjacentHTML('beforeend', deptList)
 
@@ -81,7 +81,6 @@ const addDocTemplate = () => {
     })
         .then(result => result.json())
         .then(data => {
-            console.log('data', data)
             showAlert('문서 템플릿이 추가되었습니다.', 'success')
             grid.readData();
 

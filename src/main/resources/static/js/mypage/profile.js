@@ -89,7 +89,13 @@ const setInfo = (data) => {
     // salary.value = data.salary || '-'
     bankName.value = data.bankName
     accountNum.value = data.accountNum
-    profileImg.src = data.profileImage || '/file/image/mypage/profile/noProfileImg.jpg'
+    profileImg.src = data.profileImage || '/file/image/mypage/profile/noProfileImg.jpg';
+
+    profileImg.onerror = function () {
+        this.onerror = null; // 무한 루프 방지
+        this.src = '/file/image/mypage/profile/noProfileImg.jpg';
+    };
+
 }
 
 const getProfileInfo = () => {

@@ -1,10 +1,9 @@
 package com.beauty1nside.stdr.service;
 
-import com.beauty1nside.stdr.dto.StdrDeptDTO;
+import com.beauty1nside.hr.dto.DeptDTO;
 
 import java.util.List;
 
 public interface StdrDeptService {
-  List<StdrDeptDTO> hqDeptList(Long companyNum);
-  List<StdrDeptDTO> deptList(Long companyNum);
+  List<DeptDTO> hqDeptList(Long companyNum);
 }
