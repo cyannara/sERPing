@@ -50,6 +50,7 @@ import lombok.extern.log4j.Log4j2;
  *  2025.02.13  표하연          회사영문명(코드명) 중복검사, 회사등록, 검색페이징
  *  2025.02.15  표하연          회사정보 수정 및 문의 처리
  *  2025.02.25  표하연          회사의 구독현황을 조회한다 [ServiceReturnDTO]
+ *  2025.02.28  표하연          불특정 다수의 문의들 등록 한다
  *
  *  </pre>
 */
@@ -325,7 +326,6 @@ public class ErpAdminRestController {
 		return cslist;
 	}
 	
-	//
     /**
      * ERP 사용회사 처리된 구독 정보를 조회한다
      *
@@ -338,7 +338,6 @@ public class ErpAdminRestController {
 		return dto; 
 	}
 	
-	
 	/**
      * 사업자 등록증 이미지를 서버에 저장한다 [사용중지 FTP서버변경하려고]
      * 미사용 FTPFileUploadController.java에서 처리중
@@ -349,24 +348,19 @@ public class ErpAdminRestController {
 	//@PostMapping("/uploadBusinessLicense")
     public ResponseEntity<Map<String, Object>> uploadFile(@RequestParam("file") MultipartFile file) {
         Map<String, Object> response = new HashMap<>();
-        
         String UPLOAD_DIR = "C:/atest/";
-       
         try {
             if (file.isEmpty()) {
                 response.put("success", false);
                 response.put("message", "업로드할 파일이 없습니다.");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
-
             // 파일 저장
             File saveFile = new File(UPLOAD_DIR + file.getOriginalFilename());
             file.transferTo(saveFile);
-
             response.put("success", true);
             response.put("message", "파일 업로드 성공");
             response.put("fileName", file.getOriginalFilename());
-
             return ResponseEntity.ok(response);
         } catch (IOException e) {
             e.printStackTrace();  // 콘솔에 오류 출력
@@ -381,11 +375,19 @@ public class ErpAdminRestController {
         }
     }
     
-    
+    /**
+     * 불특정 다수의 문의를 수집한다 
+     * 
+     * @param ContactRequestDTO
+     * @return String
+     */
 	@PostMapping("/phpcontact")
     public String phpcontact(@RequestBody ContactRequestDTO dto) {
-		log.info(dto);
-       return null;
+		if(erpAdminService.insertNewQuery(dto)) {
+			return "OK";
+		}else {
+			return "NO";
+		}
     }
     
 }

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beauty1nside.hr.mapper.EmpHistoryMapper">
+
+
+    <!-- ✅ 인사발령 등록 -->
+    <insert id="insertHistory" parameterType="com.beauty1nside.hr.dto.EmpHistoryDTO">
+        INSERT INTO HR_EMPLOYEE_HISTORY (
+            HISTORY_NUM, EMPLOYEE_NUM, COMPANY_NUM, CHANGE_TYPE,
+            PREVIOUS_POSITION, NEW_POSITION, PREVIOUS_DEPARTMENT_NUM, NEW_DEPARTMENT_NUM,
+            PREVIOUS_EMPLOYMENT_TYPE, NEW_EMPLOYMENT_TYPE, EFFECTIVE_DATE, PROCESSED_BY,
+            REGISTER_DATE, UPDATE_DATE, APPROVAL_STATUS, REJECT_REASON
+        ) VALUES (
+            HR_EMPLOYEE_HISTORY_SEQ.NEXTVAL, #{employeeNum}, #{companyNum}, #{changeType},
+            #{previousPosition}, #{newPosition}, #{previousDepartmentNum}, #{newDepartmentNum},
+            #{previousEmploymentType}, #{newEmploymentType}, #{effectiveDate}, null,
+            SYSDATE, SYSDATE, 'AP001', null
+        )
+    </insert>
+
+    <!-- ✅ 인사발령 목록 조회 -->
+    <select id="listHistory" parameterType="com.beauty1nside.hr.dto.EmpHistorySearchDTO" resultType="com.beauty1nside.hr.dto.EmpHistoryDTO">
+        SELECT * FROM (
+            SELECT ROWNUM rn, h.*
+            FROM (
+                SELECT 
+                    h.HISTORY_NUM, h.EMPLOYEE_NUM, e.EMPLOYEE_NAME, h.COMPANY_NUM, h.CHANGE_TYPE,
+                    h.PREVIOUS_POSITION, h.NEW_POSITION, h.PREVIOUS_DEPARTMENT_NUM, h.NEW_DEPARTMENT_NUM,
+                    h.PREVIOUS_EMPLOYMENT_TYPE, h.NEW_EMPLOYMENT_TYPE, h.EFFECTIVE_DATE,
+                    h.PROCESSED_BY, h.REGISTER_DATE, h.UPDATE_DATE, h.APPROVAL_STATUS, h.REJECT_REASON
+                FROM HR_EMPLOYEE_HISTORY h
+                JOIN HR_EMPLOYEE e ON h.EMPLOYEE_NUM = e.EMPLOYEE_NUM
+                WHERE h.COMPANY_NUM = #{companyNum} <!-- 🔹 세션에서 가져온 회사번호 검증 -->
+                
+                <if test="approvalStatus != null and approvalStatus != ''">
+                    AND h.APPROVAL_STATUS = #{approvalStatus}
+                </if>
+
+                <if test="employeeNum != null">
+                    AND h.EMPLOYEE_NUM = #{employeeNum}
+                </if>
+
+                <if test="changeType != null and changeType != ''">
+                    AND h.CHANGE_TYPE = #{changeType}
+                </if>
+
+                <if test="effectiveDateFrom != null">
+                    AND h.EFFECTIVE_DATE <![CDATA[ >= ]]> #{effectiveDateFrom}
+                </if>
+
+                <if test="effectiveDateTo != null">
+                    AND h.EFFECTIVE_DATE 
+                    <![CDATA[
+		                        
+		                        
+                    <= ]]>
+                     #{effectiveDateTo}
+                </if>
+
+                ORDER BY h.REGISTER_DATE DESC
+            ) h
+            WHERE ROWNUM <![CDATA[ <= ]]> #{end}
+        ) 
+        WHERE rn >= #{start}
+    </select>
+
+    <!-- ✅ 인사발령 개수 조회 -->
+    <select id="countHistory" parameterType="com.beauty1nside.hr.dto.EmpHistorySearchDTO" resultType="int">
+        SELECT COUNT(*) 
+        FROM HR_EMPLOYEE_HISTORY
+        WHERE COMPANY_NUM = #{companyNum}
+        
+        <if test="approvalStatus != null and approvalStatus != ''">
+            AND APPROVAL_STATUS = #{approvalStatus}
+        </if>
+
+        <if test="employeeNum != null">
+            AND EMPLOYEE_NUM = #{employeeNum}
+        </if>
+    </select>
+
+    <!-- ✅ 인사발령 승인 -->
+    <update id="approveHistory">
+        UPDATE HR_EMPLOYEE_HISTORY
+        SET APPROVAL_STATUS = 'AP002', -- 승인 상태 변경
+            PROCESSED_BY = #{processedBy},
+            EFFECTIVE_DATE = SYSDATE, -- 현재 날짜로 적용일 업데이트
+            UPDATE_DATE = SYSDATE
+        WHERE HISTORY_NUM = #{historyNum}
+    </update>
+
+    <!-- ✅ 인사발령 반려 -->
+    <update id="rejectHistory">
+        UPDATE HR_EMPLOYEE_HISTORY
+        SET APPROVAL_STATUS = 'AP003', -- 반려 상태 변경
+            PROCESSED_BY = #{processedBy},
+            REJECT_REASON = #{rejectReason},
+            UPDATE_DATE = SYSDATE
+        WHERE HISTORY_NUM = #{historyNum}
+    </update>
+
+
+</mapper>

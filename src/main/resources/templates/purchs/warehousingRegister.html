@@ -29,7 +29,7 @@
  </head>     
 <body layout:fragment="content">
 <div class="container mt-4">
-    <h2>제품구매 / 구매 등록</h2>
+    <h2>구매 등록</h2>
     
     <!-- ✅ 상단: 발주 검색 (작게) & 발주서 목록 (넓게) -->
     <div class="row">
@@ -129,7 +129,7 @@
     <div class="section-box mt-3">
         <h4 class="section-title">구매 상세 리스트</h4>
         <div class="d-flex justify-content-between">
-            <button type="button" class="btn btn-primary btn-custom" id="bttAdd">옵션 추가</button>
+            <button type="button" class="btn btn-primary btn-custom" id="bttAdd">구매추가</button>
         </div>
         <div id="warehousinglistGrid"></div>
     </div>
@@ -428,110 +428,96 @@
           ]
       });
 		 
-	
+		// ✅ 공급가격 자동 계산 함수 (VAT도 함께 계산)
+		 function calculateSupplyPrice(rowKey) {
+		     let quantity = removeCommas(warehousinglistGrid.getValue(rowKey, "warehousingStandardQuantity")) || "0";
+		     let unitPrice = removeCommas(warehousinglistGrid.getValue(rowKey, "warehousingUnitPrice")) || "0";
+		     let purchaseBodyNum = warehousinglistGrid.getValue(rowKey, "purchaseBodyNum"); // ✅ 발주서에서 온 데이터인지 확인
 
-		  
-	
+		     let supplyPrice = quantity * unitPrice;
+		     
+		     console.log(`✅ 공급가 자동 계산 (rowKey: ${rowKey}) → 공급가: ${supplyPrice}`);
 
-	 // ✅ 공급가격 자동 계산 함수
-	 function calculateSupplyPrice(rowKey) {
-	     let quantity = removeCommas(warehousinglistGrid.getValue(rowKey, "warehousingStandardQuantity")) || "0";
-	     let unitPrice = removeCommas(warehousinglistGrid.getValue(rowKey, "warehousingUnitPrice")) || "0";
+		     // ✅ 계산된 공급가격을 Grid에 업데이트
+		     warehousinglistGrid.setValue(rowKey, "warehousingSupplyPrice", supplyPrice);
 
-	     let supplyPrice = quantity * unitPrice;
-	     
-	     console.log(`✅ 공급가 자동 계산 (rowKey: ${rowKey}) → 공급가: ${supplyPrice}`);
+		     // ✅ VAT 다시 계산 (기존 값 유지)
+		     updateVat(rowKey, true);
+		 }
 
-	     // ✅ 계산된 공급가격을 Grid에 업데이트
-	     warehousinglistGrid.setValue(rowKey, "warehousingSupplyPrice", supplyPrice);
-	     
-	     
+		// ✅ 부가세 자동 적용 함수 (기존 값 유지)
+		 function updateVat(rowKey, forceUpdate = false) {
+		     const applyVat = document.getElementById("vatChecked").checked;
+		     const removeVat = document.getElementById("vatUnchecked").checked;
 
-	     // ✅ VAT 다시 계산 (발주서에서 가져온 항목도 포함)
-	     updateVat(rowKey, true);
+		     let supplyPrice = parseFloat(removeCommas(warehousinglistGrid.getValue(rowKey, "warehousingSupplyPrice"))) || 0;
+		     let existingVat = parseFloat(removeCommas(warehousinglistGrid.getValue(rowKey, "warehousingVat"))) || 0;
+		     let purchaseBodyNum = warehousinglistGrid.getValue(rowKey, "purchaseBodyNum"); // ✅ 발주서에서 온 데이터인지 확인
 
-	   
-	 }
-	 
-	// ✅ 부가세 자동 적용 함수 (기존 값 유지)
-	 function updateVat(rowKey, forceUpdate = false) {
-	     const applyVat = document.getElementById("vatChecked").checked;
+		     // ✅ 기존 VAT 값이 있고 강제 업데이트가 아닐 경우 기존 값 유지
+		     if (!forceUpdate && existingVat !== 0) {
+		         console.log(`✅ 기존 부가세 유지 (rowKey: ${rowKey}) → 기존 부가세: ${existingVat}`);
+		         return;
+		     }
 
-	     let supplyPrice = parseFloat(removeCommas(warehousinglistGrid.getValue(rowKey, "warehousingSupplyPrice"))) || 0;
-	     let existingVat = parseFloat(removeCommas(warehousinglistGrid.getValue(rowKey, "warehousingVat"))) || 0;
-	     let newVat = applyVat ? supplyPrice * 0.1 : 0;
+		     // ✅ 수량 또는 단가가 변경된 경우에만 부가세 업데이트
+		     if (purchaseBodyNum) {
+		         console.log(`📢 발주서에서 가져온 항목 (purchaseBodyNum=${purchaseBodyNum}), VAT 계산 여부 확인`);
 
-	     // ✅ 기존 VAT 값이 0이 아니면 유지, 0이면 새로 계산
-	     if (existingVat === 0 || forceUpdate) {
-	         warehousinglistGrid.setValue(rowKey, "warehousingVat", newVat);
-	         console.log(`✅ 부가세 적용 (rowKey: ${rowKey}) → 부가세: ${newVat}`);
-	     } else {
-	         console.log(`✅ 기존 부가세 유지 (rowKey: ${rowKey}) → 기존 부가세: ${existingVat}`);
-	     }
-	 }
-	
-	// ✅ 그리드 변경 감지 이벤트 추가 (수량, 단가 변경 시 자동 계산)
-	 warehousinglistGrid.on("afterChange", function (ev) {
-	     ev.changes.forEach(change => {
-	         if (change.columnName === "warehousingStandardQuantity" || change.columnName === "warehousingUnitPrice") {
-	             console.log(`📢 변경 감지 (rowKey: ${change.rowKey}, column: ${change.columnName}, value: ${change.value})`);
-	             calculateSupplyPrice(change.rowKey);
-	         }
-	     });
-	     
-	    
-	 });
+		         let quantity = parseFloat(removeCommas(warehousinglistGrid.getValue(rowKey, "warehousingStandardQuantity"))) || 0;
+		         let unitPrice = parseFloat(removeCommas(warehousinglistGrid.getValue(rowKey, "warehousingUnitPrice"))) || 0;
+		         let recalculatedSupplyPrice = quantity * unitPrice;
+		         let recalculatedVat = applyVat ? recalculatedSupplyPrice * 0.1 : 0;
 
-	// ✅ 부가세 체크박스 이벤트 핸들러 (새로운 추가된 행만 반응)
-	 document.getElementById("vatUnchecked").addEventListener("click", function () {
-	     if (this.checked) {
-	         document.getElementById("vatChecked").checked = false;
-	         setTimeout(() => {
-	             warehousinglistGrid.getData().forEach(row => {
-	                 if (!row.purchaseBodyNum) { // ✅ purchaseBodyNum이 없거나 null인 경우만 적용 (새로추가된입고리스트)
-	                     updateVat(row.rowKey);
-	                 }
-	             });
-	         }, 10);
-	     }
-	 });
-	//부가세 체크 박스 하나만 적용 되도록 
-	 document.getElementById("vatChecked").addEventListener("click", function () {
-	     if (this.checked) {
-	         document.getElementById("vatUnchecked").checked = false;
-	         setTimeout(() => {
-	             warehousinglistGrid.getData().forEach(row => {
-	                 if (!row.purchaseBodyNum) { // ✅ purchaseBodyNum이 없거나 null인 경우만 적용
-	                     updateVat(row.rowKey);
-	                 }
-	             });
-	         }, 10);
-	     }
-	 });
+		         // ✅ 공급가가 변경되었을 경우 VAT 업데이트
+		         if (recalculatedSupplyPrice !== supplyPrice) {
+		             console.log(`🔄 공급가 변경 감지, VAT 재계산 → 기존 VAT: ${existingVat}, 새 VAT: ${recalculatedVat}`);
+		             warehousinglistGrid.setValue(rowKey, "warehousingVat", recalculatedVat);
+		         }
+		     } else {
+		         // ✅ `purchaseBodyNum`이 없는 경우, 체크박스 설정에 따라 VAT 적용
+		         let newVat = removeVat ? 0 : (applyVat ? supplyPrice * 0.1 : 0);
+		         warehousinglistGrid.setValue(rowKey, "warehousingVat", newVat);
+		         console.log(`✅ 부가세 적용 (rowKey: ${rowKey}) → 부가세: ${newVat}`);
+		     }
+		 }
 
-	 // ✅ VAT 적용 함수 (purchaseBodyNum이 없는 경우만 적용)
-	 function updateVat(rowKey) {
-	     const applyVat = document.getElementById("vatChecked").checked;
+		// ✅ 모든 행에 부가세 적용
+		 function applyVatToAllRows(applyVat) {
+		     setTimeout(() => {
+		         warehousinglistGrid.getData().forEach(row => {
+		             updateVat(row.rowKey, true);
+		         });
+		     }, 10);
+		 }
+		
+		 // ✅ 부가세 체크박스 이벤트 핸들러 (새로 추가된 행만 반응)
+		 document.getElementById("vatUnchecked").addEventListener("click", function () {
+		     if (this.checked) {
+		         document.getElementById("vatChecked").checked = false;
+		         applyVatToAllRows(false);
+		     }
+		 });
 
-	     let supplyPrice = removeCommas(warehousinglistGrid.getValue(rowKey, "warehousingSupplyPrice")) || "0";
-	     let vat = applyVat ? supplyPrice * 0.1 : 0;
+		 document.getElementById("vatChecked").addEventListener("click", function () {
+		     if (this.checked) {
+		         document.getElementById("vatUnchecked").checked = false;
+		         applyVatToAllRows(true);
+		     }
+		 });
 
-	     // ✅ 부가세 업데이트 (콤마 포함)
-	     warehousinglistGrid.setValue(rowKey, "warehousingVat", vat);
-
-	     console.log(`✅ VAT 적용 (rowKey: ${rowKey}, applyVat: ${applyVat}) → 부가세: ${vat}`);
-	 }
+		// ✅ 그리드 변경 감지 이벤트 추가 (수량, 단가 변경 시 자동 계산)
+		 warehousinglistGrid.on("afterChange", function (ev) {
+		     ev.changes.forEach(change => {
+		         if (change.columnName === "warehousingStandardQuantity" || change.columnName === "warehousingUnitPrice") {
+		             console.log(`📢 변경 감지 (rowKey: ${change.rowKey}, column: ${change.columnName}, value: ${change.value})`);
+		             calculateSupplyPrice(change.rowKey);
+		             updateVat(change.rowKey, true);  // ✅ 수량 또는 단가 변경 시 VAT도 자동 업데이트
+		         }
+		     });
+		 });
 
 	
-	// ✅ 그리드 변경 감지 이벤트 추가 (수량, 단가 변경 시 자동 계산)
-	 warehousinglistGrid.on("afterChange", function (ev) {
-	     ev.changes.forEach(change => {
-	         if (change.columnName === "warehousingStandardQuantity" || change.columnName === "warehousingUnitPrice") {
-	             console.log(`📢 변경 감지 (rowKey: ${change.rowKey}, column: ${change.columnName}, value: ${change.value})`);
-	             calculateSupplyPrice(change.rowKey);
-	         }
-	     });
-	 });
 	
 
 		 

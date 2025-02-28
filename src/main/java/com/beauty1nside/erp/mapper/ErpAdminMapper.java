@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 
 import com.beauty1nside.common.dto.ComDTO;
 import com.beauty1nside.erp.dto.CompanyListDTO;
+import com.beauty1nside.erp.dto.ContactRequestDTO;
 import com.beauty1nside.erp.dto.CustomerServiceDTO;
 import com.beauty1nside.erp.dto.ErpSearchDTO;
 import com.beauty1nside.erp.dto.ServiceReturnDTO;
@@ -28,6 +29,7 @@ import com.beauty1nside.erp.dto.testDTO;
  *  2025.02.13  표하연          회사영문코드 중복처리
  *  2025.02.14  표하연          회사신규등록(회사,cs,최고관리자,구독정보목록생성)
  *  2025.02.25  표하연          회사의 구독현황을 조회한다 [ServiceReturnDTO]
+ *  2025.02.28  표하연          불특정 다수의 문의들 등록 한다
  *
  *  </pre>
 */
@@ -168,4 +170,11 @@ public interface ErpAdminMapper {
      */
 	public List<ServiceReturnDTO> serviceReturninfo(int companyNum);
 	
+	/**
+     * 불특정 다수의 문의를 수집한다
+     *
+     * @param CustomerServiceDTO
+     * @return int
+     */
+	public int insertNewQuery(ContactRequestDTO dto);
 }

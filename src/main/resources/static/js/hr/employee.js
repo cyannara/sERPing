@@ -129,7 +129,12 @@ function initializeGrid() {
             { header: "근무 유형", name: "employmentType", align: "center", sortable: true, width: 100, formatter: formatCommonCode('employmentType') },
             { header: "입사일", name: "hireDate", align: "center", sortable: true, width: 150, formatter: ({ value }) => value?.split('T')[0] || '' },
             { header: "연락처", name: "phone", align: "center", sortable: true, width: 150, formatter: formatPhoneNumber  },
-            { header: "이메일", name: "email", align: "center", sortable: true, width: 200 }
+            { header: "이메일", name: "email", align: "center", sortable: true, width: 200 },
+            { header: "근로계약서", name: "employeeContract", align: "center", sortable: true, width: 120,
+					formatter: function({ row }) {
+				        return `<button class="btn btn-info btn-sm contractBtn" data-id="${row.employeeId}">보기</button>`;
+				    },
+            }
         ],
         data: dataSource,
         rowHeaders: ['checkbox'],
@@ -410,7 +415,7 @@ function registerEmployee() {
 	formData.append("email",document.getElementById("email")?.value || "");
 	formData.append("phone",document.getElementById("phone")?.value || "");
 	formData.append("hireDate",document.getElementById("hireDate")?.value || "");
-	formData.append("departmentNum",document.getElementById("modalSubDepartment")?.value || "");
+	formData.append("departmentNum",document.getElementById("modalSubDepartment")?.value || 0);
 	formData.append("position",document.getElementById("modalPosition")?.value || "");
 	formData.append("status","ST001");
 	formData.append("employmentType",employmentValue || "");
@@ -516,7 +521,7 @@ function registerEmployee() {
     .then(message => {
         alert(message);
         return;
-        //location.reload();
+        location.reload();
     })
     .catch(error => console.error("❌ 등록 실패:", error));
     

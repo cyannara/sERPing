@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.beauty1nside.purchs.dto.WarehouseDTO;
 import com.beauty1nside.purchs.dto.WarehouseInsertVO;
+import com.beauty1nside.purchs.dto.WarehouseSearchDTO;
 import com.beauty1nside.purchs.mapper.warehouseMapper;
 import com.beauty1nside.purchs.service.warehouseService;
 
@@ -28,5 +30,15 @@ public class warehouseServiceImpl implements warehouseService{
 			warehouseMapper.warehouseInsert(vo);
 		}
 		
+	}
+
+	@Override
+	public List<WarehouseDTO> getWarehouselist(WarehouseSearchDTO dto) {
+		return warehouseMapper.warehouselist(dto);
+	}
+
+	@Override
+	public int warehouseCount(WarehouseSearchDTO dto) {
+		return warehouseMapper.warehouseCount(dto);
 	}
 }

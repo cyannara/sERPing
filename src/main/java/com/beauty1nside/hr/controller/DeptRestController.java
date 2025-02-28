@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.beauty1nside.hr.dto.DeptDTO;
 import com.beauty1nside.hr.service.DeptService;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -43,7 +44,11 @@ public class DeptRestController {
     
     // 부서 추가 API
     @PostMapping("/dept/add")
-    public ResponseEntity<String> addDepartment(@RequestBody DeptDTO dept) {
+    public ResponseEntity<String> addDepartment(@RequestBody DeptDTO dept, HttpSession session) {
+    	Integer companyNum = (Integer) session.getAttribute("companyNum"); // 세션에서 companyNum 가져오기
+        if (companyNum == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
         // ✅ 필수값 검증
         if (dept.getDepartmentName() == null || dept.getDepartmentName().trim().isEmpty()) {
             return ResponseEntity.badRequest().body("❌ 부서명은 필수 입력 사항입니다.");
@@ -86,7 +91,7 @@ public class DeptRestController {
     }
 
     // ✅ 특정 부서의 직원 수 조회 API
-    @GetMapping("/employees/{departmentNum}")
+    @GetMapping("/dept/employees/{departmentNum}")
     public ResponseEntity<?> getEmployeeCount(@PathVariable Long departmentNum) {
         int employeeCount = deptService.getEmployeeCountByDept(departmentNum);
         return ResponseEntity.ok(Map.of("employeeCount", employeeCount));

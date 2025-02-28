@@ -13,17 +13,14 @@
 	*  ======    =======    ==============================
 	*  2025.02.12  표하연          최초생성
 	*  2025.02.14  표하연          회사등록 및 검색기능 활성화
-	*  2025.02.26  표하연          회사구독정보, 구독내역, 세금계산서, 현금영수증, 거래명세서 활서오하
+	*  2025.02.26  표하연          회사구독정보, 구독내역, 세금계산서, 현금영수증, 거래명세서 활성화
+	*  2025.02.28  표하연          레이아웃 수정
 	*
 	*  </pre>
 ======================================================== -->
 <html layout:decorate="~{/erp/layouts/main}">
-
 <div class="container w-100 mw-1600" layout:fragment="content">
-	<div class="d-flex flex-column mb-1">
-		<div class="d-flex justify-content-start p-0 mt-2">
-			<h4>회사관리</h4>
-		</div>
+	<div class="d-flex flex-column mb-1 mt-3">
 		<!-- 회사 검색 영역 -->
 		<div class="p-2">
 			<div class="d-flex justify-content-center border border-primary-subtle rounded-3 bg-primary-subtle p-3">
@@ -37,6 +34,9 @@
 						id="flexCheckChecked" checked> <label
 						class="form-check-label" for="flexCheckChecked"> 미계약 </label>
 				</div>
+				
+				
+				
 				<div class="form-check">
 					<input class="form-check-input" type="checkbox" value=""
 						id="flexCheckChecked" checked> <label
@@ -45,19 +45,17 @@
 				<div class="form-check">
 					<input class="form-check-input" type="checkbox" value=""
 						id="flexCheckChecked" checked> <label
-						class="form-check-label" for="flexCheckChecked"> 일시정지 </label>
+						class="form-check-label" for="flexCheckChecked"> 만료 </label>
 				</div>
+				
+				
 				<div class="form-check">
 					<input class="form-check-input" type="checkbox" value=""
 						id="flexCheckChecked" checked> <label
-						class="form-check-label" for="flexCheckChecked"> 종료 </label>
+						class="form-check-label" for="flexCheckChecked"> 만료10일전 </label>
 				</div>
-				<div class="form-check">
-					<input class="form-check-input" type="checkbox" value=""
-						id="flexCheckChecked" checked> <label
-						class="form-check-label" for="flexCheckChecked"> 남은기간 10일
-						미만 </label>
-				</div>
+				
+				
 				<div class="form-check">
 					<input class="form-check-input" type="checkbox" value=""
 						id="flexCheckChecked" checked> <label
@@ -68,6 +66,7 @@
 						id="flexCheckChecked" checked> <label
 						class="form-check-label" for="flexCheckChecked"> 기간구독 </label>
 				</div>
+				
 				
 				<div>
 					<select name="display_amount" id="display_amount" class="col-8 input-box" onchange="changeDisplay()">
@@ -100,33 +99,33 @@
 		</div>
 		<!-- 토스트 그리드 영역 끝 -->
 		<!-- 데이터 처리 영역 -->
-		<div class="pt-2 ps-2 pe-2" style="width: 1600px;">
-		    <div class="d-flex justify-content-center border border-primary-subtle rounded-3 p-0" style="height: 400px;">
+		<div class="pt-2 ps-2 pe-2" style="width: 1560px;">
+		    <div class="d-flex justify-content-center border border-primary-subtle rounded-3 p-0" style="height: 420px;">
 		        <!-- 왼쪽 영역 -->
-		        <div class="d-flex flex-column flex-grow-1 flex-wrap p-1 btn-list" style="max-width: 50%;">
-		            <div class="d-flex flex-wrap mb-1 justify-content-between align-items-center">
+		        <div class="d-flex flex-column flex-grow-1 flex-wrap p-1 btn-list" style="max-width: 779px;">
+		            <div class="d-flex flex-wrap mb-1 justify-content-between align-items-center" style="margin-left: 7px;margin-top: 10px;">
 					    
 					    <!-- 왼쪽 정렬 버튼 그룹 -->
 					    <div class="d-flex gap-2">
-					        <button type="button" class="btn btn-success btn-sm inputComInser">회사등록</button>
+					        <button type="button" class="btn btn-outline-success btn-sm inputComInser">회사등록</button>
 					        <div class="csbtnlist" style="display: none;">
-							    <button type="button" class="btn btn-primary btn-sm cslist">CS내역</button>
-							    <button type="button" class="btn btn-success btn-sm reinfo">구독정보</button>
-							    <button type="button" class="btn btn-success btn-sm relist">구독내역</button>
+							    <button type="button" class="btn btn-outline-primary btn-sm cslist">CS내역</button>
+							    <button type="button" class="btn btn-outline-success btn-sm reinfo">구독정보</button>
+							    <button type="button" class="btn btn-outline-success btn-sm relist">구독내역</button>
 							    <!-- <button type="button" class="btn btn-outline-danger btn-sm getout">중도해지</button> -->
-							    <button type="button" class="btn btn-warning btn-sm pwreset">비밀번호초기화</button>
+							    <button type="button" class="btn btn-outline-warning btn-sm pwreset">비밀번호초기화</button>
 							</div>
 					    </div>
 					
 					    <!-- 오른쪽 정렬 버튼 -->
 					    <div>
-					        <button type="button" class="btn btn-danger btn-sm allCance" style="display: none;">닫기</button>
+					        <button type="button" class="btn btn-danger btn-sm allCance" style="display: none; position: relative; left: -7px;">닫기</button>
 					    </div>
 					    
 					</div>
 
 		            <!-- 폼시작 -->
-		            <div id="formSection" style="display: none;">
+		            <div id="formSection" style="display: none; margin-left: 7px; margin-top: 10px;">
 			            <form action="#" id="inputComFrom" enctype="multipart/form-data">
 						<input type="hidden" id="csrfToken" name="_csrf" th:value="${_csrf != null ? _csrf.token : ''}">
 			            <!-- EQ01=단순문의 / EQ02=상태변경 / EQ03=발행 / EQ04=신규등록 -->
@@ -139,19 +138,19 @@
 			            	<div class="p-0">
 			                	<div class="input-group input-group-sm mb-1 pe-1">
 									<span class="input-group-text">회사번호</span>
-									<input type="number" class="form-control" id="companyNum" name="companyNum" readonly="readonly" style="width: 50px">
+									<input type="number" class="form-control" id="companyNum" name="companyNum" readonly="readonly" style="width: 50px;">
 								</div>
 			                </div>
 			                <div class="p-0">
 			                	<div class="input-group input-group-sm mb-1 pe-1">
 									<span class="input-group-text">회사명</span>
-									<input type="text" class="form-control" id="companyName" name="companyName" style="width: 120px">
+									<input type="text" class="form-control" id="companyName" name="companyName" style="width: 115px">
 								</div>
 			                </div>
 			                <div class="p-0">
 			                	<div class="input-group input-group-sm mb-1 pe-1">
 									<span class="input-group-text">회사영문명</span>
-									<input type="text" class="form-control" placeholder="20자 이하 소문자" id="companyEngName" name="companyEngName" style="width: 130px">
+									<input type="text" class="form-control" placeholder="20자 이하 소문자" id="companyEngName" name="companyEngName" style="width: 125px">
 								</div>
 			                </div>
 			                <div class="p-0">
@@ -173,7 +172,7 @@
 			                <div class="p-0">
 			                	<div class="input-group input-group-sm mb-1 pe-1">
 									<span class="input-group-text">대표자연락처</span>
-									<input type="text" class="form-control" id="representationPhone" name="representationPhone" style="width: 120px">
+									<input type="text" class="form-control" id="representationPhone" name="representationPhone" style="width: 123px">
 								</div>
 			                </div>
 			                <div class="p-0">
@@ -185,22 +184,22 @@
 			                <div class="p-0">
 			                	<div class="input-group input-group-sm mb-1">
 									<span class="input-group-text">담당자연락처</span>
-									<input type="text" class="form-control" id="chargerPhone" name="chargerPhone" style="width: 120px">
+									<input type="text" class="form-control" id="chargerPhone" name="chargerPhone" style="width: 124px">
 								</div>
 			                </div>
 			            </div>
 			            <div class="d-flex flex-wrap mb-1">
 			                <div class="p-0">
 			                	<div class="input-group input-group-sm mb-1 pe-1">
-									<span class="input-group-text">email</span>
-									<input type="text" class="form-control" id="chargerEmail" name="chargerEmail" style="width: 240px;">
+			                		<input type="file" class="form-control" placeholder="png, jpg 가능" accept=".jpg, .jpeg, .png" id="businessLicense" name="businessLicense" style="width: 400px;">
+								    <button class="btn btn-outline-secondary" type="button" id="businessLicense_upload">업로드</button>
+									
 								</div>
 			                </div>
 			                <div class="p-0">
 				                <div class="input-group input-group-sm mb-1">
-								  <input type="file" class="form-control" placeholder="png, jpg, pdf 가능" 
-								  			accept=".jpg, .jpeg, .png, .pdf" id="businessLicense" name="businessLicense" style="width: 400px;">
-								  <button class="btn btn-outline-secondary" type="button" id="businessLicense_upload">업로드</button>
+								    <span class="input-group-text">email</span>
+									<input type="text" class="form-control" id="chargerEmail" name="chargerEmail" style="width: 244px;">
 								</div>
 			                </div>
 			            </div>
@@ -208,14 +207,14 @@
 			                <div class="p-0">
 								<div class="input-group input-group-sm mb-1 pe-1">
 									<span class="input-group-text">주소</span>
-									<input type="text" class="form-control" id="companyAddress" readonly="readonly" name="companyAddress" style="width: 300px;">
+									<input type="text" class="form-control" id="companyAddress" readonly="readonly" name="companyAddress" style="width: 340px;">
 									<button class="btn btn-outline-secondary" type="button" id="companyAddress_search">주소검색</button>
 								</div>
 			                </div>
 			                <div class="p-0">
 			                	<div class="input-group input-group-sm mb-1">
 									<span class="input-group-text">나머지주소</span>
-									<input type="text" class="form-control" id="companyAddressMOD" name="companyAddressMOD" style="width: 240px;">
+									<input type="text" class="form-control" id="companyAddressMOD" name="companyAddressMOD" style="width: 210px;">
 								</div>
 			                </div>
 			            </div>
@@ -234,7 +233,7 @@
 				                </div>
 				                <div class="p-0 me-2">
 				                	<div class="input-group input-group-sm mb-1">
-										<input type="text" class="form-control" id="dateChangeInput" name="dateChangeInput" style="width: 50px;">
+										<input type="text" class="form-control" id="dateChangeInput" name="dateChangeInput" style="width: 72px;">
 										<button class="btn btn-outline-secondary dateChange" type="button">기간변경</button>
 									</div>
 				                </div>
@@ -255,13 +254,13 @@
 			            <div class="d-flex align-items-stretch mb-1">
 						    <div class="p-0 flex-grow-1 me-2">
 						        <div class="mb-1">
-						            <label class="form-label">내용 등록 &nbsp;&nbsp;&nbsp;&nbsp;<span class="errMessage" style="font-weight: bold; color: red;"></span></label>
-						            <textarea class="form-control" id="customerServiceContent" name="customerServiceContent" rows="4"></textarea>
+						            <label class="form-label"><b>내용 등록</b> &nbsp;&nbsp;&nbsp;&nbsp;<span class="errMessage" style="font-weight: bold; color: red;"></span></label>
+						            <textarea style="width: 683px;" class="form-control" id="customerServiceContent" name="customerServiceContent" rows="4"></textarea>
 						        </div>
 						    </div>
 						    <div class="p-0">
-						        <div class="mb-1 h-100">
-						            <button type="button" class="btn btn-success h-100" id="insertAndUpdate"><b>등 록</b></button>
+						        <div style="margin-top: 32px;margin-right: 7px;">
+						            <button style="height: 110px;" type="button" class="btn btn-outline-success" id="insertAndUpdate"><b>등 록</b></button>
 						        </div>
 						    </div>
 						</div>
@@ -277,7 +276,7 @@
 		        </div>
 		
 		        <!-- 오른쪽 영역 -->
-		        <div class="d-flex justify-content-center flex-grow-1 p-1" style="max-width: 50%;">
+		        <div class="d-flex justify-content-center flex-grow-1 p-1" style="max-width: 779px;">
 		            <div class="d-flex flex-column mb-3 overflow-auto appendsection">
 					</div>
 		        </div>
@@ -285,6 +284,8 @@
 		</div>
 		<!-- 데이터 처리 영역 끝-->
 	</div>
+	
+	
 	<!-- 사업자 등록증 모달 -->
 	<div class="modal fade" id="businessLicenseModal" tabindex="-1" aria-labelledby="businessLicenseModalLabel" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered">
@@ -293,8 +294,8 @@
 					<h5 class="modal-title" id="businessLicenseModalLabel">사업자 등록증</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
-				<div class="modal-body">
-					<img id="businessLicenseImg" src="" class="img-fluid" alt="사업자 등록증">
+				<div class="modal-body d-flex justify-content-center">
+				    <img id="businessLicenseImg" src="" class="img-fluid" alt="사업자 등록증">
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
@@ -420,35 +421,42 @@
 		//그리드 생성
 		const grid = new Grid({
 			el : document.getElementById('grid'), // 컨테이너 엘리먼트
+			scrollX: false,
+		    scrollY: false,
+		    minBodyHeight: 201,
+		    columnOptions: {
+		        resizable: true
+		    },
 			pageOptions : {
 				useClient : false, //페이지 네이션 할꺼면 false // 자동으로 하게할껴면 true
 				perPage : 5, //한페이지에 몇개 보여줄지
 			},
 			//칼럼 정하기
 			columns: [
-				{ header: "회사번호", name: "companyNum", editor: 'text' },
-				{ header: "회사명", name: "companyName", editor: 'text' },
-				{ header: "대표자명", name: "representationName", editor: 'text' },
-				{ header: "담당자명", name: "chargerName", editor: 'text' },
-				{ header: "담당자연락처", name: "chargerPhone", editor: 'text' },
-				{ header: "이메일", name: "chargerEmail", editor: 'text' },
-				{ header: "사업자등록증", name: "businessLicense", editor: 'text',
+				{ header: "회사번호", name: "companyNum", editor: 'text', align: "center", width: "70" },
+				{ header: "회사명", name: "companyName", editor: 'text', align: "center", width: "200" },
+				{ header: "대표자명", name: "representationName", editor: 'text', align: "center", width: "100" },
+				{ header: "담당자명", name: "chargerName", editor: 'text', align: "center", width: "100" },
+				{ header: "담당자연락처", name: "chargerPhone", editor: 'text', align: "center", width: "200" },
+				{ header: "이메일", name: "chargerEmail", editor: 'text', align: "center" },
+				{ header: "사업자등록증", name: "businessLicense", editor: 'text', width: "100",
 					formatter: function({ value }) {
-				        return `<button class="btn btn-info btn-sm contract-btn" data-id="${value}">등록증</button>`;
+						return `<button class="btn btn-outline-primary btn-sm contract-btn" data-id="${value}">등록증</button>`;
 				    },
+				    align: "center"
 				},
-				{ header: "계약서", 
+				{ header: "계약서",  width: "100",
 			        name: "contractNum", 
 			        formatter: function({ row }) {
 			            if (row.contractNum === 0) {
 			            	return `미계약`;
 			            } else {
-			                return `<button class="btn btn-info contact-info" data-id="${row.companyNum}">계약</button>`;
+			                return `<button class="btn btn-outline-primary btn-sm contact-info" data-id="${row.companyNum}">계약서</button>`;
 			            }
 			        },
-			        editor: 'text',
+			        editor: 'text', align: "center"
 				},
-				{ header: "상태", name: "serviceState", 
+				{ header: "상태", name: "serviceState",  width: "100",
 					formatter: function({ value }) {
 			            if (value === 'EC01') {
 			            	return `서비스`;
@@ -458,9 +466,9 @@
 			                return `종료`;
 			            }
 			        },
-			        editor: 'text',
+			        editor: 'text', align: "center"
 				},
-				{ header: "남은기간", name: "remainingDays", editor: 'text',
+				{ header: "남은기간", name: "remainingDays", editor: 'text', width: "120",
 					//해당행 전체 데이터 가져오기
 					formatter: function({ row }) {
 						// 만료일 가져오기
@@ -474,17 +482,19 @@
 			            // 미리초 데이터를 일 단위로 변환
 			            const remainingDays = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
 
-			            if(remainingDays > 0){
+			            if(remainingDays > 10){
 			            	return `${remainingDays}일 남음`;
-			            }else if(remainingDays <= 0 && remainingDays >= 9){
+			            }else if(remainingDays >= 0 && remainingDays <= 9){
 			            	//나중에 붉은색 스타일 넣을꺼 가만하고 분리
+			            	//grid.addRowClassName(row.rowKey, 'custom-red-row');
 			            	return `${remainingDays}일 남음`;
 			            }else{
 				            return `종료`;
 			            }
 			        },
+			        align: "center"
 			    },
-				{ header: "구독형태", name: "subscriptionForm", editor: 'text',
+				{ header: "구독형태", name: "subscriptionForm", editor: 'text', width: "120",
 					formatter: function({ value }) {
 			            if (value === 'EL01') {
 			            	return `기간구독`;
@@ -492,8 +502,9 @@
 			            	return `정기구독`;
 			            }
 			        },
+			        align: "center"
 			    },
-				{ header: "만료일", name: "subscriptionEndDate", editor: 'text' },
+				{ header: "만료일", name: "subscriptionEndDate", editor: 'text', align: "center", width: "150" },
 			],
 			//초기 데이터 뭘로 할지
 			data : dataSource,
@@ -714,7 +725,14 @@
 		});
 		function sublist(){
 			//화면 초기화
-			document.querySelector(".appendsection").innerHTML = '<h5>구독내역<h5>';
+			//document.querySelector(".appendsection").innerHTML = '<h5>구독내역<h5>';
+			document.querySelector(".appendsection").innerHTML = `
+				<div class="appendsection2">
+			    <div class="card p-3 shadow-sm" style="width: 100%; max-width: 700px; border-radius: 12px;">
+			        <h5 class="mb-3 text-center fw-bold">📋 구독 내역</h5>
+			        <div id="subscriptionContainer" class="d-flex flex-column gap-3 appdiv"></div>
+			    </div>
+			`;
 			
 			const sublistdataSource = {
 					api : {
@@ -728,9 +746,9 @@
 			// 새로운 div 생성
 		    const sublistContainer = document.createElement("div");
 		    sublistContainer.id = "sublist";
-		    sublistContainer.style.width = "780px"; // 가로 크기 조정 가능
-		    //sublistContainer.style.height = "500px"; // 높이 조정 가능
-		    document.querySelector(".appendsection").appendChild(sublistContainer);
+		    sublistContainer.style.width = "665px"; // 가로 크기 조정 가능
+		    //document.querySelector(".appendsection").appendChild(sublistContainer);
+		    document.querySelector(".appdiv").appendChild(sublistContainer);
 			
 		 	// 기존 `sublistgrid` 객체가 있다면 삭제
 		    if (window.sublistgrid) {
@@ -740,48 +758,54 @@
 		    // 새로운 `sublistgrid` 생성
 		    window.sublistgrid = new tui.Grid({
 		        el: document.getElementById('sublist'),
+		        scrollX: false,
+			    scrollY: false,
+			    minBodyHeight: 201,
+			    columnOptions: {
+			        resizable: true
+			    },
 		        pageOptions: {
 		            useClient: false,
 		            perPage: 5
 		        },
 		        columns: [
-		            { header: "구독번호", name: "subscriptionNum", editor: 'text' },
-		            { header: "구독수단", name: "subscriptionMeanName", editor: 'text' },
-		            { header: "구독형태", name: "subscriptionFormName", editor: 'text' },
-		            { header: "구독금액", name: "subscriptionAmount", editor: 'text', formatter: ({ value }) => value.toLocaleString() + '원' },
+		            { header: "번호", name: "subscriptionNum", editor: 'text', align: "center", width: "50" },
+		            { header: "구독수단", name: "subscriptionMeanName", editor: 'text', align: "center", width: "70" },
+		            { header: "구독형태", name: "subscriptionFormName", editor: 'text', align: "center", width: "70" },
+		            { header: "구독금액", name: "subscriptionAmount", editor: 'text', formatter: ({ value }) => value.toLocaleString() + '원', align: "right", width: "100" },
 		            { header: "구독일시", name: "subscriptionDate", editor: 'text',
 						formatter: function({ value }) {
 							return subscriptday(value);
 					    },
 					},
-					{ header: "거래명세서", name: "transactionstatement", editor: 'text',
+					{ header: "거래명세서", name: "transactionstatement", editor: 'text', align: "center", width: "80",
 						formatter: function({ row }) {
-					        return `<button class="btn btn-info btn-sm sub-bill" data-id="${row.subscriptionNum}">거래명세서</button>`;
+					        return `<button class="btn btn-info btn-sm sub-bill" data-id="${row.subscriptionNum}">명세서</button>`;
 					    },
 					},
-					{ header: "세금계산서", name: "taxinvoice", editor: 'text',
+					{ header: "세금계산서", name: "taxinvoice", editor: 'text', align: "center", width: "80",
 						formatter: function({ row }) {
 							if(row.billForm=="EB01"){
 								return `발행불가`;
 							}else{
 								if(row.billNum){
-									return `<button class="btn btn-info btn-sm sub-tax" data-id="${row.subscriptionNum}_1">계산서보기</button>`;
+									return `<button class="btn btn-info btn-sm sub-tax" data-id="${row.subscriptionNum}_1">보기</button>`;
 								}else{
-						        	return `<button class="btn btn-info btn-sm sub-tax" data-id="${row.subscriptionNum}_2">발행하기</button>`;							
+						        	return `<button class="btn btn-info btn-sm sub-tax" data-id="${row.subscriptionNum}_2">발행</button>`;							
 								}							
 							}
 					    },
 					},
-					{ header: "현금영수증", name: "cashreceipt", editor: 'text',
+					{ header: "현금영수증", name: "cashreceipt", editor: 'text', align: "center", width: "80",
 						formatter: function({ row }) {
 							if(row.subscriptionMeanName=="무통장" || row.subscriptionMeanName=="계좌이체"){
 								if(row.billForm=="EB02"){
 									return `발행불가`;
 								}else{
 									if(row.billNum){
-										return `<button class="btn btn-info btn-sm sub-cash" data-id="${row.subscriptionNum}_1">영수증보기</button>`;
+										return `<button class="btn btn-info btn-sm sub-cash" data-id="${row.subscriptionNum}_1">보기</button>`;
 									}else{
-							        	return `<button class="btn btn-info btn-sm sub-cash" data-id="${row.subscriptionNum}_2">발행하기</button>`;							
+							        	return `<button class="btn btn-info btn-sm sub-cash" data-id="${row.subscriptionNum}_2">발행</button>`;							
 									}								
 								}
 							}else{
@@ -1054,71 +1078,142 @@
 			.then( result => {
 				console.log(result);
 				let servicetag = `
-						<h5>구독정보</h5>
+				<div class="appendsection2">
+					<div class="card">
+					   <h3 class="card-title">📋 구독 정보</h3>
+					   <div class="service-list">
 					`;
-				let servicetag1 = "";
-				let servicetag2 = "그룹웨서 서비스 : 미사용<br>";
-				let servicetag3 = "인사관리 서비스 : 미사용<br>";
-				let servicetag4 = "지점관리 서비스 : 미사용<br>";
-				let servicetag5 = "그룹웨어 서비스 : 미사용<br>";
+				let servicetag1 = ``;
+				let servicetag2 = `
+						<div class="service-item">
+				           <span>✅ <strong>그룹웨어 서비스</strong></span>
+				           <span>👥 사용자: 미사용</span>
+				       </div>	
+					`;
+				let servicetag3 = `
+						<div class="service-item">
+				           <span>✅ <strong>인사관리 서비스</strong></span>
+				           <span>👥 사용자: 미사용</span>
+				       </div>	
+					`;
+				let servicetag4 = `
+						<div class="service-item">
+				           <span>✅ <strong>지점관리 서비스</strong></span>
+				           <span>👥 사용자: 미사용</span>
+				       </div>	
+					`;
+				let servicetag5 = `
+						<div class="service-item">
+				           <span>✅ <strong>회계관리 서비스</strong></span>
+				           <span>👥 사용자: 미사용</span>
+				       </div>	
+					`;
 				
 				result.forEach(ele=>{
 					if(ele.subscriptionNameNum == 1 || ele.subscriptionNameNum == 6 ){
 						//서비스사용 형태와 방법
 						if(ele.limitDay <= 0){
-							servicetag1 = "sERPing 서비스 : 종료<br>";
+							servicetag1 = `
+								<div class="service-item">
+						           <span>✅ <strong>sERPing 서비스</strong></span>
+						           <span>📌 종료</span>
+						       </div>
+							`;
 						}else{
 							let endday = localdate(ele.subscriptionEndDate);
 							servicetag1 +=`
-									sERPing 서비스 : ${ele.subscriptionForm} : ${ele.limitDay}일 남음 : 종료일=${endday}<br>
+									<div class="service-item">
+							           <span>✅ <strong>sERPing 서비스</strong></span>
+							           <span>📌 ${ele.subscriptionForm}</span>
+							           <span>⏳ ${ele.limitDay}일 남음</span>
+							           <span>📅 종료일: ${endday}</span>
+							       </div>
 								`;							
 						}
 					}
 					if(ele.subscriptionNameNum == 2 || ele.subscriptionNameNum == 7 ){
 						//그룹웨어 사용
 						if(ele.limitDay <= 0){
-							servicetag2 = "그룹웨어 서비스 : 종료<br>";
+							servicetag2 = `
+								<div class="service-item">
+						           <span>✅ <strong>그룹웨어 서비스</strong></span>
+						           <span>👥 사용자: 미사용</span>
+						       </div>	
+							`;
 						}else{
 							servicetag2 =`
-								그룹웨어 서비스 : ${ele.subscriptionOption}<br>
+								<div class="service-item">
+						           <span>✅ <strong>그룹웨어 서비스</strong></span>
+						           <span>👥 사용자: ${ele.subscriptionOption}</span>
+						       </div>
 							`;	
 						}
 					}
 					if(ele.subscriptionNameNum == 3 || ele.subscriptionNameNum == 8 ){
 						//인사관리 사용
 						if(ele.limitDay <= 0){
-							servicetag3 = "인사관리 서비스 : 종료<br>";
+							servicetag3 = `
+								<div class="service-item">
+						           <span>✅ <strong>인사관리 서비스</strong></span>
+						           <span>👥 사용자: 미사용</span>
+						       </div>	
+							`;
 						}else{
 							let endday = localdate(ele.subscriptionEndDate);
 							servicetag3 =`
-								인사관리 서비스 : ${ele.subscriptionForm} : ${ele.limitDay}일 남음 : 종료일=${endday}<br>
+								<div class="service-item">
+						           <span>✅ <strong>인사관리 서비스</strong></span>
+						           <span>📌 ${ele.subscriptionForm}</span>
+						           <span>⏳ ${ele.limitDay}일 남음</span>
+						           <span>📅 종료일: ${endday}</span>
+						       </div>
 							`;	
 						}
 					}
 					if(ele.subscriptionNameNum == 4 || ele.subscriptionNameNum == 9 ){
 						//지점관리 사용
 						if(ele.limitDay <= 0){
-							servicetag4 = "지점관리 서비스 : 종료<br>";
+							servicetag4 = `
+								<div class="service-item">
+						           <span>✅ <strong>지점관리 서비스</strong></span>
+						           <span>👥 사용자: 미사용</span>
+						       </div>	
+							`;
 						}else{
 							let endday = localdate(ele.subscriptionEndDate);
 							servicetag4 =`
-								지점관리 서비스 : ${ele.subscriptionForm} : ${ele.limitDay}일 남음 : 종료일=${endday}<br>
+								<div class="service-item">
+						           <span>✅ <strong>지점관리 서비스</strong></span>
+						           <span>📌 ${ele.subscriptionForm}</span>
+						           <span>⏳ ${ele.limitDay}일 남음</span>
+						           <span>📅 종료일: ${endday}</span>
+						       </div>
 							`;	
 						}
 					}
 					if(ele.subscriptionNameNum == 5 || ele.subscriptionNameNum == 10 ){
 						//회계관리 사용
 						if(ele.limitDay <= 0){
-							servicetag5 = "회계관리 서비스 : 종료<br>";
+							servicetag5 = `
+								<div class="service-item">
+						           <span>✅ <strong>회계관리 서비스</strong></span>
+						           <span>👥 사용자: 미사용</span>
+						       </div>	
+							`;
 						}else{
 							let endday = localdate(ele.subscriptionEndDate);
 							servicetag5 =`
-								회계관리 서비스 : ${ele.subscriptionForm} : ${ele.limitDay}일 남음 : 종료일=${endday}<br>
+								<div class="service-item">
+						           <span>✅ <strong>회계관리 서비스</strong></span>
+						           <span>📌 ${ele.subscriptionForm}</span>
+						           <span>⏳ ${ele.limitDay}일 남음</span>
+						           <span>📅 종료일: ${endday}</span>
+						       </div>
 							`;	
 						}
 					}
 				});	//foreach 끝
-				servicetag += servicetag1 + servicetag2 + servicetag3 + servicetag4 + servicetag5;
+				servicetag += servicetag1 + servicetag2 + servicetag3 + servicetag4 + servicetag5+`</div></div></div>`;
 				document.querySelector(".appendsection").innerHTML = '';
 				document.querySelector(".appendsection").insertAdjacentHTML("beforeend", servicetag);
 			})	// fetch 끝
@@ -1166,27 +1261,39 @@
 				document.querySelector(".appendsection").innerHTML = '';
 				
 				result.forEach(ele => {
-					let cstag = `
-		                <div class="p-2">
-		                    <table id="answerTable">
-		                        <tr>
-		                            <th>답변유형</th>
-		                            <td>${ele.customerServiceDivision || "N/A"}</td>
-		                            <th>처리담당자</th>
-		                            <td>${ele.employeeName || "N/A"}</td>
-		                            <th>처리일시</th>
-		                            <td>${ele.customerServiceDate || "N/A"}</td>
-		                        </tr>
-		                        <tr>
-		                            <th>답변내용</th>
-		                            <td colspan="5">${ele.customerServiceContent || "내용 없음"}</td>
-		                        </tr>
-		                    </table>
-		                </div>
-		            `;
-					
-					document.querySelector(".appendsection").insertAdjacentHTML("beforeend",cstag);
-					
+				    let customerServiceDate = new Date(ele.customerServiceDate); // UTC 기준으로 Date 객체 생성
+				    customerServiceDate.setHours(customerServiceDate.getHours() + 9); // KST(UTC+9) 변환
+				    // 변환된 날짜를 YYYY-MM-DD HH:MM:SS 형식으로 포맷
+				    const year = customerServiceDate.getFullYear();
+				    const month = String(customerServiceDate.getMonth() + 1).padStart(2, '0');
+				    const day = String(customerServiceDate.getDate()).padStart(2, '0');
+				    const hours = String(customerServiceDate.getHours()).padStart(2, '0');
+				    const minutes = String(customerServiceDate.getMinutes()).padStart(2, '0');
+				    const seconds = String(customerServiceDate.getSeconds()).padStart(2, '0');
+				    // 최종 변환된 날짜
+				    const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+				    let cstag = `
+				        <div class="p-2 mb-3">
+				            <table id="answerTable">
+				                <tr>
+				                    <th style="width:100px;height:40px;">답변유형</th>
+				                    <td style="width:70px;">${ele.customerServiceDivision || "N/A"}</td>
+				                    <th style="width:100px;">처리담당자</th>
+				                    <td style="width:70px;">${ele.employeeName || "N/A"}</td>
+				                    <th style="width:100px;">처리일시</th>
+				                    <td>${formattedDate || "N/A"}</td>
+				                </tr>
+				                <tr>
+				                    <th>답변내용</th>
+				                    <td class="p-3" colspan="5">
+					                    ${ele.customerServiceContent ? ele.customerServiceContent.replace(/\n/g, '<br>') : "내용 없음"}
+					                </td>
+
+				                </tr>
+				            </table>
+				        </div>
+				    `;
+				    document.querySelector(".appendsection").insertAdjacentHTML("beforeend", cstag);
 				});
 			} )
 			//패치 끝
