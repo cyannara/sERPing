@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8">
+</head>
+<body>    
+    <div class="container">
+		<div id="sellgrid"></div>
+		<div id="pagination" class="tui-pagination"></div>
+	</div>
+	
+<script>
+	document.querySelector('#sellDetailModal').addEventListener('shown.bs.modal', (e) => {
+		console.log(rowData);
+		console.log(session);
+
+		endDate = rowData.resultDate.slice(-10);
+
+		if(rowData.resultDate.length == 10){
+			let endDay = new Date(rowData.resultDate);
+			endDay.setDate(endDay.getDate() + 1);
+			endDate = `${endDay.getFullYear()}-${("0" + (endDay.getMonth()+1)).slice(-2)}-${("0" + endDay.getDate()).slice(-2)}`;
+		}
+		console.log(endDate);
+
+		const dataSource = {
+				api: {
+					readData: { url: 'http://localhost:81/accnut/rest/selling/info', method: 'GET', initParams: { page: 1 , companyNum: session.companyNum, startDate: rowData.resultDate.slice(0,10), endDate: endDate, officeId: rowData.officeId }},
+					
+				},
+				contentType: 'application/json'
+					
+			};
+			const sellgrid = new Grid({
+				el : document.querySelector('#sellgrid'),
+				pageOptions: {
+					useClient : false,
+					perPage: parseInt(document.querySelector('#display_amount').value) ,
+				},
+				columns: [
+					{ header : "일자", name : "resultDate",  sortable : true},
+					{ header : "지점명", name : "officeId",  sortable : true, width: 80},
+					{ header : "상품코드", name : "optionCode",  sortable : true, width: 80},
+					{ header : "상품명", name : "optionName",  sortable : true, width: 250},
+					{ header : "판매량", name : "sellQy",  sortable : true, width: 80},
+					{ header : "조정량", name : "minusQy",  sortable : true, width: 80},
+					{ header : "금액", name : "price",  sortable : true},
+					{ header : "판매금액", name : "totalPrice",  sortable : true},
+					//{ header : "상세보기", name : "detail", formatter : () => '<button class="btn btn-warning btn-sm btnInfo" data-bs-toggle="modal" data-bs-target="#sellDetailModal">상세보기</button>', align: 'center'},
+					
+				],
+				data : dataSource,
+			});
+	
+	
+	});
+	
+	document.querySelector('#sellDetailModal').addEventListener('hidden.bs.modal', () => {
+		document.querySelector('#sellgrid').remove();
+		let html = `<div id="sellgrid"></div>`
+		document.querySelector('#sellDetailModal').querySelector('#pagination').insertAdjacentHTML("beforebegin", html);
+	});
+
+</script>
+</body>
+</html>
