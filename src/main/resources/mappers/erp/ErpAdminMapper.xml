@@ -17,6 +17,7 @@
 	*  2025.02.14  표하연          회사신규등록(회사,cs,최고관리자,구독정보목록생성)
 	*  2025.02.15  표하연          회사정보수정 및 기본cs를 등록한다
 	*  2025.02.25  표하연          회사의 구독현황을 조회한다 [ServiceReturnDTO]
+	*  2025.02.28  표하연          불특정 다수의 문의들 등록 한다
 	*
 	*  </pre>
 ======================================================== -->
@@ -410,4 +411,22 @@
 		where company_num = #{companyNum}
 	</select>
 
+	<!-- 
+     * 불특정 다수의 문의를 수집한다
+     *
+     * @param CustomerServiceDTO
+     * @return int
+	-->
+	<insert id="insertNewQuery" parameterType="ContactRequestDTO">
+		INSERT INTO erp_inquiry VALUES
+		( 
+			erp_inqry_seq.nextval, 
+			#{companyName}, 
+			#{chargerName}, 
+			#{chargerPhone},
+			#{chargerEmail}, 
+			#{inquiryContent}, 
+			DEFAULT 
+		)
+	</insert>
 </mapper>
