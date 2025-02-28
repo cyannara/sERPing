@@ -2,26 +2,30 @@ const empBox = document.getElementById('emp-box')
 const sendBtn = document.getElementsByClassName('send-btn')[0]
 const chatContainer = document.getElementById("chatMessages");
 let sessionEmployeeNum = document.getElementById("sessionEmployeeNum").value;
+let sessionEmployeeName = document.getElementById("sessionEmployeeName").value;
 let roomId = 0
 
 const addMsg = (sentMsg) => {
     const messageDiv = document.createElement("div");
-    messageDiv.classList.add("chat-message", 'sent');
+    let isSender = sentMsg.employeeNum === sessionEmployeeNum
+
+    messageDiv.classList.add(
+        "chat-message",
+        `${isSender ? 'sent' : 'received'}`
+    );
 
     messageDiv.innerHTML = `
                 <span class="sender-name">${sentMsg.employeeName}</span>
-                <div class="message-box dark">
+                <div class="message-box ${isSender ? 'dark' : 'yellow'}">
                     ${sentMsg.msgContent}
                 </div>
-                <span class="message-time">${formatDateTime(sentMsg.sendDate)}</span>
+                <span class="message-time">${formatDateTime(new Date())}</span>
             `;
 
     chatContainer.appendChild(messageDiv);
 }
 
-const sendMsg = () => {
-    const msgContent = document.getElementById('textarea').value
-
+const storeMsg = (msgContent, message) => {
     const url = '/api/chat/msg'
     const msg = {
         roomId,
@@ -39,9 +43,29 @@ const sendMsg = () => {
         return result.json()
     }).then((data) => {
         if(Object.keys(data.data)[0]) {
-            addMsg(data.data)
+            // 메세지를 서버로 보냄
+            // 서버가 메세지를 받고 해당 메세지를 /topic/public 채널에 브로드캐스트
+            // stompClient.subscribe() 실행됨
+            stompClient.send(`/app/chat.sendMessage/${roomId}`, {}, JSON.stringify(message));
         }
     })
+}
+
+const sendMsg = () => {
+    if (!stompClient || !stompClient.connected) {
+        console.error("WebSocket is not connected yet.");
+        return;
+    }
+    const msgContent = document.getElementById('textarea').value
+    // type: 'CHAT',
+    let message = {
+        sender: sessionEmployeeName,
+        content: msgContent,
+        senderEmpNum: sessionEmployeeNum,
+    };
+
+    storeMsg(msgContent, message)
+    document.getElementById('textarea').value = ''
 }
 
 sendBtn.addEventListener('click', () => {
@@ -76,20 +100,27 @@ const showChats = (chats) => {
     });
 }
 
-const startChat = (emp) => {
-    const url = `/api/chat/start`
+const openChatRoom = (employeeNum) => {
+    const url = `/api/chat/start/${employeeNum}`
     fetch(url, {
-        method: 'POST',
+        method: 'get',
         headers: {
-            'header': header_csrf,
             "Content-Type": "application/json",
-            'X-CSRF-Token': token_csrf
-        },
-        body: JSON.stringify(emp)
+        }
     }).then((result) => {
         return result.json()
     }).then((data) => {
         roomId = Object.keys(data)[0]
+
+        stompClient.subscribe(`/topic/public/${roomId}`, function (message) {
+            const parsedMsg = JSON.parse(message.body)
+            addMsg({
+                    employeeName: parsedMsg.sender,
+                    msgContent: parsedMsg.content,
+                    employeeNum: parsedMsg.senderEmpNum
+                })
+        });
+
         let chats = Object.values(data)[0]
         showChats(chats)
 
@@ -98,6 +129,25 @@ const startChat = (emp) => {
             $('#room-tab').tab('show');
         });
     })
+}
+
+const startChat = (employeeNum) => {
+    let socket = new SockJS('/ws');
+
+    stompClient = Stomp.over(socket);
+    stompClient.debug = null;
+    stompClient.connect({}, function () {
+        console.log('sessionEmployeeName', sessionEmployeeName)
+            // , type: 'JOIN'
+        stompClient.send(
+            `/app/chat.addUser/${roomId}`,
+            {},
+            JSON.stringify({sender: sessionEmployeeName})
+        );
+        openChatRoom(employeeNum)
+    }, function (error) {
+        console.error("WebSocket 연결 실패:", error);
+    });
 }
 
 
@@ -135,7 +185,7 @@ const setEmpList = (empList) => {
         empBox.appendChild(div);
 
         div.addEventListener('click', () => {
-            startChat(emp)
+            startChat(emp.employeeNum)
         })
     });
 }
@@ -169,5 +219,5 @@ if(sessionEmployeeNum) {
     showAlert('세션이 만료되었습니다. 다시 로그인해주세요.', 'danger')
     setTimeout(() => {
         window.location.href = "/login";
-    }, 3000)
+    }, 2000)
 }
