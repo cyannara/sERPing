@@ -2,6 +2,9 @@ package com.beauty1nside.bsn.mapper;
 
 import java.util.List;
 
+import com.beauty1nside.bhf.dto.returninglist.BhfReturnListDTO;
+import com.beauty1nside.bhf.dto.returninglist.BhfReturnListSearchDTO;
+
 import com.beauty1nside.bsn.dto.BsnGoodsLOTDTO;
 import com.beauty1nside.bsn.dto.OrderSearchDTO;
 import com.beauty1nside.bsn.dto.delivery.BsnDeliveryDTO;
@@ -65,4 +68,11 @@ public interface BsnOrderMapper {
 	void insertBsnDeliveryLotDetail(BsnDeliveryDetailDTO bsnDeliveryDetailDTO);
 	//출고 LOT 제거
 	void deleteBsnDeliveryLotDetail(BsnDeliveryDetailDTO bsnDeliveryDetailDTO);
+	//출고 확정(완료)
+	void confirmBsnDelivery(String deliveryId);
+	
+	
+	
+	
+	
 }

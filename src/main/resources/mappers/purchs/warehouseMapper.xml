@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beauty1nside.purchs.mapper.warehouseMapper">
+
+<!-- 발주서 등록 프로시저 호출-->
+<insert id="warehouseInsert" statementType="CALLABLE" parameterType="com.beauty1nside.purchs.dto.WarehouseInsertVO">
+    {CALL purchs_warehouse_register(
+        #{employeeNum, mode=IN, jdbcType=NUMERIC},
+        #{companyNum, mode=IN, jdbcType=NUMERIC},
+        #{vendorId, mode=IN, jdbcType=NUMERIC},
+        #{files, mode=IN, jdbcType=ARRAY, typeHandler=com.beauty1nside.purchs.OracleArrayWarehouseHandler}
+    )}
+</insert>
+
+
+
+</mapper>

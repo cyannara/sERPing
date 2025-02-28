@@ -19,6 +19,15 @@ public interface DeptService {
     Map<String, Object> getOrganization(Long companyNum);
     
     // 부서 추가
-    void insertDepartment(DeptDTO dto);
+    int insertDepartment(DeptDTO dept);
+    
+    // 특정 부서 조회 (부모 부서 존재 여부 확인용)
+    DeptDTO getDepartmentByNum(Long departmentNum);
+    
+    // 부서 수정 (새롭게 추가)
+    int updateDepartment(DeptDTO dept);
+    
+    // 부서에 속한 직원 수 조회
+    int getEmployeeCountByDept(Long departmentNum);
 
 }

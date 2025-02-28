@@ -1,8 +1,12 @@
 package com.beauty1nside.hr.controller;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,18 +17,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.beauty1nside.common.GridArray;
 import com.beauty1nside.common.Paging;
-import com.beauty1nside.hr.dto.EmpContractDTO;
 import com.beauty1nside.hr.dto.EmpDTO;
 import com.beauty1nside.hr.dto.EmpSearchDTO;
-import com.beauty1nside.hr.dto.SalaryDTO;
 import com.beauty1nside.hr.service.EmpService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -36,6 +39,8 @@ import lombok.extern.log4j.Log4j2;
 public class HrRestController {
 	final EmpService empService;
 	final PasswordEncoder passwordEncoder;
+	
+	private static final String UPLOAD_DIR = "src/main/resources/static/file/image/mypage/profile/";
 	
 	@GetMapping("/emp/list")
 	public Object empList(@RequestParam(name = "perPage", defaultValue = "2", required = false) int perPage, 
@@ -70,7 +75,7 @@ public class HrRestController {
 		// grid 배열 처리
 		GridArray grid = new GridArray();
 		Object result = grid.getArray(paging.getPage(), totalRecords, empList);
-		return result;
+		return ResponseEntity.ok().body(result);
 	}
 	
     @GetMapping("/emp/common-codes")
@@ -79,10 +84,12 @@ public class HrRestController {
         return ResponseEntity.ok(result);
     }	
     
+ 
     
     // 🔹 사원 등록 API
     @PostMapping("/emp/register")
-    public ResponseEntity<String> registerEmployee(@RequestBody EmpDTO empDTO) {
+    public ResponseEntity<String> registerEmployee(EmpDTO empDTO,
+    											   @RequestPart("image") MultipartFile file) {
     	
     	log.info("empDTO={}",empDTO);
     	log.info("ssnFirstPart={}",empDTO.getSsn());
@@ -105,6 +112,16 @@ public class HrRestController {
     	
     	log.info("변경된 empDTO={}",empDTO);
         try {
+        	//프로필이미지 관련
+            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            Path uploadPath = Paths.get(UPLOAD_DIR + fileName);
+            
+            Files.createDirectories(uploadPath.getParent());
+            Files.write(uploadPath, file.getBytes());
+        	
+            String imageUrl = "/file/image/mypage/profile/" + fileName;
+            empDTO.setProfileImage(imageUrl);
+            log.info("empDTOempDTOempDTOempDTOempDTOempDTO={}",empDTO);
             empService.registerEmployee(empDTO);
             return ResponseEntity.ok("사원 등록 성공! 사번: " + empDTO.getEmployeeId());
         } catch (Exception e) {

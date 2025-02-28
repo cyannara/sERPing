@@ -166,7 +166,9 @@
 			#{companyAddress}, 
 			DEFAULT, 
 			DEFAULT, 
-			DEFAULT)
+			DEFAULT,
+			erp_account_emp_seq.nextval
+		)
 	</insert>
 	
 	<!-- 
@@ -239,6 +241,36 @@
 	    </set>
 	    WHERE company_num = #{companyNum}
 	</update>
+	
+	<!-- 
+     * ERP 사용회사 그룹웨서 서비스를 초기화 시킨다
+     *
+     * @param map
+     * @return int
+	-->
+	<update id="gropServiceUpdate" parameterType="map">
+		UPDATE erp_subscription_info_list
+	    <set>
+	    	subscription_update_date = sysdate,
+	        SUBSCRIPTION_NAME_NUM = 2,
+	        SUBSCRIPTION_OPTION_NUM = 5
+	    </set>
+	    WHERE company_num = #{companyNum}
+	    and SUBSCRIPTION_NAME_NUM in ( 2, 7 )
+	</update>
+	
+	<!-- 
+     * ERP 사용회사 기본서비스 제외 모든구독을 삭제 시킴
+     *
+     * @param map
+     * @return int
+	-->
+	<delete id="ServiceDelete" parameterType="map">
+		delete from erp_subscription_info_list
+	    WHERE company_num = #{companyNum}
+	    AND SUBSCRIPTION_NAME_NUM NOT IN (1, 6)
+	</delete>
+	
 	
 	<!-- 
      * ERP 사용회사 성보를 변경한다

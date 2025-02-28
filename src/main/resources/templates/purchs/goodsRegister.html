@@ -69,12 +69,12 @@
 						
 						<!-- 브랜드 모달 -->
 						
-						    <div th:include="purchs/ModalTemplate :: ModalTemplate (
+						    <div th:include="purchs/modal/ModalTemplate :: ModalTemplate (
 						    	'brandModal', 
 						    	'modal-xl', 
 						    	'브랜드 조회', 
-						    	'purchs/brandTable', 
-						    	'purchs/brandFooter'
+						    	'purchs/modal/brandTable', 
+						    	'purchs/modal/brandFooter'
 						    )"></div>
 						
 
@@ -89,12 +89,12 @@
 	                    <input type="text" class="form-control" name="vendorName" id="vendorName" th:value="${ProductDTO.vendorName}" data-bs-toggle="modal" data-bs-target="#vendorModal"  readonly>
 	                	<input type="hidden" id="vendorId" name="vendorId"  value="${ProductDTO.vendorId}">
 	                	<!-- 거래처 모달 -->
-						    <div th:include="purchs/ModalTemplate :: ModalTemplate (
+						    <div th:include="purchs/modal/ModalTemplate :: ModalTemplate (
 						    'vendorModal', 
 						    'modal-xl', 
 						    '거래처 조회', 
-						    'purchs/vendorTable', 
-						    'purchs/brandFooter'
+						    'purchs/modal/vendorTable', 
+						    'purchs/modal/brandFooter'
 						    )"></div>
 						
 	                </div>
@@ -169,12 +169,12 @@
         <div id="myGrid" class="tui-grid-container" style="height: 200px;"></div>
         <div id="pagination" class="tui-pagination"></div>
           <!--  창고 모달 -->
-		    <div th:include="purchs/ModalTemplate :: ModalTemplate (
+		    <div th:include="purchs/modal/ModalTemplate :: ModalTemplate (
 		    'warehouseModal', 
 		    'modal-xl', 
 		    '창고 조회', 
-		    'purchs/warehouseTable', 
-		    'purchs/warehouseFooter'
+		    'purchs/modal/warehouseTable', 
+		    'purchs/modal/warehouseFooter'
 		    )"></div>
         <div class=" d-flex justify-content-center mt-4">
             <button class="btn btn-primary mx-2" id="registerBtn">등록</button>

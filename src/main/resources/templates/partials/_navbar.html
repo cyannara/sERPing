@@ -14,7 +14,7 @@
     <nav class="menu">
       <a th:href="@{/standard/doc(menu='standard')}" data="standard"
          th:classappend="${#strings.equals('standard', param.menu)} ? 'selected' : ''">기준정보</a>
-      <a th:href="@{/bsn/orderList(menu='sales')}" data="sales"
+      <a th:href="@{/bsn/order/List(menu='sales')}" data="sales"
          th:classappend="${#strings.equals('sales', param.menu)} ? 'selected' : ''">영업</a>
       <a th:href="@{/purchs/goodsRegister(menu='inventory')}" data="inventory"
          th:classappend="${#strings.equals('inventory', param.menu)} ? 'selected' : ''">재고</a>
@@ -77,7 +77,8 @@
       </li>
       <li class="nav-item nav-profile dropdown">
         <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="profileDropdown">
-          <img th:src="${session.profileImage}" alt="profile"/>
+          <img th:src="${session.profileImage}" alt="profile"
+               onerror="this.onerror=null; this.src='/file/image/mypage/profile/noProfileImg.jpg';"/>
         </a>
         <div class="dropdown-menu dropdown-menu-right navbar-dropdown" style="padding-top: 20px" aria-labelledby="profileDropdown">
           <span th:inline="text" sec:authentication="name" class="empId"></span>

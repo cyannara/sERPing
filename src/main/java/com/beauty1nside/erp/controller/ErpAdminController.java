@@ -83,13 +83,43 @@ public class ErpAdminController {
 	}
 	
 	/**
+     * ERP 팀 소개
+     *
+     * @return String
+     */
+	@GetMapping("/team")
+	public String team() {
+		return "erp/spectator/team";
+	}
+	
+	/**
+     * ERP 가격 정보
+     *
+     * @return String
+     */
+	@GetMapping("/pricing")
+	public String pricing() {
+		return "erp/spectator/pricing";
+	}
+	
+	/**
+     * ERP 문의
+     *
+     * @return String
+     */
+	@GetMapping("/contact")
+	public String contact() {
+		return "erp/spectator/contact";
+	}
+	
+	/**
      * ERP 소개 페이지 연결
      *
      * @return String
      */
 	@GetMapping("/main")
 	public String main() {
-		return "erp/main";
+		return "erp/spectator/main";
 	}
 
 }

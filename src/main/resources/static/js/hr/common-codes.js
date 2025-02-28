@@ -134,6 +134,7 @@ function populatePositionSelect(positions) {
 
 // 재직 상태 버튼 동적으로 추가
 function populateStatusButtons(statuses) {
+	console.log("📌 재직 상태 데이터:", statuses); // ✅ 디버깅
     const statusGroup = document.getElementById('statusGroup');
     statusGroup.innerHTML = ''; // 기존 버튼 초기화
 
@@ -166,6 +167,7 @@ function populateStatusButtons(statuses) {
 
 // ✅ 근무 유형 버튼 동적으로 추가 (검색 필터 & 모달용 구분)
 function populateEmploymentButtons(employmentTypes) {
+	console.log("📌 근무 유형 데이터:", employmentTypes); // ✅ 데이터 확인
     // ✅ 검색 필터용 (검색 화면)
     const searchEmploymentGroup = document.getElementById('employmentTypeGroup');
     if (!searchEmploymentGroup) {

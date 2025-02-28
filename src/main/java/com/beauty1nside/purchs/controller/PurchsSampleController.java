@@ -80,7 +80,7 @@ public class PurchsSampleController {
     //입고등록 이동 
     @GetMapping("/warehousingRegister")
     public String warehousingRegister() {
-        return "purchs/warehousingRegister"; // templates/purchs/purchaseList.html을 반환
+        return "/purchs/warehousingRegister"; // templates/purchs/purchaseList.html을 반환
     }
 
 

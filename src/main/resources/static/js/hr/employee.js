@@ -7,6 +7,27 @@ const header = document.querySelector('meta[name="_csrf_header"]').content;
 const token = document.querySelector('meta[name="_csrf"]').content;
 
 document.addEventListener("DOMContentLoaded", function () {
+	
+   let profileInputIMG = document.querySelector("#profileImage");
+   let profileImgView = document.querySelector("#profilePreview");
+   let file = null;
+
+    profileInputIMG.addEventListener("change", function (event) {
+		file = event.target.files[0];
+
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                profileImgView.src = e.target.result;
+            };
+
+            reader.readAsDataURL(file); // 파일을 읽어 base64 URL로 변환
+        }
+
+    });
+
+	
     initializeGrid();
     setupEventListeners();
     fetchNewEmployeeId(); // 모달 열릴 때 사원번호 자동 입력
@@ -375,9 +396,62 @@ function validateEmployeeForm() {
 
 
 function registerEmployee() {
+	
 	let employmentId = document.querySelector("input[name='modalEmploymentType']:checked")?.id;
 	let employmentValue = employmentId ? employmentId.substring(employmentId.lastIndexOf("_") + 1) : "";
-    let empData = {
+	
+	let profileInputIMG = document.querySelector("#profileImage");
+    const file = profileInputIMG.files[0];
+    const formData = new FormData();
+    formData.append("image", file);
+    
+    formData.append("employeeId", document.getElementById("employeeIdInput")?.value || "");
+	formData.append("employeeName",document.getElementById("employeeName")?.value || "");
+	formData.append("email",document.getElementById("email")?.value || "");
+	formData.append("phone",document.getElementById("phone")?.value || "");
+	formData.append("hireDate",document.getElementById("hireDate")?.value || "");
+	formData.append("departmentNum",document.getElementById("modalSubDepartment")?.value || "");
+	formData.append("position",document.getElementById("modalPosition")?.value || "");
+	formData.append("status","ST001");
+	formData.append("employmentType",employmentValue || "");
+	formData.append("bankName",document.getElementById("bankSelect")?.options[document.getElementById("bankSelect").selectedIndex].text.trim() || "");
+	formData.append("accountNum",document.getElementById("accountNumber")?.value || "");
+	formData.append("zipCode",document.getElementById("zipcode")?.value || "");
+	formData.append("address",document.getElementById("address")?.value || "");
+	formData.append("addressDetail",document.getElementById("addressDetail")?.value || "");
+	formData.append("memo",document.getElementById("memo")?.value || "");
+	formData.append("parentDeptNum",document.getElementById("modalDepartment")?.value || "");
+	formData.append("companyNum",document.getElementById("companyNumSJ")?.value || "");
+	formData.append("firstSsn",document.getElementById("firstSsn")?.value || "");
+	formData.append("secondSsn",document.getElementById("secondSsn")?.value || "");
+	formData.append("authority",document.getElementById("modalAutority")?.value);
+		
+    
+/*    formData.append("employeeId", "20250227025");
+	formData.append("employeeName", "길동길동");
+	formData.append("email", "sdsds2233dsd@gmail.com");
+	formData.append("phone","01051005151");
+	formData.append("hireDate","2025-02-02");
+	formData.append("departmentNum" ,"3");
+	formData.append("position", "PO001");
+	formData.append("status","ST001");
+	formData.append("employmentType","ET001");
+	formData.append("bankName","국민은행");
+	formData.append("accountNum","202202020");
+	formData.append("zipCode","05222");
+	formData.append("address","대구");
+	formData.append("addressDetail","2층");
+	formData.append("memo","메모");
+	formData.append("parentDeptNum","1");
+	formData.append("companyNum", "1");
+	formData.append("firstSsn", "202202");
+	formData.append("secondSsn","2020222");
+	formData.append("authority","AU001");*/	
+		
+	console.log("file:::",file);
+	
+
+/*    let empData = {
 		employeeId: document.getElementById("employeeIdInput")?.value || "",
         employeeName: document.getElementById("employeeName")?.value || "",
         email: document.getElementById("email")?.value || "",
@@ -387,7 +461,6 @@ function registerEmployee() {
         position: document.getElementById("modalPosition")?.value || "",
         status: "ST001",
         employmentType: employmentValue || "",
-        salary: document.getElementById("salary")?.value || "",
         bankName: document.getElementById("bankSelect")?.options[document.getElementById("bankSelect").selectedIndex].text.trim() || "",
         accountNum: document.getElementById("accountNumber")?.value || "",
         zipCode: document.getElementById("zipcode")?.value || "",
@@ -399,10 +472,10 @@ function registerEmployee() {
         firstSsn: document.getElementById("firstSsn")?.value || "",
         secondSsn: document.getElementById("secondSsn")?.value || "",
         authority: document.getElementById("modalAutority")?.value || "",
-    };
+    };*/
     
-    
-/*    	empData = {
+/*    
+    	empData = {
 	    employeeId: "250220007",
 	    employeeName: "길동이",
 	    email: "seozzini@gmail.com",
@@ -429,16 +502,15 @@ function registerEmployee() {
 
 
 
-	console.log("empData::::::",empData);
+	//console.log("empData::::::",empData);
 
     fetch("/hr/rest/emp/register", {
         method: "POST",
         headers: {
                 'header': header,
-                "Content-Type": "application/json",
                 'X-CSRF-Token': token
             },
-        body: JSON.stringify(empData)
+        body: formData
     })
     .then(response => response.text())
     .then(message => {
@@ -555,5 +627,8 @@ function openPostcode() {
         }
     }).open();
 }
+
+
+console.log("file:::::",file);
 
 

@@ -29,13 +29,15 @@
 				</select>
 			</div>
 	</div>
-<script>
+<script th:inline="javascript">
 	function searchOpt(){
+		const session = sessionData;
+		console.log("세션",session);
 		const header = document.querySelector('meta[name="_csrf_header"]').content;
         const token = document.querySelector('meta[name="_csrf"]').content;
         
 		let goods = document.querySelector("#goodsName");
-		fetch(`http://localhost:81/accnut/rest/option/list?goodsName=${goods.value}`, {
+		fetch(`http://localhost:81/accnut/rest/option/list?goodsName=${goods.value}&companyNum=${session.companyNum}`, {
 				method: "GET",
 				headers: {
 						 	'header': header,

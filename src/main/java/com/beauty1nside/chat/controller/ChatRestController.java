@@ -7,10 +7,13 @@ import com.beauty1nside.hr.dto.EmpDTO;
 import com.beauty1nside.security.service.CustomerUser;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Log4j2
 @RestController
@@ -26,13 +29,24 @@ public class ChatRestController {
   }
   
   @PostMapping("/start")
-  public List<MessageDTO> startChat(@RequestBody EmpDTO empDTO,
-                                    @AuthenticationPrincipal CustomerUser user) {
+  public Map<Long, List<MessageDTO>> startChat(@RequestBody EmpDTO empDTO,
+                                               @AuthenticationPrincipal CustomerUser user) {
     RoomDTO roomDTO = new RoomDTO();
     roomDTO.setCompanyNum(user.getUserDTO().getCompanyNum());
-    roomDTO.setEmployeeNum1(user.getUserDTO().getCompanyNum());
+    roomDTO.setEmployeeNum1(user.getUserDTO().getEmployeeNum());
     roomDTO.setEmployeeNum2(empDTO.getEmployeeNum());
-    log.info("roomDTO={}", roomDTO);
+    
     return chatService.startChat(roomDTO);
+  }
+  
+  @PostMapping("/msg")
+  public ResponseEntity<Map<String, Object>> sendMsg(@RequestBody MessageDTO messageDTO,
+                                                     @AuthenticationPrincipal CustomerUser user) {
+    messageDTO.setEmployeeNum(user.getUserDTO().getEmployeeNum());
+    
+    MessageDTO dto = chatService.sendMsg(messageDTO);
+    Map<String, Object> response = new HashMap<>();
+    response.put("data", dto);
+    return ResponseEntity.ok(response);
   }
 }

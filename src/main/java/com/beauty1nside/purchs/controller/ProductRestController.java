@@ -29,8 +29,10 @@ import com.beauty1nside.purchs.dto.ProductDTO;
 import com.beauty1nside.purchs.dto.ProductSearchDTO;
 import com.beauty1nside.purchs.dto.PurchInsertVO;
 import com.beauty1nside.purchs.dto.PurchaseSearchDTO;
+import com.beauty1nside.purchs.dto.WarehouseInsertVO;
 import com.beauty1nside.purchs.service.productService;
 import com.beauty1nside.purchs.service.purchaseService;
+import com.beauty1nside.purchs.service.warehouseService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
@@ -45,6 +47,7 @@ import lombok.extern.log4j.Log4j2;
 public class ProductRestController {
 	final productService productService;
 	final purchaseService purchaseService;
+	final warehouseService warehouseService;
 	
 	//브랜드 모달 데이터 조회 
 	@GetMapping("/brand/list")
@@ -313,6 +316,25 @@ public class ProductRestController {
 					return result;
 				
 				}
+				
+			//입고등록
+			@PostMapping("/warehouse/insert")
+			public ResponseEntity<Map<String, Object>> warehouseInsert(@RequestBody List<WarehouseInsertVO> warehouseInsertVOList) {
+			    log.info("컨트롤러====={}", warehouseInsertVOList);
+			    Map<String, Object> response = new HashMap<>();
+			    try {
+			    	warehouseService.warehouseInsert(warehouseInsertVOList);
+			        response.put("status", "success");
+			        response.put("message", "발주 등록 성공");
+			        return ResponseEntity.ok(response);
+			    } catch(Exception e) {
+			        e.printStackTrace();
+			        log.error("등록 실패", e);
+			        response.put("status", "error");
+			        response.put("message", "서버 오류 발생: " + e.getMessage());
+			        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+			    }
+			}
 
 
 }

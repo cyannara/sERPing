@@ -63,5 +63,8 @@ public interface BsnOrderService {
 	//출고 LOT 제거
 	public void removeBsnDeliveryLotDetail(BsnDeliveryDetailDTO bsnDeliveryDetailDTO);
 	
+	//출고 확정
+	public void completeBsnDelivery(BsnDeliveryDTO bsnDeliveryDTO);
+	
 	
 }

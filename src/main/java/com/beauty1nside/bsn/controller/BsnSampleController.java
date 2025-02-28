@@ -50,14 +50,14 @@ public class BsnSampleController {
 	};
 	
 	
-	@GetMapping("/orderRegist")
+	@GetMapping("/order/Regist")
 	public String orderRegist() {
 		
 
 		return "/bsn/orderRegist";
 	};
 	
-	@GetMapping("/orderList")
+	@GetMapping("/order/List")
 	public String orderList() {
 		
 		return "/bsn/orderList";
@@ -71,12 +71,12 @@ public class BsnSampleController {
 		return "/bsn/orderDelivery";
 	};
 	
-	@GetMapping("/orderCS")
+	@GetMapping("/order/cs")
 	public String orderCS() {
 		
-		return "redirect:/bsn/orderCS/Returning";
+		return "redirect:/bsn/order/cs/returning";
 	};
-	@GetMapping("/orderCS/Returning")
+	@GetMapping("/order/cs/returning")
 	public String returning() {
 		
 		return "/bsn/orderReturning";

@@ -3,9 +3,10 @@
  */
 
 document.addEventListener("DOMContentLoaded", function () {
+ 
     applyCommonCodesToModal(); // 모달 공통 코드 적용
     setupEventListeners(); // 이벤트 리스너 연결
-	
+
     // ✅ 초기화 버튼 이벤트 리스너 연결 (id 일치 확인)
     let resetBtn = document.getElementById("resetBtn");
     if (resetBtn) {
@@ -23,35 +24,35 @@ document.addEventListener("DOMContentLoaded", function () {
     } else {
         console.error("❌ empRegisterModal을 찾을 수 없습니다.");
     }
-    
-    
-    // ✅ 등록 버튼 이벤트 리스너 추가
-/*    let registerBtn = document.getElementById("registerEmployeeBtn");
-    if (registerBtn) {
-        registerBtn.addEventListener("click", function (event) {
-            event.preventDefault(); // 기본 동작 방지
 
-            Swal.fire({
-                title: "📌 사원 등록",
-                text: "정말 등록하시겠습니까?",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonText: "네, 등록합니다",
-                cancelButtonText: "아니요, 취소",
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    registerEmployee(); // ✅ 사원 등록 처리 함수 호출
-                    Swal.fire("✅ 등록 완료!", "사원이 성공적으로 등록되었습니다.", "success");
-                } else {
-                    Swal.fire("🚫 등록 취소", "사원 등록이 취소되었습니다.", "error");
-                }
-            });
-        });
-        console.log("✅ 등록 버튼 이벤트 리스너 연결 완료");
-    } else {
-        console.error("❌ registerEmployeeBtn 요소를 찾을 수 없습니다.");
-    }*/
+
+    // ✅ 등록 버튼 이벤트 리스너 추가
+    /*    let registerBtn = document.getElementById("registerEmployeeBtn");
+        if (registerBtn) {
+            registerBtn.addEventListener("click", function (event) {
+                event.preventDefault(); // 기본 동작 방지
     
+                Swal.fire({
+                    title: "📌 사원 등록",
+                    text: "정말 등록하시겠습니까?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "네, 등록합니다",
+                    cancelButtonText: "아니요, 취소",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        registerEmployee(); // ✅ 사원 등록 처리 함수 호출
+                        Swal.fire("✅ 등록 완료!", "사원이 성공적으로 등록되었습니다.", "success");
+                    } else {
+                        Swal.fire("🚫 등록 취소", "사원 등록이 취소되었습니다.", "error");
+                    }
+                });
+            });
+            console.log("✅ 등록 버튼 이벤트 리스너 연결 완료");
+        } else {
+            console.error("❌ registerEmployeeBtn 요소를 찾을 수 없습니다.");
+        }*/
+
 });
 
 
@@ -94,7 +95,7 @@ function resetEmployeeForm() {
     if (radioButtons.length > 0) {
         radioButtons[0].checked = true;
     }
-    
+
     // 4️⃣ 하위 부서 초기화
     populateSubDepartments("");  // ✅ 하위 부서 필터링 함수 호출
 
@@ -150,7 +151,7 @@ function initializeEmailInput() {
             }
         }
     });
-    
+
 }
 
 

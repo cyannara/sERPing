@@ -22,11 +22,18 @@ import com.beauty1nside.erp.dto.ErpEmployeeDTO;
 */
 public interface ErpAdminLoginMapper {
 	/**
-     * ERP 사용회사 사원 로그인
+     * 로그인 정보를 가져간다
      *
-     * @param String
      * @param String
      * @return ErpEmployeeDTO
      */
 	public ErpEmployeeDTO loginConfig(@Param("employeeId") String employeeId);
+	
+	/**
+     * 로그인 할 수있는 계정이 있는지 갯수를 확인한다
+     *
+     * @param String
+     * @return int
+     */
+	public int loginCount(@Param("employeeId") String employeeId);
 }

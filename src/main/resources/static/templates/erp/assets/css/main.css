@@ -53,7 +53,7 @@
 }
 
 .accent-background {
-  --background-color: #1bbd36;
+  --background-color: #cfe2ff;
   --default-color: #ffffff;
   --heading-color: #ffffff;
   --accent-color: #ffffff;
@@ -98,7 +98,7 @@ h6 {
 
 /* PHP Email Form Messages
 ------------------------------*/
-.php-email-form .error-message {
+.email-form .error-message {
   display: none;
   background: #df1529;
   color: #ffffff;
@@ -108,7 +108,7 @@ h6 {
   font-weight: 600;
 }
 
-.php-email-form .sent-message {
+.email-form .sent-message {
   display: none;
   color: #ffffff;
   background: #059652;
@@ -118,7 +118,7 @@ h6 {
   font-weight: 600;
 }
 
-.php-email-form .loading {
+.email-form .loading {
   display: none;
   background: var(--surface-color);
   text-align: center;
@@ -126,7 +126,7 @@ h6 {
   margin-bottom: 24px;
 }
 
-.php-email-form .loading:before {
+.email-form .loading:before {
   content: "";
   display: inline-block;
   border-radius: 50%;
@@ -135,10 +135,10 @@ h6 {
   margin: 0 10px -6px 0;
   border: 3px solid var(--accent-color);
   border-top-color: var(--surface-color);
-  animation: php-email-form-loading 1s linear infinite;
+  animation: email-form-loading 1s linear infinite;
 }
 
-@keyframes php-email-form-loading {
+@keyframes email-form-loading {
   0% {
     transform: rotate(0deg);
   }
@@ -733,6 +733,14 @@ h6 {
   padding-right: 10px;
   color: color-mix(in srgb, var(--default-color), transparent 70%);
 }
+
+.breadcrumbs ol li a,
+.breadcrumbs ol li a:visited,
+.breadcrumbs ol li a:hover,
+.breadcrumbs ol li a:active {
+  color: blue !important;
+}
+
 
 /*--------------------------------------------------------------
 # Global Sections
@@ -2396,17 +2404,17 @@ section,
   color: color-mix(in srgb, var(--default-color), transparent 40%);
 }
 
-.contact .php-email-form {
+.contact .email-form {
   width: 100%;
 }
 
-.contact .php-email-form .form-group {
+.contact .email-form .form-group {
   padding-bottom: 8px;
 }
 
-.contact .php-email-form input[type=text],
-.contact .php-email-form input[type=email],
-.contact .php-email-form textarea {
+.contact .email-form input[type=text],
+.contact .email-form input[type=email],
+.contact .email-form textarea {
   color: var(--default-color);
   background-color: var(--surface-color);
   border-radius: 0px;
@@ -2415,30 +2423,30 @@ section,
   border-color: color-mix(in srgb, var(--default-color), transparent 80%);
 }
 
-.contact .php-email-form input[type=text]:focus,
-.contact .php-email-form input[type=email]:focus,
-.contact .php-email-form textarea:focus {
+.contact .email-form input[type=text]:focus,
+.contact .email-form input[type=email]:focus,
+.contact .email-form textarea:focus {
   border-color: var(--accent-color);
 }
 
-.contact .php-email-form input[type=text]::placeholder,
-.contact .php-email-form input[type=email]::placeholder,
-.contact .php-email-form textarea::placeholder {
+.contact .email-form input[type=text]::placeholder,
+.contact .email-form input[type=email]::placeholder,
+.contact .email-form textarea::placeholder {
   color: color-mix(in srgb, var(--default-color), transparent 70%);
 }
 
-.contact .php-email-form input[type=text],
-.contact .php-email-form input[type=email] {
+.contact .email-form input[type=text],
+.contact .email-form input[type=email] {
   height: 48px;
   padding: 10px 15px;
 }
 
-.contact .php-email-form textarea {
+.contact .email-form textarea {
   padding: 10px 12px;
   height: 290px;
 }
 
-.contact .php-email-form button[type=submit] {
+.contact .email-form button[type=submit] {
   background: var(--accent-color);
   color: var(--contrast-color);
   border: 0;
@@ -2447,7 +2455,7 @@ section,
   border-radius: 4px;
 }
 
-.contact .php-email-form button[type=submit]:hover {
+.contact .email-form button[type=submit]:hover {
   background: color-mix(in srgb, var(--accent-color) 90%, black 15%);
 }
 

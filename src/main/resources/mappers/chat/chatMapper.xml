@@ -30,9 +30,48 @@
             RETURNING room_id INTO #{roomId}
     </insert>
 
+    <insert id="insertMsg"
+            parameterType="com.beauty1nside.chat.dto.MessageDTO"
+            >
+        INSERT INTO grpwr_chat_message (
+            msg_id,
+            room_id,
+            employee_num,
+            msg_content,
+            send_date
+        ) VALUES (
+                     GRPWR_CAHT_MESSAGE_SEQ.nextval,
+                     #{roomId},
+                     #{employeeNum},
+                     #{msgContent},
+                     sysdate
+                 )
+    </insert>
+
+    <select id="getMsgJustSent" resultType="com.beauty1nside.chat.dto.MessageDTO">
+        SELECT
+            g.msg_id,
+            g.room_id,
+            g.employee_num,
+            g.msg_content,
+            g.send_date,
+            h.employee_name
+        FROM grpwr_chat_message g
+                 join hr_employee h on g.employee_num = h.employee_num
+        WHERE g.room_id = #{roomId} and
+              msg_id = (SELECT MAX(msg_id) FROM grpwr_chat_message)
+    </select>
+
     <select id="getMsgList">
-        select *
-        from grpwr_chat_message
+        select g.MSG_ID,
+               g.ROOM_ID,
+               g.EMPLOYEE_NUM,
+               g.MSG_CONTENT,
+               g.SEND_DATE,
+               h.employee_name
+        from grpwr_chat_message g
+            join hr_employee h on g.employee_num = h.employee_num
         where room_id = #{roomId}
+        order by g.send_date asc
     </select>
 </mapper>

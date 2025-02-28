@@ -8,17 +8,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.beauty1nside.bhf.dto.returninglist.BhfReturnListSearchDTO;
 import com.beauty1nside.bsn.dto.OrderSearchDTO;
 import com.beauty1nside.bsn.dto.delivery.BsnDeliveryDTO;
 import com.beauty1nside.bsn.dto.delivery.BsnDeliveryDetailDTO;
 import com.beauty1nside.bsn.dto.order.BhfOrderDTO;
 import com.beauty1nside.bsn.dto.order.BsnOrderDTO;
 import com.beauty1nside.bsn.dto.order.BsnOrderDetailDTO;
+import com.beauty1nside.bsn.service.BsnCsService;
+import com.beauty1nside.bsn.service.BsnCustomException;
 import com.beauty1nside.bsn.service.BsnOrderService;
 import com.beauty1nside.common.GridArray;
 import com.beauty1nside.common.Paging;
@@ -37,6 +41,8 @@ import lombok.extern.log4j.Log4j2;
 public class BsnRestController {
 	
 	final private BsnOrderService bsnOrderService;
+	
+	final private BsnCsService bsnCsService;
 	
 	@GetMapping("/bhfOrder")
 	public Object bhfOrder(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
@@ -180,6 +186,8 @@ public class BsnRestController {
 
 	};
 	
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	//출고 조회
 	@GetMapping("/deli")
 	public Object delivery(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
@@ -313,6 +321,46 @@ public class BsnRestController {
 	        response.put("message", "LOT 삭제 실패");
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
+	}
+	
+	//출고 확정(완료)
+	@PutMapping("/deli/confirm")
+	public ResponseEntity<Map<String, Object>> deliveryConfrim(@RequestBody BsnDeliveryDTO bsnDeliveryDTO){
+		Map<String, Object> response = new HashMap<>();
+		try {
+			bsnOrderService.completeBsnDelivery(bsnDeliveryDTO);
+			response.put("status", "success");
+	        response.put("message", "출고 성공");
+	        return ResponseEntity.ok(response); // JSON 형태 응답
+			
+		} catch (BsnCustomException e) {
+			log.error("출고 실패", e);
+	        response.put("status", "error");
+	        response.put("message", e.getErrorMessage());
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+		}
+	}
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	@GetMapping("/cs/request")
+	public Object csRequestList(@RequestParam(name = "perPage", defaultValue = "2", required = false) int perPage, 
+			@RequestParam(name = "page", defaultValue = "1", required = false) int page, 
+			BhfReturnListSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
+		// 페이징 유닛 수
+		paging.setPageUnit(perPage);
+		paging.setPage(page);
+		
+		// 페이징 조건
+		dto.setStart(paging.getFirst());
+		dto.setEnd(paging.getLast());
+		
+		// 페이징 처리
+		paging.setTotalRecord(bsnCsService.countBhfReturningList(dto));
+		
+		// grid 배열 처리
+		GridArray grid = new GridArray();
+		Object result = grid.getArray( paging.getPage(), bsnCsService.countBhfReturningList(dto), bsnCsService.bhfReturningList(dto) );
+		return result;
 	}
 	
 }

@@ -1,0 +1,319 @@
+
+<body>
+
+<style>
+/* 상품명 & 상품코드 병합된 셀 스타일 */
+
+/* ✅ 전체 그리드의 스크롤 제거 */
+#productGrid {
+    overflow: hidden !important; /* ✅ 스크롤 제거 */
+    height: auto !important; /* ✅ 높이 자동 조정 */
+}
+
+/* ✅ 내부 요소에서 강제 스크롤 제거 */
+.tui-grid-body-area {
+    overflow: hidden !important;
+}
+
+/* ✅ 세로 스크롤 없애기 */
+.tui-grid-container {
+    max-height: none !important;
+}
+.merged-cell {
+    background-color: #f8f9fa !important; /* 연한 회색 */
+    font-weight: bold;
+    text-align: left;
+    padding: 10px;
+}
+
+/* ✅ 그리드 전체 테두리 추가 */
+.tui-grid-container {
+    border: 1px solid #ddd !important; /* 전체 그리드 박스 테두리 */
+    border-radius: 5px; /* 둥근 테두리 */
+    overflow: hidden; /* 모서리 깔끔하게 정리 */
+}
+
+/* ✅ 헤더(컬럼명) 부분 테두리 */
+.tui-grid-header-area {
+    border-bottom: 2px solid #ccc !important; /* 헤더와 바디 구분 */
+}
+
+/* ✅ 셀(Cell) 테두리 설정 */
+.tui-grid-cell {
+    border-right: 1px solid #ddd !important;
+    border-bottom: 1px solid #ddd !important;
+}
+
+/* ✅ 마지막 컬럼의 테두리 없애기 (디자인 개선) */
+.tui-grid-cell:last-child {
+    border-right: none !important;
+}
+
+/* ✅ 마지막 행의 테두리 없애기 (디자인 개선) */
+.tui-grid-body-area .tui-grid-cell:last-child {
+    border-bottom: none !important;
+}
+
+/* ✅ 헤더(컬럼명) 배경색 & 글씨 스타일 */
+.tui-grid-header-cell {
+    background-color: #f1f1f1 !important; /* 헤더 배경색 */
+    font-weight: bold;
+    text-align: center;
+    border-right: 1px solid #ddd !important;
+}
+
+/* ✅ 줄 간격 스타일 조정 */
+.tui-grid-row {
+    border-bottom: 1px solid #ddd !important;
+}
+
+/* ✅ hover(마우스 오버) 시 강조 효과 */
+.tui-grid-cell:hover {
+    background-color: #f9f9f9 !important;
+}
+
+</style>
+<!-- 검색창 -->
+<div class="search-grid" id="custom-container">
+    <div class="d-flex flex-wrap align-items-center gap-3">
+        <div class="d-flex align-items-center">
+            <span class="label-search me-2">상품명</span>
+            <input type="text" name="goodsName" id="searchGoodsName" class="form-control w-auto">
+        </div>
+        <div class="d-flex align-items-center">
+            <span class="label-search me-2">브랜드명</span>
+            <input type="text" name="brandName" id="searchBrandName" class="form-control w-auto">
+        </div>
+        <div class="d-flex align-items-center">
+            <span class="label-search me-2">표시수량</span>
+            <select name="display_amount" id="product_display_amount" class="form-control w-auto" onchange="changeProductDisplay()">
+                <option value="10" selected>10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+        <button type="button" class="btn btn-primary ms-auto" onclick="productSearch()">검색</button>
+        <button type="button" class="btn btn-secondary" onclick="resetFilters()">초기화</button>
+    </div>
+</div>
+
+<!-- 그리드 -->
+<div id="table-container" class="mt-3">
+    <div id="productGrid"></div>
+    <div id="pagination" class="tui-pagination"></div>
+</div>
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("✅ 상품 조회 모달 스크립트 실행됨");
+    initProductGrid();
+    
+    if (typeof productGrid !== 'undefined' && productGrid !== null) {
+    	
+        productGrid.on("click", function (ev) {
+            console.log("📢 상품 조회 그리드 셀 클릭됨:", ev);
+
+            if (ev.rowKey !== null && ev.rowKey !== undefined) {
+                const rowData = productGrid.getRow(ev.rowKey);
+                console.log("📢 선택한 행의 데이터:", rowData);
+
+                // ✅ sessionStorage에 저장 (각 키에 대해 저장)
+                sessionStorage.setItem("selectedGoodsCode", rowData.goodsCode || '');
+                sessionStorage.setItem("selectedGoodsName", rowData.goodsName || '');
+                sessionStorage.setItem("selectedOptionCode", rowData.optionCode || '');
+                sessionStorage.setItem("selectedOptionName", rowData.optionName || '');
+                sessionStorage.setItem("selectedOptionNum", rowData.optionNum || '');
+                sessionStorage.setItem("selectedOptionNum", rowData.optionNum || '');
+                sessionStorage.setItem("selectedVendorName", rowData.vendorName || '');
+                sessionStorage.setItem("selectedVendorId", rowData.vendorId || '');
+                sessionStorage.setItem("selectedGoodsStandard", rowData.goodsStandard || '');
+                sessionStorage.setItem("selectedGoodsSupplyPrice", rowData.goodsSupplyPrice || '');
+
+                console.log("✅ 저장된 데이터 확인:");
+                console.log("📢 상품코드:", sessionStorage.getItem("selectedGoodsCode"));
+                console.log("📢 상품명:", sessionStorage.getItem("selectedGoodsName"));
+                console.log("📢 옵션코드:", sessionStorage.getItem("selectedOptionCode"));
+                console.log("📢 옵션명:", sessionStorage.getItem("selectedOptionName"));
+                console.log("📢 옵션번호:", sessionStorage.getItem("selectedOptionNum"));
+                console.log("📢 거래처명:", sessionStorage.getItem("selectedVendorName"));
+                console.log("📢 거래처번호:", sessionStorage.getItem("selectedVendorId"));
+                console.log("📢 규격:", sessionStorage.getItem("selectedGoodsStandard"));
+                console.log("📢 공급가격:", sessionStorage.getItem("selectedGoodsSupplyPrice"));
+            } else {
+                console.warn("❌ rowKey가 null 또는 undefined 입니다.");
+            }
+        });
+    } else {
+        console.warn("❌ productGrid가 정의되지 않았습니다.");
+    }
+    
+    
+});
+
+let productGrid;
+
+function initProductGrid() {
+	
+	console.log("initProductGrid()실행")
+
+    const companyNum = [[${session.companyNum}]];
+  
+
+	if (!companyNum) {
+        console.error("❌ 세션에서 companyNum 값을 찾을 수 없음.");
+        return; // companyNum이 없으면 요청을 하지 않음
+    } 
+    
+    //const companyNum = 1;
+
+    console.log("✅ 설정된 companyNum:", companyNum);
+
+    const productDataSource = {
+            api: {  
+                readData: { 
+                    url: '/purchs/rest/product/list', 
+                    method: 'GET',
+                    requestOptions: { // ✅ 명확한 옵션 추가
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'same-origin' // ✅ CORS 문제 방지
+                    },
+                    initParams:{ 
+                        page: 1,
+                        perPage: 10,
+                        companyNum: companyNum
+                    },
+                    beforeRequest: function(request) {
+                        console.log("📢 서버로 요청 보내기 전 requestParams:", request.params);
+                    },
+                    afterResponse: function(response) {
+                        console.log("📢 서버 응답:", response);
+
+                        if (response.data && response.data.contents) {
+                            console.log("✅ 변환된 데이터:", response.data.contents);
+                            return { data: response.data.contents, totalCount: response.data.pagination.totalCount };
+                        }
+
+                        console.warn("⚠️ 서버 응답에 contents가 없습니다.");
+                        return { data: [], totalCount: 0 };
+                    }
+
+                }
+            },
+            contentType: 'application/json',
+            serverSidePagination: true
+        };
+        
+        console.log("✅ productDataSource 설정 완료:", productDataSource);
+
+        productGrid = new tui.Grid({
+            el: document.getElementById('productGrid'),
+            data: productDataSource,  
+            pageOptions: {
+                useClient: false,
+                perPage: 10,
+            },
+            bodyHeight: 'auto', 
+            columns: [
+                { header: "상품명", 
+                  name: "goodsName", 
+                  rowSpan: true,
+                  renderer: {
+                      type: CustomTextRenderer
+                  },
+                  className: "merged-cell"
+                  },
+                { header: "상품코드", 
+                  name: "goodsCode", 
+                  rowSpan: true,
+                  renderer: {
+                      type: CustomTextRenderer
+                  },
+                  className: "merged-cell"
+                  }, 
+                { header: "옵션명", name: "optionName" },
+                { header: "옵션번호", name: "optionCode" },
+                { header: "브랜드", name: "brandName" },
+                { header: "규격", name: "goodsStandard"}
+               
+            ],
+            rowClassName: function(row) {
+                return getRowColorClass(row);
+            }
+        });
+        
+        console.log("✅ Toast Grid 초기화 완료");
+        
+        // ✅ 상품 선택 시 sessionStorage에 저장
+        productGrid.on('click', function (ev) {
+            const rowData = productGrid.getRow(ev.rowKey);
+            ["goodsCode", "goodsName", "optionCode", "optionName", "vendorName", "goodsStandard"].forEach(key => {
+                sessionStorage.setItem(`selected${key}`, rowData[key]);
+            });
+        });
+
+}
+
+// 표시 수량 변경
+function changeProductDisplay() {
+    let gap = parseInt(document.querySelector('#product_display_amount').value);
+    productGrid.setPerPage(gap);
+    productGrid.reloadData();
+}
+
+// 검색 실행
+function productSearch() {
+    let goodsName = document.querySelector('#searchGoodsName').value;
+    let brandName = document.querySelector('#searchBrandName').value;
+
+    productGrid.setRequestParams({
+        "companyNum": [[${session.companyNum}]],
+        "goodsName": goodsName,
+        "brandName": brandName
+    });
+
+    productGrid.reloadData();
+}
+
+// 필터 초기화
+function resetFilters() {
+    document.querySelector('#searchGoodsName').value = '';
+    document.querySelector('#searchBrandName').value = '';
+    document.querySelector('#product_display_amount').value = '10';
+
+    productGrid.setRequestParams({
+        "companyNum": companyNum,
+        "goodsName": '',
+        "brandName": ''
+    });
+
+    productGrid.reloadData();
+}
+
+//✅ 텍스트를 굵게하고 정렬하는 렌더러
+class CustomTextRenderer {
+    constructor(props) {
+        const el = document.createElement('div');
+        el.innerText = props.value;
+        el.style.padding = '10px';
+        el.style.fontWeight = 'bold';
+        el.style.textAlign = 'left';
+        this.el = el;
+    }
+    getElement() {
+        return this.el;
+    }
+}
+
+
+
+</script>
+
+
+</body>
+
+
+
+

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layouts/layout}" lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>근로계약조회</title>
+    
+    <!-- TOAST UI -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/tui.grid/latest/tui-grid.css">
+    <script src="https://uicdn.toast.com/tui.grid/latest/tui-grid.js"></script>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body layout:fragment="content">
+
+<div class="container mt-3">
+    <h2 class="mb-4">근로계약 조회</h2>
+
+    <div class="row">
+        <!-- 오른쪽: 근로 계약 조회 -->
+        <div class="col-md-12">
+            <div class="mb-3">
+                <input type="text" class="form-control" id="searchKeyword" placeholder="사원명 검색">
+                <button class="btn btn-primary mt-2" onclick="loadContracts()">검색</button>
+            </div>
+            <div id="contractGrid"></div>
+        </div>
+    </div>
+</div>
+
+<!-- 사원 선택 모달 -->
+<div class="modal fade" id="employeeSelectModal" tabindex="-1" aria-labelledby="employeeSelectModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">사원 선택</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="employeeGrid"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ✅ 사원 선택 기능
+document.addEventListener("DOMContentLoaded", function () {
+    const employeeGrid = new tui.Grid({
+        el: document.getElementById('employeeGrid'),
+        columns: [
+            { header: "사원번호", name: "employeeNum" },
+            { header: "이름", name: "employeeName" },
+            { header: "부서", name: "departmentName" },
+            { header: "선택", name: "select", formatter: () => '<button class="btn btn-success btn-sm selectEmployee">선택</button>' }
+        ]
+    });
+
+    window.loadEmployees = function () {
+        fetch("/hr/rest/emp/list")
+            .then(response => response.json())
+            .then(data => employeeGrid.resetData(data))
+            .catch(error => alert("사원 목록 로드 실패"));
+    };
+
+    document.getElementById("employeeGrid").addEventListener("click", function (event) {
+        if (event.target.classList.contains("selectEmployee")) {
+            const row = employeeGrid.getRow(event.target.closest("tr").rowIndex);
+            document.getElementById("employeeNum").value = row.employeeNum;
+            document.getElementById("employeeSelectModal").querySelector(".btn-close").click();
+        }
+    });
+});
+
+// ✅ 계약 등록
+function submitContract() {
+    const contractData = {
+        employeeNum: document.getElementById("employeeNum").value,
+        contractType: document.getElementById("contractType").value,
+        contractStartDate: document.getElementById("contractStartDate").value,
+        contractEndDate: document.getElementById("contractEndDate").value,
+        salary: document.getElementById("salary").value
+    };
+
+    fetch("/hr/rest/contract/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(contractData)
+    })
+    .then(response => response.text())
+    .then(() => {
+        alert("계약 등록 성공");
+        loadContracts(); // 등록 후 목록 갱신
+    })
+    .catch(() => alert("등록 실패"));
+}
+
+// ✅ 계약 목록 조회
+function loadContracts() {
+    fetch("/hr/rest/contract/list")
+        .then(response => response.json())
+        .then(data => contractGrid.resetData(data))
+        .catch(() => alert("계약 목록 불러오기 실패"));
+}
+
+// ✅ 계약 목록 그리드 초기화
+const contractGrid = new tui.Grid({
+    el: document.getElementById('contractGrid'),
+    columns: [
+        { header: "사원번호", name: "employeeNum" },
+        { header: "이름", name: "employeeName" },
+        { header: "계약 유형", name: "contractType" },
+        { header: "계약 시작일", name: "contractStartDate" },
+        { header: "급여", name: "salary" }
+    ]
+});
+</script> 
+
+</body>
+</html>
