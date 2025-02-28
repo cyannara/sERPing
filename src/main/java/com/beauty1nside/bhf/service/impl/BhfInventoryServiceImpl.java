@@ -45,10 +45,4 @@ public class BhfInventoryServiceImpl implements BhfInventoryService {
 		return (insertResult > 0 && updateResult > 0 && updatePlus > 0) ? true : false;
 	}
 
-	@Override
-	public List<BhfInventoryInsertDTO> invenHistory(BhfInventoryListSearchDTO dto) {
-		
-		return mapper.invenHistory(dto);
-	}
-
 }

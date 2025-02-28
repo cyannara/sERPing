@@ -22,4 +22,6 @@ public class BhfOrdListDTO {
 	private String goodsStandard;
 	private int quantity;
 	
+	private int companyNum;
+	
 }

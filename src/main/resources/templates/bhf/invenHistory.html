@@ -15,17 +15,57 @@
 			<div class="col-md-12 stretch-card mt-5 mb-5">
 				<div class="card">
 					<div class="card-body">
-						<h6 class="mb-4">조정 내역 조회</h6>
+						<div id="rayout-container" class="row mb-3">
+							<h6 class=" col-sm-9">조정 내역 조회</h6>
+							<span class="label-search col-sm-1" style="font-size: 1em">표시수량</span>
+							<select name="display_amount" id="display_amount" class="col-sm-1 input-box" onchange="changeDisplay()">
+								<option value="5" selected>5</option>
+								<option value="10">10</option>
+								<option value="20">20</option>
+								<option value="50">50</option>
+								<option value="100">100</option>
+							</select>
+						</div>
 						<div id="invenHistory"></div>
 						<div id="pagination" class="tui-pagination"></div>
+						<div style="text-align : right">
+							<button type="button" class="btnExcel">EXCEL</button>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 	
-	<script>
+	<script th:inline="javascript">
+	
 		var Grid = tui.Grid;
+	
+		//회사번호 땡겨오기
+		let sessioCompanyNum = [[${session.companyNum}]];
+		let departmentNum = [[${session.departmentNum}]];
+		let branchOfficeId = "";
+		
+		function getDeptName() {
+			fetch(`/deptName/${departmentNum}`)
+	        .then(response => {
+	            return response.text(); // 서버에서 문자열(부서명) 응답을 받음
+	        })
+	        .then(data => {
+				branchOfficeId = data;
+	            
+				//비동기방식인 fetch가 끝나고 값을 가져와서 넣음(조회 쿼리 호출에 넣으면 값이 들어가지 않았느데 실행됨)
+				grid.setRequestParams({companyNum: sessioCompanyNum, branchOfficeId: branchOfficeId})
+				grid.readData();
+	        })
+	        .catch(error => console.error("부서명 가져오기 실패:", error)); 
+        }
+		
+		//페이지가 로드되면 함수 실행
+		document.addEventListener("DOMContentLoaded",()=>{
+			getDeptName();
+			downExcel();
+		})
 		
 		// 재고 조정 조회 쿼리 호출
 		const dataSource = {
@@ -43,16 +83,35 @@
 				perPage: 5,
 			},
 			columns: [ 
-				{ header : "상품코드", name : "goodsCode"},
-				{ header : "상품명", name : "goodsName"},
-				{ header : "옵션코드", name : "optionCode"},
-				{ header : "옵션명", name : "optionName"},
-				{ header : "규격", name : "goodsStandard"},
-				{ header : "조정수량", name : "mediationQuantity"},
-				{ header : "조정사유", name : "mediationReason"}
+				{ header : "상품코드", name : "goodsCode", align: 'center'},
+				{ header : "상품명", name : "goodsName", align: 'center'},
+				{ header : "옵션코드", name : "optionCode", align: 'center'},
+				{ header : "옵션명", name : "optionName", align: 'center'},
+				{ header : "규격", name : "goodsStandard", align: 'center'},
+				{ header : "조정수량(+)", name : "quantity", align: 'center'},
+				{ header : "조정수량(-)", name : "mediationQuantity", align: 'center'},
+				{ header : "조정사유", name : "mediationReason", align: 'center'}
 			],
 			data: dataSource
 		});
+		
+		function changeDisplay() {
+			let gap = parseInt(document.querySelector('#display_amount').value);
+			grid.setPerPage(gap,dataSource);
+		}
+		
+		//엑셀파일 만들기
+		function downExcel(){
+			let btnExcel = document.querySelector('.btnExcel');
+			btnExcel.addEventListener("click", function () {
+			       const options = {
+			         				includeHiddenColumns: true,
+			         				//onlySelected: true,
+			         				fileName: '조정내역',
+			       					};
+			       grid.export('xlsx', options);
+		     })
+		}
 		
 	</script>
 	

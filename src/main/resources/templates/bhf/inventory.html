@@ -22,7 +22,7 @@
 			<div class="col-md-6 mt-2 mb-5">
 				<div class="row">
 					<label class="col-sm-4">지점명</label> 
-					<input type="text"class="col-sm-7" id="branchOfficeId">
+					<input type="text"class="col-sm-7" id="branchOfficeId" readonly>
 				</div>
 			</div>
 			<div class="col-md-12 stretch-card mt-2 mb-5">
@@ -31,6 +31,9 @@
 						<h6 class="mb-4">상품 재고 조회</h6>
 						<div id="inventory"></div>
 						<div id="pagination" class="tui-pagination"></div>
+						<div style="text-align : right">
+							<button type="button" class="btnExcel">EXCEL</button>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -50,15 +53,40 @@
 		</div>
 	</div>
 	
-	<script>
+	<script th:inline="javascript">
+	
 		var Grid = tui.Grid;
 		
 		const header = document.querySelector('meta[name="_csrf_header"]').content; //서버에서 요구하는 CSRF 헤더이름
 	    const token = document.querySelector('meta[name="_csrf"]').content; //서버에서 생성한 CSRF 토큰 값
 		
-		//페이지가 로드되면 테이블에 데이터가 없을때 뜨는 문구 함수 실행
+		//회사번호 땡겨오기
+		let sessioCompanyNum = [[${session.companyNum}]];
+		let departmentNum = [[${session.departmentNum}]];
+		let branchOfficeId = "";
+		
+		function getDeptName() {
+			fetch(`/deptName/${departmentNum}`)
+	        .then(response => {
+	            return response.text(); // 서버에서 문자열(부서명) 응답을 받음
+	        })
+	        .then(data => {
+	        	// 부서명 필드에 값 넣기
+	            document.getElementById("branchOfficeId").value = data; 
+				branchOfficeId = document.querySelector('#branchOfficeId').value;
+	            
+				//비동기방식인 fetch가 끝나고 값을 가져와서 넣음(조회 쿼리 호출에 넣으면 값이 들어가지 않았느데 실행됨)
+				grid.setRequestParams({companyNum: sessioCompanyNum, branchOfficeId: branchOfficeId})
+				grid.readData();
+	        })
+	        .catch(error => console.error("부서명 가져오기 실패:", error)); 
+        }
+
+		//페이지가 로드되면 함수 실행
 		document.addEventListener("DOMContentLoaded",()=>{
 			MDnodata();
+			getDeptName();
+			downExcel();
 		})
 		
 		// 상품 조회 쿼리 호출
@@ -77,12 +105,12 @@
 				perPage: 5,
 			},
 			columns: [ 
-				{ header : "상품코드", name : "goodsCode"},
-				{ header : "상품명", name : "goodsName"},
-				{ header : "옵션코드", name : "optionCode"},
-				{ header : "옵션명", name : "optionName"},
-				{ header : "규격", name : "goodsStandard"},
-				{ header : "수량", name : "stockQuantity"}
+				{ header : "상품코드", name : "goodsCode", align: 'center'},
+				{ header : "상품명", name : "goodsName", align: 'center'},
+				{ header : "옵션코드", name : "optionCode", align: 'center'},
+				{ header : "옵션명", name : "optionName", align: 'center'},
+				{ header : "규격", name : "goodsStandard", align: 'center'},
+				{ header : "수량", name : "stockQuantity", align: 'center'}
 			],
 			data: dataSource
 		});
@@ -116,7 +144,7 @@
 		    }
 		});
 		
-		// 주문 상세 테이블
+		// 재고 조정 테이블
 		const grid2 = new Grid({
 			el: document.getElementById('mediation'), 
 /* 			pageOptions: {
@@ -126,13 +154,14 @@
 			columns: [ 
 				{ header : "상품코드", name : "goodsCode", hidden : 1},
 				{ header : "옵션코드", name : "optionCode", hidden : 1},
-				{ header : "상품명", name : "goodsName"},
-				{ header : "옵션명", name : "optionName"},
-				{ header : "규격", name : "goodsStandard"},
-				{ header : "수량", name : "stockQuantity"},
+				{ header : "상품명", name : "goodsName", align: 'center'},
+				{ header : "옵션명", name : "optionName", align: 'center'},
+				{ header : "규격", name : "goodsStandard", align: 'center'},
+				{ header : "수량", name : "stockQuantity", align: 'center'},
 				{ 
 					header : "플러스 수량", 
-					name : "quantity", 
+					name : "quantity",
+					align: 'center',
 					editor: 'text',
 					onAfterChange: function(ev) { // onAfterChange는 해당 열에 변경이 있을때마다 호출되는 이벤트
 		                // ev.value:사용자가 입력한 값, ev.rowkey:변경된 셀이 어떤 행인지 알려주는 키
@@ -153,6 +182,7 @@
 				{ 
 					header : "마이너스 수량", 
 					name : "mediationQuantity", 
+					align: 'center',
 					editor: 'text',
 					onAfterChange: function(ev) { // onAfterChange는 해당 열에 변경이 있을때마다 호출되는 이벤트
 		                // ev.value:사용자가 입력한 값, ev.rowkey:변경된 셀이 어떤 행인지 알려주는 키
@@ -170,7 +200,7 @@
 		                }
 		            }
 				},
-				{ header : "조정사유",  name : "mediationReason", editor: 'text'}
+				{ header : "조정사유",  name : "mediationReason", align: 'center', editor: 'text'}
 			],
 			data: ""
 		});
@@ -179,9 +209,7 @@
 		function insert() {
 			
 		    let mediationData = grid2.getData(); 
-		    let branchOfficeId = document.querySelector("#branchOfficeId").value; // 지점 ID
-		    let companyNum = 1; // 나중에 세션값 가져와야함
-		
+		    
 		    if (mediationData.length === 0) {
 		        alert("등록할 상품을 선택해주세요.");
 		        return;
@@ -216,7 +244,7 @@
 			        mediationQuantity: item.mediationQuantity,
 			        mediationReason: item.mediationReason,
 			        branchOfficeId: branchOfficeId,
-			        companyNum: companyNum
+			        companyNum: sessioCompanyNum
 		    	}))
 		    };
 		
@@ -251,9 +279,14 @@
 		// 검색 함수
 		function search(){
 			let goodsName = document.querySelector('#goodsName').value;
-			grid.setRequestParams({"goodsName" : goodsName})
+			let parameter = {};
+			parameter.companyNum = sessioCompanyNum
+			parameter.branchOfficeId = branchOfficeId;
+			parameter.goodsName = goodsName;
+			grid.setRequestParams(parameter)
 			grid.readData();
 			nodata();
+			MDnodata();
 		}
 		
 		// 재고 테이블 데이터 없을때 나오는 문구
@@ -270,6 +303,20 @@
 				nodata.innerHTML = '재고를 선택 해주세요';
 			}, 100)
 		}
+		
+		//엑셀파일 만들기
+		function downExcel(){
+			let btnExcel = document.querySelector('.btnExcel');
+			btnExcel.addEventListener("click", function () {
+			       const options = {
+			         				includeHiddenColumns: true,
+			         				//onlySelected: true,
+			         				fileName: '상품재고',
+			       					};
+			       grid.export('xlsx', options);
+		     })
+		}
+		
 	</script>
 	
 </body>

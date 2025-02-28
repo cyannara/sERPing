@@ -15,7 +15,7 @@
 			<div class="col-md-6 mt-2 mb-2">
 				<div class="row">
 					<label class="col-sm-4">주문 지점</label> 
-					<input type="text"class="col-sm-7" id="branchOfficeId"> 
+					<input type="text"class="col-sm-7" id="branchOfficeId" readonly> 
 				</div>
 			</div>
 			<div class="col-md-6 mt-2 mb-2">
@@ -68,6 +68,9 @@
 						<h6 class="mb-4">발주서 상세</h6>
 						<div id="orderListDetail"></div>
 						<div id="pagination" class="tui-pagination"></div>
+						<div style="text-align : right">
+							<button type="button" class="btnExcel">EXCEL</button>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -81,26 +84,56 @@
 		</div>
 	</div>
 	
-	<script>
+	<script th:inline="javascript">
+	
 		var Grid = tui.Grid;
 		
+		const header = document.querySelector('meta[name="_csrf_header"]').content; //서버에서 요구하는 CSRF 헤더이름
+	    const token = document.querySelector('meta[name="_csrf"]').content; //서버에서 생성한 CSRF 토큰 값
+	
+		//회사번호,지점 땡겨오기
+		let sessioCompanyNum = [[${session.companyNum}]];
+		let departmentNum = [[${session.departmentNum}]];
+		let branchOfficeId = "";
+				
+		function getDeptName() {
+			fetch(`/deptName/${departmentNum}`)
+	        .then(response => {
+	            return response.text(); // 서버에서 문자열(부서명) 응답을 받음
+	        })
+	        .then(data => {
+	        	// 부서명 필드에 값 넣기
+	            document.getElementById("branchOfficeId").value = data; 
+				branchOfficeId = document.querySelector('#branchOfficeId').value;
+	            
+				//비동기방식인 fetch가 끝나고 값을 가져와서 넣음(조회 쿼리 호출에 넣으면 값이 들어가지 않았느데 실행됨)
+				grid.setRequestParams({companyNum: sessioCompanyNum, branchOfficeId: branchOfficeId})
+				grid.readData();
+	        })
+	        .catch(error => console.error("부서명 가져오기 실패:", error)); 
+        }
+
+		//페이지가 로드되면 함수 실행
+		document.addEventListener("DOMContentLoaded",()=>{
+			OLDnodata();
+			getDeptName();
+			downExcel();
+		})
+
 		// 발주서 취소시 필요한 발주서코드,클릭된 행의 키 담기 위해 변수선언
 		let cancelOrdCd = null;
 		let cancelKey = null;
-		
-		//페이지가 로드되면 테이블에 데이터가 없을때 뜨는 문구 함수 실행
-		document.addEventListener("DOMContentLoaded",()=>{
-			OLDnodata();
-		})
 		
 		// 발주서조회 쿼리 호출
 		const dataSource = {
 			api: {
 				readData: { url: 'http://localhost:81/bhf/rest/order/list', method: 'GET', initParams: { page: 1 }},
 			},
-			contentType: 'application/json'
+			contentType: 'application/json',
+			initialRequest: false
 			
 		};
+		
 		// 발주서 테이블
 		const grid = new Grid({
 			el: document.getElementById('orderList'), 
@@ -109,15 +142,16 @@
 				perPage: 5,
 			},
 			columns: [ 
-				{ header : "발주서코드", name : "orderCode"},
-				{ header : "지점", name : "branchOfficeId"},
-				{ header : "발주일자", name : "orderDate"},
-				{ header : "납기일자", name : "dueDate"},
-				{ header : "진행상태", name : "progressStatus"},
-				{ header : "비고", name : "remark"}
+				{ header : "발주서코드", name : "orderCode", align: 'center'},
+				{ header : "지점", name : "branchOfficeId", align: 'center'},
+				{ header : "발주일자", name : "orderDate", align: 'center'},
+				{ header : "납기일자", name : "dueDate", align: 'center'},
+				{ header : "진행상태", name : "progressStatus", align: 'center'},
+				{ header : "비고", name : "remark", align: 'center'}
 			],
 			data: dataSource
 		});
+		
 		// 발주서 테이블 행 선택
 		grid.on('click', (ev) => {
 			const rowKey = ev.rowKey;  	// 클릭된 행의 키값
@@ -176,13 +210,13 @@
 				perPage: 5,
 			},
 			columns: [ 
-				{ header : "발주서코드", name : "orderCode"},
-				{ header : "상품코드", name : "goodsCode"},
-				{ header : "상품명", name : "goodsName"},
-				{ header : "옵션코드", name : "optionCode"},
-				{ header : "옵션명", name : "optionName"},
-				{ header : "규격", name : "goodsStandard"},
-				{ header : "수량", name : "quantity"}
+				{ header : "발주서코드", name : "orderCode", align: 'center'},
+				{ header : "상품코드", name : "goodsCode", align: 'center'},
+				{ header : "상품명", name : "goodsName", align: 'center'},
+				{ header : "옵션코드", name : "optionCode", align: 'center'},
+				{ header : "옵션명", name : "optionName", align: 'center'},
+				{ header : "규격", name : "goodsStandard", align: 'center'},
+				{ header : "수량", name : "quantity", align: 'center'}
 			],
 			data: []
 		});
@@ -202,7 +236,10 @@
     		    fetch('http://localhost:81/bhf/rest/order/cancel', {
  		        method: 'POST',
  		        headers: {
- 		            'Content-Type': 'application/json'
+ 		            'Content-Type': 'application/json',
+ 		         	//위에 변수로 저장한 헤더이름,토큰값 넣어주기
+		        	'header': header, 
+		            'X-CSRF-Token': token
  		        },
  		        body: JSON.stringify({
 	            	orderCode: orderCode,
@@ -231,13 +268,13 @@
 		// 검색 함수
 		function search(){
 			// 값 가져와서 변수선언
-			let branchOfficeId = document.querySelector('#branchOfficeId').value;
 			let progressStatus = document.querySelector('#progressStatus').value;
 			let orderDate = document.querySelector('#orderDate').value;
 			let dueDate = document.querySelector('#dueDate').value;
 			// 객체로 담을 변수선언
 			let parameter = {};
 			// 객체 담기
+			parameter.companyNum = sessioCompanyNum
 			parameter.branchOfficeId = branchOfficeId;
 			parameter.progressStatus = progressStatus;
 			// sql로 선언한 Date는 null값이 들어가면 오류가 나서 null이 아닐때 넣는거로 선언
@@ -250,19 +287,23 @@
 			// 검색 조건들 보내기
 			grid.setRequestParams(parameter);
 			grid.readData();
+			//밑에 값이 있는데 검색을 했을때 지우기
+			const cancelSection = document.getElementById('cancelSection'); // 취소 영역 전체
+			cancelSection.style.display = 'none'; // 취소 영역 숨기기
+			grid2.resetData([]);
 			//데이터가 없으면 뜨는 문구
 			OLnodata();
+			OLDnodata();
 		}
 		
 		// 검색 초기화 함수
 		function reset(){
 			// 입력칸 빈칸으로 변경
-			let branchOfficeId = document.querySelector('#branchOfficeId').value = '';
 			let progressStatus = document.querySelector('#progressStatus').value = '';
 			let orderDate = document.querySelector('#orderDate').value = '';
 			let dueDate = document.querySelector('#dueDate').value = '';
-			// 빈 값을 보냄
-			grid.setRequestParams({});
+			// 검색 조건 없이 보내야하나 회사번호랑 지점명은 꼭 들어가야 해서 넣고 보냄
+			grid.setRequestParams({companyNum: sessioCompanyNum, branchOfficeId: branchOfficeId});
 			grid.readData();
 		}
 		
@@ -280,6 +321,19 @@
 				let nodata = document.querySelectorAll('.tui-grid-layer-state-content p')[1];
 				nodata.innerHTML = '발주서를 선택 해주세요';
 			}, 100)
+		}
+		
+		//엑셀파일 만들기
+		function downExcel(){
+			let btnExcel = document.querySelector('.btnExcel');
+			btnExcel.addEventListener("click", function () {
+			       const options = {
+			         				includeHiddenColumns: true,
+			         				//onlySelected: true,
+			         				fileName: '발주상품',
+			       					};
+			       grid2.export('xlsx', options);
+		     })
 		}
 		
 	</script>
