@@ -6,8 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.beauty1nside.bhf.dto.returninglist.BhfReturnListDTO;
 import com.beauty1nside.bhf.dto.returninglist.BhfReturnListSearchDTO;
-
-
+import com.beauty1nside.bsn.dto.cs.BsnReturnListDTO;
 import com.beauty1nside.bsn.mapper.BsnCsMapper;
 import com.beauty1nside.bsn.service.BsnCsService;
 
@@ -27,6 +26,11 @@ public class BsnCsServiceImpl implements BsnCsService{
 	@Override
 	public int countBhfReturningList(BhfReturnListSearchDTO dto) {
 		return bsnCsMapper.countBhfReturningList(dto);
+	}
+
+	@Override
+	public List<BsnReturnListDTO> bhfReturningDetail(BhfReturnListSearchDTO dto) {
+		return bsnCsMapper.selectBhfReturningDetail(dto);
 	}
 
 }
