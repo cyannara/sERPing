@@ -46,7 +46,7 @@ public class BsnSampleController {
 	
 	@GetMapping("/order")
 	public String order() {
-		return "redirect:/bsn/orderRegist";
+		return "redirect:/bsn/order/Regist";
 	};
 	
 	
