@@ -30,4 +30,10 @@ public class OtherServiceImpl implements OtherService{
 		return otherMapper.bhfList(companyNum);
 	}
 	
+	@Override
+	public Map<String, Object> companyInfo(int companyNum) {
+		// TODO Auto-generated method stub
+		return otherMapper.companyInfo(companyNum);
+	}
+	
 }
