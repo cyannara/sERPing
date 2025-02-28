@@ -8,7 +8,7 @@ import com.beauty1nside.purchs.dto.ProdInsertVO;
 
 public interface productService {
 	//카테고리 조회 
-	public List<ProductDTO> getCatelist();
+	List<ProductDTO> getCatelist(int companyNum);  // ✅ companyNum 추가
 	
 	//브랜드 조회
 	public List<ProductDTO> getBrandlist(ProductSearchDTO dto);

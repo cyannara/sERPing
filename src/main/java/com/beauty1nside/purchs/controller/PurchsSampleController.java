@@ -37,9 +37,10 @@ public class PurchsSampleController {
 	//제품 등록 페이지 이동
 	@GetMapping("/goodsRegister")
 	public void showRegister(Model model) {
-		model.addAttribute("ProductDTO", new ProductDTO());
-	    model.addAttribute("catelist", productService.getCatelist()); // 빈 객체라도 전달
+		ProductDTO productDTO = new ProductDTO();
+		model.addAttribute("ProductDTO",productDTO);
 	}
+	
 	
 	//발주서 등록 페이지 이동 
 	@GetMapping("/purchaseRegister")

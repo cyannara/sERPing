@@ -2,10 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.beauty1nside.purchs.mapper.productMapper">
 <!-- catelist 카테고리 조회-->
-<select id="catelist" resultType="ProductDTO">
-select *
-from stdr_classification
-order by classification_id desc
+
+<select id="getCatelist" resultType="ProductDTO">
+    SELECT * FROM stdr_classification
+    WHERE company_num = #{companyNum}
+    ORDER BY classification_id DESC
 </select>
 
 <!-- brandlist 브랜드 조회 -->
@@ -19,18 +20,20 @@ order by classification_id desc
                BRAND_NAME,
                COMPANY_NUM
         FROM STDR_BRAND
+        where company_num = #{companyNum}
         <include refid="searchbrandInfo"/>  <!-- 검색 조건 포함 -->
-
+		ORDER BY BRAND_ID DESC <!-- ORDER BY 위치  -->
         
     )
     WHERE RN BETWEEN #{start} AND #{end}  <!--  WHERE 수정 -->
-    ORDER BY BRAND_ID DESC <!-- ORDER BY 위치  -->
+    
 </select>
 
 
 <!-- 카운트 -->
 <select id="brandcount" resultType="int">
 	select count(*) from stdr_brand
+	 where company_num = #{companyNum}
 		<include refid="searchbrandInfo"></include>
 </select>
 
@@ -54,18 +57,20 @@ order by classification_id desc
                VENDOR_ID,
                VENDOR_NAME             
         FROM GRPWR_VENDOR
+        where company_num = #{companyNum}
         <include refid="searchVendorInfo"/>  <!-- 검색 조건 포함 -->
-
+		ORDER BY VENDOR_ID DESC <!-- ORDER BY 위치  -->
         
     )
     WHERE RN BETWEEN #{start} AND #{end}  <!--  WHERE 수정 -->
-    ORDER BY VENDOR_ID DESC <!-- ORDER BY 위치  -->
+    
 </select>
 
 
 <!-- 카운트 -->
 <select id="vendorcount" resultType="int">
 	select count(*) from GRPWR_VENDOR
+	where company_num = #{companyNum}
 		<include refid="searchVendorInfo"></include>
 </select>
 
@@ -89,18 +94,20 @@ order by classification_id desc
                WAREHOUSE_NAME,
                COMPANY_NUM
         FROM STDR_WAREHOUSE
+        where company_num = #{companyNum}
         <include refid="searchwarehouseInfo"/>  <!-- 검색 조건 포함 -->
-
+		 ORDER BY WAREHOUSE_ID DESC <!-- ORDER BY 위치  -->
         
     )
     WHERE RN BETWEEN #{start} AND #{end}  <!--  WHERE 수정 -->
-    ORDER BY WAREHOUSE_ID DESC <!-- ORDER BY 위치  -->
+   
 </select>
 
 
 <!-- 카운트 -->
 <select id="warehousecount" resultType="int">
 	select count(*) from STDR_WAREHOUSE
+	where company_num = #{companyNum}
 		<include refid="searchwarehouseInfo"></include>
 </select>
 

@@ -29,7 +29,6 @@ import com.beauty1nside.purchs.dto.ProductDTO;
 import com.beauty1nside.purchs.dto.ProductSearchDTO;
 import com.beauty1nside.purchs.dto.PurchInsertVO;
 import com.beauty1nside.purchs.dto.PurchaseSearchDTO;
-import com.beauty1nside.purchs.dto.WarehouseDTO;
 import com.beauty1nside.purchs.dto.WarehouseInsertVO;
 import com.beauty1nside.purchs.dto.WarehouseSearchDTO;
 import com.beauty1nside.purchs.service.productService;
@@ -51,10 +50,29 @@ public class ProductRestController {
 	final purchaseService purchaseService;
 	final warehouseService warehouseService;
 	
+	// ✅ 카테고리 목록 조회 (companyNum 기준)
+	@GetMapping("/product/catelist")
+    public ResponseEntity<?> getCategoryList(@RequestParam("companyNum") int companyNum) {
+        System.out.println("📢 요청받은 companyNum: " + companyNum); // ✅ 서버 로그 확인
+
+        List<ProductDTO> categoryList = productService.getCatelist(companyNum);
+
+        if (categoryList == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("❌ 데이터베이스에서 카테고리 목록을 가져오지 못했습니다.");
+        }
+
+        if (categoryList.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("⚠️ 카테고리 데이터 없음");
+        }
+
+        return ResponseEntity.ok(categoryList);
+    }
+	
 	//브랜드 모달 데이터 조회 
 	@GetMapping("/brand/list")
 	public Object brandList(@RequestParam(name="perPage",defaultValue="2", required = false) int perPage,
 							@RequestParam(name="page", defaultValue = "1" ,required = false) int page,
+							@RequestParam(name="companyNum", required=true) int companyNum,  // ✅ 회사번호 필수
 							@ModelAttribute ProductSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
 		
 	
@@ -81,6 +99,7 @@ public class ProductRestController {
 	@GetMapping("/vendor/list")
 	public Object vendorList(@RequestParam(name="perPage",defaultValue="2", required = false) int perPage,
 							@RequestParam(name="page", defaultValue = "1" ,required = false) int page,
+							@RequestParam(name="companyNum", required=true) int companyNum,  // ✅ 회사번호 필수
 							@ModelAttribute ProductSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
 		
 		
@@ -106,6 +125,7 @@ public class ProductRestController {
 		@GetMapping("/warehouse/list")
 		public Object warehouseList(@RequestParam(name="perPage",defaultValue="2", required = false) int perPage,
 								@RequestParam(name="page", defaultValue = "1" ,required = false) int page,
+								@RequestParam(name="companyNum", required=true) int companyNum,  // ✅ 회사번호 필수
 								@ModelAttribute ProductSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
 			
 			
@@ -377,5 +397,3 @@ public class ProductRestController {
 
 
 }
-
-	

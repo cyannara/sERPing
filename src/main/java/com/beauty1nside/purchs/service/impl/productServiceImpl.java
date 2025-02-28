@@ -24,10 +24,7 @@ public class productServiceImpl implements productService{
 	private final productMapper productMapper;
 	
 
-	@Override
-	public List<ProductDTO> getCatelist() {
-		return productMapper.catelist();
-	}
+	
 
 	@Override
 	public List<ProductDTO> getBrandlist(ProductSearchDTO dto) {
@@ -74,6 +71,12 @@ public class productServiceImpl implements productService{
 	@Override
 	public int productcount(ProductSearchDTO vo) {
 		return productMapper.productcount(vo);
+	}
+
+	@Override
+	public List<ProductDTO> getCatelist(int companyNum) {
+		
+		return productMapper.getCatelist(companyNum);
 	}
 	
 

@@ -2,13 +2,15 @@ package com.beauty1nside.purchs.mapper;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.beauty1nside.purchs.dto.ProductDTO;
 import com.beauty1nside.purchs.dto.ProductSearchDTO;
 import com.beauty1nside.purchs.dto.ProdInsertVO;
 
 public interface productMapper {
 	//카테고리 조회 (드롭박스)
-	List<ProductDTO>catelist();
+	List<ProductDTO> getCatelist(@Param("companyNum") int companyNum);
 	
 	//브랜드 조회 (모달)
 	List<ProductDTO>brandlist(ProductSearchDTO dto);
