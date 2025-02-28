@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beauty1nside.bhf.mapper.ErpBoardMapper">
+
+	<select id="boardList" resultType="ErpBoardListDTO" parameterType="ErpBoardListSearchDTO">
+		select	board_id,
+				board_title,
+				board_content,
+				board_category,
+				board_date,
+				employee_name
+		from(select rownum rn,
+					board_id,
+					board_title,
+					board_content,
+					board_category,
+					board_date,
+					employee_name
+			from	grpwr_board
+		<![CDATA[
+			where rownum <= #{end}
+		]]>
+			and <include refid="searchInfo"></include>
+			)
+		where rn >= #{start}
+	</select>
+	
+	<select id="count" parameterType="ErpBoardListSearchDTO">
+		SELECT COUNT(board_id)
+		FROM grpwr_board
+		<where>
+			<include refid="searchInfo"></include>
+		</where>
+	</select>
+	
+	<sql id="searchInfo">
+		company_num = #{companyNum}
+		<if test="boardId != null and ! boardId.equals('') and boardId != 0">
+			AND board_id = #{boardId}
+		</if>
+		<if test="boardTitle != null and ! boardTitle.equals('')">
+			AND board_title = #{boardTitle}
+		</if>
+		<if test="boardCategory != null and ! boardCategory.equals('')">
+			AND board_category = #{boardCategory}
+		</if>
+		<if test="employeeName != null and ! employeeName.equals('')">
+			AND employee_name = #{employeeName}
+		</if>
+		<if test="boardDate != null and ! boardDate.equals('')">
+			AND TO_CHAR(board_date, 'yyyy-mm-dd') = #{boardDate}
+		</if>
+	</sql>
+
+</mapper>

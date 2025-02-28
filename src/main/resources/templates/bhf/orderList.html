@@ -65,7 +65,17 @@
 			<div class="col-md-12 stretch-card mt-2 mb-5">
 				<div class="card">
 					<div class="card-body">
-						<h6 class="mb-4">발주서 상세</h6>
+						<div id="rayout-container" class="row mb-3">
+							<h6 class=" col-sm-9">발주서 상세</h6>
+							<span class="label-search col-sm-1" style="font-size: 1em">표시수량</span>
+							<select name="display_amount" id="display_amount" class="col-sm-1 input-box" onchange="changeDisplay()">
+								<option value="5" selected>5</option>
+								<option value="10">10</option>
+								<option value="20">20</option>
+								<option value="50">50</option>
+								<option value="100">100</option>
+							</select>
+						</div>
 						<div id="orderListDetail"></div>
 						<div id="pagination" class="tui-pagination"></div>
 						<div style="text-align : right">
@@ -215,8 +225,8 @@
 				{ header : "상품명", name : "goodsName", align: 'center'},
 				{ header : "옵션코드", name : "optionCode", align: 'center'},
 				{ header : "옵션명", name : "optionName", align: 'center'},
-				{ header : "규격", name : "goodsStandard", align: 'center'},
-				{ header : "수량", name : "quantity", align: 'center'}
+				{ header : "규격", name : "goodsStandard", align: 'center', width: 150},
+				{ header : "수량", name : "quantity", align: 'center', width: 150}
 			],
 			data: []
 		});
@@ -321,6 +331,11 @@
 				let nodata = document.querySelectorAll('.tui-grid-layer-state-content p')[1];
 				nodata.innerHTML = '발주서를 선택 해주세요';
 			}, 100)
+		}
+
+		function changeDisplay() {
+			let gap = parseInt(document.querySelector('#display_amount').value);
+			grid2.setPerPage(gap,dataSource);
 		}
 		
 		//엑셀파일 만들기
