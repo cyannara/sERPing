@@ -2,6 +2,7 @@ package com.beauty1nside.bsn.service.impl;
 
 import java.util.List;
 
+
 import org.springframework.stereotype.Service;
 
 import com.beauty1nside.bsn.dto.BsnGoodsLOTDTO;
@@ -14,7 +15,9 @@ import com.beauty1nside.bsn.dto.order.BhfOrderDetailDTO;
 import com.beauty1nside.bsn.dto.order.BsnOrderDTO;
 import com.beauty1nside.bsn.dto.order.BsnOrderDetailDTO;
 import com.beauty1nside.bsn.mapper.BsnOrderMapper;
+import com.beauty1nside.bsn.service.BsnCustomException;
 import com.beauty1nside.bsn.service.BsnOrderService;
+
 
 import lombok.RequiredArgsConstructor;
 
@@ -107,11 +110,36 @@ public class BsnOrderServiceImpl implements BsnOrderService {
 	public void registerBsnDeliveryLotDetail(BsnDeliveryDetailDTO bsnDeliveryDetailDTO) {
 		bsnOrderMapper.insertBsnDeliveryLotDetail(bsnDeliveryDetailDTO);
 	}
+	
+	//출고 LOT 삭제
 	@Override
 	public void removeBsnDeliveryLotDetail(BsnDeliveryDetailDTO bsnDeliveryDetailDTO) {
 		bsnOrderMapper.deleteBsnDeliveryLotDetail(bsnDeliveryDetailDTO);
 		
 	}
+	
+	//출고 완료
+	@Override
+	public void completeBsnDelivery(BsnDeliveryDTO bsnDeliveryDTO) {
+		try {
+	        bsnOrderMapper.confirmBsnDelivery(bsnDeliveryDTO.getDeliveryId());
+	    } catch (BsnCustomException e) {
+	        // MyBatis 예외 처리
+	    	if (e.getErrorCode() == -20001) {
+	            throw new BsnCustomException(e.getErrorCode(), "출고 가능한 수량이 부족합니다.");
+	        } else if (e.getErrorCode() == -20002) {
+	            throw new BsnCustomException(e.getErrorCode(), "창고 재고 데이터가 없습니다.");
+	        } else if (e.getErrorCode() == -20003) {
+	            throw new BsnCustomException(e.getErrorCode(), "출고 확정 중 오류 발생: " + e.getErrorMessage());
+	        } else if (e.getErrorCode() == -20004) {
+	            throw new BsnCustomException(e.getErrorCode(), "배송 데이터가 없습니다.");
+	        } else if (e.getErrorCode() == -20005) {
+	            throw new BsnCustomException(e.getErrorCode(), "주문 데이터가 없습니다.");
+	        } else {
+	            throw new BsnCustomException(-99999, "알 수 없는 오류 발생");
+	        }
+	    }
+	 }
 	
 	
 	

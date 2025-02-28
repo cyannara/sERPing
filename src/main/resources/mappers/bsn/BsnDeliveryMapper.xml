@@ -49,7 +49,7 @@ WHERE RN BETWEEN #{start} AND #{end}
 
 
 <!-- 출고 상세 목록-->
-<select id="selectBsnDeliveryDetail">
+<select id="selectBsnDeliveryDetail"  parameterType="BsnDeliveryDTO">
 SELECT 
 delivery_detail_id,
 delivery_id,
@@ -76,19 +76,20 @@ bdd.sufficiency_status,
 bdd.option_barcode,
 bod.goods_name,
 bod.option_name,
-bod.goods_standard
+bdd.goods_standard
 
 FROM bsn_delivery_detail bdd
 LEFT JOIN bsn_order_detail bod ON bdd.order_detail_id = bod.order_detail_id
 WHERE bdd.delivery_id = #{deliveryId}
 )
 WHERE RN BETWEEN #{start} AND #{end}
+
 </select>
 
 <!-- 출고 상세 목록 수량-->
 
 <!-- 출고 LOT 상세 목록-->
-<select id="selectBsnDeliveryLotDetail">
+<select id="selectBsnDeliveryLotDetail" parameterType="BsnDeliveryDetailDTO">
 SELECT delivery_lot_detail_num, 
        delivery_detail_id, 
        goods_lot_num, 
@@ -102,7 +103,7 @@ SELECT /*+ INDEX_ASC(bsn_delivery_lot_detail PK_BSN_DELIVERY_LOT_DETAIL) */
        bdl.delivery_lot_detail_num, 
        bdl.delivery_detail_id, 
        bdl.goods_lot_num, 
-       --  여기서 delivery_possible_qnt를 다시 계산
+       --  여기서 delivery_possible_qnt를 계산
        TRUNC((pwb.warehousing_remaining_quantity)
        - COALESCE((
            SELECT SUM(delivery_qnt) 
@@ -113,12 +114,19 @@ SELECT /*+ INDEX_ASC(bsn_delivery_lot_detail PK_BSN_DELIVERY_LOT_DETAIL) */
            AND bd2.delivery_status = 'DS01'
            <![CDATA[
            AND bdl2.delivery_detail_id < #{deliveryDetailId}
-       )*6, 0))/ 6 AS delivery_possible_qnt,
+       )* goods_standard_ratio, 0))/ goods_standard_ratio AS delivery_possible_qnt,
        ]]>
        bdl.delivery_qnt,
        pwb.goods_consumption_date
 FROM bsn_delivery_lot_detail bdl
-JOIN purchs_warehousing_body pwb ON bdl.goods_lot_num = pwb.goods_lot_num
+LEFT JOIN purchs_warehousing_body pwb ON bdl.goods_lot_num = pwb.goods_lot_num
+LEFT JOIN bsn_delivery_detail bdd ON bdl.delivery_detail_id = bdd.delivery_detail_id
+LEFT JOIN bsn_order_detail bod ON bdd.order_detail_id = bod.order_detail_id
+LEFT JOIN (
+    SELECT order_detail_id,
+           REGEXP_SUBSTR(goods_standard, '\d+', 2, 1) / REGEXP_SUBSTR(goods_standard, '\d+', 1, 1) AS goods_standard_ratio
+    FROM bsn_order_detail
+) ratio_table ON bod.order_detail_id = ratio_table.order_detail_id
 WHERE bdl.delivery_detail_id = #{deliveryDetailId}
 )
 WHERE RN BETWEEN #{start} AND #{end}
@@ -156,7 +164,7 @@ WHERE RN BETWEEN #{start} AND #{end}
 </sql>
 
 <!-- 창고 LOT별 조회(임시) -->
-<select id="selectGoodsWarehouseLot">
+<select id="selectGoodsWarehouseLot" parameterType="BsnDeliveryDetailDTO">
 SELECT ROW_NUMBER() OVER (
               ORDER BY pwb.goods_consumption_date ASC
        ) AS RN, 
@@ -164,35 +172,33 @@ SELECT ROW_NUMBER() OVER (
        pwb.option_num,
        po.option_code,
        pwb.goods_lot_num,
-       -- 기존 수량에서 "출고대기" 상태의 LOT 수량 빼기
-       TRUNC(pwb.warehousing_remaining_quantity / 6) - 
-       COALESCE((
-           SELECT SUM(bdl.delivery_qnt) 
-           FROM BSN_DELIVERY_LOT_DETAIL bdl
-           JOIN BSN_DELIVERY_DETAIL bdd ON bdl.delivery_detail_id = bdd.delivery_detail_id
-           JOIN BSN_DELIVERY bd ON bdd.delivery_id = bd.delivery_id
-           WHERE bdl.goods_lot_num = pwb.goods_lot_num
-             -- 출고대기 상태인 것만 합산
-             AND bd.delivery_status = 'DS01'
-       ), 0) AS warehousing_remaining_quantity,
+
+       -- 남은 박스 개수 계산 (출고대기 수량 반영)
+       TRUNC(
+           (pwb.warehousing_remaining_quantity - COALESCE((
+               SELECT SUM(bdl.delivery_qnt * 
+                         (REGEXP_SUBSTR(bdd.goods_standard, '\d+', 2, 1) 
+                          / REGEXP_SUBSTR(bdd.goods_standard, '\d+', 1, 1))) 
+               FROM BSN_DELIVERY_LOT_DETAIL bdl
+               JOIN BSN_DELIVERY_DETAIL bdd ON bdl.delivery_detail_id = bdd.delivery_detail_id
+               JOIN BSN_DELIVERY bd ON bdd.delivery_id = bd.delivery_id
+               WHERE bdl.goods_lot_num = pwb.goods_lot_num
+                 AND bd.delivery_status = 'DS01'
+           ), 0))
+           / 
+           (SELECT REGEXP_SUBSTR(bdd.goods_standard, '\d+', 2, 1) 
+                   / REGEXP_SUBSTR(bdd.goods_standard, '\d+', 1, 1) 
+            FROM BSN_DELIVERY_DETAIL bdd
+            WHERE delivery_detail_id = #{deliveryDetailId})
+       ) AS warehousing_remaining_quantity,  -- 별칭 추가
+
        pwb.goods_consumption_date
        
 FROM purchs_warehousing_body pwb
 LEFT JOIN purchse_option po ON pwb.option_num = po.option_num
 WHERE pwb.company_num = 1
   AND po.option_code = #{optionCode}
-  
-  AND (TRUNC(pwb.warehousing_remaining_quantity / 6) - 
-       COALESCE((
-           SELECT SUM(bdl.delivery_qnt) 
-           FROM BSN_DELIVERY_LOT_DETAIL bdl
-           JOIN BSN_DELIVERY_DETAIL bdd ON bdl.delivery_detail_id = bdd.delivery_detail_id
-           JOIN BSN_DELIVERY bd ON bdd.delivery_id = bd.delivery_id
-           WHERE bdl.goods_lot_num = pwb.goods_lot_num
-             AND bd.delivery_status = 'DS01'
-  <![CDATA[
-       ), 0) > 0) 
-  ]]>
+  AND warehousing_remaining_quantity > 0
   AND NOT EXISTS (
       SELECT 1 
       FROM BSN_DELIVERY_LOT_DETAIL bdl
@@ -201,20 +207,25 @@ WHERE pwb.company_num = 1
   )
 ORDER BY pwb.goods_consumption_date ASC
 
+
 </select>
 
 <insert id="insertBsnDeliveryLotDetail" statementType="CALLABLE">
-call insert_Bsn_dlv_lot( 
+call Bsn_Dlv_Lot_Register( 
        #{deliveryDetailId},
        #{lotDetails, typeHandler=com.beauty1nside.bsn.BsnDeliDtlArrayTypeHandler}  
 ) 
 </insert>
 
 <delete id="deleteBsnDeliveryLotDetail" statementType="CALLABLE">
-call DELETE_BSN_DLV_LOT(
+call BSN_DLV_LOT_REMOVE(
        #{deliveryDetailId},
        #{lotDetails, typeHandler=com.beauty1nside.bsn.BsnDeliDtlArrayTypeHandler}
 )
 </delete>
+
+<update id="confirmBsnDelivery" statementType="CALLABLE">
+CALL BSN_DELIVERY_CONFIRM(#{deliveryId})
+</update>
 
 </mapper>

@@ -337,7 +337,7 @@ function loadDeliveryLotDetail(deliveryDetailId) {
         .then(data => {
             if (data && data.data && data.data.contents) {
             	const detailData = data.data.contents; // 상세 데이터 저장
-            	
+            	console.log(detailData);
                 deliveryLotDetailGrid.resetData(detailData);
             } else {
                 console.warn("상세 데이터가 없습니다.");
@@ -528,21 +528,53 @@ function deleteLot(dlvyDTO) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //출고 확정
 function confirmDelivery() {
-	//출고 확정지을 주문ID
-	console.log("출고 확정지을 주문ID: " + selectDlivyId);
+	//출고 확정지을 주문ID : selectDlivyId
+	//console.log("출고 확정지을 주문ID: " + selectDlivyId);
 	//const deliveryDetailData = deliveryDetailGrid.getData();
 	
+	const header = document.querySelector('meta[name="_csrf_header"]').content;
+    const token = document.querySelector('meta[name="_csrf"]').content;
+	let dlvyDTO = { deliveryId : selectDlivyId };
+    
+    
+    fetch('/bsn/rest/deli/confirm', {
+        method: 'PUT',
+        headers: {
+        	'header': header,
+        	'X-CSRF-Token': token,
+            'Content-Type': 'application/json'  // JSON 형식으로 보내기
+        },
+        body: JSON.stringify(dlvyDTO)  // 객체를 JSON으로 변환하여 전송
+    })
+    .then(response => {
+        if (!response.ok) {
+            // 200번대 이외의 응답 코드 처리(코드는 서비스 참조)
+        	return response.json().then(data => {
+                throw new Error(data.message || '출고 확정 처리 중 오류가 발생했습니다.');
+            });
+        }
+        return response.json();  // 응답 본문을 JSON으로 반환
+    })
+    .then(data => {
+        if (data.status === "success") {
+            showAlert('출고 완료', 'success');
+         	// 값 초기화 + 값 초기화
+            refreshGrid();
+            deliveryDetailGrid.resetData([]);
+            deliveryLotDetailGrid.resetData([]);
+            selectedRow = null;
+
+        } else {
+            showAlert('출고 실패:'+ data.message, 'danger');
+        }
+    })
+    .catch(error => {
+        // 네트워크 오류나 200번대가 아닌 상태 코드에 대한 예외 처리
+        console.error('Error:', error);
+        showAlert('출고 실패:'+ error.message, 'danger');
+    });
 	
-	//const requestData = deliveryDetailData.map(row => ({
-	//	   deliveryDetailId:Number(row.deliveryDetailId),
-	//}));
-	//console.log(requestData);
-	//let dlvyDTO = {
-			
-	//		deliveryId: selectDlivyId,
-	//		deliveryDetails: requestData
-	//};
-	//console.log(dlvyDTO);
+	
 	
 	
 }

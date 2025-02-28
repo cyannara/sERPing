@@ -120,7 +120,7 @@ WHERE  order_code = #{orderCode}
 
 <!-- 주문과 발주 상세 정보를 삽입하는 프로시저 호출 -->
 <insert id="insertBsnOrder" statementType="CALLABLE">
-call insert_Bsn_Order( 
+call Bsn_Order_Register( 
               #{orderCode}, 
               #{branchOfficeId}, 
               #{orderDate}, 

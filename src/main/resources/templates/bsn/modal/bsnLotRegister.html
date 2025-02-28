@@ -11,6 +11,7 @@
 	<script>
         let registerGrid;
 
+
 		
         document.addEventListener("DOMContentLoaded", function () {
             registerGrid = new tui.Grid({
@@ -29,6 +30,7 @@
                 }
             });
         });
+        
 		
 
         // 모달이 열릴 때 데이터 업데이트
@@ -72,7 +74,7 @@
      // 📌 REST API에서 데이터 가져오는 함수
      const LotListDataSource = {
 		api: {
-			readData: { url: 'http://localhost:81/bsn/rest/goods/lot', method: 'GET', initParams: { page: 1 }},
+			readData: { url: '/bsn/rest/goods/lot', method: 'GET', initParams: { page: 1 }},
 			//?optionCode=${selectedRow.optionCode}&deliveryDetailId=${selectedRow.deliveryDetailId}
 		},
 		contentType: 'application/json'
@@ -86,6 +88,15 @@
     	    return date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }) // "2025년 2월 17일"
     	        
     	}
+     
+     // 테이블 데이터 없을때 나오는 문구
+		function REnodata(){
+			console.log("조회중")
+			setTimeout( () => {
+				let nodata = document.querySelectorAll('.tui-grid-layer-state-content p')[0];
+				nodata.innerHTML = '해당하는 데이터가 없습니다.';
+			}, 100)
+		}
     </script>
 </body>
 </html>

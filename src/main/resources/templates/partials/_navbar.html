@@ -14,7 +14,7 @@
     <nav class="menu">
       <a th:href="@{/standard/doc(menu='standard')}" data="standard"
          th:classappend="${#strings.equals('standard', param.menu)} ? 'selected' : ''">기준정보</a>
-      <a th:href="@{/bsn/orderList(menu='sales')}" data="sales"
+      <a th:href="@{/bsn/order/List(menu='sales')}" data="sales"
          th:classappend="${#strings.equals('sales', param.menu)} ? 'selected' : ''">영업</a>
       <a th:href="@{/purchs/goodsRegister(menu='inventory')}" data="inventory"
          th:classappend="${#strings.equals('inventory', param.menu)} ? 'selected' : ''">재고</a>

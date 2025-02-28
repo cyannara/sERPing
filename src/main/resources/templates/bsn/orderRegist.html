@@ -336,18 +336,8 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		    
 		    console.log("검색 조건:", params);
 		    
-		 	// grid(발주요청)에 파라미터 설정
-//		    grid.setRequestParams({
-//	      		"deteOption": selectedOption,
-//	            "startDate": startDate,
-//	            "endDate": endDate,
-//	            "branch": selectedBhf
-//	    });
 		 	grid.readData(1, params, true);
 		   
-
-		    // 데이터 갱신
-		    //grid.readData();
 		}
 		
 		//검색 조건 초기화
