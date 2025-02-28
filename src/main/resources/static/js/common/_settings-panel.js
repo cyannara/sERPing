@@ -1,13 +1,14 @@
 const empBox = document.getElementById('emp-box')
 const sendBtn = document.getElementsByClassName('send-btn')[0]
 const chatContainer = document.getElementById("chatMessages");
+const textarea = document.getElementById('textarea')
 let sessionEmployeeNum = document.getElementById("sessionEmployeeNum").value;
 let sessionEmployeeName = document.getElementById("sessionEmployeeName").value;
 let roomId = 0
 
 const addMsg = (sentMsg) => {
     const messageDiv = document.createElement("div");
-    let isSender = sentMsg.employeeNum === sessionEmployeeNum
+    let isSender = sentMsg.employeeNum === Number(sessionEmployeeNum)
 
     messageDiv.classList.add(
         "chat-message",
@@ -23,6 +24,7 @@ const addMsg = (sentMsg) => {
             `;
 
     chatContainer.appendChild(messageDiv);
+    chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: "smooth" });
 }
 
 const storeMsg = (msgContent, message) => {
@@ -56,7 +58,7 @@ const sendMsg = () => {
         console.error("WebSocket is not connected yet.");
         return;
     }
-    const msgContent = document.getElementById('textarea').value
+    const msgContent = textarea.value
     // type: 'CHAT',
     let message = {
         sender: sessionEmployeeName,
@@ -65,12 +67,19 @@ const sendMsg = () => {
     };
 
     storeMsg(msgContent, message)
-    document.getElementById('textarea').value = ''
+    textarea.value = ''
 }
 
 sendBtn.addEventListener('click', () => {
     sendMsg()
 })
+
+textarea.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && !event.shiftKey) {  // Shift+Enter 제외
+        event.preventDefault();  // 줄 바꿈 방지
+        sendMsg();
+    }
+});
 
 const showChats = (chats) => {
     let messages = chats.map((chat) => {
@@ -127,6 +136,7 @@ const openChatRoom = (employeeNum) => {
         // Bootstrap의 탭 기능을 활용
         $(document).ready(function() {
             $('#room-tab').tab('show');
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         });
     })
 }
@@ -137,8 +147,6 @@ const startChat = (employeeNum) => {
     stompClient = Stomp.over(socket);
     stompClient.debug = null;
     stompClient.connect({}, function () {
-        console.log('sessionEmployeeName', sessionEmployeeName)
-            // , type: 'JOIN'
         stompClient.send(
             `/app/chat.addUser/${roomId}`,
             {},
