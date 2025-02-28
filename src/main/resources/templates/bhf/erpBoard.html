@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layouts/layout}"
+      lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<title>게시판만들기프로젝트힘들다ㅠ</title>
+</head>
+<body layout:fragment="content">
+	<div class="container">
+		<div class="row">
+			<h3 class="mt-2 mb-2">사내 게시판</h3>
+			<hr>
+			<div class="col-md-12 stretch-card mt-3 mb-2">
+				<div class="card">
+					<div class="card-body">
+						<div class="row mb-4">
+							<label class="col-sm-1" style="text-align:center">제목</label> 
+							<input type="text"class="col-sm-2" id="boardTitle">
+							<label class="col-sm-1" style="text-align:center">작성자</label> 
+							<input type="text"class="col-sm-2" id="employeeName">
+							<label class="col-sm-1" style="text-align:center">분류</label> 
+							<select name="progressStatus" id="boardCategory" class="col-sm-2">
+								<option value="" selected>분류 선택</option>
+								<option value="공지">공지</option>
+								<option value="행사">행사</option>
+							</select>
+							<label class="col-sm-1" style="text-align:center">작성일</label> 
+							<input type="date"class="col-sm-2" id="boardDate">
+						</div>
+						<div style="text-align : center" class="mb-4">
+							<button onclick="search()">검색</button>
+							<button onclick="reset()">초기화</button>
+						</div>					
+						<div id="board"></div>
+						<div id="pagination" class="tui-pagination"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script th:inline="javascript">
+		var Grid = tui.Grid;
+		
+		let sessioCompanyNum = [[${session.companyNum}]];
+		
+		const dataSource = {
+			api: {
+				readData: { url: 'http://localhost:81/bhf/rest/board/list', method: 'GET', initParams: { page: 1, companyNum: sessioCompanyNum }},
+			},
+			contentType: 'application/json'
+			
+		};
+		
+		//게시판
+		const grid = new Grid({
+			el: document.getElementById('board'), 
+			pageOptions: {
+				useClient: false,
+				perPage: 5,
+			},
+			columns: [ 
+				{ header : "번호", name : "boardId", align: 'center', width: 100},
+				{ header : "분류", name : "boardCategory", align: 'center', width: 200},
+				{ header : "제목", name : "boardTitle", align: 'center'},
+				{ header : "작성자", name : "employeeName", align: 'center', width: 150},
+				{ header : "작성일", name : "boardDate", align: 'center', width: 150}
+			],
+			data: dataSource
+		});
+		
+		// 검색 함수
+		function search(){
+			
+			let boardCategory = document.querySelector('#boardCategory').value;
+			let employeeName = document.querySelector('#employeeName').value;
+			let boardTitle = document.querySelector('#boardTitle').value;
+			let boardDate = document.querySelector('#boardDate').value;
+			
+			let parameter = {};
+			
+			parameter.boardCategory = boardCategory
+			parameter.employeeName = employeeName;
+			parameter.boardTitle = boardTitle;
+			
+			if(boardDate != ''){
+				parameter.boardDate = boardDate;
+			}
+			
+			grid.setRequestParams(parameter);
+			grid.readData();
+			
+			OLDnodata();
+		}
+		
+		// 검색 초기화 함수
+		function reset(){
+			
+			let boardTitle = document.querySelector('#boardTitle').value = '';
+			let employeeName = document.querySelector('#employeeName').value = '';
+			let boardCategory = document.querySelector('#boardCategory').value = '';
+			let boardDate = document.querySelector('#boardDate').value = '';
+			
+			grid.setRequestParams({companyNum: sessioCompanyNum});
+			grid.readData();
+		}
+		
+		function OLDnodata(){
+			setTimeout( () => {
+				let nodata = document.querySelectorAll('.tui-grid-layer-state-content p')[0];
+				nodata.innerHTML = '해당하는 데이터가 없습니다.';
+			}, 100)
+		}
+		
+	</script>
+	
+</body>
+</html>

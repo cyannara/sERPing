@@ -21,10 +21,16 @@ public class BhfVueController {
 	    model.addAttribute("menu", "branch");
 	  }
 	
-	//샘플 페이지
+	//바코드 페이지
 	@GetMapping("/barcodeCreate")
 	public String barcodeCreate() {
 		return "/bhf/barcodeCreate";
+	};
+	
+	//게시판 페이지
+	@GetMapping("/erpBoard")
+	public String erpBoard() {
+		return "/bhf/erpBoard";
 	};
 
 	//샘플 페이지
