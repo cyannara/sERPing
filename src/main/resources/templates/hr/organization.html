@@ -96,6 +96,7 @@
                     <div class="select-wrapper" id="comClick">
                         <span class="toggle-btn">▼</span> 
                    		<input type="checkbox" class="dept-checkbox" value="company" disabled />
+                   		<input type="hidden" id="sessionCompanyNum" th:value="${session.companyNum}">
                         <span class="select-text" th:text="${company.companyName}" id="selectComKorName"></span> <span> / </span> 
                         <span class="select-text" th:text="${company.companyEngName}" id="selectComEngName"></span> 
                         (<span class="count" th:text="${company.totalEmployeeCount}"></span>)
@@ -258,7 +259,7 @@
 
 
   <script th:inline="javascript">
-  let companyNumSJ = /*[[${company.companyNum}]]*/ null;
+  let companyNumSJ = /*[[${session.companyNum}]]*/ null;
   let companyNum = /*[[${session.companyNum}]]*/ null; 
   let departmentNumSJ = 0;
   
@@ -524,7 +525,7 @@
         	    if (companyId !== undefined) {
         	        
         	        departmentNumSJ=0;
-        	        fetch(`/hr/rest/emp/organization?perPage=5&companyNum=${companyNumSJ}&departmentNum=${departmentNumSJ}&page=1`, {
+        	        fetch(`/hr/rest/emp/organization?perPage=5&companyNum=${companyNum}&departmentNum=${departmentNumSJ}&page=1`, {
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json',
@@ -544,7 +545,7 @@
         	        departmentNumSJ = departmentNum;
 
         	     // 쿼리 호출
-                    fetch(`/hr/rest/emp/organization?perPage=5&companyNum=${companyNumSJ}&departmentNum=${departmentNumSJ}&page=1`, {
+                    fetch(`/hr/rest/emp/organization?perPage=5&companyNum=${companyNum}&departmentNum=${departmentNumSJ}&page=1`, {
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json',

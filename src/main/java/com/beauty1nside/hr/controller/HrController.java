@@ -8,7 +8,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.beauty1nside.hr.dto.EmpDTO;
 import com.beauty1nside.hr.dto.EmpSearchDTO;
@@ -16,6 +15,7 @@ import com.beauty1nside.hr.service.DeptService;
 import com.beauty1nside.hr.service.EmpService;
 
 import groovy.util.logging.Log4j2;
+import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 
 @Log4j2
@@ -49,8 +49,17 @@ public class HrController {
     
   //인사관리-조직도관리
 	@GetMapping("/organization")
-	public String getOrganization(@RequestParam(name = "companyNum", required = false, defaultValue = "1") Long companyNum, Model model) {
-	    Map<String, Object> organization = deptService.getOrganization(companyNum);
+	public String getOrganization(HttpSession session, Model model) {
+	    // ✅ 세션에서 companyNum 가져오기
+	    Long sessionCompanyNum = (Long) session.getAttribute("companyNum");
+
+	    // ✅ 세션에 companyNum이 없을 경우 예외 처리
+	    if (sessionCompanyNum == null) {
+	        return "redirect:/login"; // 로그인 페이지로 리다이렉트
+	    }
+
+	    // ✅ 세션에서 가져온 companyNum으로 조직도 조회
+	    Map<String, Object> organization = deptService.getOrganization(sessionCompanyNum);
 	    model.addAttribute("company", organization.get("company"));
 	    model.addAttribute("departments", organization.get("departments"));
 	    return "hr/organization";
