@@ -6,15 +6,25 @@
  <head>
 
 <style>
-        /* ✅ 공통 스타일 */
-        .container { max-width: 1200px; margin: auto; }
-        .section-box { background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
-        .section-title { font-weight: bold; margin-bottom: 10px; }
+     /* ✅ 공통 스타일 */
+     .container { max-width: 1200px; margin: auto; }
+     .section-box { background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
+     .section-title { font-weight: bold; margin-bottom: 10px; }
+     
+     .tui-grid-container {
+	    overflow: visible !important;
+	}
+     
 
-        
+	.tui-datepicker.tui-datepicker-popup {
+	    transform: none !important; /* ✅ Grid 내부의 transform 속성 제거 */
+	    position: absolute !important;
+	}
+	
+  
 
-        
-    </style>
+
+</style>
  	
  </head>     
 <body layout:fragment="content">
@@ -58,8 +68,8 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <h4 class="section-title mb-0">발주서 목록</h4>
                     <div class="d-flex align-items-center">
-                        <label for="purchase_display_amount" class="form-label me-2 mb-0" style="font-size: 14px;">표시 수량</label>
-                        <select id="purchase_display_amount" class="form-select form-select-sm" onchange="changeProductDisplay()" style="width: 80px;">
+                        <label for="warehouse_display_amount" class="form-label me-2 mb-0" style="font-size: 14px;">표시 수량</label>
+                        <select id="warehouse_display_amount" class="form-select form-select-sm" onchange="changewarehousingDisplay()" style="width: 80px;">
                             <option value="10" selected>10</option>
                             <option value="20">20</option>
                             <option value="50">50</option>
@@ -85,8 +95,10 @@
 	            <input type="date" id="purchaseDate" class="form-control" th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" readonly>
 	        </div>
 	        <div class="flex-grow-1">
-	            <label for="responsiblePerson" class="form-label">담당자</label>
+	            <label for="responsiblePerson" class="form-label">구매담당자</label>
 	            <input type="text" id="employeeName" name="employeeName" class="form-control" th:value="${session.employeeName}" readonly>
+	            <input type="hidden" id="employeeNum" name="employeeNum" class="form-control" th:value="${session.employeeNum}" >
+	            <input type="hidden" id="companyNum" name="companyNum" class="form-control" th:value="${session.companyNum}" >
 	        </div>
 	        <div class="flex-grow-1">
 	            <label for="warehouse" class="form-label">입고창고</label>
@@ -94,16 +106,16 @@
 	            <input type="hidden" id="warehouseId" name="warehouseId">
 	        </div>
 	          <!--  창고 모달 -->
-			    <div th:include="purchs/ModalTemplate :: ModalTemplate (
+			    <div th:include="purchs/modal/ModalTemplate :: ModalTemplate (
 			    'warehouseModal', 
 			    'modal-xl', 
 			    '창고 조회', 
-			    'purchs/warehouseTable', 
-			    'purchs/warehouseFooter'
+			    'purchs/modal/warehouseTable', 
+			    'purchs/modal/warehouseFooter'
 			    )"></div>
 	        <div class="flex-grow-1">
-	            <label for="manufactureDate" class="form-label">제조일자</label>
-	            <input type="date" id="manufactureDate" class="form-control">
+	            <label for="manufactureDateInput" class="form-label">제조일자</label>
+	            <input type="date" id="manufactureDateInput" class="form-control">
 	        </div>
 	    </div>
 	    
@@ -121,25 +133,57 @@
         </div>
         <div id="warehousinglistGrid"></div>
     </div>
+    
+    	 
+	<!-- 상품 모달 -->
+	 <div th:include="purchs/modal/ModalTemplate :: ModalTemplate (
+	  'goodsModal', 
+	  'modal-xl', 
+	  '상품 조회', 
+	  'purchs/modal/goodsTable', 
+	  'purchs/modal/brandFooter'
+	  )"></div> 
 
     <div class="text-center mt-4">
-        <button type="button" class="btn btn-primary">등록</button>
+        <button type="button" class="btn btn-primary" id="warehousingInsert">등록</button>
         <button type="button" class="btn btn-secondary">초기화</button>
     </div>
 </div>
 
-
 <script>
 
-	
-  // 커스텀 렌더러 클래스 정의 (최상단)
-  class CustomTextRenderer {
+
+ // 커스텀 렌더러 클래스 정의 (최상단)
+  if (!window.CustomTextRenderer) {
+    console.log("✅ CustomTextRenderer 선언됨");
+    window.CustomTextRenderer = class {
+        constructor(props) {
+            const el = document.createElement('div');
+            el.innerText = props.value;
+            el.style.padding = '10px';
+            el.style.fontWeight = 'bold';
+            el.style.textAlign = 'left';
+            this.el = el;
+        }
+        getElement() {
+            return this.el;
+        }
+    };
+} else {
+    console.warn("⚠️ CustomTextRenderer가 이미 선언되어 있음, 중복 선언 방지됨.");
+}
+
+  
+//✅ 삭제 버튼 렌더러 (전역으로 이동)
+  class DeleteRenderer {
       constructor(props) {
-          const el = document.createElement('div');
-          el.innerText = props.value;
-          el.style.padding = '10px';
-          el.style.fontWeight = 'bold';
-          el.style.textAlign = 'left';
+          const el = document.createElement("button");
+          el.textContent = "삭제";
+          el.className = "btnDelete btn btn-danger btn-sm";
+          el.addEventListener("click", () => {
+              // ✅ 올바른 그리드 객체에서 해당 행 삭제
+              warehousinglistGrid.removeRow(props.rowKey);
+          });
           this.el = el;
       }
       getElement() {
@@ -147,37 +191,90 @@
       }
   }
   
-	//✅ 삭제 버튼 렌더러 (전역으로 이동)
-	  class DeleteRenderer {
-	      constructor(props) {
-	          const el = document.createElement("button");
-	          el.textContent = "삭제";
-	          el.className = "btnDelete btn btn-danger btn-sm";
-	          el.addEventListener("click", () => {
-	              // ✅ 올바른 그리드 객체에서 해당 행 삭제
-	              warehousinglistGrid.removeRow(props.rowKey);
-	          });
-	          this.el = el;
-	      }
-	      getElement() {
-	          return this.el;
-	      }
-	  }
+//✅ 동적으로 input 값이 변경될 때 빈 제조일자 자동 입력
+  document.querySelector("#manufactureDateInput").addEventListener("input", function () {
+      fillEmptyManufactureDates();
+  });
+
+  // ✅ 빈 제조일자를 input 값으로 자동 채우는 함수
+  function fillEmptyManufactureDates() {
+      console.log("📢 빈 제조일자 자동 입력 시작");
+
+      // ✅ 현재 input 박스의 제조일자 값 가져오기
+      const manufactureDateInput = document.querySelector("#manufactureDateInput").value;
+      if (!manufactureDateInput) {
+          console.warn("⚠️ 제조일자 입력 박스 값이 비어 있습니다.");
+          return;
+      }
+
+      // ✅ 그리드 데이터 확인
+      warehousinglistGrid.getData().forEach(row => {
+          if (!row.manufactureDate) {  // ✅ 값이 비어 있는 경우에만 입력
+              console.log(`✅ 제조일자 자동 입력: rowKey=${row.rowKey}, 값=${manufactureDateInput}`);
+              warehousinglistGrid.setValue(row.rowKey, "manufactureDate", manufactureDateInput);
+          }
+      });
+
+      console.log("✅ 제조일자 자동 입력 완료!");
+  }
+
+
+
+	
+  let purchaselistGrid; 
+  let warehousinglistGrid; // ✅ 전역 변수로 선언
   let header = document.querySelector('meta[name="_csrf_header"]').content;
   let token = document.querySelector('meta[name="_csrf"]').content;
   // 페이지 로드 후 그리드 초기화
   document.addEventListener("DOMContentLoaded", function () {
       console.log("✅ 발주서 그리드 초기화");
-      initPurchaseGrid();
-      initWarehouseModal(); // ✅ 창고 모달 초기화 추가
-      initwarehousingGrid();
-   
       
-   // ✅ 구매리스트추가 버튼 클릭 이벤트 추가
-      //document.querySelector("#addwarehousinglist").addEventListener("click", moveToPurchaseDetail);
-  });
+      setTimeout(fillEmptyManufactureDates, 1000); // ✅ 1초 후 실행 (그리드 로드 이후)
+      
+      initPurchaseGrid();//발주서그리드
+  
+      initwarehousingGrid(); // 구매 상세 리스트 그리드 초기화
+      setTimeout(fillEmptyManufactureDates, 1000); // ✅ 1초 후 실행 (그리드 로드 이후)
+      
+      initWarehouseModal(); // 창고 모달 초기화 추가
+      
+  	
+  	//모달 닫기 작업 
+  	const modalElement = document.getElementById("goodsModal");
+  	const closeButton = modalElement.querySelector('[data-bs-dismiss="modal"]');
 
-  let purchaselistGrid;
+  	if (closeButton) {
+  	    closeButton.addEventListener("click", function () {
+  	        console.log("✅ 창고 모달 닫기 버튼 클릭됨!");
+
+  	        try {
+  	        	let modalInstance = bootstrap.Modal.getInstance("#goodsModal") || new bootstrap.Modal("#goodsModal");
+  	            modalInstance.hide(); // ✅ Bootstrap 방식으로 모달 닫기
+  	            
+  	        } catch (error) {
+  	            console.warn("❌ Bootstrap 5가 로드되지 않았음. 대체 방식 사용");
+  	            modalElement.classList.remove("show");
+  	            modalElement.style.display = "none";
+  	            document.body.classList.remove("modal-open");
+
+  	            setTimeout(() => {
+  	                document.querySelectorAll(".modal-backdrop").forEach((element) => element.remove()); // 백그라운드 제거
+  	            }, 300);
+  				
+  	// ✅ 모달 닫힐 때 sessionStorage 값 가져와서 그리드에 저장
+  		    setupModalCloseEvent();
+      
+  	          
+  	        }
+  	    });
+  	} else {
+  	    console.warn("❌ 창고 모달 닫기 버튼을 찾을 수 없습니다.");
+  	} 
+  	
+
+  
+  });
+  
 
   function initPurchaseGrid() {
       const companyNum = [[${session.companyNum}]];
@@ -216,6 +313,7 @@
           contentType: 'application/json',
           serverSidePagination: true
       };
+      
 
       purchaselistGrid = new tui.Grid({
           el: document.getElementById('purchaselistGrid'),
@@ -233,15 +331,16 @@
               { header: "거래처명", name: "vendorName" },
               { header: "상품명", name: "goodsName" },
               { header: "옵션명", name: "optionName" },
-              { header: "발주수", name: "purchaseQuantity" },
-              { header: "미입고수", name: "nonWarehousingNum" },
+              { header: "발주수", name: "purchaseQuantity" ,formatter:(row)=>numberFormat(row.value) },
+              { header: "미입고수", name: "nonWarehousingNum" ,formatter:(row)=>numberFormat(row.value) },
           ]
       });
-
+      // ✅ 전역 변수로 설정 (이벤트 등록 전에 필요)
+      window.purchaseGrid = purchaselistGrid;
       console.log("✅ Toast Grid 초기화 완료");
   }
 
-  // 3. 기타 함수들 (검색, 필터 초기화, 표시 수량 변경 등)
+  // purchaselistGrid 검색
   function purchaseSearch() {
       let purchaseNum = document.querySelector('#searchPurchaseNum').value.trim();
       let vendorName = document.querySelector('#searchVendorName').value.trim();
@@ -257,8 +356,8 @@
       purchaselistGrid.reloadData();
   }
 
-  function changeProductDisplay() {
-      let gap = parseInt(document.querySelector('#purchase_display_amount').value);
+  function changewarehousingDisplay() {
+      let gap = parseInt(document.querySelector('#warehouse_display_amount').value);
       purchaselistGrid.setPerPage(gap);
       purchaselistGrid.reloadData();
   }
@@ -271,7 +370,7 @@
       document.querySelector('#purchase_display_amount').value = '';
       purchaselistGrid.setRequestParams({
           "companyNum": companyNum,
-          "vendorName" : vendorName,
+          "vendorName" : '',
           "purchaseNum": '',
           "startDate": '',
           "endDate": ''
@@ -279,31 +378,42 @@
       purchaselistGrid.reloadData();
   }
   
-  let warehousinglistGrid;
   //구매리스트 그리드 
   function initwarehousingGrid(){
+	  
 
 		 warehousinglistGrid = new tui.Grid({
           el: document.getElementById('warehousinglistGrid'),
           data: [],
-          
           bodyHeight: 'auto',
           scrollX :false,
           scrollY : false,
           rowHeaders: ['checkbox'], 
           columns: [
-              { header: "상품코드", name: "goodsCode"},
-              { header: "발주서번호", name: "purchaseBodyNum" ,hidden: true},
-              { header: "상품명", name: "goodsName" },
-              { header: "옵션코드", name: "optionCode" },
-              { header: "옵션명", name: "optionName" },
-              { header: "거래처명", name: "vendorName" },
-              { header: "거래처번호", name: "vendorId" ,hidden: true},
-              { header: "규격", name: "goodsStandard" },
-              { header: "수량", name: "purchaseQuantity", editor: "text" },
-              { header: "단가", name: "purchaseUnitPrice" },
-              { header: "공급가액", name: "purchaseSupplyPrice" },
-              { header: "부가세", name: "purchaseVat" },
+              { header: '상품코드', name: 'goodsCode'},
+              { header: '발주서번호', name: 'purchaseBodyNum' ,hidden: true},
+              { header: '상품명', name: 'goodsName' },
+              { header: '옵션코드', name: 'optionCode' },
+              { header: '옵션명', name: 'optionName' },
+              { header: '옵션번호', name: 'optionNum' ,hidden: true},
+              { header: '거래처명', name: 'vendorName' },
+              { header: '거래처번호', name: 'vendorId' ,hidden: true},
+              { header: '규격', name: 'goodsStandard' },
+              { header: '수량', name: 'warehousingStandardQuantity', editor: "text" ,formatter:(row)=>numberFormat(row.value)},
+              { header: '단가', name: 'warehousingUnitPrice',formatter:(row)=>numberFormat(row.value) },
+              { header: '공급가액', name: 'warehousingSupplyPrice' ,formatter:(row)=>numberFormat(row.value)},
+              { header: '부가세', name: 'warehousingVat' ,formatter:(row)=>numberFormat(row.value)},
+             { 
+            	    header: '제조일자', 
+            	    name: 'manufactureDate', 
+            	    editor: { type : "datePicker",
+						  options : { format : "yyyy-MM-dd",
+					  		  type : "date",
+					  		  timepicker : false
+					  		 
+						  }}},
+
+
               {
                   header : "삭제"
                   ,name: "delete"
@@ -318,18 +428,143 @@
           ]
       });
 		 
-	      const bttAdd = document.getElementById("bttAdd");
-	 	 // 행추가
-	         bttAdd.addEventListener("click", function () {
-	         	warehousinglistGrid.appendRow({}, { at: 0 }); // 빈 행 추가
-	         });
-	 	 
-	      //상품 및 옵션 칸 클릭 하면 정보리스트 모달 출력 
-	   	  window.purchaseGrid.on("click", (ev) => {
-	   	    if (ev.columnName === "goodsName" || ev.columnName === "goodsCode" || ev.columnName === "optionName" || ev.columnName === "optionCode") {
-	   	        openGoodsModal(ev.rowKey);
-	   		    }
-	   	});
+	
+
+		  
+	
+
+	 // ✅ 공급가격 자동 계산 함수
+	 function calculateSupplyPrice(rowKey) {
+	     let quantity = removeCommas(warehousinglistGrid.getValue(rowKey, "warehousingStandardQuantity")) || "0";
+	     let unitPrice = removeCommas(warehousinglistGrid.getValue(rowKey, "warehousingUnitPrice")) || "0";
+
+	     let supplyPrice = quantity * unitPrice;
+	     
+	     console.log(`✅ 공급가 자동 계산 (rowKey: ${rowKey}) → 공급가: ${supplyPrice}`);
+
+	     // ✅ 계산된 공급가격을 Grid에 업데이트
+	     warehousinglistGrid.setValue(rowKey, "warehousingSupplyPrice", supplyPrice);
+	     
+	     
+
+	     // ✅ VAT 다시 계산 (발주서에서 가져온 항목도 포함)
+	     updateVat(rowKey, true);
+
+	   
+	 }
+	 
+	// ✅ 부가세 자동 적용 함수 (기존 값 유지)
+	 function updateVat(rowKey, forceUpdate = false) {
+	     const applyVat = document.getElementById("vatChecked").checked;
+
+	     let supplyPrice = parseFloat(removeCommas(warehousinglistGrid.getValue(rowKey, "warehousingSupplyPrice"))) || 0;
+	     let existingVat = parseFloat(removeCommas(warehousinglistGrid.getValue(rowKey, "warehousingVat"))) || 0;
+	     let newVat = applyVat ? supplyPrice * 0.1 : 0;
+
+	     // ✅ 기존 VAT 값이 0이 아니면 유지, 0이면 새로 계산
+	     if (existingVat === 0 || forceUpdate) {
+	         warehousinglistGrid.setValue(rowKey, "warehousingVat", newVat);
+	         console.log(`✅ 부가세 적용 (rowKey: ${rowKey}) → 부가세: ${newVat}`);
+	     } else {
+	         console.log(`✅ 기존 부가세 유지 (rowKey: ${rowKey}) → 기존 부가세: ${existingVat}`);
+	     }
+	 }
+	
+	// ✅ 그리드 변경 감지 이벤트 추가 (수량, 단가 변경 시 자동 계산)
+	 warehousinglistGrid.on("afterChange", function (ev) {
+	     ev.changes.forEach(change => {
+	         if (change.columnName === "warehousingStandardQuantity" || change.columnName === "warehousingUnitPrice") {
+	             console.log(`📢 변경 감지 (rowKey: ${change.rowKey}, column: ${change.columnName}, value: ${change.value})`);
+	             calculateSupplyPrice(change.rowKey);
+	         }
+	     });
+	     
+	    
+	 });
+
+	// ✅ 부가세 체크박스 이벤트 핸들러 (새로운 추가된 행만 반응)
+	 document.getElementById("vatUnchecked").addEventListener("click", function () {
+	     if (this.checked) {
+	         document.getElementById("vatChecked").checked = false;
+	         setTimeout(() => {
+	             warehousinglistGrid.getData().forEach(row => {
+	                 if (!row.purchaseBodyNum) { // ✅ purchaseBodyNum이 없거나 null인 경우만 적용 (새로추가된입고리스트)
+	                     updateVat(row.rowKey);
+	                 }
+	             });
+	         }, 10);
+	     }
+	 });
+	//부가세 체크 박스 하나만 적용 되도록 
+	 document.getElementById("vatChecked").addEventListener("click", function () {
+	     if (this.checked) {
+	         document.getElementById("vatUnchecked").checked = false;
+	         setTimeout(() => {
+	             warehousinglistGrid.getData().forEach(row => {
+	                 if (!row.purchaseBodyNum) { // ✅ purchaseBodyNum이 없거나 null인 경우만 적용
+	                     updateVat(row.rowKey);
+	                 }
+	             });
+	         }, 10);
+	     }
+	 });
+
+	 // ✅ VAT 적용 함수 (purchaseBodyNum이 없는 경우만 적용)
+	 function updateVat(rowKey) {
+	     const applyVat = document.getElementById("vatChecked").checked;
+
+	     let supplyPrice = removeCommas(warehousinglistGrid.getValue(rowKey, "warehousingSupplyPrice")) || "0";
+	     let vat = applyVat ? supplyPrice * 0.1 : 0;
+
+	     // ✅ 부가세 업데이트 (콤마 포함)
+	     warehousinglistGrid.setValue(rowKey, "warehousingVat", vat);
+
+	     console.log(`✅ VAT 적용 (rowKey: ${rowKey}, applyVat: ${applyVat}) → 부가세: ${vat}`);
+	 }
+
+	
+	// ✅ 그리드 변경 감지 이벤트 추가 (수량, 단가 변경 시 자동 계산)
+	 warehousinglistGrid.on("afterChange", function (ev) {
+	     ev.changes.forEach(change => {
+	         if (change.columnName === "warehousingStandardQuantity" || change.columnName === "warehousingUnitPrice") {
+	             console.log(`📢 변경 감지 (rowKey: ${change.rowKey}, column: ${change.columnName}, value: ${change.value})`);
+	             calculateSupplyPrice(change.rowKey);
+	         }
+	     });
+	 });
+	
+
+		 
+	 const bttAdd = document.getElementById("bttAdd");
+	    if (bttAdd) {
+	        bttAdd.addEventListener("click", function () {
+	            warehousinglistGrid.appendRow({isManualInput: true}, { at: 0 }); // 빈 행 추가
+	        });
+	    }
+	    
+
+	    // ✅ 🔥 `warehousingGrid` 클릭 이벤트 등록 (상품명, 옵션 클릭 시 모달 열기)
+	    warehousinglistGrid.on("click", function (ev) {
+	        console.log("📢 `warehousingGrid` 클릭 감지됨:", ev);
+
+	        if (ev && ev.columnName) {
+	            console.log("📢 클릭된 열:", ev.columnName);
+	            if (["goodsName", "goodsCode", "optionName", "optionCode"].includes(ev.columnName)) {
+	                console.log("✅ 상품/옵션 클릭 이벤트 감지됨! rowKey:", ev.rowKey);
+	                openGoodsModal(ev.rowKey);
+	            }
+	        } else {
+	            console.warn("⚠️ `ev` 객체 또는 `ev.columnName`이 정의되지 않음.");
+	        }
+	    });
+
+	    console.log("✅ `warehousingGrid` 초기화 완료 및 클릭 이벤트 등록됨");
+	    
+	    
+	document.getElementById("warehousingInsert").addEventListener("click",function(){
+			warehousingRegister();
+		})
+	    
   }
 
   function initWarehouseModal() {
@@ -398,7 +633,7 @@
 	            // ✅ input 박스에 값 자동 반영
 	            document.getElementById("warehouseId").value = selectedWarehouseId;
 	            document.getElementById("warehouseName").value = selectedWarehouseName;
-
+				console.log("창고아이디확인==",document.getElementById("warehouseId").value)
 	            // ✅ 저장된 값 제거 (한 번 적용 후 삭제)
 	            sessionStorage.removeItem("selectedWarehouseId");
 	            sessionStorage.removeItem("selectedWarehouseName");
@@ -415,89 +650,95 @@
 	
 	    // ✅ 발주서 목록에서 체크된 항목 가져오기
 	    let checkedRows = purchaselistGrid.getCheckedRows();
-	
-	    if (checkedRows.length === 0) {
-	    	showAlert('이동할 항목을 선택하세요.', 'danger');
-	        return;
-	    }
-	
+		console.log("✅ 선택된 행 데이터:", checkedRows);
+		
+		if (!checkedRows || checkedRows.length === 0) {
+		    console.warn("⚠️ 선택된 데이터가 없습니다.");
+		    showAlert('이동할 항목을 선택하세요.', 'danger');
+		    return;
+		}
 	    console.log("✅ 선택된 행 데이터:", checkedRows);
 	    
 	    
 	
 	    // ✅ `warehousinglistGrid`가 정의되지 않았다면 초기화
-	    if (warehousinglistGrid === null) {
+	    if (!warehousinglistGrid) {
 	        console.warn("❌ `warehousinglistGrid`가 초기화되지 않았습니다. 초기화 시도!");
 	        initwarehousingGrid();  // ✅ 그리드 초기화
 	    }
-	
-	    if (warehousinglistGrid === null) {
-	        console.error("❌ `warehousinglistGrid` 초기화 실패!");
+	    
+	    if (checkedRows.length === 0) {
+	        console.warn("⚠️ 선택된 데이터가 없습니다. 그리드 추가를 중단합니다.");
 	        return;
 	    }
 	
+	 	console.log(checkedRows);
+	
 	    // ✅ 선택된 데이터 구매 상세 리스트(warehousinglistGrid)에 추가
-	    checkedRows.forEach(row => {
-	        warehousinglistGrid.appendRow({
-	            goodsCode: row.goodsCode || "", // 상품코드
-	            goodsName: row.goodsName || "", // 상품명
-	            purchaseBodyNum : row.purchaseBodyNum || "",
-	            optionCode: row.optionCode || "", // 옵션코드
-	            optionName: row.optionName || "", // 옵션명
-	            vendorName: row.vendorName || "", // 거래처명
-	            vendorId: row.vendorId || "", // 거래처번호 (hidden)
-	            goodsStandard: row.goodsStandard || "", // 규격
-	            purchaseQuantity: row.nonWarehousingNum || 1, // 수량 (기본값 1)
-	            purchaseUnitPrice: row.purchaseUnitPrice || 0, // 단가
-	            purchaseSupplyPrice: row.purchaseSupplyPrice || 0, // 공급가액
-	            purchaseVat: row.purchaseVat || 0, // 부가세
-	        });
-	    });
+	  checkedRows.forEach(row => {
+		    warehousinglistGrid.appendRow({
+		        goodsCode: row.goodsCode || "", 
+		        goodsName: row.goodsName || "", 
+		        purchaseBodyNum: row.purchaseBodyNum || "",
+		        optionCode: row.optionCode || "", 
+		        optionName: row.optionName || "", 
+		        optionNum: row.optionNum,
+		        vendorName: row.vendorName || "",
+		        vendorId: row.vendorId || "",
+		        goodsStandard: row.goodsStandard || "",
+		        warehousingStandardQuantity: row.nonWarehousingNum || 1, 
+		        warehousingUnitPrice: row.purchaseUnitPrice || 0,
+		        warehousingSupplyPrice: row.purchaseSupplyPrice || 0,
+		        warehousingVat: row.purchaseVat || 0,
+		        isManualInput: true
+		    });
+		});
+
 	
 	    console.log("✅ 구매 상세 리스트에 추가 완료");
+	    
+	    // ✅ 부가세 적용
+	    //applyVatToAllRows();
 	    
   
 	}
 	
-//상품 모달 작업 
+//상품모달
+	
+let selectedRowKey = null; // ✅ 선택한 행(rowKey) 저장용 변수
 // ✅ 모달 열기 함수
-	function openGoodsModal(rowKey) {
-	    console.log("📢 선택한 행(rowKey):", rowKey);
-	
-	    const modalElement = document.getElementById('goodsModal');
-	    if (!modalElement) {
-	        console.error("❌ 모달 요소를 찾을 수 없습니다.");
-	        return;
-	    }
-	
-	    if (typeof productGrid !== 'undefined' && productGrid !== null) {
-	        console.log("📢 상품 조회 그리드 데이터 갱신 시작");
-	
-	        // 데이터를 먼저 불러온 후, 모달을 표시
-	        productGrid.readData();
-	        
-	        // ✅ 데이터 갱신 후 모달을 표시하도록 이벤트 리스너 추가
-	        productGrid.on("onGridUpdated", function () {
-	            console.log("📢 상품 조회 그리드 데이터 갱신 완료");
-	            
-	            // ✅ 모달 표시
-	            const modalInstance = new bootstrap.Modal(modalElement);
-	            modalInstance.show();
-	            console.log("📢 상품 조회 모달 열림:", rowKey);
-	
-	            // ✅ 데이터 반영 후 레이아웃 새로고침 (지연 실행)
-	            setTimeout(() => {
-	                productGrid.refreshLayout();
-	                console.log("📢 상품 조회 그리드 리프레시 완료");
-	            }, 500);
-	        });
-	    } else {
-	        console.warn("❌ productGrid가 정의되지 않았습니다.");
-	    }
-	}
-	
-	// ✅ 모달이 완전히 열린 후 동작
-	document.getElementById('goodsModal').addEventListener('shown.bs.modal', function () {
+function openGoodsModal(rowKey) {
+    console.log("📢 선택한 행(rowKey):", rowKey);
+
+    let modalElement = document.getElementById('goodsModal');
+
+    if (!modalElement) {
+        console.error("❌ 모달 요소를 찾을 수 없습니다.");
+        return;
+    }
+
+    // ✅ Bootstrap Modal 인스턴스 가져오기 (getInstance 대신 new Modal 사용)
+    let modalInstance = new bootstrap.Modal(modalElement);
+
+    // ✅ 모달 표시
+    modalInstance.show();
+
+    console.log("📢 상품 조회 모달 열림:", rowKey);
+
+    // ✅ productGrid가 정의되었는지 확인 후 실행
+    if (typeof productGrid !== 'undefined' && productGrid !== null) {
+        setTimeout(() => {
+            productGrid.refreshLayout();
+            console.log("📢 상품 조회 그리드 리프레시 실행됨");
+        }, 500);
+    } else {
+        console.warn("❌ productGrid가 정의되지 않았습니다.");
+    }
+}
+
+
+// ✅ 모달이 완전히 열린 후 동작
+document.getElementById('goodsModal').addEventListener('shown.bs.modal', function () {
 	    console.log("📢 상품 조회 모달이 완전히 열림");
 
 	    if (typeof productGrid !== 'undefined' && productGrid !== null) {
@@ -509,9 +750,144 @@
 	        console.warn("❌ productGrid가 정의되지 않았습니다.");
 	    }
 	});
+	
+	// ✅ 모달 닫힐 때 sessionStorage 값 가져와서 그리드에 저장
+function setupModalCloseEvent() {
+    console.log("✅ 모달 닫힘 이벤트 실행");
+
+    let focusedCell = warehousinglistGrid.getFocusedCell();
+    if (!focusedCell || focusedCell.rowKey === undefined) {
+        console.warn("❌ 먼저 행을 선택해야 합니다.");
+        return;
+    }
+
+    const rowKey = focusedCell.rowKey;
+
+    // ✅ sessionStorage의 key와 그리드의 name을 매칭
+    const dataMap = {
+        selectedGoodsCode: "goodsCode",
+        selectedGoodsName: "goodsName",
+        selectedOptionCode: "optionCode",
+        selectedOptionName: "optionName",
+        selectedOptionNum : "optionNum",
+        selectedOptionNum: "optionNum",
+        selectedVendorName: "vendorName",
+        selectedVendorId: "vendorId",
+        selectedGoodsStandard: "goodsStandard",
+        selectedGoodsSupplyPrice: "warehousingUnitPrice"
+    };
+
+    Object.keys(dataMap).forEach(storageKey => {
+        const gridColumn = dataMap[storageKey];
+        const value = sessionStorage.getItem(storageKey);
+        if (value) {
+            warehousinglistGrid.setValue(rowKey, gridColumn, value);
+            sessionStorage.removeItem(storageKey); // ✅ 사용한 데이터 삭제
+        }
+    });
+
+    console.log("✅ 발주 그리드에 데이터 저장 완료");
+}
+
+//구매등록 함수
+function warehousingRegister(){
+	 const warehouseIdElement = document.getElementById("warehouseId");
+	
+	if (!warehouseIdElement) {
+        console.error("❌ `warehouseId` 요소를 찾을 수 없습니다.");
+        return;
+    }
+
+    const warehouseIdInput = warehouseIdElement.value;
+    console.log("✅ 창고 ID 확인:", warehouseIdInput);
+
+    if (!warehouseIdInput) {
+        console.error("❌ 창고 ID가 비어 있습니다. 창고를 선택했는지 확인하세요.");
+        alert("창고를 선택해 주세요.");
+        return;
+    }
+	
+	// ✅ 체크된 행의 그리드 값만 가져오기
+    const gridData = warehousinglistGrid.getCheckedRows();
+    if (gridData.length === 0) {
+        alert("입고할 상품이 없습니다.");
+        return;
+    }
+ 	// ✅ 거래처 ID 기준으로 그룹화
+    const groupedData = {};
+    gridData.forEach((item) => {
+        const vendorId = parseInt(item.vendorId) || 0;
+        
+        if (!groupedData[vendorId]) {
+            groupedData[vendorId] = {
+                employeeNum: parseInt(document.getElementById("employeeNum").value),
+                companyNum: parseInt(document.getElementById("companyNum").value),
+                vendorId: vendorId,
+                files: []
+            };
+        }
+        
+        // ✅ orderPlanBodyNum이 없으면 null 처리
+        const purchaseBodyNum = item.purchaseBodyNum;
+
+        // ✅ 발주서 바디 추가 (숫자로 변환)
+        groupedData[vendorId].files.push({
+        	optionNum: parseInt(item.optionNum)||0,
+        	manufactureDate: item.manufactureDate,
+        	warehousingStandardQuantity: parseInt(item.warehousingStandardQuantity)||0,
+        	warehousingUnitPrice: parseInt(item.warehousingUnitPrice)||0,
+            warehousingSupplyPrice: item.warehousingSupplyPrice,
+            warehousingVat: item.warehousingVat,
+            goodsStandard: item.goodsStandard,
+            warehouseId: parseInt(document.getElementById("warehouseId").value)||0,
+            purchaseBodyNum: (typeof purchaseBodyNum === 'string' ? parseInt(purchaseBodyNum.replace(/,/g, '')) : purchaseBodyNum) || null
+
+           
+           
+        });
+    });
+    
+ // groupedData를 배열로 변환 (각 그룹별 발주 데이터)
+    const warehousingArray = Object.values(groupedData);
+    console.log("서버로 전송할 데이터:", warehousingArray);
+    
+ // CSRF 토큰 및 헤더 정보 (meta 태그에서 미리 읽어옴)
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+    const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+
+    // 컨트롤러의 엔드포인트로 POST 요청 전송 (예: /purchs/rest/purchase/insert)
+    fetch("/purchs/rest/warehouse/insert", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            [csrfHeader]: csrfToken
+        },
+        body: JSON.stringify(warehousingArray)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === "success") {
+            showAlert("입고 등록 성공", "success");
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showAlert("입고 등록 실패", "danger");
+        }
+    })
+    .catch(error => {
+        console.error("입고 등록 오류:", error);
+        showAlert("서버 오류: " + error, "danger");
+    });
 
 
- 
+}
+	
+
+
+
+
+
+
+
   
 </script>
 

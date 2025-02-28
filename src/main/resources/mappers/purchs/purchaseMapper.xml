@@ -109,7 +109,8 @@
 			    g.goods_name,
 			    g.goods_code,
 			    o.option_name,
-			    o.option_code
+			    o.option_code,
+			    o.option_num
 			FROM purchs_purchase_header h
 			JOIN purchs_purchase_body b ON h.purchase_num = b.purchase_num
 			JOIN grpwr_vendor v ON h.vendor_id = v.vendor_id

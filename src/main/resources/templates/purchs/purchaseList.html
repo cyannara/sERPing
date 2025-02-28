@@ -133,20 +133,20 @@
     </div>
     
     <!--  발주서 모달 -->
-		    <div th:include="purchs/ModalTemplate :: ModalTemplate (
+		    <div th:include="purchs/modal/ModalTemplate :: ModalTemplate (
 		    'printModal', 
 		    'modal-xl', 
 		    '발주서 조회', 
-		    'purchs/purchaseForm', 
-		    'purchs/purchaseFooter'
+		    'purchs/modal/purchaseForm', 
+		    'purchs/modal/purchaseFooter'
 		    )"></div>
     <!--  메일 모달 -->
-		    <div th:include="purchs/ModalTemplate :: ModalTemplate (
+		    <div th:include="purchs/modal/ModalTemplate :: ModalTemplate (
 		    'mailsenderModal', 
 		    'modal-xl', 
 		    'EMAIL', 
-		    'purchs/mailsender', 
-		    'purchs/mailFooter'
+		    'purchs/modal/mailsender', 
+		    'purchs/modal/mailFooter'
 		    )"></div>
     
     
