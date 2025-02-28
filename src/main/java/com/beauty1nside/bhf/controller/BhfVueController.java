@@ -5,6 +5,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -31,6 +32,13 @@ public class BhfVueController {
 	@GetMapping("/erpBoard")
 	public String erpBoard() {
 		return "/bhf/erpBoard";
+	};
+	//게시판 상세 페이지
+	@GetMapping("/erpBoardDTL")
+	public String erpBoardDTL(@RequestParam("boardId") int boardId, Model model) {
+		
+		model.addAttribute("boardId",boardId);
+		return "/bhf/erpBoardDTL";
 	};
 
 	//샘플 페이지

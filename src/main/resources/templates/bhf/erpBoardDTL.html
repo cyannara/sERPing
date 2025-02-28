@@ -1,0 +1,45 @@
+<!doctype html>
+<html layout:decorate="~{layouts/layout}"
+      lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>board</title>>
+</head>
+<body layout:fragment="content">
+	<div class="container">
+		<div class="row">
+			<h3 class="mt-2 mb-2">게시판 글 상세 내용</h3>
+			<span id="boardId" th:data-board-id="${boardId}"></span>
+			<hr>
+		</div>
+	</div>
+	<h3>문서 템플릿</h3>
+	
+	<div id="editor" class="toastui-editor-contents"></div>
+	
+	<!-- 밑에 패티까지 해서 데이터 가져오는거까지 성공 이제 화면구성하고 데이터 넣기 -->
+	
+	<script th:inline="javascript">
+		let sessioCompanyNum = [[${session.companyNum}]];
+	    const boardId = document.getElementById("boardId").dataset.boardId
+	    console.log(boardId)
+	    const url = `http://localhost:81/bhf/rest/board/list?boardId=${boardId}&companyNum=${sessioCompanyNum}`;
+	    fetch(url, {
+	        method: "GET",
+	        headers: {
+	            "Content-Type": "application/json",
+	        }
+	    })
+	        .then(result => result.json())
+	        .then(data => {
+	            const editor = document.getElementById('editor')
+	            editor.innerHTML = data.documentTemplate;
+	        })
+	        .catch(error => console.error("Error fetching data:", error)); 
+	</script>
+</body>
+</html>
