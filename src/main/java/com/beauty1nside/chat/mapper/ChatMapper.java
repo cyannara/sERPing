@@ -11,5 +11,7 @@ public interface ChatMapper {
   RoomDTO getChatRoom(RoomDTO roomDTO);
   Long insertChatRoom(RoomDTO roomDTO);
   List<MessageDTO> getMsgList(Long roomId);
+  void insertMsg(MessageDTO messageDTO);
+  MessageDTO getMsgJustSent(Long roomId);
   
 }

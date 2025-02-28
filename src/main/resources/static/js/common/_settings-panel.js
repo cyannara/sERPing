@@ -1,21 +1,80 @@
 const empBox = document.getElementById('emp-box')
-const msgList = document.getElementById('msgList')
 const sendBtn = document.getElementsByClassName('send-btn')[0]
-const textContent = document.getElementById('textarea').textContent
+const chatContainer = document.getElementById("chatMessages");
 let sessionEmployeeNum = document.getElementById("sessionEmployeeNum").value;
+let roomId = 0
+
+const addMsg = (sentMsg) => {
+    const messageDiv = document.createElement("div");
+    messageDiv.classList.add("chat-message", 'sent');
+
+    messageDiv.innerHTML = `
+                <span class="sender-name">${sentMsg.employeeName}</span>
+                <div class="message-box dark">
+                    ${sentMsg.msgContent}
+                </div>
+                <span class="message-time">${formatDateTime(sentMsg.sendDate)}</span>
+            `;
+
+    chatContainer.appendChild(messageDiv);
+}
 
 const sendMsg = () => {
+    const msgContent = document.getElementById('textarea').value
 
+    const url = '/api/chat/msg'
+    const msg = {
+        roomId,
+        msgContent
+    }
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'header': header_csrf,
+            "Content-Type": "application/json",
+            'X-CSRF-Token': token_csrf
+        },
+        body: JSON.stringify(msg)
+    }).then((result) => {
+        return result.json()
+    }).then((data) => {
+        if(Object.keys(data.data)[0]) {
+            addMsg(data.data)
+        }
+    })
 }
 
 sendBtn.addEventListener('click', () => {
-    sendMsg(textContent)
+    sendMsg()
 })
 
-msgList.addEventListener('click', function (event) {
-    event.preventDefault(); // 기본 이벤트 차단 방지
-    console.log("msgList 클릭됨!");
-});
+const showChats = (chats) => {
+    let messages = chats.map((chat) => {
+        return {
+            sender: chat.employeeName,
+            msgContent: chat.msgContent,
+            sendDate: chat.sendDate,
+            type: chat.employeeNum === Number(sessionEmployeeNum) ? 'sent' : 'received'
+        }
+    })
+
+    chatContainer.innerHTML = ""
+
+    messages.forEach(message => {
+        const messageDiv = document.createElement("div");
+        messageDiv.classList.add("chat-message", message.type);
+
+        messageDiv.innerHTML = `
+                <span class="sender-name">${message.sender}</span>
+                <div class="message-box ${message.type === "received" ? "yellow" : "dark"}">
+                    ${message.msgContent}
+                </div>
+                <span class="message-time">${formatDateTime(message.sendDate)}</span>
+            `;
+
+        chatContainer.appendChild(messageDiv);
+    });
+}
 
 const startChat = (emp) => {
     const url = `/api/chat/start`
@@ -28,17 +87,16 @@ const startChat = (emp) => {
         },
         body: JSON.stringify(emp)
     }).then((result) => {
-        console.log('result', result)
         return result.json()
     }).then((data) => {
-        console.log(data)
+        roomId = Object.keys(data)[0]
+        let chats = Object.values(data)[0]
+        showChats(chats)
 
         // Bootstrap의 탭 기능을 활용
         $(document).ready(function() {
             $('#room-tab').tab('show');
         });
-        // 기존 채팅방이 있으면 대화 목록 들고 채팅방으로 이동
-        // 채팅방이 없으면 새로 만들고 채팅방으로 이동
     })
 }
 
@@ -56,6 +114,13 @@ const setEmpList = (empList) => {
         // 이미지 태그 생성
         const img = document.createElement("img");
         img.src = emp.profileImage || '/file/image/mypage/profile/noProfileImg.jpg';
+
+        // when emp.profileImage has a value but no image existed
+        img.onerror = function () {
+            this.onerror = null; // 무한 루프 방지
+            this.src = "/file/image/mypage/profile/noProfileImg.jpg";
+        };
+
         img.alt = emp.employeeName;
 
         // 이름 태그 생성
@@ -86,6 +151,10 @@ const getEmpList = () => {
     }).then((result) => {
         return result.json()
     }).then((data) => {
+        // when no other employees in the same company
+        if(!data.length) {
+            return
+        }
         const me = data.find(emp => emp.employeeNum === Number(sessionEmployeeNum))
         const notMe = data.filter(emp => emp.employeeNum !== Number(sessionEmployeeNum))
 

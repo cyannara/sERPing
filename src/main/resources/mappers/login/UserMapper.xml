@@ -56,8 +56,7 @@
 
                  UNION ALL
 
-                 -- erp_user_accounts에서 가져오기
-                 SELECT NULL AS employee_num,  -- NULL이면 0으로 변환
+                 SELECT u.employee_num,
                         u.employee_id,
                         u.employee_pw,
                         NULL AS employee_name,

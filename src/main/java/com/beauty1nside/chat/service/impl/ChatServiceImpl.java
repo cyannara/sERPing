@@ -8,6 +8,7 @@ import com.beauty1nside.hr.dto.EmpDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -25,24 +26,27 @@ public class ChatServiceImpl implements ChatService {
   }
   
   @Override
-  public List<MessageDTO> startChat(RoomDTO roomDTO) {
+  public Map<Long, List<MessageDTO>> startChat(RoomDTO roomDTO) {
     RoomDTO dto = chatMapper.getChatRoom(roomDTO);
     Map<Long, List<MessageDTO>> returnValue = new HashMap<>();
-    
-    log.info("startChat dto={}", dto);
     
     if (dto == null) {
       try {
         Long roomId = chatMapper.insertChatRoom(roomDTO);
-        
-        return returnValue.put(roomId, List.of());
+        return (Map<Long, List<MessageDTO>>) returnValue.put(roomId, List.of());
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
     } else {
-      log.info("dto.getRoomId(){}", dto.getRoomId());
-      log.info("returnValue={}", returnValue.put(dto.getRoomId(), chatMapper.getMsgList(dto.getRoomId())));
-      return returnValue.put(dto.getRoomId(), chatMapper.getMsgList(dto.getRoomId()));
+      returnValue.put(dto.getRoomId(), chatMapper.getMsgList(dto.getRoomId()));
+      return returnValue;
     }
+  }
+  
+  @Override
+  @Transactional
+  public MessageDTO sendMsg(MessageDTO messageDTO) {
+    chatMapper.insertMsg(messageDTO);
+    return chatMapper.getMsgJustSent(messageDTO.getRoomId());
   }
 }

@@ -24,7 +24,6 @@
 			   e.UPDATE_DATE,
 			   e.COMPANY_NUM,
 			   e.DEPARTMENT_NUM,
-			   e.SALARY,
 			   d.department_name AS departmentName,
 			   fn_get_cmmn_name(e.POSITION) AS position
 		FROM hr_employee e
