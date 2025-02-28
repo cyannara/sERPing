@@ -78,7 +78,8 @@
         display: flex;
         flex-direction: column;
         height: calc(100vh - 80px);
-        padding: 45px 10px 10px 10px;
+        padding: 0 10px 10px 10px;
+        margin-top: 45px;
     }
 
     .chat-messages {
