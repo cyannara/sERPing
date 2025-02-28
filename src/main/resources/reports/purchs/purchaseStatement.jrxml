@@ -1,0 +1,487 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 7.2.0.final using JasperReports Library version 6.6.0  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="purchaseStatement" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="82f1d9ec-6ccf-42c7-86d0-8e9d19f0baa3">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="beauty1nside"/>
+	<style name="han_font" fontName="맑은"/>
+	<parameter name="p_companynum" class="java.lang.Integer"/>
+	<parameter name="p_warehousingchit" class="java.lang.Long"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT h.warehousing_chit AS warehousing_chit,
+       h.warehousing_date AS warehousing_date,
+       v.vendor_name AS vendor_name,
+       e.employee_name AS employee_name,
+       g.goods_name AS goods_name,
+       o.option_name AS option_name,
+       g.goods_standard AS goods_standard,
+       b.warehousing_standard_quantity AS warehousing_standard_quantity,
+       b.warehousing_unit_price AS warehousing_unit_price,
+       b.warehousing_supply_price AS warehousing_supply_price,
+       b.warehousing_vat AS warehousing_vat,
+       NVL(SUM(b.warehousing_standard_quantity) OVER (PARTITION BY h.warehousing_header_num), 0) AS total_quantity,
+       NVL(SUM(CAST(b.warehousing_supply_price AS NUMBER)) OVER (PARTITION BY h.warehousing_header_num), 0) AS total_supply_price,
+       NVL(SUM(CAST(b.warehousing_vat AS NUMBER)) OVER (PARTITION BY h.warehousing_header_num), 0) AS total_warehousing_vat,
+       to_char( NVL((SUM(CAST(b.warehousing_supply_price AS NUMBER)) OVER (PARTITION BY h.warehousing_header_num) +
+            SUM(CAST(b.warehousing_vat AS NUMBER)) OVER (PARTITION BY h.warehousing_header_num)), 0) ,'999,999,999') || '원' AS warehousing_total_amount
+FROM purchs_warehousing_header h 
+JOIN purchs_warehousing_body b ON h.warehousing_header_num = b.warehousing_header_num
+JOIN purchse_option o ON b.option_num = o.option_num
+JOIN purchse_goods g ON o.goods_num = g.goods_num
+JOIN hr_employee e ON h.employee_num = e.employee_num
+JOIN grpwr_vendor v ON h.vendor_id = v.vendor_id
+WHERE h.company_num = $P{p_companynum} 
+AND h.warehousing_chit = $P{p_warehousingchit}]]>
+	</queryString>
+	<field name="WAREHOUSING_CHIT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="WAREHOUSING_CHIT"/>
+	</field>
+	<field name="WAREHOUSING_DATE" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="WAREHOUSING_DATE"/>
+	</field>
+	<field name="VENDOR_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="VENDOR_NAME"/>
+	</field>
+	<field name="EMPLOYEE_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYEE_NAME"/>
+	</field>
+	<field name="GOODS_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="GOODS_NAME"/>
+	</field>
+	<field name="OPTION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="OPTION_NAME"/>
+	</field>
+	<field name="GOODS_STANDARD" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="GOODS_STANDARD"/>
+	</field>
+	<field name="WAREHOUSING_STANDARD_QUANTITY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="WAREHOUSING_STANDARD_QUANTITY"/>
+	</field>
+	<field name="WAREHOUSING_UNIT_PRICE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="WAREHOUSING_UNIT_PRICE"/>
+	</field>
+	<field name="WAREHOUSING_SUPPLY_PRICE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="WAREHOUSING_SUPPLY_PRICE"/>
+	</field>
+	<field name="WAREHOUSING_VAT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="WAREHOUSING_VAT"/>
+	</field>
+	<field name="TOTAL_QUANTITY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="TOTAL_QUANTITY"/>
+	</field>
+	<field name="TOTAL_SUPPLY_PRICE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="TOTAL_SUPPLY_PRICE"/>
+	</field>
+	<field name="TOTAL_WAREHOUSING_VAT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="TOTAL_WAREHOUSING_VAT"/>
+	</field>
+	<field name="WAREHOUSING_TOTAL_AMOUNT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WAREHOUSING_TOTAL_AMOUNT"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="90" splitType="Stretch">
+			<staticText>
+				<reportElement style="han_font" x="206" y="24" width="143" height="43" uuid="1497fcb9-d520-4cb8-a58f-43ba9052671f"/>
+				<textElement verticalAlignment="Middle">
+					<font size="30" isBold="true" isUnderline="true"/>
+					<paragraph lineSpacing="Single" lineSpacingSize="1.0"/>
+				</textElement>
+				<text><![CDATA[구매전표]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="71" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<staticText>
+				<reportElement style="han_font" mode="Opaque" x="3" y="8" width="80" height="21" backcolor="#B0D9FF" uuid="c19bf204-619b-4169-9697-ee166067fc8a"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[구매전표번호]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="han_font" mode="Opaque" x="3" y="29" width="80" height="21" backcolor="#B0D9FF" uuid="83021047-09e5-4814-afe8-56ab040009d4"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[구매일자]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="han_font" mode="Opaque" x="276" y="29" width="77" height="21" backcolor="#B0D9FF" uuid="6db635db-fdc6-4212-8764-ced6a836e97d"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[입고담당자]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="han_font" mode="Opaque" x="276" y="8" width="77" height="21" backcolor="#B0D9FF" uuid="51a765bc-27f2-4000-b073-85b6c16b15d7"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[구매처]]></text>
+			</staticText>
+			<textField>
+				<reportElement style="han_font" x="83" y="29" width="193" height="21" uuid="60b4ca47-0b12-44cf-a9f2-e27128959fdf">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("yyyy-MM-dd").format($F{WAREHOUSING_DATE})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="han_font" x="83" y="8" width="193" height="21" uuid="ecf62efb-8bce-4bf0-8794-4a8cb6360b60">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{WAREHOUSING_CHIT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="han_font" x="353" y="29" width="198" height="21" uuid="bb51029a-4914-4bb9-be98-dd30325c2364">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMPLOYEE_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="han_font" x="353" y="8" width="198" height="21" uuid="18bf726d-f5c9-4cea-bd29-7923d125a547">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VENDOR_NAME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="han_font" mode="Opaque" x="276" y="50" width="38" height="21" backcolor="#B0D9FF" uuid="4f5aa8b3-d0da-4881-9cf5-a6be69f81ccf"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[수량]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="han_font" mode="Opaque" x="314" y="50" width="50" height="21" backcolor="#B0D9FF" uuid="a132f512-50d8-47f5-ac9f-0f5f56d26e0a"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[단가]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="han_font" mode="Opaque" x="494" y="50" width="57" height="21" backcolor="#B0D9FF" uuid="08a77508-f63d-471b-9562-bc2dc9d5768a"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[부가세]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="han_font" mode="Opaque" x="423" y="50" width="71" height="21" backcolor="#B0D9FF" uuid="77c02fda-16b3-46f9-97c5-ebc92f7413c1"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[공급가액]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="han_font" mode="Opaque" x="133" y="50" width="143" height="21" backcolor="#B0D9FF" uuid="75733276-58ab-414f-9535-c286b90b0a59"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[옵션명]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="han_font" mode="Opaque" x="3" y="50" width="130" height="21" backcolor="#B0D9FF" uuid="a8ee9f54-cdae-40aa-b5da-e19ce91faeee"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[상품명]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="han_font" mode="Opaque" x="364" y="50" width="59" height="21" backcolor="#B0D9FF" uuid="28dd6442-9425-4e04-9437-a319a4d8aa33"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[규격]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField>
+				<reportElement style="han_font" x="3" y="0" width="130" height="30" uuid="4c39f29a-5f89-4d5b-93d0-d6bf585d2fd2">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a6b7891b-2408-418d-82e4-ca9a6c00fb09"/>
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="8"/>
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{GOODS_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="han_font" x="133" y="0" width="143" height="30" uuid="2ab82773-31e2-448a-af7b-56a757d6bde5">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="03f0ee1a-042a-4f04-bc5e-a6e4cc3ac38e"/>
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="8"/>
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OPTION_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="han_font" x="423" y="0" width="71" height="30" uuid="78e628fa-51a4-4d35-8b13-c571b8514297">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="81a08791-7763-4f25-aba2-bcb8c85e6b19"/>
+					<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new DecimalFormat("###,###").format($F{WAREHOUSING_SUPPLY_PRICE})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="han_font" x="276" y="0" width="38" height="30" uuid="002f3634-52c4-4fb1-bfd6-0d0f0ccd310f">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="01aaa487-857d-4ae3-9976-c76458dc6ea1"/>
+					<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new DecimalFormat("###,###").format($F{WAREHOUSING_STANDARD_QUANTITY})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="han_font" x="494" y="0" width="57" height="30" uuid="1a90bc1c-7049-4d62-9bd5-aa164fe1bc74">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a664a4b5-7054-480a-b82c-a1bb33a30c1a"/>
+					<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new DecimalFormat("###,###").format($F{WAREHOUSING_VAT})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="han_font" x="364" y="0" width="59" height="30" uuid="d218a030-9a70-48b6-95b5-977585d979e9">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="89d0a508-886f-48d5-b2b2-563f0cd6495f"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{GOODS_STANDARD}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="han_font" x="314" y="0" width="50" height="30" uuid="ebeb6c71-fbb8-49d8-bc04-ada5aa1d3696">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="73e5ac01-f00a-4544-8150-e599accff95f"/>
+					<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new DecimalFormat("###,###").format($F{WAREHOUSING_UNIT_PRICE})]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="242" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<staticText>
+				<reportElement style="han_font" mode="Opaque" x="3" y="0" width="80" height="21" backcolor="#B0D9FF" uuid="16cf08da-468b-4a80-9e86-74cc9ed2b193"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[총 합계]]></text>
+			</staticText>
+			<textField>
+				<reportElement style="han_font" x="83" y="0" width="468" height="21" uuid="f07b178f-b5cf-4346-a8c6-2120f6295b1f">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new DecimalFormat("###,###").format($F{TOTAL_QUANTITY})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="han_font" x="52" y="54" width="499" height="21" uuid="46f51ecc-3450-402c-b0ee-5d93ee0e6e5f"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{WAREHOUSING_TOTAL_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="han_font" mode="Opaque" x="133" y="33" width="61" height="21" backcolor="#B0D9FF" uuid="8a134080-20b3-4ca1-89a1-8a53d8932903"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[공급가액]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="han_font" mode="Opaque" x="3" y="33" width="49" height="21" backcolor="#B0D9FF" uuid="f45ea384-c65f-41c9-8e95-76644ce6fd2d"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[수량]]></text>
+			</staticText>
+			<textField>
+				<reportElement style="han_font" x="194" y="33" width="170" height="21" uuid="a97cff68-b528-41d4-b190-a1158dfd4080">
+					<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new DecimalFormat("###,###").format($F{TOTAL_SUPPLY_PRICE})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="han_font" x="423" y="33" width="128" height="21" uuid="f5be5e92-2d59-4543-99bf-e57dedc88963">
+					<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new DecimalFormat("###,###").format($F{TOTAL_WAREHOUSING_VAT})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="han_font" mode="Opaque" x="52" y="33" width="81" height="21" backcolor="#FFFFFF" uuid="5a0b3d3c-cc0e-43bf-84c4-d4cc57dda1ba"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="han_font" mode="Opaque" x="3" y="54" width="49" height="21" backcolor="#B0D9FF" uuid="2b156135-a985-4bd3-a528-b94df5524d6a"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[총금액]]></text>
+			</staticText>
+			<textField>
+				<reportElement style="han_font" x="52" y="33" width="81" height="21" uuid="cd6bdfee-1acd-4bf2-8cce-26a96fdcf73e">
+					<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new DecimalFormat("###,###").format($F{TOTAL_QUANTITY})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="han_font" mode="Opaque" x="364" y="33" width="59" height="21" backcolor="#B0D9FF" uuid="315277a5-bbea-4672-9ecb-0f786ad4ad2a"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[VAT]]></text>
+			</staticText>
+			<textField>
+				<reportElement style="han_font" x="227" y="106" width="100" height="30" uuid="1932fc5d-6876-4625-986b-b8b16118ac0e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="50"/>
+	</pageFooter>
+</jasperReport>

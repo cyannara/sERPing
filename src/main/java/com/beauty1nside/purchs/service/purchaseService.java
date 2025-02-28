@@ -8,7 +8,7 @@ import com.beauty1nside.purchs.dto.PurchaseSearchDTO;
 
 public interface purchaseService {
 
- //발주서 등록 
+  //발주서 등록 
 	public void purchaseInsert(List<PurchInsertVO> voList);
 	
 	//발주서 조회

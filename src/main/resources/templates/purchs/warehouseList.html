@@ -1,0 +1,418 @@
+<html layout:decorate="~{layouts/layout}"
+      lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+ 
+ <head>
+
+
+<!-- pdf 캔버스 설정 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
+<script>
+  // PDF.js 워커 경로 설정
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.worker.min.js';
+</script>
+
+
+
+ 	<style>
+    /* ✅ 컨테이너 스타일 */
+    #custom-container {
+        background-color: #f8f9fa; /* 연한 회색 배경 */
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 박스 그림자 */
+        margin-bottom: 20px;
+    }
+    
+    /* ✅ 검색 바 스타일 */
+    .search-container { margin-bottom: 15px; }
+    .btn-search { background-color: #28a745; color: white; }
+    .btn-reset { background-color: #007bff; color: white; }
+    
+    /* ✅ 테이블 & 그리드 스타일 */
+    .tui-grid-container {
+        border: 1px solid #ddd !important;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+
+    .tui-grid-header-cell {
+        background-color: #f1f1f1 !important;
+        font-weight: bold;
+        text-align: center;
+        border-right: 1px solid #ddd !important;
+    }
+
+    .tui-grid-cell {
+        border-right: 1px solid #ddd !important;
+        border-bottom: 1px solid #ddd !important;
+    }
+
+    .tui-grid-cell:hover {
+        background-color: #f9f9f9 !important;
+    }
+
+    /* ✅ 페이지네이션 스타일 */
+    .pagination-container {
+        text-align: center;
+        margin-top: 15px;
+    }
+    
+	    .pdf-container {
+	  max-width: 800px;       /* 최대 너비 800px */
+	  margin: 0 auto;         /* 수평 중앙 정렬 */
+	  display: flex;
+	  justify-content: center;/* 가로 중앙 정렬 (내부 콘텐츠 중앙 배치) */
+	  align-items: center;    /* 세로 중앙 정렬 */
+	  height: 1000px;          /* 원하는 높이 (예: 600px) */
+	  border: 1px solid #ccc; /* 필요 시 테두리 추가 */
+	  background-color: #f9f9f9;
+	}
+	
+	#pdfCanvas {
+	  width: 100%;            /* 컨테이너 너비에 맞춤 */
+	  height: auto;           /* 비율 유지 */
+	  max-height: 100%;       /* 컨테이너 높이 내에서 제한 */
+	}
+    
+    
+   
+</style>
+ 	
+ </head>     
+<body layout:fragment="content">
+
+
+<div class="container mt-4">
+  <h2 class="mb-4">구매 조회</h2>
+  <!-- 검색 바 한 줄 정렬 -->
+  <div id="custom-container" class="mb-3">
+    <div class="row g-2 align-items-center">
+      <div class="col-auto">
+        <label for="searchGoodsName" class="form-label">상품명</label>
+        <input type="text" id="searchGoodsName" class="form-control">
+      </div>
+      <div class="col-auto">
+        <label for="searchVendorName" class="form-label">거래처</label>
+        <input type="text" id="searchVendorName" class="form-control">
+      </div>
+      <div class="col-auto">
+        <label class="form-label">구매일자</label>
+        <div class="input-group">
+          <input type="date" id="searchStartDate" class="form-control">
+          <span class="input-group-text">~</span>
+          <input type="date" id="searchEndDate" class="form-control">
+        </div>
+      </div>
+      <div class="col-auto">
+        <label for="warehouse_display_amount" class="form-label">표시수량</label>
+        <select id="warehouse_display_amount" class="form-select" onchange="changeWarehouseDisplay()">
+          <option value="10" selected>10</option>
+          <option value="20">20</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+      </div>
+      <div class="col-auto ">
+        <button type="button" class="btn btn-primary" onclick="warehouseSearch()">검색</button>
+      </div>
+      <div class="col-auto">
+        <button type="button" class="btn btn-secondary" onclick="resetFilters()">초기화</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 나머지 페이지 내용... -->
+  
+   <!-- 구매 리스트 테이블 -->
+    <div id="table-container" class="mt-3">
+        <div id="warehouselistGrid"></div>
+        <div id="pagination" class="tui-pagination"></div>
+    </div>
+    
+    <!--  발주서 모달 -->
+		    <div th:include="purchs/modal/ModalTemplate :: ModalTemplate (
+		    'statementModal', 
+		    'modal-xl', 
+		    '발주서 조회', 
+		    'purchs/modal/whstatementForm', 
+		    'purchs/modal/whstatementFooter'
+		    )"></div>
+   
+    
+    <!-- 구매등록 버튼 -->
+    <div class="text-end">
+        <button class="btn btn-primary">구매 등록</button>
+    </div>
+  
+</div>
+
+    
+   
+
+
+
+
+
+<script>
+// (1) PDF.js로 PDF 파일을 캔버스에 렌더링
+	function renderPDF(reportUrl) {
+	  const canvas = document.getElementById('pdfCanvas');
+	  const context = canvas.getContext('2d');
+	
+	  // PDF 로드
+	  pdfjsLib.getDocument(reportUrl).promise.then(pdf => {
+	    console.log('PDF loaded, total pages:', pdf.numPages);
+	    // 첫 페이지만 렌더링 (필요시 여러 페이지 지원 가능)
+	    pdf.getPage(1).then(page => {
+	      const scale = 1.5; // 확대/축소 비율
+	      const viewport = page.getViewport({ scale });
+	      // 캔버스 크기 설정
+	      canvas.width = viewport.width;
+	      canvas.height = viewport.height;
+	
+	      // 페이지 렌더링
+	      const renderContext = {
+	        canvasContext: context,
+	        viewport: viewport
+	      };
+	      page.render(renderContext).promise.then(() => {
+	        console.log('Page rendered');
+	      });
+	    });
+	  }).catch(error => {
+	    console.error('PDF 로드 오류:', error);
+	  });
+	}
+	
+  // 2. 커스텀 렌더러 클래스 정의 (최상단)
+  class CustomTextRenderer {
+      constructor(props) {
+          const el = document.createElement('div');
+          el.innerText = props.value;
+          el.style.padding = '10px';
+          el.style.fontWeight = 'bold';
+          el.style.textAlign = 'left';
+          this.el = el;
+      }
+      getElement() {
+          return this.el;
+      }
+  }
+	
+
+  // (3) PrintRenderer 수정 → PDF.js 렌더링
+  class PrintRenderer {
+      constructor(props = {}) {
+          this.props = props; // 전달받은 props 저장
+          const el = document.createElement('a');
+          el.innerText = "인쇄";
+          el.style.color = "#007bff";
+          el.style.cursor = "pointer";
+          el.style.textDecoration = "underline";
+          el.addEventListener("click", (e) => {
+              e.preventDefault();
+              // 현재 행의 데이터
+              const rowData = this.props.grid.getRow(this.props.rowKey);
+              const warehousingChit = rowData ? rowData.warehousingChit : null;
+
+              if (warehousingChit) {
+                  sessionStorage.setItem("warehousingChit", warehousingChit);
+                  console.log("sessionStorage 저장 완료:", warehousingChit);
+              } else {
+                  console.warn("발주번호 데이터가 없습니다.");
+              }
+
+              // Thymeleaf에서 렌더링된 회사번호
+              const companyNum = [[${session.companyNum}]];
+
+              // (1) PDF 생성 엔드포인트 (Jasper → PDF)
+              //     예: '/purchs/report/report?companynum=...&purchasenum=...'
+              //     (HTML이 아니라 PDF 바이너리를 반환해야 함)
+              const reportUrl = `/purchs/report/statementreport?companynum=${companyNum}&warehousingChit=${warehousingChit}`;
+              console.log("PDF URL:", reportUrl);
+
+              // (2) PDF.js로 캔버스 렌더링
+              renderPDF(reportUrl);
+
+              // (3) 모달 표시
+              const printModalEl = document.getElementById('statementModal');
+              if (printModalEl) {
+                  const printModal = new bootstrap.Modal(printModalEl);
+                  printModal.show();
+              } else {
+                  console.error("모달 요소(printModal)를 찾을 수 없습니다.");
+              }
+          });
+          this.el = el;
+      }
+      getElement() {
+          return this.el;
+      }
+  }
+  //pdf다운
+  document.getElementById('pdfDown').addEventListener('click', function() {
+	  // Thymeleaf로 렌더링된 회사번호 (예: 1)
+	  const companyNum = [[${session.companyNum}]];
+	  // 그리드나 PrintRenderer를 통해 sessionStorage에 저장된 발주번호 사용
+	  const warehousingChit = sessionStorage.getItem("warehousingChit");
+	  if (!warehousingChit) {
+	    alert("발주번호가 존재하지 않습니다.");
+	    return;
+	  }
+	  // 다운로드 엔드포인트 URL 구성 (/purchs/report/reportDownload 엔드포인트 사용)
+	  const downloadUrl = `/purchs/report/statementreportDownload?companynum=${companyNum}&warehousingChit=${warehousingChit}`;
+	  console.log("Download URL:", downloadUrl);
+	  // 브라우저를 해당 URL로 이동시켜 파일 다운로드를 유도
+	  window.location.href = downloadUrl;
+	});
+
+  
+  
+  // 2. 페이지 로드 후 그리드 초기화
+  document.addEventListener("DOMContentLoaded", function () {
+      console.log("✅ 발주서 그리드 초기화");
+      initWarehouseGrid();
+  });
+
+  let warehouselistGrid;
+
+  function initWarehouseGrid() {
+      const companyNum = [[${session.companyNum}]];
+      if (!companyNum) {
+          console.error("❌ 세션에서 companyNum 값을 찾을 수 없음.");
+          return;
+      }
+      const warehouselistDataSource = {
+          api: {
+              readData: {
+                  url: '/purchs/rest/warehouselist/list',
+                  method: 'GET',
+                  requestOptions: {
+                      headers: { 'Content-Type': 'application/json' },
+                      credentials: 'same-origin'
+                  },
+                  initParams: {
+                      page: 1,
+                      perPage: 10,
+                      companyNum: companyNum
+                  },
+                  beforeRequest: function(request) {
+                      console.log("📢 서버로 요청 보내기 전 requestParams:", request.params);
+                  },
+                  afterResponse: function(response) {
+                      console.log("📢 서버 응답:", response);
+                      if (response.data && response.data.contents) {
+                          console.log("✅ 변환된 데이터:", response.data.contents);
+                          return { data: response.data.contents, totalCount: response.data.pagination.totalCount };
+                      }
+                      console.warn("⚠️ 서버 응답에 contents가 없습니다.");
+                      return { data: [], totalCount: 0 };
+                  }
+              }
+          },
+          contentType: 'application/json',
+          serverSidePagination: true
+      };
+
+      warehouselistGrid = new tui.Grid({
+          el: document.getElementById('warehouselistGrid'),
+          data: warehouselistDataSource,
+          pageOptions: {
+              useClient: false,
+              perPage: 10
+          },
+          bodyHeight: 'auto',
+          columns: [
+              { header: "구매전표번호", name: "warehousingChit", rowSpan: true, renderer: { type: CustomTextRenderer } },
+              { header: "구매일자", name: "warehousingDate" },
+              { header: "상품LOT번호", name: "goodsLotNum" },
+              { header: "구매처명", name: "vendorName" },
+              { header: "상품명", name: "goodsName" },
+              { header: "옵션명", name: "optionName" },
+              { header: "총금액", name: "warehousingUnitTotalAmount" },
+              { header: "창고명", name: "warehouseName" },
+              { header: "인쇄", name: "print", renderer: { type: PrintRenderer } }
+              
+          ]
+      });
+
+      console.log("✅ Toast Grid 초기화 완료");
+  }
+
+  // 3. 기타 함수들 (검색, 필터 초기화, 표시 수량 변경 등)
+  function warehouseSearch() {
+      let goodsName = document.querySelector('#searchGoodsName').value.trim();
+      let vendorName = document.querySelector('#searchVendorName').value.trim();
+      let startDate = document.querySelector('#searchStartDate').value;
+      let endDate = document.querySelector('#searchEndDate').value;
+      warehouselistGrid.setRequestParams({
+          "companyNum": [[${session.companyNum}]],
+          "goodsName": goodsName,
+          "vendorName": vendorName,
+          "startDate": startDate,
+          "endDate": endDate
+      });
+      warehouselistGrid.reloadData();
+  }
+
+  function changeWarehouseDisplay() {
+      let gap = parseInt(document.querySelector('#warehouse_display_amount').value);
+      purchaselistGrid.setPerPage(gap);
+      purchaselistGrid.reloadData();
+  }
+
+  function resetFilters() {
+      document.querySelector('#searchGoodsName').value = '';
+      document.querySelector('#searchVendorName').value = '';
+      document.querySelector('#searchStartDate').value = '';
+      document.querySelector('#searchEndDate').value = '';
+      document.querySelector('#purchase_display_amount').value = '';
+      purchaselistGrid.setRequestParams({
+          "companyNum": companyNum,
+          "goodsName": '',
+          "vendorName": '',
+          "startDate": '',
+          "endDate": ''
+      });
+      purchaselistGrid.reloadData();
+  }
+  const modalElement = document.getElementById("statementModal");
+  const closeButton = modalElement.querySelector('[data-bs-dismiss="modal"]');
+  if (closeButton) {
+      closeButton.addEventListener("click", function () {
+          console.log("✅ 인쇄 모달 닫기 버튼 클릭됨!");
+
+          try {
+          	let modalInstance = bootstrap.Modal.getInstance("#statementModal") || new bootstrap.Modal("#printModal");
+              modalInstance.hide(); // ✅ Bootstrap 방식으로 모달 닫기
+              
+          } catch (error) {
+              console.warn("❌ Bootstrap 5가 로드되지 않았음. 대체 방식 사용");
+              modalElement.classList.remove("show");
+              modalElement.style.display = "none";
+              document.body.classList.remove("modal-open");
+
+              setTimeout(() => {
+                  document.querySelectorAll(".modal-backdrop").forEach((element) => element.remove()); // 백그라운드 제거
+              }, 300);
+           
+          }
+      });
+  } else {
+      console.warn("❌ 인쇄 모달 닫기 버튼을 찾을 수 없습니다.");
+  }
+  
+	//PDF 모달 닫힘 시 sessionStorage의 발주번호 삭제 (예: printModal)
+	  modalElement.addEventListener("hidden.bs.modal", function () {
+	      console.log("PDF 모달이 닫혔습니다. 구매전표번호 삭제");
+	      sessionStorage.removeItem("warehousingChit");
+	  });
+	
+	
+</script>
+
+</body>
+
