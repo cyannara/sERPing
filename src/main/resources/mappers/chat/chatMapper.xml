@@ -27,8 +27,31 @@
                      #{employeeNum1},
                      #{employeeNum2}
                  )
-            RETURNING room_id INTO #{roomId}
     </insert>
+
+    <select id="getRoomJustMade" resultType="com.beauty1nside.chat.dto.RoomDTO">
+        SELECT
+            room_id,
+            company_num,
+            employee_num1,
+            employee_num2
+        FROM grpwr_chat_room
+        where room_id = (SELECT MAX(room_id) FROM grpwr_chat_room)
+    </select>
+
+    <select id="getMsgJustSent" resultType="com.beauty1nside.chat.dto.MessageDTO">
+        SELECT
+            g.msg_id,
+            g.room_id,
+            g.employee_num,
+            g.msg_content,
+            g.send_date,
+            h.employee_name
+        FROM grpwr_chat_message g
+                 join hr_employee h on g.employee_num = h.employee_num
+        WHERE g.room_id = #{roomId} and
+            msg_id = (SELECT MAX(msg_id) FROM grpwr_chat_message)
+    </select>
 
     <insert id="insertMsg"
             parameterType="com.beauty1nside.chat.dto.MessageDTO"
@@ -47,20 +70,6 @@
                      sysdate
                  )
     </insert>
-
-    <select id="getMsgJustSent" resultType="com.beauty1nside.chat.dto.MessageDTO">
-        SELECT
-            g.msg_id,
-            g.room_id,
-            g.employee_num,
-            g.msg_content,
-            g.send_date,
-            h.employee_name
-        FROM grpwr_chat_message g
-                 join hr_employee h on g.employee_num = h.employee_num
-        WHERE g.room_id = #{roomId} and
-              msg_id = (SELECT MAX(msg_id) FROM grpwr_chat_message)
-    </select>
 
     <select id="getMsgList">
         select g.MSG_ID,

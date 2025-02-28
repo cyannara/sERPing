@@ -1,27 +1,35 @@
 const empBox = document.getElementById('emp-box')
 const sendBtn = document.getElementsByClassName('send-btn')[0]
 const chatContainer = document.getElementById("chatMessages");
+const textarea = document.getElementById('textarea')
 let sessionEmployeeNum = document.getElementById("sessionEmployeeNum").value;
+let empList = document.getElementById("empList")
+
+let sessionEmployeeName = document.getElementById("sessionEmployeeName").value;
 let roomId = 0
 
 const addMsg = (sentMsg) => {
     const messageDiv = document.createElement("div");
-    messageDiv.classList.add("chat-message", 'sent');
+    let isSender = sentMsg.employeeNum === Number(sessionEmployeeNum)
+
+    messageDiv.classList.add(
+        "chat-message",
+        `${isSender ? 'sent' : 'received'}`
+    );
 
     messageDiv.innerHTML = `
                 <span class="sender-name">${sentMsg.employeeName}</span>
-                <div class="message-box dark">
+                <div class="message-box ${isSender ? 'dark' : 'yellow'}">
                     ${sentMsg.msgContent}
                 </div>
-                <span class="message-time">${formatDateTime(sentMsg.sendDate)}</span>
+                <span class="message-time">${formatDateTime(new Date())}</span>
             `;
 
     chatContainer.appendChild(messageDiv);
+    chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: "smooth" });
 }
 
-const sendMsg = () => {
-    const msgContent = document.getElementById('textarea').value
-
+const storeMsg = (msgContent, message) => {
     const url = '/api/chat/msg'
     const msg = {
         roomId,
@@ -39,14 +47,41 @@ const sendMsg = () => {
         return result.json()
     }).then((data) => {
         if(Object.keys(data.data)[0]) {
-            addMsg(data.data)
+            // 메세지를 서버로 보냄
+            // 서버가 메세지를 받고 해당 메세지를 /topic/public 채널에 브로드캐스트
+            // stompClient.subscribe() 실행됨
+            stompClient.send(`/app/chat.sendMessage/${roomId}`, {}, JSON.stringify(message));
         }
     })
+}
+
+const sendMsg = () => {
+    if (!stompClient || !stompClient.connected) {
+        console.error("WebSocket is not connected yet.");
+        return;
+    }
+    const msgContent = textarea.value
+    // type: 'CHAT',
+    let message = {
+        sender: sessionEmployeeName,
+        content: msgContent,
+        senderEmpNum: sessionEmployeeNum,
+    };
+
+    storeMsg(msgContent, message)
+    textarea.value = ''
 }
 
 sendBtn.addEventListener('click', () => {
     sendMsg()
 })
+
+textarea.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && !event.shiftKey) {  // Shift+Enter 제외
+        event.preventDefault();  // 줄 바꿈 방지
+        sendMsg();
+    }
+});
 
 const showChats = (chats) => {
     let messages = chats.map((chat) => {
@@ -76,28 +111,70 @@ const showChats = (chats) => {
     });
 }
 
-const startChat = (emp) => {
-    const url = `/api/chat/start`
+const openChatRoom = (employeeNum) => {
+    const url = `/api/chat/start/${employeeNum}`
     fetch(url, {
-        method: 'POST',
+        method: 'get',
         headers: {
-            'header': header_csrf,
             "Content-Type": "application/json",
-            'X-CSRF-Token': token_csrf
-        },
-        body: JSON.stringify(emp)
+        }
     }).then((result) => {
         return result.json()
     }).then((data) => {
         roomId = Object.keys(data)[0]
+
+        stompClient.subscribe(`/topic/public/${roomId}`, function (message) {
+            const parsedMsg = JSON.parse(message.body)
+            addMsg({
+                    employeeName: parsedMsg.sender,
+                    msgContent: parsedMsg.content,
+                    employeeNum: parsedMsg.senderEmpNum
+                })
+        });
+
         let chats = Object.values(data)[0]
         showChats(chats)
 
         // Bootstrap의 탭 기능을 활용
         $(document).ready(function() {
+            let goback = document.getElementById("goback")
             $('#room-tab').tab('show');
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            empList.classList.add('hide')
+            goback.classList.add('show')
+            empList.classList.remove('show')
+            goback.classList.remove('hide')
+
+
+            goback.addEventListener('click', () => {
+                console.log(goback)
+                $(document).ready(function() {
+                    $('#todo-tab').tab('show');
+                    empList.classList.add('show')
+                    empList.classList.remove('hide')
+                    goback.classList.add('hide')
+                    goback.classList.remove('show')
+                });
+            })
         });
     })
+}
+
+const startChat = (employeeNum) => {
+    let socket = new SockJS('/ws');
+
+    stompClient = Stomp.over(socket);
+    stompClient.debug = null;
+    stompClient.connect({}, function () {
+        stompClient.send(
+            `/app/chat.addUser/${roomId}`,
+            {},
+            JSON.stringify({sender: sessionEmployeeName})
+        );
+        openChatRoom(employeeNum)
+    }, function (error) {
+        console.error("WebSocket 연결 실패:", error);
+    });
 }
 
 
@@ -135,7 +212,7 @@ const setEmpList = (empList) => {
         empBox.appendChild(div);
 
         div.addEventListener('click', () => {
-            startChat(emp)
+            startChat(emp.employeeNum)
         })
     });
 }
@@ -169,5 +246,5 @@ if(sessionEmployeeNum) {
     showAlert('세션이 만료되었습니다. 다시 로그인해주세요.', 'danger')
     setTimeout(() => {
         window.location.href = "/login";
-    }, 3000)
+    }, 2000)
 }
