@@ -370,7 +370,7 @@ function subManagement(data) {
 document.addEventListener("DOMContentLoaded", function () {
     //관리자이면서 마이페이지이면 메뉴 생기게
     var currentUrl = window.location.href;
-    if(sessionData.authority != "AU001"){
+    if(sessionData.authority == "AU001"){
 		console.log("aaaaaaaaaaaaaa");
 		if ( currentUrl.includes("/mypage/") || currentUrl.includes("/erp/erpsubinfo") || currentUrl.includes("/erp/usercontact") 
 		 || currentUrl.includes("/erp/fppay") ) {
