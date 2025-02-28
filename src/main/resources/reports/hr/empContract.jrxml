@@ -4,6 +4,7 @@
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="sERPing"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<parameter name="p_employeeNum" class="java.lang.Long"/>
+	<parameter name="p_companyNum" class="java.lang.Long"/>
 	<queryString>
 		<![CDATA[WITH LATEST_CONTRACT AS (
     SELECT 
@@ -11,6 +12,8 @@
         CONTRACT_TYPE, CONTRACT_START_DATE, CONTRACT_END_DATE, 
         WORK_LOCATION, JOB_DESCRIPTION, WORK_DAYS, MONTHLY_SALARY, BONUS, 
         SALARY_PAYMENT_DATE, PAYMENT_METHOD, ANNUAL_LEAVE_POLICY, REGISTER_DATE,
+        WORK_START_TIME,WORK_END_TIME,BREAK_START_TIME,BREAK_END_TIME,
+        
         ROW_NUMBER() OVER (PARTITION BY EMPLOYEE_NUM ORDER BY CONTRACT_START_DATE DESC) AS RN
     FROM HR_EMPLOYEE_CONTRACT
 )
@@ -22,17 +25,22 @@ SELECT
 
     TO_CHAR(LC.CONTRACT_START_DATE, 'YYYY"년" MM"월" DD"일"') AS CONTRACT_START_DATE,
     TO_CHAR(LC.CONTRACT_END_DATE, 'YYYY"년" MM"월" DD"일"') AS CONTRACT_END_DATE,
-    LC.WORK_DAYS, 
+    NVL(LC.WORK_DAYS, '월~금') AS WORK_DAYS,
     LC.MONTHLY_SALARY, 
     LC.BONUS, 
-    LC.SALARY_PAYMENT_DATE, 
+    LC.SALARY_PAYMENT_DATE,  
     LC.PAYMENT_METHOD, 
-    LC.ANNUAL_LEAVE_POLICY, 
+    NVL(LC.ANNUAL_LEAVE_POLICY, '없음') AS ANNUAL_LEAVE_POLICY,
     TO_CHAR(LC.REGISTER_DATE, 'YYYY"년" MM"월" DD"일"') AS CONTRACT_REGISTER_DATE,
 
     COALESCE(PD.DEPARTMENT_NAME || ' - ', '') || D.DEPARTMENT_NAME AS WORK_LOCATION,
 
-    COALESCE(LC.JOB_DESCRIPTION, (SELECT CMMN_NAME FROM CMMN WHERE CMMN_CODE = E.POSITION)) AS JOB_DESCRIPTION
+    COALESCE(LC.JOB_DESCRIPTION, (SELECT CMMN_NAME FROM CMMN WHERE CMMN_CODE = E.POSITION)) AS JOB_DESCRIPTION,
+    
+    NVL(TO_CHAR(TO_DATE(LC.WORK_START_TIME, 'HH24:MI'), 'HH24"시" MI"분"'), '00시 00분') AS WORK_START_TIME,
+    NVL(TO_CHAR(TO_DATE(LC.WORK_END_TIME, 'HH24:MI'), 'HH24"시" MI"분"'), '00시 00분') AS WORK_END_TIME,
+    NVL(TO_CHAR(TO_DATE(LC.BREAK_START_TIME, 'HH24:MI'), 'HH24"시" MI"분"'), '00시 00분') AS BREAK_START_TIME,
+    NVL(TO_CHAR(TO_DATE(LC.BREAK_END_TIME, 'HH24:MI'), 'HH24"시" MI"분"'), '00시 00분') AS BREAK_END_TIME
 
 FROM LATEST_CONTRACT LC
 JOIN HR_EMPLOYEE E ON LC.EMPLOYEE_NUM = E.EMPLOYEE_NUM
@@ -40,8 +48,8 @@ JOIN ERP_COMPANY C ON LC.COMPANY_NUM = C.COMPANY_NUM
 JOIN HR_DEPARTMENT D ON LC.DEPARTMENT_NUM = D.DEPARTMENT_NUM
 LEFT JOIN HR_DEPARTMENT PD ON D.PARENT_DEPARTMENT_NUM = PD.DEPARTMENT_NUM 
 WHERE LC.RN = 1 
-AND E.EMPLOYEE_NUM = $P{p_employeeNum} 
-]]>
+AND E.EMPLOYEE_NUM =  $P{p_employeeNum}
+AND C.COMPANY_NUM =  $P{p_companyNum} ]]>
 	</queryString>
 	<field name="COMPANY_NAME" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.label" value="COMPANY_NAME"/>
@@ -97,88 +105,124 @@ AND E.EMPLOYEE_NUM = $P{p_employeeNum}
 	<field name="JOB_DESCRIPTION" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.label" value="JOB_DESCRIPTION"/>
 	</field>
+	<field name="WORK_START_TIME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WORK_START_TIME"/>
+	</field>
+	<field name="WORK_END_TIME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WORK_END_TIME"/>
+	</field>
+	<field name="BREAK_START_TIME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="BREAK_START_TIME"/>
+	</field>
+	<field name="BREAK_END_TIME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="BREAK_END_TIME"/>
+	</field>
 	<title>
 		<band height="802" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<image>
-				<reportElement x="0" y="0" width="549" height="802" uuid="a9f103fa-46e6-4d73-8170-83f48e1eea6a"/>
+				<reportElement x="0" y="0" width="560" height="802" uuid="64f3a667-0b49-4569-8bcf-7ae91148a7e0"/>
 				<imageExpression><![CDATA["images/contractBG.jpg"]]></imageExpression>
 			</image>
 			<textField>
-				<reportElement x="50" y="80" width="100" height="30" uuid="0e56a082-69db-4241-bfc9-22744b737683"/>
+				<reportElement x="80" y="100" width="50" height="13" uuid="0e56a082-69db-4241-bfc9-22744b737683"/>
 				<textFieldExpression><![CDATA[$F{COMPANY_NAME}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="280" y="90" width="100" height="30" uuid="2febfe4e-4d4b-4099-90a6-b00216007dd8"/>
+				<reportElement x="307" y="100" width="30" height="13" uuid="2febfe4e-4d4b-4099-90a6-b00216007dd8"/>
 				<textFieldExpression><![CDATA[$F{EMPLOYEE_NAME}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="170" y="130" width="100" height="30" uuid="9237f792-e33d-4a01-8cf0-124d5154ca87"/>
+				<reportElement x="170" y="138" width="80" height="20" uuid="9237f792-e33d-4a01-8cf0-124d5154ca87"/>
 				<textFieldExpression><![CDATA[$F{CONTRACT_START_DATE}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="230" y="550" width="130" height="40" uuid="919c2622-51bd-4199-b73a-2d001c4ad05f"/>
+				<reportElement x="210" y="577" width="126" height="20" uuid="919c2622-51bd-4199-b73a-2d001c4ad05f"/>
 				<textFieldExpression><![CDATA[$F{CONTRACT_REGISTER_DATE}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="160" y="590" width="100" height="30" uuid="5631a6bd-b23e-467c-84bf-a0933f7534e1"/>
+				<reportElement x="173" y="617" width="90" height="20" uuid="5631a6bd-b23e-467c-84bf-a0933f7534e1"/>
 				<textFieldExpression><![CDATA[$F{COMPANY_NAME}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="170" y="654" width="290" height="20" uuid="ef976a1c-b438-42b7-9e0b-db96892356d6"/>
+				<reportElement x="170" y="670" width="290" height="20" uuid="ef976a1c-b438-42b7-9e0b-db96892356d6"/>
 				<textFieldExpression><![CDATA[$F{EMPLOYEE_ADDRESS}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="170" y="670" width="100" height="20" uuid="188057ad-1438-48d0-b0a0-611848174089"/>
+				<reportElement x="170" y="687" width="100" height="20" uuid="188057ad-1438-48d0-b0a0-611848174089"/>
 				<textFieldExpression><![CDATA[$F{EMPLOYEE_PHONE}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="170" y="690" width="100" height="20" uuid="9c4efc5f-63ee-44ca-9d35-cfdb01acf7ca"/>
+				<reportElement x="170" y="704" width="100" height="20" uuid="9c4efc5f-63ee-44ca-9d35-cfdb01acf7ca"/>
 				<textFieldExpression><![CDATA[$F{EMPLOYEE_NAME}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="170" y="630" width="100" height="23" uuid="f1bda299-0dcc-4456-88d4-b8a5bf75ed11"/>
+				<reportElement x="170" y="650" width="100" height="23" uuid="f1bda299-0dcc-4456-88d4-b8a5bf75ed11"/>
 				<textFieldExpression><![CDATA[$F{COMPANY_NAME}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="170" y="620" width="270" height="15" uuid="210a487c-9a11-4a1f-840e-674455833b58"/>
+				<reportElement x="172" y="632" width="270" height="15" uuid="210a487c-9a11-4a1f-840e-674455833b58"/>
 				<textFieldExpression><![CDATA[$F{COMPANY_ADDRESS}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="310" y="590" width="100" height="30" uuid="b145422e-2c3d-45c8-a45b-9750fcfd6967"/>
+				<reportElement x="337" y="620" width="90" height="20" uuid="b145422e-2c3d-45c8-a45b-9750fcfd6967"/>
 				<textFieldExpression><![CDATA[$F{REPRESENTATION_PHONE}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="100" y="390" width="100" height="30" uuid="c1d65c52-f1cf-4778-87a9-e9181850f45a"/>
+				<reportElement x="147" y="404" width="94" height="20" uuid="c1d65c52-f1cf-4778-87a9-e9181850f45a"/>
 				<textFieldExpression><![CDATA[$F{ANNUAL_LEAVE_POLICY}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="150" y="320" width="100" height="30" uuid="abdafbd5-4ea4-41e7-b670-909b2b3c0a34"/>
+				<reportElement x="166" y="329" width="60" height="20" uuid="abdafbd5-4ea4-41e7-b670-909b2b3c0a34"/>
 				<textFieldExpression><![CDATA[$F{PAYMENT_METHOD}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="130" y="210" width="100" height="30" uuid="bde0c189-4e3c-4e14-a3b0-2f82d1492fb6"/>
+				<reportElement x="137" y="220" width="67" height="16" uuid="bde0c189-4e3c-4e14-a3b0-2f82d1492fb6"/>
 				<textFieldExpression><![CDATA[$F{WORK_DAYS}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="160" y="240" width="100" height="30" uuid="5f6e987b-a0b3-4724-b79d-5bb957d7168b"/>
+				<reportElement x="124" y="245" width="70" height="20" uuid="5f6e987b-a0b3-4724-b79d-5bb957d7168b"/>
 				<textFieldExpression><![CDATA[$F{MONTHLY_SALARY}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="170" y="260" width="100" height="30" uuid="e99ef00e-1b60-493c-b14c-761291accd46"/>
+				<reportElement x="194" y="278" width="80" height="22" uuid="e99ef00e-1b60-493c-b14c-761291accd46"/>
 				<textFieldExpression><![CDATA[$F{BONUS}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="310" y="130" width="100" height="30" uuid="41305a33-68de-4046-8ad9-6586fab762af"/>
+				<reportElement x="310" y="138" width="80" height="20" uuid="41305a33-68de-4046-8ad9-6586fab762af"/>
 				<textFieldExpression><![CDATA[$F{CONTRACT_END_DATE}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="130" y="150" width="100" height="30" uuid="32b298e4-6b67-4e89-8d7e-ce27438ae56f"/>
+				<reportElement x="130" y="161" width="100" height="15" uuid="32b298e4-6b67-4e89-8d7e-ce27438ae56f"/>
 				<textFieldExpression><![CDATA[$F{WORK_LOCATION}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="270" y="300" width="50" height="20" uuid="3c1773ec-57ed-4b73-8d7f-2469c2a4452b"/>
+				<reportElement x="295" y="313" width="35" height="20" uuid="3c1773ec-57ed-4b73-8d7f-2469c2a4452b"/>
 				<textFieldExpression><![CDATA[$F{SALARY_PAYMENT_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="150" y="200" width="50" height="15" uuid="85a3d592-1ca5-4057-a2f3-97f5d26e5076"/>
+				<textFieldExpression><![CDATA[$F{WORK_START_TIME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="220" y="200" width="50" height="15" uuid="b59438cb-041c-4c87-9815-1b3178df89ba"/>
+				<textFieldExpression><![CDATA[$F{WORK_END_TIME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="350" y="203" width="50" height="18" uuid="01e3bf85-6949-4f49-8ff0-5c13e61fc171"/>
+				<textFieldExpression><![CDATA[$F{BREAK_START_TIME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="406" y="202" width="54" height="20" uuid="88101283-6080-4970-ace8-3235d95cff13"/>
+				<textFieldExpression><![CDATA[$F{BREAK_END_TIME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="200" y="256" width="64" height="22" uuid="49f07dd0-d8f8-44ac-9cd5-83ddbcc9f6f1"/>
+				<textFieldExpression><![CDATA[$F{MONTHLY_SALARY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="140" y="180" width="94" height="16" uuid="28b6123c-b840-4b3b-8baf-7dc4e4f74a55"/>
+				<textFieldExpression><![CDATA[$F{JOB_DESCRIPTION}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>

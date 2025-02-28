@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -29,6 +28,7 @@ import com.beauty1nside.hr.service.EmpService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -45,11 +45,23 @@ public class HrRestController {
 	@GetMapping("/emp/list")
 	public Object empList(@RequestParam(name = "perPage", defaultValue = "2", required = false) int perPage, 
 			@RequestParam(name = "page", defaultValue = "1", required = false) int page, 
-			@ModelAttribute EmpSearchDTO dto, @ModelAttribute  Paging paging) throws JsonMappingException, JsonProcessingException {
+			@ModelAttribute EmpSearchDTO dto, @ModelAttribute  Paging paging, HttpSession session) throws JsonMappingException, JsonProcessingException {
 		
 		
 		log.info("📥 empList 호출됨");
 	    log.info("🔍 검색 DTO 값: {}", dto);
+	    
+	    // ✅ 세션에서 `companyNum` 가져오기
+	    Long sessionCompanyNum = (Long) session.getAttribute("companyNum");
+
+	    
+	    // ✅ `companyNum`이 없거나 유효하지 않으면 접근 차단
+	    if (sessionCompanyNum == null || sessionCompanyNum <= 0) {
+	        return ResponseEntity.status(403).body("잘못된 접근입니다. (세션에 회사번호 없음)");
+	    }
+
+	    // ✅ 검색 DTO에 `companyNum` 설정 (세션 기반)
+	    dto.setCompanyNum(sessionCompanyNum);
 	    
 	    // ✅ 검색 조건이 올바르게 전달되는지 확인
 	    log.info("🔎 searchType: {}", dto.getSearchType());
@@ -89,14 +101,26 @@ public class HrRestController {
     // 🔹 사원 등록 API
     @PostMapping("/emp/register")
     public ResponseEntity<String> registerEmployee(EmpDTO empDTO,
-    											   @RequestPart("image") MultipartFile file) {
+    											   @RequestPart(value = "image", required = false) MultipartFile file, HttpSession session) {
     	
     	log.info("empDTO={}",empDTO);
     	log.info("ssnFirstPart={}",empDTO.getSsn());
     	
+        // ✅ 세션에서 `companyNum` 가져오기
+        Long sessionCompanyNum = (Long) session.getAttribute("companyNum");
+        
+        // ✅ `companyNum`이 없거나 유효하지 않으면 접근 차단
+        if (sessionCompanyNum == null || sessionCompanyNum <= 0) {
+            return ResponseEntity.status(403).body("잘못된 접근입니다. (세션에 회사번호 없음)");
+        }
+
+        // ✅ DTO의 `companyNum`을 세션 값으로 설정 (보안 강화)
+        empDTO.setCompanyNum(sessionCompanyNum);
+
+    	
     	//ssn 합치기
-    	String newSsn = empDTO.getFirstSsn()+"-"+empDTO.getSecondSsn();
-    	newSsn = passwordEncoder.encode(newSsn);
+    	String newSsn = empDTO.getFirstSsn()+"-"+ passwordEncoder.encode(empDTO.getSecondSsn());
+    	
     	empDTO.setSsn(newSsn);
     	
     	//비밀번호: 생년월일 8자리
@@ -111,23 +135,29 @@ public class HrRestController {
     	empDTO.setAddress(newAddress);
     	
     	log.info("변경된 empDTO={}",empDTO);
-        try {
-        	//프로필이미지 관련
-            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-            Path uploadPath = Paths.get(UPLOAD_DIR + fileName);
-            
-            Files.createDirectories(uploadPath.getParent());
-            Files.write(uploadPath, file.getBytes());
-        	
-            String imageUrl = "/file/image/mypage/profile/" + fileName;
-            empDTO.setProfileImage(imageUrl);
-            log.info("empDTOempDTOempDTOempDTOempDTOempDTO={}",empDTO);
-            empService.registerEmployee(empDTO);
-            return ResponseEntity.ok("사원 등록 성공! 사번: " + empDTO.getEmployeeId());
-        } catch (Exception e) {
-            log.error("❌ 사원 등록 실패: ", e);
-            return ResponseEntity.status(500).body("사원 등록 실패");
+    	
+        // ✅ 파일이 존재하는 경우에만 업로드 수행
+        if (file != null && !file.isEmpty()) {
+            try {
+                String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+                Path uploadPath = Paths.get("src/main/resources/static/file/image/mypage/profile/" + fileName);
+                Files.createDirectories(uploadPath.getParent());
+                Files.write(uploadPath, file.getBytes());
+                
+                String imageUrl = "/file/image/mypage/profile/" + fileName;
+                empDTO.setProfileImage(imageUrl);
+            } catch (Exception e) {
+                log.error("❌ 파일 업로드 실패:", e);
+                return ResponseEntity.status(500).body("파일 업로드 실패");
+            }
+        } else {
+            log.info("🚨 프로필 이미지 없음, 기본 이미지 적용");
+            empDTO.setProfileImage("/file/image/mypage/profile/noProfileImg.jpg"); // 기본 이미지 설정
         }
+
+        // ✅ 사원 등록 실행
+        empService.registerEmployee(empDTO);
+        return ResponseEntity.ok("사원 등록 성공! 사번: " + empDTO.getEmployeeId());
     }
     
     @GetMapping("/emp/new-employee-id")

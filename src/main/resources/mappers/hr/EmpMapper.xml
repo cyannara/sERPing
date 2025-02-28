@@ -18,10 +18,10 @@
 		fn_get_cmmn_name(e.employment_type) AS employmentType,
 		d.department_name AS departmentName
 		FROM hr_employee e
-		LEFT JOIN hr_department d ON
+		LEFT JOIN hr_department d ON	
 		e.department_num = d.department_num
-		WHERE e.employee_num =
-		#{employee_num}
+		WHERE e.employee_num = #{employee_num}
+		AND e.company_num = #{companyNum}
 		ORDER BY e.employee_num DESC
 	</select>
 
@@ -198,6 +198,11 @@
 
 
 	<sql id="searchInfo">
+	
+	    <if test="companyNum != null">
+	        AND e.company_num = #{companyNum}  <!-- 🔥 회사번호 검증 추가 -->
+	    </if>
+		
 	    <if test="searchKeyword != null and searchKeyword != ''">
 	        <choose>
 	            <when test="searchType == '전체'">
