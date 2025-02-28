@@ -3,6 +3,8 @@ const sendBtn = document.getElementsByClassName('send-btn')[0]
 const chatContainer = document.getElementById("chatMessages");
 const textarea = document.getElementById('textarea')
 let sessionEmployeeNum = document.getElementById("sessionEmployeeNum").value;
+let empList = document.getElementById("empList")
+
 let sessionEmployeeName = document.getElementById("sessionEmployeeName").value;
 let roomId = 0
 
@@ -135,8 +137,25 @@ const openChatRoom = (employeeNum) => {
 
         // Bootstrap의 탭 기능을 활용
         $(document).ready(function() {
+            let goback = document.getElementById("goback")
             $('#room-tab').tab('show');
             chatContainer.scrollTop = chatContainer.scrollHeight;
+            empList.classList.add('hide')
+            goback.classList.add('show')
+            empList.classList.remove('show')
+            goback.classList.remove('hide')
+
+
+            goback.addEventListener('click', () => {
+                console.log(goback)
+                $(document).ready(function() {
+                    $('#todo-tab').tab('show');
+                    empList.classList.add('show')
+                    empList.classList.remove('hide')
+                    goback.classList.add('hide')
+                    goback.classList.remove('show')
+                });
+            })
         });
     })
 }

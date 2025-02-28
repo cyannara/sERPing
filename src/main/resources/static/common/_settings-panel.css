@@ -1,15 +1,51 @@
 .settings-panel {
-    .chatroom {
+    .tab-content {
         padding: 0 !important;
-        margin-right: 24px;
-        font-size: 16px !important;
+        /*padding-top: 45px;*/
     }
+    .chatroom {
+        /*padding: 0 !important;*/
+        /*margin-right: 24px;*/
+        /*font-size: 16px !important;*/
+        display: none;
+    }
+    #empList {
+        &.hide {
+            display: none;
+        }
+        &.show {
+            display: block;
+        }
+    }
+
+    #goback {
+        display: none;
+        position: absolute;
+        left: 0;
+        padding-right: 20px;
+        cursor: pointer;
+        &.show {
+            display: block;
+        }
+        &.hide {
+            display: none;
+        }
+        > a {
+            margin-top: 1px;
+            font-size: 20px;
+            padding: 5px 0 0 20px;
+        }
+    }
+
     .nav-link {
         color: gray !important;
     }
     .nav-link.active{
         color: #4B49AC !important;
         font-weight: 800;
+        border: none;
+        border-bottom: 1px solid gray;
+        margin: 0;
     }
     .emp-item {
         height: 60px;
@@ -41,8 +77,8 @@
     #room-section {
         display: flex;
         flex-direction: column;
-        height: calc(100vh - 118px);
-        padding: 10px;
+        height: calc(100vh - 80px);
+        padding: 45px 10px 10px 10px;
     }
 
     .chat-messages {
