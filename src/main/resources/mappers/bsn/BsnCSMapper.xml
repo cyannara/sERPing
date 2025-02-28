@@ -44,5 +44,38 @@
 	</sql>
 	
 	
+	<!-- 교환및반품 상세 조회 -->
+	<select id="selectBhfReturningDetail" resultType="BsnReturnListDTO" parameterType="BhfReturnListSearchDTO">
+		select goods_name, 
+		       goods_code,
+			   option_name, 
+			   option_code,
+			   quantity, 
+			   exchange_returning_choice, 
+			   returning_reason,
+			   option_barcode,
+			   goods_lot_num
+		from (select /*+INDEX_DESC(bhf_returning_detail pk_bhf_returning_detail)*/
+					 rownum rn, 
+					 goods_name, 
+					 goods_code,
+				     option_name, 
+				     option_code,
+				     quantity, 
+				     exchange_returning_choice, 
+				     returning_reason,
+				     option_barcode,
+			         goods_lot_num
+			 from    bhf_returning_detail
+			 
+		<![CDATA[
+			where rownum <= #{end}
+		]]>
+			and returning_code = #{returningCode} 
+			)
+		where rn >= #{start}
+	</select>
+	
+	
 
 </mapper>

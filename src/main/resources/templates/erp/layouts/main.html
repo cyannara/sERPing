@@ -60,6 +60,20 @@
   pdfjsLib.GlobalWorkerOptions.workerSrc =
     'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.worker.min.js';
   </script>
+  <script>
+	document.addEventListener("DOMContentLoaded", function () {
+	    const currentPath = window.location.pathname;
+	    let navLinks = document.querySelectorAll("#navmenu ul li a");
+	    navLinks.forEach(link => {
+	        let linkPath = new URL(link.href, window.location.origin).pathname;
+	        if (currentPath === linkPath) {
+	            link.classList.add("active");
+	        } else {
+	            link.classList.remove("active");
+	        }
+	    });
+	});
+	</script>
 
   <!-- =======================================================
 	 * ERP서비스를 위한 관리자 페이지
@@ -112,13 +126,16 @@
 	}
 	/* cslist 스타일 */
 	#answerTable {
-	    width: 750px;
+	    width: 100%;  /* 또는 auto */
+	    max-width: 700px;  /* 최대 너비 설정 */
+	    table-layout: fixed; /* 셀 크기 고정 */
 	    border-collapse: separate;
 	    border-spacing: 0;
 	    border-radius: 10px;
-	    overflow: hidden; /* 둥근 테두리가 잘리지 않도록 */
+	    overflow: hidden; /* 스크롤 방지 */
 	    text-align: left;
-	    font-size: 12px;
+	    font-size: 14px;
+	    word-wrap: break-word; /* 내용이 넘칠 경우 줄바꿈 */
 	}
 	/* 내부 셀 스타일 */
 	#answerTable th, #answerTable td {
@@ -153,6 +170,14 @@
 	        max-width: 1600px;
 	    }
 	}
+	.appendsection2 {
+	    display: flex;
+	    flex-direction: column; /* 세로 정렬 */
+	    align-items: center; /* 가로 중앙 정렬 */
+	    justify-content:center;
+	    width: 700px;
+	    height: 100%;
+	}
 	.pdf-container {
 		max-width: 1000px;       /* 최대 너비 800px */
 		margin: 0 auto;         /* 수평 중앙 정렬 */
@@ -172,6 +197,42 @@
 	.modal-body {
 		padding: 13px !important;
 	}
+	.custom-red-row {
+        background-color: rgba(255, 0, 0, 0.2) !important; /* 연한 붉은색 배경 */
+    }
+    .tui-grid-container .tui-pagination.tui-grid-pagination {
+	    padding-top: 10px !important;
+	}
+	.card {
+	    width: 100%;
+	    max-width: 700px;
+	    background-color: #f8f9fa; /* 밝은 배경 */
+	    padding: 20px;
+	    border-radius: 10px;
+	    box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.1);
+	}
+	
+	.card-title {
+	    text-align: center;
+	    font-size: 30px;
+	    font-weight: bold;
+	    margin-bottom: 15px;
+	}
+	
+	.service-list {
+	    display: flex;
+	    flex-direction: column;
+	    gap: 10px;
+	}
+	
+	.service-item {
+	    background: white;
+	    padding: 10px;
+	    border-radius: 8px;
+	    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+	    font-size: 16px;
+	    line-height: 1.6;
+	}
 </style>
 
 </head>
@@ -189,7 +250,7 @@
       <nav id="navmenu" class="navmenu">
         <ul>
 		  <li><a href="main">HOME</a></li>        	
-          <li><a href="team.html">CS문의</a></li>
+          <li><a href="cs">CS문의</a></li>
           <li><a href="admin">회사관리</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>

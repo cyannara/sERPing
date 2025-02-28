@@ -102,7 +102,7 @@ public class ErpAdminLoginController {
 			if (passwordEncoder.matches(employeePw, dto.getEmployeePw())) {
 				log.info("로그인 성공: {}", employeeId);
 				session.setAttribute("ErpEmployeeInfo", dto);
-		        return "/erp/admin"; // 로그인 성공 시 DTO 반환
+				return "redirect:/erp/admin";
 		    } else {
 		        log.warn("비밀번호 불일치: {}", employeeId);
 		        model.addAttribute("loginResult", "실패");

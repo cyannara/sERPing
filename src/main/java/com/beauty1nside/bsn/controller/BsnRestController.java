@@ -363,4 +363,25 @@ public class BsnRestController {
 		return result;
 	}
 	
+	@GetMapping("/cs/request/detail")
+	public Object csRequestDetail(@RequestParam(name = "perPage", defaultValue = "2", required = false) int perPage, 
+			@RequestParam(name = "page", defaultValue = "1", required = false) int page, 
+			BhfReturnListSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
+		// 페이징 유닛 수
+		paging.setPageUnit(1000);
+		paging.setPage(page);
+		
+		// 페이징 조건
+		dto.setStart(paging.getFirst());
+		dto.setEnd(paging.getLast());
+		
+		// 페이징 처리
+		paging.setTotalRecord(bsnCsService.countBhfReturningList(dto));
+		
+		// grid 배열 처리
+		GridArray grid = new GridArray();
+		Object result = grid.getArray( paging.getPage(), bsnCsService.countBhfReturningList(dto), bsnCsService.bhfReturningDetail(dto) );
+		return result;
+	}
+	
 }

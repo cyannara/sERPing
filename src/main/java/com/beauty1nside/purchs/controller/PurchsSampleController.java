@@ -82,6 +82,12 @@ public class PurchsSampleController {
     public String warehousingRegister() {
         return "/purchs/warehousingRegister"; // templates/purchs/purchaseList.html을 반환
     }
+    
+    //입고리스트이동
+    @GetMapping("/warehouseList")
+    public String warehousingList() {
+        return "/purchs/warehouseList"; // templates/purchs/purchaseList.html을 반환
+    }
 
 
 

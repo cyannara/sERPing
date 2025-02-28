@@ -28,13 +28,13 @@ public class ChatRestController {
     return chatService.empList(companyNum);
   }
   
-  @PostMapping("/start")
-  public Map<Long, List<MessageDTO>> startChat(@RequestBody EmpDTO empDTO,
+  @GetMapping("/start/{employeeNum}")
+  public Map<Long, List<MessageDTO>> startChat(@PathVariable(name="employeeNum") Long employeeNum,
                                                @AuthenticationPrincipal CustomerUser user) {
     RoomDTO roomDTO = new RoomDTO();
     roomDTO.setCompanyNum(user.getUserDTO().getCompanyNum());
     roomDTO.setEmployeeNum1(user.getUserDTO().getEmployeeNum());
-    roomDTO.setEmployeeNum2(empDTO.getEmployeeNum());
+    roomDTO.setEmployeeNum2(employeeNum);
     
     return chatService.startChat(roomDTO);
   }

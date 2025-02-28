@@ -1,15 +1,13 @@
 package com.beauty1nside.accnut.controller;
 
-import java.util.List;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.beauty1nside.accnut.dto.AssetDTO;
 import com.beauty1nside.accnut.service.AssetService;
 
 import lombok.AllArgsConstructor;
@@ -21,6 +19,12 @@ import lombok.extern.log4j.Log4j2;
 @RequestMapping("/accnut/*")
 public class AccnutSampleController {
 
+	// 내 화면에서도 사이드바가 보이게 하는거
+    @ModelAttribute
+      public void setAttributes(Model model) {
+        model.addAttribute("menu", "account");
+      }
+	
 	//샘플 페이지
 	@GetMapping("/")
 	public String sample() {

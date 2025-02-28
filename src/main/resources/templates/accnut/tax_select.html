@@ -1,10 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html layout:decorate="~{layouts/layout}"
+      lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
 <meta charset="UTF-8">
 <title>세금계산서 조회</title>
 </head>
-<body>
-
+<body layout:fragment="content">
+	<div class="container">
+		<!-- 메뉴이름 -->
+		 <div>
+			 <h2>세금계산서 조회</h2>
+		 </div>
+	</div>
 </body>
 </html>

@@ -19,7 +19,7 @@
 		th:if="${#strings.equals('sales', param.menu) or #strings.equals('sales', menu)}">
 		<ul class="nav">
 			<li class="nav-item"><a class="nav-link"
-				th:href="@{/bsn/order(menu='sales')}"> <i class="icon-grid menu-icon"></i> <span
+				th:href="@{/bsn/order/List(menu='sales')}"> <i class="icon-grid menu-icon"></i> <span
 					class="menu-title">주문관리</span>
 			</a>
 			<div class="collapse" id="ui-basic-1">
@@ -47,7 +47,7 @@
 			
 			</li>
 			<li class="nav-item"><a class="nav-link"
-				th:href="@{/bsn/order/cs(menu='sales')}"> <i class="icon-grid menu-icon"></i> <span
+				th:href="@{/bsn/order/cs/returning(menu='sales')}"> <i class="icon-grid menu-icon"></i> <span
 					class="menu-title">CS관리</span>
 			</a>
 			<div class="collapse" id="ui-basic-1">
@@ -117,7 +117,7 @@
 						<li class="nav-item"><a class="nav-link"
 							th:href="@{/purchs/warehousingRegister(menu='inventory')}">구매등록</a></li>
 						<li class="nav-item"><a class="nav-link"
-							th:href="@{/purchs/purchaseList(menu='inventory')}">구매조회</a></li>
+							th:href="@{/purchs/warehouseList(menu='inventory')}">구매조회</a></li>
 					</ul>
 				</div>
 			</li>
@@ -192,13 +192,19 @@
         <li class="nav-item">
           <a class="nav-link" th:href="@{/bhf/order(menu='branch')}">
             <i class="icon-grid menu-icon"></i>
-            <span class="menu-title">상품 발주 요청</span>
+            <span class="menu-title">상품 입고 요청</span>
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link" th:href="@{/bhf/ordList(menu='branch')}">
             <i class="icon-grid menu-icon"></i>
-            <span class="menu-title">상품 발주 조회</span>
+            <span class="menu-title">입고 요청 조회</span>
+          </a>
+        </li>
+         <li class="nav-item">
+          <a class="nav-link" th:href="@{/bhf/goodsIn(menu='branch')}">
+            <i class="icon-grid menu-icon"></i>
+            <span class="menu-title">상품 입고 등록</span>
           </a>
         </li>
         <li class="nav-item">
@@ -214,15 +220,9 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" th:href="@{/bhf/goodsIn(menu='branch')}">
-            <i class="icon-grid menu-icon"></i>
-            <span class="menu-title">상품 입고</span>
-          </a>
-        </li>
-        <li class="nav-item">
           <a class="nav-link" th:href="@{/bhf/inventory(menu='branch')}">
             <i class="icon-grid menu-icon"></i>
-            <span class="menu-title">재고 관리</span>
+            <span class="menu-title">창고 재고 관리</span>
           </a>
         </li>
         <li class="nav-item">
@@ -241,7 +241,86 @@
 	</div>
 	<div
 		th:if="${#strings.equals('account', param.menu) or #strings.equals('account', menu)}">
-		<span class="menu-title">account</span>
+		<ul class="nav">
+			<!-- 자산 채무 메뉴 -->
+			<li class="nav-item"><a class="nav-link"
+				data-bs-toggle="collapse" href="#ui-basic-1" aria-expanded="false"
+				aria-controls="ui-basic-1"> <i class="icon-grid menu-icon"></i>
+					<span class="menu-title">자산/채무</span> <i class="menu-arrow"></i>
+			</a>
+				<div class="collapse" id="ui-basic-1">
+					<ul class="nav flex-column sub-menu">
+						<li class="nav-item"><a class="nav-link"
+							href="/accnut/asset">자산관리</a></li>
+						<li class="nav-item"><a class="nav-link"
+							href="/accnut/debt">채무관리</a></li>
+					</ul>
+				</div></li>
+
+			<!-- 거래대장 메뉴 -->
+			<li class="nav-item"><a class="nav-link"
+				data-bs-toggle="collapse" href="#ui-basic-2" aria-expanded="false"
+				aria-controls="ui-basic-2"> <i class="icon-grid menu-icon"></i>
+					<span class="menu-title">거래대장</span> <i class="menu-arrow"></i>
+			</a>
+				<div class="collapse" id="ui-basic-2">
+					<ul class="nav flex-column sub-menu">
+						<li class="nav-item"><a class="nav-link"
+							href="/accnut/book_insert">거래대장 등록</a></li>
+						<li class="nav-item"><a class="nav-link"
+							href="/accnut/book_select">거래대장 조회</a></li>
+					</ul>
+				</div></li>
+				
+			<!-- 지급처리 메뉴 -->
+			<li class="nav-item"><a class="nav-link"
+				data-bs-toggle="collapse" href="#ui-basic-3" aria-expanded="false"
+				aria-controls="ui-basic-3"> <i class="icon-grid menu-icon"></i>
+					<span class="menu-title">지급 처리</span> <i class="menu-arrow"></i>
+			</a>
+				<div class="collapse" id="ui-basic-3">
+					<ul class="nav flex-column sub-menu">
+						<li class="nav-item"><a class="nav-link"
+							href="/accnut/salary">급여 처리</a></li>
+						<li class="nav-item"><a class="nav-link"
+							href="/accnut/unpay">미지급금 처리</a></li>
+						<li class="nav-item"><a class="nav-link"
+							href="/accnut/etc_pay">기타지급 처리</a></li>
+						<li class="nav-item"><a class="nav-link"
+							href="/accnut/incidental_cost">부대비용 처리</a></li>
+					</ul>
+				</div></li>
+				
+			<!-- 세금계산서 메뉴 -->
+			<li class="nav-item"><a class="nav-link"
+				data-bs-toggle="collapse" href="#ui-basic-4" aria-expanded="false"
+				aria-controls="ui-basic-4"> <i class="icon-grid menu-icon"></i>
+					<span class="menu-title">세금계산서</span> <i class="menu-arrow"></i>
+			</a>
+				<div class="collapse" id="ui-basic-4">
+					<ul class="nav flex-column sub-menu">
+						<li class="nav-item"><a class="nav-link"
+							href="/accnut/tax_insert">세금계산서 발행</a></li>
+						<li class="nav-item"><a class="nav-link"
+							href="/accnut/tax_select">세금계산서 조회</a></li>
+					</ul>
+				</div></li>
+				
+			<!-- 통계 메뉴 -->
+			<li class="nav-item"><a class="nav-link"
+				data-bs-toggle="collapse" href="#ui-basic-5" aria-expanded="false"
+				aria-controls="ui-basic-5"> <i class="icon-grid menu-icon"></i>
+					<span class="menu-title">통계</span> <i class="menu-arrow"></i>
+			</a>
+				<div class="collapse" id="ui-basic-5">
+					<ul class="nav flex-column sub-menu">
+						<li class="nav-item"><a class="nav-link"
+							href="/accnut/selling_select">매출 조회</a></li>
+						<li class="nav-item"><a class="nav-link"
+							href="/accnut/selling_status">매출 현황</a></li>
+					</ul>
+				</div></li>
+		</ul>
 	</div>
 
 	<div th:if="${#strings.equals('mypage', param.menu) or #strings.equals('mypage', menu)}">
@@ -252,34 +331,10 @@
 			<li class="nav-item"><a class="nav-link" th:href="@{/mypage/approval(menu='mypage')}">
 				<i class="icon-grid menu-icon"></i> <span class="menu-title">전자 결재</span></a>
 			</li>
-			<!-- 
-			<li class="nav-item"><a class="nav-link" th:href="@{/erp/usercontact(menu='mypage')}">
-				<i class="icon-grid menu-icon"></i> <span class="menu-title">사용계약서</span></a>
-			</li>
-			<li class="nav-item">
-				<a class="nav-link" th:href="@{/erp/erpsubinfo(menu='mypage')}">
-					<i class="icon-grid menu-icon"></i>
-					<span class="menu-title">구독</span>
-				</a>
-			<div class="collapse" id="ui-basic-1">
-					<ul class="nav flex-column sub-menu rounded-3">
-						<li class="nav-item"><a class="nav-link" th:href="@{/erp/erpsubinfo(menu='mypage')}">구독조회</a></li>
-						<li class="nav-item"><a class="nav-link" th:href="@{/erp/fppay(menu='mypage')}">구독결제</a></li>
-						<li class="nav-item"><a class="nav-link" th:href="@{/erp/subpay(menu='mypage')}">결제수단</a></li>
-					</ul>
-				</div>
-			</li>
-			 -->
 		</ul>
 	</div>
 
 </nav>
-<!-- 표하연작성 마이페이지 관리자 항목처리 -->
-<script th:inline="javascript">
-	console.log("aab");
-	console.log("aab",[[${session.comapnyName}]]);
-</script>
-<!-- 표하연작성 마이페이지 관리자 항목처리 끝 -->
 
 	<!--  <ul class="nav">-->
 	<!--    <li class="nav-item">-->

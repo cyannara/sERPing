@@ -89,7 +89,7 @@ if(employeeNum) {
     }, 100)
     setTimeout(() => {
         window.location.href = "/login";
-    }, 3000);
+    }, 2000);
 }
 
 let inApprovalStatus = ''
