@@ -62,6 +62,9 @@
 		.modal-body {
 			padding: 13px !important;
 		}
+		.tui-grid-body-area {
+			height: 217px !important;
+		}
 	</style>
 	<div class="container">
 		<div class="row">
@@ -76,7 +79,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-md-6 stretch-card mt-2 mb-2">
+			<div class="col-md-6 stretch-card mt-2 mb-2" style="height: 345px;">
 				<div class="card">
 					<div class="card-body">
 						<h6 class="mb-4">나의구독</h6>
@@ -299,7 +302,8 @@
 				{ header: "구독형태", name: "subscriptionFormName", editor: 'text' },
 				{ header: "구독금액", name: "subscriptionAmount", editor: 'text',
 					formatter: function({ value }) {
-				        return value.toLocaleString()+'원';
+						return numberFormat(value)+'원';
+						//return value.toLocaleString()+'원';
 				    },
 				},
 				{ header: "구독일시", name: "subscriptionDate", editor: 'text',
@@ -364,23 +368,6 @@
 			//초기 데이터 뭘로 할지
 			data : sublistdataSource,
 		});
-		
-		//날짜 변환함수
-		function subscriptday(value){
-			const utcDate = new Date(value);
-			// 한국 시간(KST)으로 변환 (24시간 형식 유지)
-			const options = { 
-			    year: 'numeric', month: '2-digit', day: '2-digit',
-			    hour: '2-digit', minute: '2-digit', second: '2-digit',
-			    hour12: false, timeZone: "Asia/Seoul"
-			};
-			// `toLocaleString` 사용하여 변환 후, 포맷을 `yyyy-MM-dd HH:mm:ss`로 조정
-			const kstDate = new Intl.DateTimeFormat("ko-KR", options).format(utcDate)
-			    .replace(/\./g, '-') // yyyy.MM.dd → yyyy-MM-dd 로 변환
-			    .replace(/ /g, '')    // 공백 제거
-			    .trim();
-			return kstDate;
-		}
 		
 		//현재 그리드에 강조된행을 기록할 변수
 		let selectedRowKey = null;

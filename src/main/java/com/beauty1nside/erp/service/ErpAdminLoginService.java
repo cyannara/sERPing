@@ -1,5 +1,7 @@
 package com.beauty1nside.erp.service;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.beauty1nside.erp.dto.ErpEmployeeDTO;
 
 /**
@@ -26,4 +28,12 @@ public interface ErpAdminLoginService {
      * @return ErpEmployeeDTO
      */
 	public ErpEmployeeDTO loginConfig(String employeeId);
+	
+	/**
+     * 로그인 할 수있는 계정이 있는지 갯수를 확인한다
+     *
+     * @param String
+     * @return boolean
+     */
+	public boolean loginCount(@Param("employeeId") String employeeId);
 }

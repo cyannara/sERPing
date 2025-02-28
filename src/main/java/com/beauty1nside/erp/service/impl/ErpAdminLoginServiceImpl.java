@@ -51,4 +51,15 @@ public class ErpAdminLoginServiceImpl implements ErpAdminLoginService{
 		return erpAdminLoginMapper.loginConfig(employeeId);
 	}
 
+	/**
+     * 로그인 할 수있는 계정이 있는지 갯수를 확인한다
+     *
+     * @param String
+     * @return boolean
+     */
+	@Override
+	public boolean loginCount(String employeeId) {
+		return erpAdminLoginMapper.loginCount(employeeId) >= 1 ? true:false;
+	}
+
 }

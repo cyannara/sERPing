@@ -43,4 +43,5 @@ public class ComDTO {
 	private String businessLicense;	//등록증파일주소
 	private String serviceState;
 	private Date registerDate;
+	private int employeeNum;
 }
