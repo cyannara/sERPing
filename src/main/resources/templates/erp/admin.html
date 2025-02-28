@@ -68,7 +68,7 @@
 				</div>
 				
 				
-				<div>
+				<!-- <div>
 					<select name="display_amount" id="display_amount" class="col-8 input-box" onchange="changeDisplay()">
 						<option value="5" selected>5</option>
 						<option value="10">10</option>
@@ -76,7 +76,7 @@
 						<option value="50">50</option>
 						<option value="100">100</option>
 					</select>
-				</div>
+				</div> -->
 				<div>
 					<span class="label-search col-4">회사명</span>
 					<input type="text" name="companyName2" id="companyName2" class="col-8 input-box">
@@ -92,9 +92,16 @@
 		<!-- 토스트 그리드 영역 -->
 		<div class="p-2">
 			<div class="d-flex justify-content-center">
-				<!--  -->
 				<div id="grid"></div>
-				<div id="pagination" class="tui-pagination"></div>
+				<div style="width:200px; z-index:999; position: absolute; left:-100px; top:10px;">
+					<select name="display_amount" id="display_amount" class="col-8 input-box" onchange="changeDisplay()">
+						<option value="5" selected>5</option>
+						<option value="10">10</option>
+						<option value="20">20</option>
+						<option value="50">50</option>
+						<option value="100">100</option>
+					</select>
+				</div>
 			</div>
 		</div>
 		<!-- 토스트 그리드 영역 끝 -->
@@ -390,6 +397,40 @@
 		        }
 		    });
 		});
+		
+		
+		
+		
+		
+		
+		
+		
+		document.addEventListener("DOMContentLoaded", function () {
+		    // 1. 페이지네이션 요소 찾기
+		    const paginationContainer = document.querySelector(".tui-pagination.tui-grid-pagination");
+
+		    if (paginationContainer) {
+		        // 2. 새로운 select 요소를 담을 div 생성
+		        const selectContainer = document.createElement("div");
+		        selectContainer.classList.add("select-container"); // CSS 클래스 추가
+		        selectContainer.innerHTML = `
+		            <select name="display_amount" id="display_amount" class="form-select form-select-sm" onchange="changeDisplay()">
+		                <option value="5" selected>5</option>
+		                <option value="10">10</option>
+		                <option value="20">20</option>
+		                <option value="50">50</option>
+		                <option value="100">100</option>
+		            </select>
+		        `;
+
+		        // 3. 페이지네이션 요소 뒤에 삽입
+		        paginationContainer.insertAdjacentElement("afterend", selectContainer);
+		    }
+		});
+
+
+		
+		
 		
 		// 모달 열기 함수
 		function openBusinessLicenseModal(value) {
