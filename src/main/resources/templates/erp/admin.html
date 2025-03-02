@@ -24,49 +24,71 @@
 		<!-- 회사 검색 영역 -->
 		<div class="p-2">
 			<div class="d-flex justify-content-center border border-primary-subtle rounded-3 bg-primary-subtle p-3">
-				<div class="form-check me-3">
-					<input class="form-check-input" type="checkbox" value=""
-						id="flexCheckDefault"> <label class="form-check-label"
-						for="flexCheckDefault"> 계약 </label>
-				</div>
-				<div class="form-check">
-					<input class="form-check-input" type="checkbox" value=""
-						id="flexCheckChecked" checked> <label
-						class="form-check-label" for="flexCheckChecked"> 미계약 </label>
-				</div>
-				
-				
-				
-				<div class="form-check">
-					<input class="form-check-input" type="checkbox" value=""
-						id="flexCheckChecked" checked> <label
-						class="form-check-label" for="flexCheckChecked"> 서비스 </label>
-				</div>
-				<div class="form-check">
-					<input class="form-check-input" type="checkbox" value=""
-						id="flexCheckChecked" checked> <label
-						class="form-check-label" for="flexCheckChecked"> 만료 </label>
-				</div>
-				
-				
-				<div class="form-check">
-					<input class="form-check-input" type="checkbox" value=""
-						id="flexCheckChecked" checked> <label
-						class="form-check-label" for="flexCheckChecked"> 만료10일전 </label>
-				</div>
-				
-				
-				<div class="form-check">
-					<input class="form-check-input" type="checkbox" value=""
-						id="flexCheckChecked" checked> <label
-						class="form-check-label" for="flexCheckChecked"> 정기구독 </label>
-				</div>
-				<div class="form-check">
-					<input class="form-check-input" type="checkbox" value=""
-						id="flexCheckChecked" checked> <label
-						class="form-check-label" for="flexCheckChecked"> 기간구독 </label>
-				</div>
-				
+				<fieldset class="me-3">
+					<legend>계약</legend>
+					<div class="fieldset-container">
+						<div class="form-check mt-2 p-0">
+							<input type="checkbox" class="btn-check" id="ok_contact" autocomplete="off" checked="checked">
+							<label class="btn btn-outline-primary" for="ok_contact">계약</label>
+						</div>
+						<div class="form-check mt-2 p-0">
+							<input type="checkbox" class="btn-check" id="no_contact" autocomplete="off" checked="checked">
+							<label class="btn btn-outline-primary" for="no_contact">미계약</label>
+						</div>
+					</div>
+				</fieldset>
+				<fieldset class="me-3">
+					<legend>서비스</legend>
+					<div class="fieldset-container">
+						<div class="form-check mt-2 p-0">
+							<input type="checkbox" class="btn-check" id="useing" autocomplete="off" checked="checked">
+							<label class="btn btn-outline-primary" for="useing">사용중</label>
+						</div>
+						<div class="form-check mt-2 p-0">
+							<input type="checkbox" class="btn-check" id="unuseing" autocomplete="off" checked="checked">
+							<label class="btn btn-outline-primary" for="unuseing">만료</label>
+						</div>
+					</div>
+				</fieldset>
+				<fieldset class="me-3">
+					<legend>구독형태</legend>
+					<div class="fieldset-container">
+						<div class="form-check mt-2 p-0">
+							<input type="checkbox" class="btn-check" id="daysubscript" autocomplete="off" checked="checked">
+							<label class="btn btn-outline-primary" for="daysubscript">기간구독</label>
+						</div>
+						<div class="form-check mt-2 p-0">
+							<input type="checkbox" class="btn-check" id="regulsubscript" autocomplete="off" checked="checked">
+							<label class="btn btn-outline-primary" for="regulsubscript">정기구독</label>
+						</div>
+					</div>
+				</fieldset>
+				<fieldset class="me-3">
+					<legend>남은기간</legend>
+					<div class="fieldset-container">
+						<div class="form-check mt-2 p-0">
+							<input type="checkbox" class="btn-check" id="lastday" autocomplete="off">
+							<label class="btn btn-outline-primary" for="lastday">10일 미만</label>
+						</div>
+					</div>
+				</fieldset>
+				<fieldset class="me-3">
+					<legend>회사명</legend>
+					<div class="fieldset-container">
+						<div class="form-check mt-2 p-0">
+							<input type="text" name="companyName2" id="companyName2" class="form-control col-8 input-box">
+						</div>
+					</div>
+				</fieldset>
+				<fieldset class="me-3">
+					<legend>처리</legend>
+					<div class="fieldset-container">
+						<div class="form-check mt-2 p-0">
+							<button type="button" class="btn btn-success me-2" onclick="search()">검색</button>
+				  			<button type="button" class="btn btn-secondary" onclick="reset()">초기화</button>
+						</div>
+					</div>
+				</fieldset>
 				
 				<!-- <div>
 					<select name="display_amount" id="display_amount" class="col-8 input-box" onchange="changeDisplay()">
@@ -77,15 +99,6 @@
 						<option value="100">100</option>
 					</select>
 				</div> -->
-				<div>
-					<span class="label-search col-4">회사명</span>
-					<input type="text" name="companyName2" id="companyName2" class="col-8 input-box">
-				</div>
-				<div>
-				<div class="d-flex justify-content-center align-items-center">
-				  <button type="button" class="btn btn-primary me-2" onclick="search()">검색</button>
-				  <button type="button" class="btn btn-secondary" onclick="reset()">초기화</button>
-				</div>
 			</div>
 		</div>
 		<!-- 회사 검색 영역 끝 -->
@@ -93,15 +106,6 @@
 		<div class="p-2">
 			<div class="d-flex justify-content-center">
 				<div id="grid"></div>
-				<div style="width:200px; z-index:999; position: absolute; left:-100px; top:10px;">
-					<select name="display_amount" id="display_amount" class="col-8 input-box" onchange="changeDisplay()">
-						<option value="5" selected>5</option>
-						<option value="10">10</option>
-						<option value="20">20</option>
-						<option value="50">50</option>
-						<option value="100">100</option>
-					</select>
-				</div>
 			</div>
 		</div>
 		<!-- 토스트 그리드 영역 끝 -->
@@ -383,7 +387,7 @@
 		let selectedRowKey = null;
 		let subselectedRowKey = null;
 		
-		//로그인 처리할때 까지 이건 계속 있어야함
+		//로그인된 사용자 정보
 		let employeeNum = ErpEmployeeInfo.employeeNum;
 		document.querySelector("#employeeNum").value = employeeNum;
 		
@@ -397,40 +401,6 @@
 		        }
 		    });
 		});
-		
-		
-		
-		
-		
-		
-		
-		
-		document.addEventListener("DOMContentLoaded", function () {
-		    // 1. 페이지네이션 요소 찾기
-		    const paginationContainer = document.querySelector(".tui-pagination.tui-grid-pagination");
-
-		    if (paginationContainer) {
-		        // 2. 새로운 select 요소를 담을 div 생성
-		        const selectContainer = document.createElement("div");
-		        selectContainer.classList.add("select-container"); // CSS 클래스 추가
-		        selectContainer.innerHTML = `
-		            <select name="display_amount" id="display_amount" class="form-select form-select-sm" onchange="changeDisplay()">
-		                <option value="5" selected>5</option>
-		                <option value="10">10</option>
-		                <option value="20">20</option>
-		                <option value="50">50</option>
-		                <option value="100">100</option>
-		            </select>
-		        `;
-
-		        // 3. 페이지네이션 요소 뒤에 삽입
-		        paginationContainer.insertAdjacentElement("afterend", selectContainer);
-		    }
-		});
-
-
-		
-		
 		
 		// 모달 열기 함수
 		function openBusinessLicenseModal(value) {
@@ -637,18 +607,43 @@
 			let gap = parseInt(document.querySelector('#display_amount').value);
 			grid.setPerPage(gap, dataSource)
 		}
+		//엔터이벤트
+		document.getElementById("companyName2").addEventListener("keypress", function(event) {
+		    if (event.key === "Enter") {
+		        search();
+		    }
+		});
 		//검색 처리 이벤트
 		function search(){
 			let companyName = document.querySelector('#companyName2').value;
-			console.log(companyName);
-			grid.setRequestParams({"companyName" : companyName})
+			let ok_contact = document.querySelector('#ok_contact').checked;
+			let no_contact = document.querySelector('#no_contact').checked;
+			let useing = document.querySelector('#useing').checked;
+			let unuseing = document.querySelector('#unuseing').checked;
+			let daysubscript = document.querySelector('#daysubscript').checked;
+			let regulsubscript = document.querySelector('#regulsubscript').checked;
+			let lastday = document.querySelector('#lastday').checked;
+			if(lastday){
+				document.querySelector('#regulsubscript').checked = false;
+			}
+			
+			grid.setRequestParams({"companyName" : companyName, "okContact" : ok_contact, "noContact" : no_contact, "useing" : useing, "unuseing" : unuseing
+				, "daysubscript" : daysubscript, "regulsubscript" : regulsubscript, "lastday" : lastday});
 			grid.readData();
 		}
 		//검색 초기화 이벤트
 		function reset(){
-			let companyName = document.querySelector('#companyName');
-	
+			let companyName = document.querySelector('#companyName2');
 			companyName.value = '';
+			document.querySelector('#ok_contact').checked = true;
+			document.querySelector('#no_contact').checked = true;
+			document.querySelector('#useing').checked = true;
+			document.querySelector('#unuseing').checked = true;
+			document.querySelector('#daysubscript').checked = true;
+			document.querySelector('#regulsubscript').checked = true;
+			document.querySelector('#lastday').checked = false;
+
+			
 			
 			grid.setRequestParams({"companyName" : companyName.value })
 			grid.readData();
@@ -821,7 +816,7 @@
 					},
 					{ header: "거래명세서", name: "transactionstatement", editor: 'text', align: "center", width: "80",
 						formatter: function({ row }) {
-					        return `<button class="btn btn-info btn-sm sub-bill" data-id="${row.subscriptionNum}">명세서</button>`;
+					        return `<button class="btn btn-outline-primary btn-sm sub-bill" data-id="${row.subscriptionNum}">명세서</button>`;
 					    },
 					},
 					{ header: "세금계산서", name: "taxinvoice", editor: 'text', align: "center", width: "80",
@@ -830,9 +825,9 @@
 								return `발행불가`;
 							}else{
 								if(row.billNum){
-									return `<button class="btn btn-info btn-sm sub-tax" data-id="${row.subscriptionNum}_1">보기</button>`;
+									return `<button class="btn btn-outline-primary btn-sm sub-tax" data-id="${row.subscriptionNum}_1">보기</button>`;
 								}else{
-						        	return `<button class="btn btn-info btn-sm sub-tax" data-id="${row.subscriptionNum}_2">발행</button>`;							
+						        	return `<button class="btn btn-outline-primary btn-sm sub-tax" data-id="${row.subscriptionNum}_2">발행</button>`;							
 								}							
 							}
 					    },
@@ -844,9 +839,9 @@
 									return `발행불가`;
 								}else{
 									if(row.billNum){
-										return `<button class="btn btn-info btn-sm sub-cash" data-id="${row.subscriptionNum}_1">보기</button>`;
+										return `<button class="btn btn-outline-primary btn-sm sub-cash" data-id="${row.subscriptionNum}_1">보기</button>`;
 									}else{
-							        	return `<button class="btn btn-info btn-sm sub-cash" data-id="${row.subscriptionNum}_2">발행</button>`;							
+							        	return `<button class="btn btn-outline-primary btn-sm sub-cash" data-id="${row.subscriptionNum}_2">발행</button>`;							
 									}								
 								}
 							}else{
@@ -1018,26 +1013,6 @@
 			});
 			//명세서버튼 클릭 끝
 			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
 			//아무셀 클릭
 			sublistgrid.on('click', function (ev) {
 				//버튼 클릭이면 전체 클릭 이벤트 발생 안하게 하기
@@ -1073,15 +1048,16 @@
 			                let modalContent = "";
 
 			                data.forEach((item, index) => {
-			                    modalContent += `
-			                        <div class="p-2 border-bottom">
-			                            <h6><strong>${index + 1}. ${item.subscriptionName}</strong></h6>
-			                            <p>구독옵션: ${item.subscriptionOption}</p>
-			                            <p>구독가격: ${item.subscriptionOptionPrice}원</p>
-			                        </div>
+			                	modalContent += `
+			                		<div class="subscription-card">
+				                        <span class="icon">✅</span>
+				                        <strong class="service-name">${index + 1}. ${item.subscriptionName}</strong>
+				                        <span class="icon">📌</span> <span>구독옵션: ${item.subscriptionOption}</span>
+				                        <span class="icon">💸 <span>구독금액: <strong>${item.subscriptionOptionPrice}</strong></span>
+				                    </div>
 			                    `;
-			                    console.log(modalContent);
 			                });
+		                    console.log(modalContent);
 
 			                document.querySelector("#subinfolistModal .modal-body").innerHTML = modalContent;
 
@@ -1128,25 +1104,25 @@
 				let servicetag2 = `
 						<div class="service-item">
 				           <span>✅ <strong>그룹웨어 서비스</strong></span>
-				           <span>👥 사용자: 미사용</span>
+				           <span>👥 그룹웨어: 미사용</span>
 				       </div>	
 					`;
 				let servicetag3 = `
 						<div class="service-item">
 				           <span>✅ <strong>인사관리 서비스</strong></span>
-				           <span>👥 사용자: 미사용</span>
+				           <span>📌 인사관리: 미사용</span>
 				       </div>	
 					`;
 				let servicetag4 = `
 						<div class="service-item">
 				           <span>✅ <strong>지점관리 서비스</strong></span>
-				           <span>👥 사용자: 미사용</span>
+				           <span>📌 지점관리: 미사용</span>
 				       </div>	
 					`;
 				let servicetag5 = `
 						<div class="service-item">
 				           <span>✅ <strong>회계관리 서비스</strong></span>
-				           <span>👥 사용자: 미사용</span>
+				           <span>📌 회계관리: 미사용</span>
 				       </div>	
 					`;
 				
@@ -1178,7 +1154,7 @@
 							servicetag2 = `
 								<div class="service-item">
 						           <span>✅ <strong>그룹웨어 서비스</strong></span>
-						           <span>👥 사용자: 미사용</span>
+						           <span>👥 그룹웨어: 미사용</span>
 						       </div>	
 							`;
 						}else{
@@ -1196,7 +1172,7 @@
 							servicetag3 = `
 								<div class="service-item">
 						           <span>✅ <strong>인사관리 서비스</strong></span>
-						           <span>👥 사용자: 미사용</span>
+						           <span>📌 인사관리: 미사용</span>
 						       </div>	
 							`;
 						}else{
@@ -1217,7 +1193,7 @@
 							servicetag4 = `
 								<div class="service-item">
 						           <span>✅ <strong>지점관리 서비스</strong></span>
-						           <span>👥 사용자: 미사용</span>
+						           <span>📌 지점관리: 미사용</span>
 						       </div>	
 							`;
 						}else{
@@ -1238,7 +1214,7 @@
 							servicetag5 = `
 								<div class="service-item">
 						           <span>✅ <strong>회계관리 서비스</strong></span>
-						           <span>👥 사용자: 미사용</span>
+						           <span>📌 회계관리: 미사용</span>
 						       </div>	
 							`;
 						}else{

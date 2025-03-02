@@ -29,6 +29,7 @@ import lombok.extern.log4j.Log4j2;
  *   수정일      수정자          수정내용
  *  -------    --------    ---------------------------
  *  2025.02.12  표하연          최초 생성
+ *  2025.03.02  표하연          문의페이지 작성
  *
  *  </pre>
 */
@@ -80,6 +81,29 @@ public class ErpAdminController {
         }
         
         return "erp/admin";
+	}
+	
+	/**
+     * ERP 관리자 문의 페이지 연결
+     *
+     * @param Model
+     * @param HttpServletRequest
+     * @param HttpSession
+     * @return String
+     */
+	@GetMapping("/cs")
+	public String cs(Model model, HttpServletRequest request, HttpSession session) {
+		CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
+        if (csrfToken != null) {
+            model.addAttribute("_csrf", csrfToken);
+        }
+        //서버단에서 사전 차단
+        Object ErpEmployeeInfo = session.getAttribute("ErpEmployeeInfo");
+        // 세션이 없으면 로그인 페이지로 리다이렉트
+        if (ErpEmployeeInfo == null) {
+            return "redirect:/erp/login";
+        }
+        return "erp/cs";
 	}
 	
 	/**

@@ -270,7 +270,7 @@
           tag += `[인사관리 : ${window.subscriptionState.hrObjdate}일 / 지점관리 : ${window.subscriptionState.pointObjdate}일 / 회계관리 : ${window.subscriptionState.accountObjdate}일] 남았습니다.`;
           document.querySelector(".addService").insertAdjacentHTML("beforeend", tag);
             
-        }, 500);
+        }, 700);
         
         async function hr_list(data){
         	const url = "/erp/rest/hrlist/"+data;

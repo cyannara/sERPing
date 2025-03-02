@@ -25,6 +25,7 @@ import lombok.extern.log4j.Log4j2;
  *   수정일      수정자          수정내용
  *  -------    --------    ---------------------------
  *  2025.02.16  표하연          최초 생성
+ *  2025.03.02  표하연          회사정보를 업데이트 한다
  *
  *  </pre>
 */
@@ -60,6 +61,16 @@ public class ErpAdminLoginServiceImpl implements ErpAdminLoginService{
 	@Override
 	public boolean loginCount(String employeeId) {
 		return erpAdminLoginMapper.loginCount(employeeId) >= 1 ? true:false;
+	}
+
+	/**
+     * 회사정보를 업데이트 한다
+     *
+     * @return void
+     */
+	@Override
+	public void companystateupdate() {
+		erpAdminLoginMapper.companystateupdate();
 	}
 
 }

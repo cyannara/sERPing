@@ -17,7 +17,7 @@
 	*  2025.02.14  표하연          회사신규등록(회사,cs,최고관리자,구독정보목록생성)
 	*  2025.02.15  표하연          회사정보수정 및 기본cs를 등록한다
 	*  2025.02.25  표하연          회사의 구독현황을 조회한다 [ServiceReturnDTO]
-	*  2025.02.28  표하연          불특정 다수의 문의들 등록 한다
+	*  2025.02.28  표하연          불특정 다수의 문의를 crud 한다
 	*
 	*  </pre>
 ======================================================== -->
@@ -122,10 +122,35 @@
      *
 	-->
 	<sql id="searchInfo">
-		<if test="companyName != null and ! companyName.equals('')">
-			AND company_name Like '%' || #{companyName} || '%'
+	    <if test="companyName != null and companyName != ''">
+	        AND c.company_name Like '%' || #{companyName} || '%'
+	    </if>
+	    <if test="contact != null and (contact == 1 or contact == 2)">
+	        AND d.contract_num 
+	        <choose>
+	        	<when test="contact == 1">is not null</when>
+	            <when test="contact == 2">is NULL</when>
+	        </choose>
+	    </if>
+	    <if test="service != null and (service == 1 or service == 2)">
+	        AND c.service_state = 
+	        <choose>
+	            <when test="service == 1">'EC01'</when>
+	            <when test="service == 2">'EC03'</when>
+	        </choose>
+	    </if>
+	    <if test="subform != null and (subform == 1 or subform == 2)">
+	        AND l.subscription_form = 
+	        <choose>
+	            <when test="subform == 1">'EL01'</when>
+	            <when test="subform == 2">'EL02'</when>
+	        </choose>
+	    </if>
+	    <if test="lastday">
+		    AND l.subscription_end_date BETWEEN #{startday} AND #{endday}
 		</if>
 	</sql>
+
 	
 	<!-- 
      * ERP 신규회사 정보를 등록한다
@@ -428,5 +453,105 @@
 			#{inquiryContent}, 
 			DEFAULT 
 		)
+	</insert>
+	
+	<!-- 
+     * 불특정 다수의 문의를 조회한다
+     *
+     * @param ErpSearchDTO
+     * @return int
+	-->
+	<select id="usecslist" resultType="ErpInquiryDTO">
+	SELECT *
+		FROM (
+		    SELECT A.*, ROWNUM RN
+		    FROM (
+				select 
+				    inquiry_num,
+				    company_name,
+				    charger_name,
+				    charger_phone,
+				    charger_email,
+				    inquiry_content,
+				    inquiry_date,
+				    (
+				        select count(*)
+				        from erp_answer
+				        where inquiry_num = i.inquiry_num
+				    ) as cnt_inquiry
+				from erp_inquiry i
+				<where>
+					<include refid="okquery"></include>
+				</where> 
+				order by i.inquiry_date DESC
+				) A
+			<![CDATA[
+		     WHERE ROWNUM <= #{end}
+		    ]]>
+	    )
+	    <![CDATA[
+			WHERE RN >= #{start}
+		]]>	
+	</select>
+	
+	<!-- 
+     * 불특정 다수의 문의를 조회한다
+     *
+     * @param ErpSearchDTO
+     * @return int
+	-->
+	<select id="usecslistcount">
+		select 
+		    count(*)
+		from erp_inquiry i
+		<where>
+			<include refid="okquery"></include>
+		</where> 
+	</select>
+	
+	
+	<!-- 
+     * usecslist(문의전체조회) / usecslistcount(문의전체갯수조회) 에 사용
+     *
+     *
+	-->
+	<sql id="okquery">
+	    <if test="okcunt != null and okcunt != ''">
+	        (
+		        select count(*)
+		        from erp_answer
+		        where inquiry_num = i.inquiry_num
+		    ) = 0
+	    </if>
+	</sql>
+	
+	<!-- 
+     * 불특정 다수의 문의에 대한 답변을 조회한다
+     *
+     * @param int
+     * @return List<ErpAnswerDTO>
+	-->
+	<select id="requestlist" resultType="ErpAnswerDTO">
+		select
+		    answer_num,
+		    inquiry_num,
+		    employee_num,
+		    erp_employee_name(employee_num) as employee_name,
+		    answer_content,
+		    answer_date
+		from erp_answer
+		where inquiry_num = #{inquiryNum}
+		order by answer_date DESC
+	</select>
+	
+	<!-- 
+     * 불특정 다수의 문의에 대한 답변을 등록한다
+     *
+     * @param ErpAnswerDTO
+     * @return int
+	-->
+	<insert id="registerquest" parameterType="ErpAnswerDTO">
+		insert into erp_answer
+			values (erp_answer_seq.nextval, #{inquiryNum}, #{employeeNum}, #{answerContent}, sysdate)
 	</insert>
 </mapper>

@@ -13,6 +13,8 @@ import com.beauty1nside.common.mapper.ErpComMapper;
 import com.beauty1nside.erp.dto.CompanyListDTO;
 import com.beauty1nside.erp.dto.ContactRequestDTO;
 import com.beauty1nside.erp.dto.CustomerServiceDTO;
+import com.beauty1nside.erp.dto.ErpAnswerDTO;
+import com.beauty1nside.erp.dto.ErpInquiryDTO;
 import com.beauty1nside.erp.dto.ErpSearchDTO;
 import com.beauty1nside.erp.dto.ServiceReturnDTO;
 import com.beauty1nside.erp.dto.testDTO;
@@ -38,7 +40,7 @@ import lombok.extern.log4j.Log4j2;
  *  2025.02.13  표하연          회사영문코드 중복처리
  *  2025.02.14  표하연          회사신규등록(회사,cs,최고관리자,구독정보목록생성)
  *  2025.02.25  표하연          회사의 구독현황을 조회한다 [ServiceReturnDTO]
- *  2025.02.28  표하연          불특정 다수의 문의들 등록 한다
+ *  2025.02.28  표하연          불특정 다수의 문의를 crud 한다
  *
  *  </pre>
 */
@@ -338,5 +340,49 @@ public class ErpAdminServiceImpl implements ErpAdminService {
 	@Override
 	public boolean insertNewQuery(ContactRequestDTO dto) {
 		return erpAdminMapper.insertNewQuery(dto) >= 1 ? true:false;
+	}
+
+	/**
+     * 불특정 다수의 문의를 조회한다
+     *
+     * @param ErpSearchDTO
+     * @return List<ErpInquiryDTO>
+     */
+	@Override
+	public List<ErpInquiryDTO> usecslist(ErpSearchDTO searchDTO) {
+		return erpAdminMapper.usecslist(searchDTO);
+	}
+
+	/**
+     * 불특정 다수의 문의 전체 갯수를 조회한다
+     *
+     * @param ErpSearchDTO
+     * @return int
+     */
+	@Override
+	public int usecslistcount(ErpSearchDTO searchDTO) {
+		return erpAdminMapper.usecslistcount(searchDTO);
+	}
+
+	/**
+     * 불특정 다수의 문의에 대한 답변을 조회한다
+     *
+     * @param int
+     * @return List<ErpAnswerDTO>
+     */
+	@Override
+	public List<ErpAnswerDTO> requestlist(int inquiryNum) {
+		return erpAdminMapper.requestlist(inquiryNum);
+	}
+
+	/**
+     * 불특정 다수의 문의에 대한 답변을 등록한다
+     *
+     * @param ErpAnswerDTO
+     * @return boolean
+     */
+	@Override
+	public boolean registerquest(ErpAnswerDTO dto) {
+		return erpAdminMapper.registerquest(dto) >= 1 ? true:false;
 	}
 }

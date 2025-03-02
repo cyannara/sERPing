@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<!-- =======================================================
+	* ERP홈페이지 불특정 다수의 문의를 관리하는 페이지
+	* @author ERP 관리자 개발팀 표하연
+	* @since 2025.03.02
+	* @version 1.0
+	* @see
+	*
+	* <pre>
+	* << 개정이력(Modification Information) >>
+	*
+	*   수정일      수정자          수정내용
+	*  ======    =======    ==============================
+	*  2025.03.02  표하연          최초생성
+	*
+	*  </pre>
+======================================================== -->
+<html layout:decorate="~{/erp/layouts/main}">
+<div class="container w-100 mw-1600" layout:fragment="content">
+	<div class="d-flex justify-content-center">
+		<div class="d-flex flex-row mt-3 mb-3">
+			<div class="p-2">
+				<div class="appendsection2">
+					<div class="card">
+						<h3 class="card-title">📋 문의 내역</h3>
+						<div class="form-check mt-2 p-0"
+							style="position: absolute; z-index: 999;">
+							<input type="checkbox" class="btn-check" id="okquery"
+								autocomplete="off"> <label
+								class="btn btn-outline-primary" for="okquery">미답변만</label>
+						</div>
+						<div class="service-list">
+							<div id="grid"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="p-0">
+				<div class="d-flex flex-column mb-3">
+					<div class="p-2">
+						<div class="appendsection2">
+							<div class="card">
+								<h3 class="card-title">📋 문의 상세</h3>
+								<div class="service-list">
+									<form class="row g-3">
+										<input type="hidden" id="inquiryNum" name="inquiryNum" value="">
+										<div class="col-6">
+											<label for="companyName" class="form-label m-0">회사명</label>
+											<input type="text" class="form-control" id="companyName" readonly="readonly">
+										</div>
+										<div class="col-6">
+											<label for="chargerEmail" class="form-label m-0">이메일</label>
+											<input type="email" class="form-control" id="chargerEmail" readonly="readonly">
+										</div>
+										<div class="col-3 m-0">
+											<label for="chargerName" class="form-label m-0">담당자명</label>
+											<input type="text" class="form-control" id="chargerName" readonly="readonly">
+										</div>
+										<div class="col-4 m-0">
+											<label for="chargerPhone" class="form-label m-0">연락처</label>
+											<input type="tel" class="form-control" id="chargerPhone" readonly="readonly">
+										</div>
+										<div class="col-5 m-0">
+											<label for="inquiryDate" class="form-label m-0">문의일시</label>
+											<input type="text" class="form-control" id="inquiryDate" readonly="readonly">
+										</div>
+										<div class="col-12 m-0">
+											<label for="inquiryContent" class="form-label m-0">문의내용</label>
+											<textarea class="form-control overflow-scroll" id="inquiryContent" readonly="readonly"></textarea>
+										</div>
+										<div class="col-11 m-0">
+											<label for="requestquery" class="form-label m-0">처리등록</label>
+											<textarea class="form-control overflow-scroll" id="requestquery"></textarea>
+										</div>
+										<div class="col-1 m-0 pt-4">
+											<button type="submit" class="btn btn-primary w-100 h-100 registerbtn">등록</button>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="ps-2 pe-2">
+						<div class="appendsection2">
+							<div class="card overflow-scroll" style="height:410px;">
+								<h3 class="card-title">📋 처리 기록</h3>
+								<div class="service-list requestlst"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script th:inline="javascript">
+	//클릭한 행의 정보를 담는 전역 변수
+	var rowData = false;
+	//현재 그리드에 강조된행을 기록할 변수
+	let selectedRowKey = null;
+	//로그인된 사용자 정보
+	let employeeNum = ErpEmployeeInfo.employeeNum;
+	//페이지 로드후 처리할 이벤트들
+	document.addEventListener("DOMContentLoaded", function() {
+	});
+	
+	//그리드 선언
+	var Grid = tui.Grid;
+	const dataSource = {
+		api : {
+			readData: { url: '/erp/rest/usecslist', method: 'GET'},
+		},
+		contentType : 'application/json',
+	};
+
+	//그리드 생성
+	const grid = new Grid({
+		el : document.getElementById('grid'), // 컨테이너 엘리먼트
+		scrollX: false,
+	    scrollY: false,
+	    minBodyHeight: 680,
+	    columnOptions: {
+	        resizable: true
+	    },
+		pageOptions : {
+			useClient : false, //페이지 네이션 할꺼면 false // 자동으로 하게할껴면 true
+			perPage : 17, //한페이지에 몇개 보여줄지
+		},
+		//칼럼 정하기
+		columns: [
+			{ header: "번호", name: "inquiryNum", editor: 'text', align: "center", width: "50" },
+			{ header: "회사명", name: "companyName", editor: 'text', align: "center" },
+			{ header: "담당자명", name: "chargerName", editor: 'text', align: "center", width: "100" },
+			{ header: "담당자연락처", name: "chargerPhone", editor: 'text', align: "center", width: "120" },
+			//{ header: "이메일", name: "chargerEmail", editor: 'text', align: "center", width: "200" },
+			//{ header: "문의내용", name: "inquiryContent", editor: 'text', align: "center" },
+			{ header: "등록일", name: "inquiryDate", editor: 'text', align: "center", width: "150",
+				formatter: function({ value }) {
+					return subscriptday(value);
+			    },
+			},
+			{ header: "처리여부", name: "cntInquiry", editor: 'text', align: "center", width: "100",
+				formatter: function({ value }) {
+					if(value >= 1){
+						return `처리완료`;
+					}else{
+						return `미처리`;
+					}
+			    },
+			},
+		],
+		//초기 데이터 뭘로 할지
+		data : dataSource,
+	});
+	
+	//행선택
+	grid.on('click', function (ev) {
+		if (ev.rowKey !== null) {
+			//현재 강조된 행 클래스 초기화
+			if (selectedRowKey !== null) {
+	            grid.removeRowClassName(selectedRowKey, 'tui-grid-row-highlight');
+	        }
+			// 클릭한 행에 강조 효과 추가
+			grid.addRowClassName(ev.rowKey, 'tui-grid-row-highlight');
+			 // 현재 강조된 행을 기록
+	        selectedRowKey = ev.rowKey;
+			
+			rowData = grid.getRow(ev.rowKey);
+			//console.log(`클릭한 행 데이터:\n${JSON.stringify(rowData, null, 2)}`);
+			
+			document.querySelector("#inquiryNum").value = rowData.inquiryNum;
+			document.querySelector("#companyName").value = rowData.companyName;
+			document.querySelector("#chargerName").value = rowData.chargerName;
+			document.querySelector("#chargerPhone").value = rowData.chargerPhone;
+			document.querySelector("#chargerEmail").value = rowData.chargerEmail;
+			document.querySelector("#inquiryContent").value = rowData.inquiryContent;
+			document.querySelector("#inquiryDate").value = subscriptday(rowData.inquiryDate);
+			
+			requesthistory(rowData.inquiryNum);
+		}
+	});
+	
+	//처리기록 함수
+	function requesthistory(number){
+		document.querySelector(".requestlst").innerHTML = '';
+		const url = `/erp/rest/requestlist/`+number;
+		fetch(url, {
+			method:"get",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		})
+		.then(result => result.json())
+		.then(result => {
+			if (Array.isArray(result) && result.length > 0) {
+			    result.forEach(ele => {
+			        let cstag = `
+			            <div class="p-2 mb-2">
+			                <table id="answerTable">
+			                    <tr>
+			                        <th style="width:100px;height:40px;">처리번호</th>
+			                        <td style="width:70px;">${ele.answerNum || "N/A"}</td>
+			                        <th style="width:100px;">처리담당자</th>
+			                        <td style="width:70px;">${ele.employeeName || "N/A"}</td>
+			                        <th style="width:100px;">처리일시</th>
+			                        <td>${ele.answerDate ? subscriptday(ele.answerDate) : "N/A"}</td>
+			                    </tr>
+			                    <tr>
+			                        <th>처리내용</th>
+			                        <td class="p-3" colspan="5">
+			                            ${ele.answerContent ? ele.answerContent.replace(/\n/g, '<br>') : "내용 없음"}
+			                        </td>
+			                    </tr>
+			                </table>
+			            </div>
+			        `;
+			        document.querySelector(".requestlst").insertAdjacentHTML("beforeend", cstag);
+			    });
+			} else {
+			    let emptyCstag = `
+			        <div class="p-2 mb-2">
+			            <table id="answerTable">
+			                <tr>
+			                    <th style="width:100px;height:40px;">처리번호</th>
+			                    <td style="width:70px;">N/A</td>
+			                    <th style="width:100px;">처리담당자</th>
+			                    <td style="width:70px;">N/A</td>
+			                    <th style="width:100px;">처리일시</th>
+			                    <td>N/A</td>
+			                </tr>
+			                <tr>
+			                    <th>처리내용</th>
+			                    <td class="p-3" colspan="5">등록된 처리이 없습니다.</td>
+			                </tr>
+			            </table>
+			        </div>
+			    `;
+			    document.querySelector(".requestlst").insertAdjacentHTML("beforeend", emptyCstag);
+			}
+		})
+	}
+	
+	//날짜 변환함수
+	function subscriptday(value){
+		const utcDate = new Date(value);
+		// 한국 시간(KST)으로 변환 (24시간 형식 유지)
+		const options = { 
+		    year: 'numeric', month: '2-digit', day: '2-digit',
+		    hour: '2-digit', minute: '2-digit', second: '2-digit',
+		    hour12: false, timeZone: "Asia/Seoul"
+		};
+		// `toLocaleString` 사용하여 변환 후, 포맷을 `yyyy-MM-dd HH:mm:ss`로 조정
+		const kstDate = new Intl.DateTimeFormat("ko-KR", options).format(utcDate)
+		    .replace(/\./g, '-') // yyyy.MM.dd → yyyy-MM-dd 로 변환
+		    .replace(/ /g, '')    // 공백 제거
+		    .trim();
+		return kstDate;
+	}
+	
+	//미답변만 보기
+	document.querySelector("#okquery").addEventListener("click",function(){
+		if(document.querySelector('#okquery').checked){
+			grid.setRequestParams({"okcunt" : "OK"});
+			grid.readData();			
+		}else{
+			grid.setRequestParams({"okcunt" : null});
+			grid.readData();
+		}
+	});
+	
+	//처리등록버튼
+	document.querySelector(".registerbtn").addEventListener("click", handleSubmit);
+	/* document.querySelector("#requestquery").addEventListener("keydown", function (event) {
+	    if (event.key === "Enter") {
+	        handleSubmit(event);
+	    }
+	}); */
+	function handleSubmit(event) {
+	    event.preventDefault(); // 기본 동작(폼 제출) 방지
+	    // 문의번호
+	    let inquiryNum = document.querySelector("#inquiryNum").value;
+	    if (!inquiryNum) {
+	        return;
+	    }
+	    // 문의내용
+	    let requestquery = document.querySelector("#requestquery").value;
+	    const requestObj = {
+	        inquiryNum: parseInt(inquiryNum),
+	        answerContent: requestquery,
+	        employeeNum: employeeNum,
+	    };
+
+		const url = `/erp/rest/registerquest`;
+		fetch( url, {
+			method : "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body : JSON.stringify(requestObj),
+		})
+		.then( result => result.text() )
+		.then( result => {
+			if(result=="OK"){
+				requesthistory(inquiryNum);
+				grid.reloadData();
+				document.querySelector("#requestquery").value = '';
+				setTimeout(() => {
+		            grid.addRowClassName(selectedRowKey, 'tui-grid-row-highlight');
+		        }, 500);
+			}else{
+			}
+		})
+	}
+	</script>
+</div>

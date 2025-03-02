@@ -211,20 +211,17 @@
 	    border-radius: 10px;
 	    box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.1);
 	}
-	
 	.card-title {
 	    text-align: center;
 	    font-size: 30px;
 	    font-weight: bold;
 	    margin-bottom: 15px;
 	}
-	
 	.service-list {
 	    display: flex;
 	    flex-direction: column;
 	    gap: 10px;
 	}
-	
 	.service-item {
 	    background: white;
 	    padding: 10px;
@@ -242,6 +239,39 @@
 	    padding: 5px;
 	    border-radius: 5px;
 	}
+	fieldset {
+	    position: relative;
+	    border: 1px solid #19875455;
+	    padding: 10px;
+	    border-radius: 7px;
+	}
+	.fieldset-container {
+	    display: flex;
+	    gap: 10px; /* 버튼 간격 조절 */
+	    align-items: center;
+	}
+	legend {
+	    position: absolute;
+	    top: -12px; /* 원하는 위치 조정 */
+	    left: 10px;
+	    font-size: 15px;
+	    background-color: #cfe2ff;
+	    display: inline-block;
+	    width: auto;
+	}
+	.subscription-card {
+	    background: #f9f9f9; /* 부드러운 배경 */
+	    border-radius: 12px; /* 둥근 모서리 */
+	    padding: 15px;
+	    margin-bottom: 10px;
+	    box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 */
+	    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+	}
+	.subscription-card:hover {
+	    transform: translateY(-2px); /* 마우스를 올리면 살짝 위로 이동 */
+	    box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
+	}
+			
 </style>
 
 </head>

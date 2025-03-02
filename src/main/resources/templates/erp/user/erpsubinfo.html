@@ -65,103 +65,182 @@
 		.tui-grid-body-area {
 			height: 217px !important;
 		}
+		.card {
+		    width: 100%;
+		    height: 100%;
+		    background-color: #f8f9fa; /* 밝은 배경 */
+		    padding: 20px;
+		    border-radius: 10px;
+		    box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.1);
+		}
+		.card-title {
+		    text-align: center;
+		    font-size: 30px;
+		    font-weight: bold;
+		    margin-bottom: 15px;
+		}
+		.service-list {
+		    display: flex;
+		    flex-direction: column;
+		    gap: 10px;
+		}
+		.service-item {
+		    background: white;
+		    padding: 10px;
+		    border-radius: 8px;
+		    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+		    font-size: 16px;
+		    line-height: 1.6;
+		}
+		.appendsection2 {
+		    display: flex;
+		    flex-direction: column; /* 세로 정렬 */
+		    align-items: center; /* 가로 중앙 정렬 */
+		    justify-content:center;
+		    width: 100%;
+		    height: 100%;
+		}
 	</style>
 	<div class="container">
 		<div class="row">
 			<div class="h3 pb-2 mb-2 text-black border-bottom border-secondary">
-				구독현황
+				구독조회
 			</div>
 			<div class="col-md-6 stretch-card mt-2 mb-2">
 				<div class="card">
-					<div class="card-body">
-						<h6 class="mb-4">구독정보</h6>
-						<div id="subDetailgrid"></div>
-					</div>
+					<h3 class="card-title">📋 결제 상세</h3>
+					<div id="subDetailgrid"></div>
 				</div>
 			</div>
-			<div class="col-md-6 stretch-card mt-2 mb-2" style="height: 345px;">
-				<div class="card">
-					<div class="card-body">
-						<h6 class="mb-4">나의구독</h6>
-						
+			<div class="col-md-6 stretch-card mt-2 mb-2">
+				<div class="appendsection2">
+					<div class="card">
+						<h3 class="card-title">📋 구독 현황</h3>
+						<div class="service-list">
+							<div class="service-item">
+								<span>✅ <strong>sERPing 서비스</strong></span>
+								<span id="subObj"></span>
+								<span id="subObjdate"></span> <span id="subObjdateDay"></span>
+							</div>
+							<div class="service-item">
+								<span>✅ <strong>그룹웨어 서비스</strong></span>
+								<span id="gpOption"></span>
+								<span id="groupObj"></span>
+							</div>
+							<div class="service-item">
+								<span>✅ <strong>인사관리 서비스</strong></span>
+								<span id="hrObj"></span>
+								<span id="hrObjdate"></span>
+							</div>
+							<div class="service-item">
+								<span>✅ <strong>지점관리 서비스</strong></span>
+								<span id="pointObj"></span>
+								<span id="pointObjdate"></span>
+							</div>
+							<div class="service-item">
+								<span>✅ <strong>회계관리 서비스</strong></span>
+								<span id="accountObj"></span>
+								<span id="accountObjdate"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!--
+					<div class="card">
+						<div class="card-body">
+							<h6 class="mb-4">나의구독</h6>
+
 							<div id="custom-container">
 								<div class="d-flex">
 									<div class="p-1 flex-fill">
 										<div class="d-flex">
-											<div class="p-1 flex-fill bg-primary-subtle">
-												구독형태
-											</div>
-											<div class="p-1 flex-fill border border-primary-subtle border-2">
-												<span id=subObj></span>
+											<div class="p-1 flex-fill bg-primary-subtle">구독형태</div>
+											<div
+												class="p-1 flex-fill border border-primary-subtle border-2">
+												<span id="subObj"></span>
 											</div>
 										</div>
 									</div>
 									<div class="p-1 flex-fill">
 										<div class="d-flex">
-											<div class="p-1 flex-fill bg-primary-subtle">
-												남은기간
-											</div>
-											<div class="p-1 flex-fill border border-primary-subtle border-2">
+											<div class="p-1 flex-fill bg-primary-subtle">남은기간</div>
+											<div
+												class="p-1 flex-fill border border-primary-subtle border-2">
 												<span id="subObjdate"></span>
 											</div>
 										</div>
 									</div>
 									<div class="p-1 flex-fill">
 										<div class="d-flex">
-											<div class="p-1 flex-fill bg-primary-subtle">
-												만료일
-											</div>
-											<div class="p-1 flex-fill border border-primary-subtle border-2">
+											<div class="p-1 flex-fill bg-primary-subtle">만료일</div>
+											<div
+												class="p-1 flex-fill border border-primary-subtle border-2">
 												<span id="subObjdateDay"></span>
 											</div>
 										</div>
 									</div>
 								</div>
 							</div>
-							<div class="d-flex justify-content-center" style="font-size: 20px;">
+							<div class="d-flex justify-content-center"
+								style="font-size: 20px;">
 								<div class="d-flex flex-column mb-3">
 									<div class="p-1 bg-primary-subtle">부가서비스</div>
-									<div class="p-1 bg-primary-subtle border border-primary-subtle border-2 border-bottom-0">남은기간</div>
-									<div class="p-1 bg-primary-subtle border border-primary-subtle border-2">만료일</div>
+									<div
+										class="p-1 bg-primary-subtle border border-primary-subtle border-2 border-bottom-0">남은기간</div>
+									<div
+										class="p-1 bg-primary-subtle border border-primary-subtle border-2">만료일</div>
 								</div>
-								<!-- 
-								<div class="d-flex flex-column mb-3">
-									<div class="p-1 bg-primary-subtle"><span id=subObj></span></div>
-									<div class="p-1 border border-primary-subtle border-2 border-bottom-0"><span id="subObjdate"></span></div>
-									<div class="p-1 border border-primary-subtle border-2"><span id="subObjdateDay"></span></div>
-								</div>
-								 -->
 								<div class="d-flex flex-column mb-3">
 									<div class="p-1 bg-primary-subtle">그룹웨어</div>
-									<div class="p-1 border border-primary-subtle border-2 border-bottom-0"><span id="gpOption"></span></div>
-									<div class="p-1 border border-primary-subtle border-2"><span id="groupObj"></span></div>
+									<div
+										class="p-1 border border-primary-subtle border-2 border-bottom-0">
+										<span id="gpOption"></span>
+									</div>
+									<div class="p-1 border border-primary-subtle border-2">
+										<span id="groupObj"></span>
+									</div>
 								</div>
 								<div class="d-flex flex-column mb-3">
 									<div class="p-1 bg-primary-subtle">인사관리</div>
-									<div class="p-1 border border-primary-subtle border-2 border-bottom-0"><span id="hrObj"></span></div>
-									<div class="p-1 border border-primary-subtle border-2"><span id="hrObjdate"></span></div>
+									<div
+										class="p-1 border border-primary-subtle border-2 border-bottom-0">
+										<span id="hrObj"></span>
+									</div>
+									<div class="p-1 border border-primary-subtle border-2">
+										<span id="hrObjdate"></span>
+									</div>
 								</div>
 								<div class="d-flex flex-column mb-3">
 									<div class="p-1 bg-primary-subtle">지점관리</div>
-									<div class="p-1 border border-primary-subtle border-2 border-bottom-0"><span id="pointObj"></span></div>
-									<div class="p-1 border border-primary-subtle border-2"><span id="pointObjdate"></span></div>
+									<div
+										class="p-1 border border-primary-subtle border-2 border-bottom-0">
+										<span id="pointObj"></span>
+									</div>
+									<div class="p-1 border border-primary-subtle border-2">
+										<span id="pointObjdate"></span>
+									</div>
 								</div>
 								<div class="d-flex flex-column mb-3">
 									<div class="p-1 bg-primary-subtle">회계관리</div>
-									<div class="p-1 border border-primary-subtle border-2 border-bottom-0"><span id="accountObj"></span></div>
-									<div class="p-1 border border-primary-subtle border-2"><span id="accountObjdate"></span></div>
+									<div
+										class="p-1 border border-primary-subtle border-2 border-bottom-0">
+										<span id="accountObj"></span>
+									</div>
+									<div class="p-1 border border-primary-subtle border-2">
+										<span id="accountObjdate"></span>
+									</div>
 								</div>
 							</div>
-						
+
+						</div>
 					</div>
+					-->
 				</div>
-			</div>
-			<div class="col-md-12 stretch-card mt-0 mb-2">
+				<div class="col-md-12 stretch-card mt-0 mb-2">
 				<div class="card">
-					<div class="card-body">
-						<h6 class="mb-2">구독목록</h6>
-						<div id="sublist"></div>
-					</div>
+					<h3 class="card-title">📋 구독 목록</h3>
+					<div id="sublist"></div>
 				</div>
 			</div>
 		</div>
@@ -206,75 +285,75 @@
 			
 			//subObj
 			if(window.subscriptionState.subObj=="date"){
-				subObj.innerHTML = "기간구독";
+				subObj.innerHTML = "📌 기간구독";
 			}else{
-				subObj.innerHTML = "정기구독";
+				subObj.innerHTML = "📌 정기구독";
 			}
 			//subObjdate //subObjdateDay
 			if(window.subscriptionState.subObjdate && window.subscriptionState.subObjdate != 0){
 				//만료 남은 기간
-				subObjdate.innerHTML = window.subscriptionState.subObjdate+"일";
+				subObjdate.innerHTML = "⏳ "+window.subscriptionState.subObjdate+"일 남음";
 				//만료일자
 				let today = new Date();
 				today.setDate(today.getDate()+window.subscriptionState.subObjdate);
 				let result = today.toISOString().split("T")[0];
-				subObjdateDay.innerHTML = result;
-				groupObj.innerHTML = result;
+				subObjdateDay.innerHTML = "📅 종료일: "+result;
+				groupObj.innerHTML = "📅 종료일: "+result;
 			}else{
-				subObjdate.innerHTML = "만료";
+				subObjdate.innerHTML = "⏳ 만료";
 				subObjdateDay.innerHTML = "-";
 			}
 			//gpOption
 			if(window.subscriptionState.gpOption=="50"){
-				gpOption.innerHTML = "50명";
+				gpOption.innerHTML = "👥 50명 (기본서비스)";
 			}else if(window.subscriptionState.gpOption=="100"){
-				gpOption.innerHTML = "100명";
+				gpOption.innerHTML = "👥 100명 (서비스)";
 			}else{
-				gpOption.innerHTML = "인원 무제한";
+				gpOption.innerHTML = "👥 무제한 (서비스)";
 			}
 			
 			//hrObj //hrObjdate
 			if(window.subscriptionState.hrObjdate && window.subscriptionState.hrObjdate != 0){
 				//만료 남은 기간
-				hrObj.innerHTML = window.subscriptionState.hrObjdate+"일";
+				hrObj.innerHTML = "⏳ "+window.subscriptionState.hrObjdate+"일 남음";
 				//만료일자
 				let today = new Date();
 				today.setDate(today.getDate()+window.subscriptionState.hrObjdate);
 				let result = today.toISOString().split("T")[0];
-				hrObjdate.innerHTML = result;
+				hrObjdate.innerHTML = "📅 종료일: "+result;
 			}else{
-				hrObj.innerHTML = "만료";
-				hrObjdate.innerHTML = "-";
+				hrObj.innerHTML = "⏳ 만료";
+				hrObjdate.innerHTML = "📅 종료일: -";
 			}
 			
 			//pointObj //pointObjdate
 			if(window.subscriptionState.pointObjdate && window.subscriptionState.pointObjdate != 0){
 				//만료 남은 기간
-				pointObj.innerHTML = window.subscriptionState.pointObjdate+"일";
+				pointObj.innerHTML = "⏳ "+window.subscriptionState.pointObjdate+"일 남음";
 				//만료일자
 				let today = new Date();
 				today.setDate(today.getDate()+window.subscriptionState.pointObjdate);
 				let result = today.toISOString().split("T")[0];
-				pointObjdate.innerHTML = result;
+				pointObjdate.innerHTML = "📅 종료일: "+result;
 			}else{
-				pointObj.innerHTML = "만료";
-				pointObjdate.innerHTML = "-";
+				pointObj.innerHTML = "⏳ 만료";
+				pointObjdate.innerHTML = "📅 종료일: -";
 			}
 			
 			//pointObj //pointObjdate
 			if(window.subscriptionState.accountObjdate && window.subscriptionState.accountObjdate != 0){
 				//만료 남은 기간
-				accountObj.innerHTML = window.subscriptionState.accountObjdate+"일";
+				accountObj.innerHTML = "⏳ "+window.subscriptionState.accountObjdate+"일 남음";
 				//만료일자
 				let today = new Date();
 				today.setDate(today.getDate()+window.subscriptionState.accountObjdate);
 				let result = today.toISOString().split("T")[0];
-				accountObjdate.innerHTML = result;
+				accountObjdate.innerHTML = "📅 종료일: "+result;
 			}else{
-				accountObj.innerHTML = "만료";
-				accountObjdate.innerHTML = "-";
+				accountObj.innerHTML = "⏳ 만료";
+				accountObjdate.innerHTML = "📅 종료일: -";
 			}
-		}, 500);
+		}, 1000);
 		
 		
 		//구독목록 그리드 선언
