@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.beauty1nside.bhf.dto.returninglist.BhfReturnListSearchDTO;
 import com.beauty1nside.bsn.dto.OrderSearchDTO;
+import com.beauty1nside.bsn.dto.cs.BsnReturningRefusalDTO;
+import com.beauty1nside.bsn.dto.cs.BsnReturningRegistDTO;
 import com.beauty1nside.bsn.dto.delivery.BsnDeliveryDTO;
 import com.beauty1nside.bsn.dto.delivery.BsnDeliveryDetailDTO;
 import com.beauty1nside.bsn.dto.order.BhfOrderDTO;
@@ -382,6 +384,43 @@ public class BsnRestController {
 		GridArray grid = new GridArray();
 		Object result = grid.getArray( paging.getPage(), bsnCsService.countBhfReturningList(dto), bsnCsService.bhfReturningDetail(dto) );
 		return result;
+	}
+	
+	@PostMapping("/cs/request/confirm")
+	public ResponseEntity<Map<String, Object>> csRequestconfirm(@RequestBody BsnReturningRegistDTO bsnReturningRegistDTO) {
+		Map<String, Object> response = new HashMap<>();
+		
+		
+		try {
+			bsnCsService.registBsnReturning(bsnReturningRegistDTO);
+			response.put("status", "success");
+	        response.put("message", "반품 및 교환 처리 성공");
+	        return ResponseEntity.ok(response); // JSON 형태 응답
+			
+		} catch (Exception e) {
+			log.error("주문 등록 실패", e);
+	        response.put("status", "error");
+	        response.put("message", "반품 및 교환 처리 실패");
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+		}
+		
+	}
+	@PutMapping("/cs/request/cancel")
+	public ResponseEntity<Map<String, Object>> csRequestCancle(@RequestBody BsnReturningRefusalDTO bsnReturningRefusalDTO){
+		Map<String, Object> response = new HashMap<>();
+		
+		try {
+			bsnCsService.cancleBsnReturning(bsnReturningRefusalDTO);
+			response.put("status", "success");
+	        response.put("message", "요청 취소 성공");
+	        return ResponseEntity.ok(response); // JSON 형태 응답
+			
+		} catch (Exception e) {
+			log.error("취소 실패", e);
+	        response.put("status", "error");
+	        response.put("message", "요청 취소 실패");
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+		}
 	}
 	
 }

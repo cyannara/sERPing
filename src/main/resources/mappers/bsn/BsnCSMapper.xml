@@ -5,6 +5,7 @@
 <!-- 교환및반품 조회 -->
 	<select id="selectBhfReturningList" resultType="BhfReturnListDTO" parameterType="BhfReturnListSearchDTO">
 		select returning_code, 
+		       branch_office_id,
 			   request_date, 
 			   progress_status, 
 			   return_remark
@@ -12,6 +13,7 @@
                          ORDER BY TO_NUMBER(REGEXP_SUBSTR(returning_code, '\d+')) desc
                       ) AS RN,
 					  returning_code, 
+					  branch_office_id,
 					  request_date, 
 					  progress_status, 
 					  return_remark
@@ -46,7 +48,8 @@
 	
 	<!-- 교환및반품 상세 조회 -->
 	<select id="selectBhfReturningDetail" resultType="BsnReturnListDTO" parameterType="BhfReturnListSearchDTO">
-		select goods_name, 
+		select returning_detail_code,
+		       goods_name, 
 		       goods_code,
 			   option_name, 
 			   option_code,
@@ -57,6 +60,7 @@
 			   goods_lot_num
 		from (select /*+INDEX_DESC(bhf_returning_detail pk_bhf_returning_detail)*/
 					 rownum rn, 
+					 returning_detail_code,
 					 goods_name, 
 					 goods_code,
 				     option_name, 
@@ -75,6 +79,23 @@
 			)
 		where rn >= #{start}
 	</select>
+	
+	<insert id="insertBsnCSReturningGoods" statementType="CALLABLE">
+	    call Bsn_Returning_Register(#{companyNum}, 
+	                                #{employeeNum},
+	                                #{branchOfficeId},
+	                                #{returningCode},
+	                                #{returningDetailData, typeHandler=com.beauty1nside.bsn.BsnReturningDtlArrayTypeHandler},
+	                                #{exchangeList, typeHandler=com.beauty1nside.bsn.BsnReturningDtlArrayTypeHandler},
+	                                #{warehousingList, typeHandler=com.beauty1nside.bsn.BsnReturningDtlArrayTypeHandler}
+	    )
+	</insert>
+	
+	<update id="cancelBsnCSReturningGoods">
+		UPDATE bhf_returning
+		SET    progress_status='취소', return_remark=#{returnRemark}
+		WHERE  returning_code = #{returningCode}
+	</update>
 	
 	
 

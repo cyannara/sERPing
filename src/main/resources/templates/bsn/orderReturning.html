@@ -96,15 +96,15 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		<div th:include="bsn/modal/bsnModalTemplate :: ModalTemplate(
 						    	'confirmCheckModal', 
 						    	'modal-md', 
-						    	'반품확인', 
+						    	'반품처리', 
 						    	'bsn/modal/bsnCsCheckReturning', 
 						    	'bsn/modal/bsnModalFooter')">
      	</div>
 		
 		<div th:include="bsn/modal/bsnModalTemplate :: ModalTemplate(
 						    	'csOrderRegisterModal', 
-						    	'modal-lg', 
-						    	'교환용 주문 재등록', 
+						    	'modal-md', 
+						    	'반품및교환처리', 
 						    	'bsn/modal/bsnCsOrdRegister', 
 						    	'bsn/modal/bsnModalFooter')">
      	</div>
@@ -125,12 +125,15 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	//회사번호
 	let sessioCompanyNum = [[${session.companyNum}]];
 	let departmentNum = [[${session.departmentNum}]];
-	let branchOfficeId = "";
+	let employeeNum = [[${session.employeeNum}]];
 	</script>
 	
 	<script>
 		var Grid = tui.Grid;
 		let returningCode;
+		let branchOfficeId;
+		
+		let returningData;
 		
 		
 		//페이지가 로드되면 테이블에 데이터가 없을때 뜨는 문구 함수 실행
@@ -156,6 +159,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 			},
 			columns: [ 
 				{ header : "교환및반품 코드", name : "returningCode"},
+				{ header : "지점ID", name: "branchOfficeId"},
 				{ header : "신청일자", name : "requestDate"},
 				{ header : "진행상태", name : "progressStatus"},
 				{ header : "비고", name : "returnRemark"}
@@ -168,8 +172,9 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 			if(rowKey != undefined){ 	// 행 말고 다른데 클릭해도 이 함수가 실행되서 행의 키값이 있을때만 실행되게 함
 				
 				const rowData = grid.getRow(rowKey); //해당 행의 데이터 가져오기
-				 returningCode = rowData.returningCode; // 교환및반품 코드
-				console.log(returningCode);
+				returningCode = rowData.returningCode; // 교환및반품 코드
+				branchOfficeId = rowData.branchOfficeId;
+				//console.log(returningCode, branchOfficeId);
 				
 				// 교환및반품 상세 조회 쿼리호출(orderCode)
 			    fetch('/bsn/rest/cs/request/detail?returningCode=' + returningCode, {
@@ -222,6 +227,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 				perPage: 5,
 			},
 			columns: [ 
+				//{ header : "상세코드", name : "returningDetailCode"},
 				{ header : "상품명", name : "goodsName"},
 				//{ header : "상품코드", name : "goodsCode"},
 				{ header : "옵션명", name : "optionName"},
@@ -231,7 +237,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 				//{ header : "사유", name : "returningReason", width: 'auto'},
 				//{ header : "바코드", name : "optionBarcode"},
 				//{ header : "LOT번호", name : "goodsLotNum"},
-				//{ header : '재입고수량', name: 'WareHousingQnt', editor: 'text',  },
+				//{ header : '재입고수량', name: 'warehousingQnt', editor: 'text',  },
 				//{ header : '폐기수량', name: 'DisuseQnt', editor: 'text',  }
 
 			],
@@ -254,14 +260,14 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 				//{ header : "사유", name : "returningReason"},
 				//{ header : "바코드", name : "optionBarcode"},
 				{ header : "LOT번호", name : "goodsLotNum"},
-				{ header : '재입고수량', name: 'wareHousingQnt', editor: 'text',  },
+				{ header : '재입고수량', name: 'warehousingQnt', editor: 'text',  },
 				{ header : '폐기수량', name: 'disuseQnt', editor: 'text',  }
 
 			],
 			data: ""
 		});
 		
-		//반품및 교환 처리 완료 버튼 이벤트
+		//반품및 교환 처리 완료버튼(처리 전 오류 체크)
 		document.getElementById('confirmButton').addEventListener('click', () => {
 			grid3.finishEditing();
 			
@@ -272,16 +278,16 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 				return;
 			}
 			
-			// wareHousingQnt 또는 disuseQnt 값이 null인 경우 체크
-		    const hasNullValues = returningDetailData.some(row => row.wareHousingQnt == null || row.disuseQnt == null);
+			// warehousingQnt 또는 disuseQnt 값이 null인 경우 체크
+		    const hasNullValues = returningDetailData.some(row => row.warehousingQnt == null || row.disuseQnt == null);
 		    if (hasNullValues) {
 		        showAlert('반품 처리할 항목 중 입력되지 않은 값이 있습니다.', 'danger');
 		        return;
 		    }
 		    
-		 	// wareHousingQnt 또는 disuseQnt에 숫자가 아닌 값이 있는지 확인
+		 	// warehousingQnt 또는 disuseQnt에 숫자가 아닌 값이 있는지 확인
 		    const hasInvalidNumbers = returningDetailData.some(row =>
-		        isNaN(Number(row.wareHousingQnt)) || isNaN(Number(row.disuseQnt))
+		        isNaN(Number(row.warehousingQnt)) || isNaN(Number(row.disuseQnt))
 		    );
 		    if (hasInvalidNumbers) {
 		        showAlert('반품 처리할 재입고 / 폐기 수량를 제대로 입력해 주세요.', 'danger');
@@ -289,15 +295,16 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		    }
 			
 		    
-		 	// wareHousingQnt + disuseQnt === quantity 검증
+		 	// warehousingQnt + disuseQnt === quantity 검증
 		    const isValidQuantity = returningDetailData.every(row => 
-		    	( Number( row.wareHousingQnt || 0 )+ Number( row.disuseQnt || 0 )) === row.quantity);
+		    	( Number( row.warehousingQnt || 0 )+ Number( row.disuseQnt || 0 )) === row.quantity);
 		    if (!isValidQuantity) {
 		        showAlert('재입고 수량과 폐기 수량의 합이 요청된 수량과 일치하지 않습니다.', 'danger');
 		        return;
 		    }
 			
-		    const warehousingList = returningDetailData.filter(row => Number( row.wareHousingQnt || 0 ) != 0 );
+		    //내용 확인
+		    const warehousingList = returningDetailData.filter(row => Number( row.warehousingQnt || 0 ) != 0 );
 		    console.log("재입고리스트 : ", warehousingList);
 		    
 		    const exchangeList = returningDetailData.filter(row => row.exchangeReturningChoice === '교환' );
@@ -305,6 +312,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 
 		    
 		 	// 교환 품목이 있는 경우 주문 및 출고 등록 모달 띄우기
+		 	//
 		    if (exchangeList.length > 0) {
 		        //csOrderRegisterModal.show();
 		        checkOrderSelection(csOrderRegisterModal);
@@ -335,8 +343,10 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 			grid.setRequestParams(parameter);
 			grid.readData();
 			
-			//선택한 반품 코드 초기화
+			//선택한 반품 코드와 지점ID 초기화
 			returningCode = null;
+			branchOfficeId = null;
+			
 			
 			//데이터가 없으면 뜨는 문구
 			REnodata();
@@ -350,9 +360,10 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 			// 빈 값을 보냄
 			grid.setRequestParams({});
 			grid.readData();
-			
+
 			//선택한 반품 코드 초기화
-			returningCode
+			returningCode = null;
+			branchOfficeId = null;
 		}
 		
 		// 교환및반품 테이블 데이터 없을때 나오는 문구
@@ -393,7 +404,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		    
 		    return {
 		    	returningCode: returningCode, // 선택된 반품 코드
-		        return_remark: cancelReason //cancelReasonInput.value //반품 취소 사유
+		        returnRemark: cancelReason //cancelReasonInput.value //반품 취소 사유
 		    };
 		}
 		
@@ -402,7 +413,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 			const header = document.querySelector('meta[name="_csrf_header"]').content;
 		    const token = document.querySelector('meta[name="_csrf"]').content;
 			
-		    fetch('/bsn/rest/...........', {
+		    fetch('/bsn/rest/cs/request/cancel', {
 		        method: 'PUT',
 		        headers: {
 		        	'header': header,
@@ -415,9 +426,21 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		    .then(data => {
 		        if (data.status === "success") {
 		            showAlert('취소 완료', 'success');
-		         	// 그리드 초기화 + 값 초기화
-		            //refreshOrderGrid();
 		            document.querySelector('#cancelReason').value = '';
+					// 그리드 초기화 + 값 초기화
+		         	
+		            let reasonArea = document.querySelector('#reasonArea');
+		            let returningCodeArea = document.querySelector('#returningCodeArea');
+		            returningCode = null;
+		            branchOfficeId = null;
+		            reasonArea.innerHTML = ``;
+		            returningCodeArea.innerHTML = ``;
+		            
+		            grid2.resetData([]);
+		            grid3.resetData([]);
+					
+		         	// 새로 고침
+		         	grid.reloadData();
 		           
 		        } else {
 		            showAlert('취소 실패:'+ data.message, 'danger');
@@ -426,6 +449,53 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 
 		    }) 
 		}
+		
+		// 교환및반품 처리함수
+		function confirmReturning(returningData) {
+			//console.log(returningData);
+			
+			
+			const header = document.querySelector('meta[name="_csrf_header"]').content;
+		    const token = document.querySelector('meta[name="_csrf"]').content;
+			
+		    fetch('/bsn/rest/cs/request/confirm', {
+		        method: 'POST',
+		        headers: {
+		        	'header': header,
+		        	'X-CSRF-Token': token,
+		            'Content-Type': 'application/json'  // JSON 형식으로 보내기
+		        },
+		        body: JSON.stringify(returningData)  // 객체를 JSON으로 변환하여 전송
+		    })
+		    .then(response => response.json())
+		    .then(data => {
+		        if (data.status === "success") {
+		            showAlert('반품 및 교환 처리 성공', 'success');
+		         	
+		            // 그리드 초기화 + 값 초기화
+		         	
+		            let reasonArea = document.querySelector('#reasonArea');
+		            let returningCodeArea = document.querySelector('#returningCodeArea');
+		            returningCode = null;
+		            branchOfficeId = null;
+		            reasonArea.innerHTML = ``;
+		            returningCodeArea.innerHTML = ``;
+		            
+		            grid2.resetData([]);
+		            grid3.resetData([]);
+					
+		         	// 새로 고침
+		         	grid.reloadData();
+		            
+		           
+		        } else {
+		            showAlert('반품 및 교환 처리 실패: '+ data.message, 'danger');
+		        }
+		    }) 
+		    
+		    
+		}
+		
 		
 		
 		
@@ -443,33 +513,61 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		    		
 		    		//////////////////처리 함수(재입고만)
 		    		
+		    		// 입력한 수량 타입 변환
+					grid3.getData().forEach((row, index) => {
+					    if (row.warehousingQnt !== undefined) {
+					        grid3.setValue(index, 'warehousingQnt', Number(row.warehousingQnt) || 0);
+					    }
+					    if (row.disuseQnt !== undefined) {
+					        grid3.setValue(index, 'disuseQnt', Number(row.disuseQnt) || 0);
+					    }
+					});
+		    		
 		    		const returningDetailData = grid3.getData(); 
-		    		const warehousingList = returningDetailData.filter(row => Number( row.wareHousingQnt || 0 ) != 0 );
+		    		const warehousingList = returningDetailData.filter(row => Number( row.warehousingQnt || 0 ) != 0 );
 		    		const exchangeList = [];
 		    		
-		    		let returningData = {
+		    		returningData = {
+		    				employeeNum: employeeNum,
+		    				companyNum : sessioCompanyNum,
+		    				branchOfficeId: branchOfficeId,
 		    				returningCode : returningCode,
+		    				returningDetailData: returningDetailData,
 		    				warehousingList : warehousingList,
 		    				exchangeList : exchangeList
 		    				
 		    		}
-				    console.log(returningData);
+				    //console.log(returningData);
+		    		
+		    		
 		    		
 		    		///////////////////
 		    	}
 					//////////////////처리 함수(재입고 + 교환)
 		    	else if (modal === csOrderRegisterModal){
 		    		const returningDetailData = grid3.getData(); 
-		    		const warehousingList = returningDetailData.filter(row => Number( row.wareHousingQnt || 0 ) != 0 );
+		    		const warehousingList = returningDetailData.filter(row => Number( row.warehousingQnt || 0 ) != 0 );
 		    		const exchangeList = returningDetailData.filter(row => row.exchangeReturningChoice === '교환' );
 		    		
-		    		let returningData = {
+		    		
+		    		
+		    		returningData = {
+		    				employeeNum: employeeNum,
+		    				companyNum : sessioCompanyNum,
+		    				branchOfficeId: branchOfficeId,
 		    				returningCode : returningCode,
+		    				returningDetailData: returningDetailData,
 		    				warehousingList : warehousingList,
 		    				exchangeList : exchangeList
 		    				
 		    		}
-				    console.log(returningData);
+				    //console.log(returningData);
+		    		
+		    		
+		    		
+		    		
+		    		
+		    		
 		    	}
 		    	
 	    		///////////////////
@@ -506,10 +604,11 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 
 		            if (activeModal) {
 		            	if (activeModal.id === 'confirmCheckModal') {
+		            		confirmReturning(returningData);
 		            		confirmCheckModal.hide();
 			                    
 		                } else if (activeModal.id === 'csOrderRegisterModal') {
-		                    
+		                	confirmReturning(returningData);
 		                    csOrderRegisterModal.hide();
 		                    
 		                } else if (activeModal.id === 'cancelModal') {
@@ -517,7 +616,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		                    const cancelRequest = createCancelRequest();
 		                    if (!cancelRequest) return; // 취소 사유가 없으면 중단
 		                    //반품 신청 취소 처리
-		                    //cancelReturning(cancelRequest);
+		                    cancelReturning(cancelRequest);
 		                    console.log(cancelRequest);
 		                    cancelModal.hide();
 		                }

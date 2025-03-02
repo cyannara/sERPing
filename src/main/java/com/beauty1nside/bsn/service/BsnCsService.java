@@ -5,6 +5,8 @@ import java.util.List;
 import com.beauty1nside.bhf.dto.returninglist.BhfReturnListDTO;
 import com.beauty1nside.bhf.dto.returninglist.BhfReturnListSearchDTO;
 import com.beauty1nside.bsn.dto.cs.BsnReturnListDTO;
+import com.beauty1nside.bsn.dto.cs.BsnReturningRefusalDTO;
+import com.beauty1nside.bsn.dto.cs.BsnReturningRegistDTO;
 
 
 public interface BsnCsService {
@@ -14,6 +16,10 @@ public interface BsnCsService {
 	
 	public List<BsnReturnListDTO> bhfReturningDetail(BhfReturnListSearchDTO dto);
 
-	int countBhfReturningList(BhfReturnListSearchDTO dto);
+	public int countBhfReturningList(BhfReturnListSearchDTO dto);
+	
+	public void registBsnReturning(BsnReturningRegistDTO bsnReturningRegistDTO);
+	
+	public void cancleBsnReturning(BsnReturningRefusalDTO bsnReturningRefusalDTO);
 
 }
