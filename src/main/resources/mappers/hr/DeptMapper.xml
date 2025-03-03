@@ -79,5 +79,12 @@
 	    WHERE DEPARTMENT_NUM = #{departmentNum}
 	</select>
 
+	<!-- 부서가 없는 직원수 -->
+	<select id="countEmployeesWithoutDepartment" parameterType="long" resultType="int">
+	    SELECT COUNT(*) 
+	    FROM hr_employee 
+	    WHERE company_num = #{companyNum} 
+	    AND department_num IS NULL
+	</select>
 
 </mapper>

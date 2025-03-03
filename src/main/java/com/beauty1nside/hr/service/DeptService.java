@@ -29,5 +29,9 @@ public interface DeptService {
     
     // 부서에 속한 직원 수 조회
     int getEmployeeCountByDept(Long departmentNum);
+    
+
+    // 부서가 없는 직원 수 조회
+    int countEmployeesWithoutDepartment(Long companyNum);
 
 }

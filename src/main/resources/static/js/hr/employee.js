@@ -8,6 +8,10 @@ const header = document.querySelector('meta[name="_csrf_header"]').content;
 const token = document.querySelector('meta[name="_csrf"]').content;
 
 document.addEventListener("DOMContentLoaded", function () {
+
+    setTimeout(() => {
+        populateFilters(); // 필터 로딩 함수 실행
+    }, 100);
 	
 const modalElement = document.getElementById("contractModal");
   const closeButton = modalElement.querySelector('[data-bs-dismiss="modal"]');
@@ -228,7 +232,7 @@ function loadCommonCodes() {
         .then(response => response.json())
         .then(data => {
             commonCodes = data;
-            populateFilters(); // 필터 UI 업데이트
+            //populateFilters(); // 필터 UI 업데이트
             populateModals(); // 모달 UI 업데이트
         })
         .catch(error => console.error("공통 코드 로딩 실패:", error));
@@ -245,7 +249,12 @@ function populateFilters() {
     const statusSelect = document.getElementById("statusFilter");
     const employmentTypeSelect = document.getElementById("employmentTypeFilter");
     const departmentSelect = document.getElementById("departmentFilter");
-    
+ 
+	console.log("🔎 positionSelect:", document.getElementById("positionFilter"));
+	console.log("🔎 statusSelect:", document.getElementById("statusFilter"));
+	console.log("🔎 employmentTypeSelect:", document.getElementById("employmentTypeFilter"));
+	console.log("🔎 departmentSelect:", document.getElementById("departmentFilter")); 
+	    
     if (!positionSelect || !statusSelect || !employmentTypeSelect || !departmentSelect) {
         console.error("❌ populateFilters() 실행 실패! 필터 요소 중 일부가 존재하지 않습니다.");
         return; // 요소가 없으면 함수 실행 중단

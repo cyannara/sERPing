@@ -45,8 +45,11 @@ import lombok.extern.log4j.Log4j2;
 		@GetMapping("/emp/list")
 		public Object empList(@RequestParam(name = "perPage", defaultValue = "2", required = false) int perPage, 
 				@RequestParam(name = "page", defaultValue = "1", required = false) int page, 
-				@ModelAttribute EmpSearchDTO dto, @ModelAttribute  Paging paging, HttpSession session) throws JsonMappingException, JsonProcessingException {
+				@ModelAttribute EmpSearchDTO dto, HttpSession session) throws JsonMappingException, JsonProcessingException {
 			
+		    Paging paging = new Paging(); // 🔥 `@ModelAttribute` 사용하지 않고 직접 생성
+		    paging.setPageUnit(perPage);
+		    paging.setPage(page);
 			
 			log.info("📥 empList 호출됨");
 		    log.info("🔍 검색 DTO 값: {}", dto);
@@ -66,6 +69,7 @@ import lombok.extern.log4j.Log4j2;
 		    // ✅ 검색 조건이 올바르게 전달되는지 확인
 		    log.info("🔎 searchType: {}", dto.getSearchType());
 		    log.info("🔎 searchKeyword: {}", dto.getSearchKeyword());
+		    log.info("🔎 departmentNum: {}", dto.getDepartmentNum()); // 🔥 확인용
 			
 			
 			// 페이징 유닛 수
@@ -232,6 +236,7 @@ import lombok.extern.log4j.Log4j2;
 	    @GetMapping("/emp/list-by-company")
 	    public ResponseEntity<Map<String, Object>> getEmployeesByCompany(
 	            @RequestParam("companyNum") Long companyNum,
+	            //@RequestParam(name = "departmentNum", required = false) Long departmentNum,
 	            @RequestParam(name = "perPage", defaultValue = "10") int perPage,
 	            @RequestParam(name = "page", defaultValue = "1") int page,
 	            @RequestParam(name = "searchKeyword", required = false) String searchKeyword) {
@@ -239,6 +244,7 @@ import lombok.extern.log4j.Log4j2;
 	        // DTO 설정
 	        EmpSearchDTO searchDTO = new EmpSearchDTO();
 	        searchDTO.setCompanyNum(companyNum);
+	        //searchDTO.setDepartmentNum(departmentNum);
 	        searchDTO.setSearchType("employeeName");  // ✅ 사원명 검색으로 고정
 	        searchDTO.setSearchKeyword(searchKeyword); // 검색어 설정
 	        searchDTO.setStart((page - 1) * perPage + 1);
