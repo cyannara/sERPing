@@ -39,6 +39,7 @@ function loadCommonCodes() {
             commonCodes.employmentTypes = employmentTypes;
             commonCodes.auths = auths;
 
+			
             // ✅ 필터 & 모달 UI 업데이트
             populateDepartmentSelect(departments);
             populatePositionSelect(positions);

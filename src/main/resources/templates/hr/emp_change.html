@@ -83,6 +83,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 { header: "새 직급", name: "newPosition", width: 120 },
                 { header: "기존 부서", name: "previousDepartmentNum", width: 120 },
                 { header: "새 부서", name: "newDepartmentNum", width: 120 },
+                { header: "기존 유형", name: "previousEmployMentType", width: 120 },
+                { header: "새 유형", name: "newEmploymentType", width: 120 },
                 { header: "적용일", name: "effectiveDate", width: 120 },
                 { header: "승인 상태", name: "approvalStatus", width: 100 },
                 { header: "발령 처리자", name: "processedBy", width: 100 },
@@ -111,10 +113,10 @@ document.addEventListener("DOMContentLoaded", function () {
         fetch('/hr/rest/history/list')
             .then(response => response.json())
             .then(data => {
-                console.log("📌 인사발령 데이터:", data);
+                console.log("인사발령 데이터:", data);
                 historyGrid.resetData(data.historyList);
             })
-            .catch(error => console.error("❌ 인사발령 목록 조회 실패:", error));
+            .catch(error => console.error("인사발령 목록 조회 실패:", error));
     }
 
     // ✅ 인사발령 승인
@@ -125,7 +127,7 @@ document.addEventListener("DOMContentLoaded", function () {
             alert(message);
             fetchHistoryList();
         })
-        .catch(error => console.error("❌ 승인 실패:", error));
+        .catch(error => console.error("승인 실패:", error));
     }
 
     // ✅ 인사발령 반려

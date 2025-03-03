@@ -46,6 +46,24 @@ public class HrController {
 	    model.addAttribute("employeeList", empList);  // 리스트를 모델에 추가
 	    return "hr/employee";
 	}
+	
+	  //인사관리-조직도조회
+		@GetMapping("/organization_list")
+		public String getOrganizationList(HttpSession session, Model model) {
+		    // ✅ 세션에서 companyNum 가져오기
+		    Long sessionCompanyNum = (Long) session.getAttribute("companyNum");
+
+		    // ✅ 세션에 companyNum이 없을 경우 예외 처리
+		    if (sessionCompanyNum == null) {
+		        return "redirect:/login"; // 로그인 페이지로 리다이렉트
+		    }
+
+		    // ✅ 세션에서 가져온 companyNum으로 조직도 조회
+		    Map<String, Object> organization = deptService.getOrganization(sessionCompanyNum);
+		    model.addAttribute("company", organization.get("company"));
+		    model.addAttribute("departments", organization.get("departments"));
+		    return "hr/organization_list";
+		}
     
   //인사관리-조직도관리
 	@GetMapping("/organization")

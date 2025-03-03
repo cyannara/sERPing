@@ -21,7 +21,8 @@ public class EmpHistoryDTO {
     private String previousPosition;  // 기존 직급
     private String newPosition;       // 새로운 직급
     private Long previousDepartmentNum; // 기존 부서 번호
-    private Long newDepartmentNum;    // 새로운 부서 번호
+    private Long previousDepartmentName; // 기존 부서 번호
+    private Long newDepartmentName;    // 새로운 부서 번호
     private String previousEmploymentType; // 기존 고용 유형
     private String newEmploymentType; // 새로운 고용 유형
     @DateTimeFormat(pattern = "yyyy-MM-dd")

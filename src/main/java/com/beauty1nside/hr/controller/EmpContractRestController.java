@@ -100,7 +100,7 @@ public class EmpContractRestController {
 	    
 	    response.setContentType(MediaType.APPLICATION_PDF_VALUE);
 	    // 다운로드를 위한 헤더 설정: attachment; filename="파일명.pdf"
-	    response.setHeader("Content-Disposition", "attachment; filename=\"근로계약서_" + employeeNum + ".pdf\"");
+	    response.setHeader("Content-Disposition", "attachment; filename=\"empContract_" + employeeNum + ".pdf\"");
 	    JasperExportManager.exportReportToPdfStream(jasperPrint, response.getOutputStream());
 	}
     

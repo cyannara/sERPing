@@ -1,36 +1,36 @@
 	package com.beauty1nside.hr.controller;
 	
 	import java.nio.file.Files;
-	import java.nio.file.Path;
-	import java.nio.file.Paths;
-	import java.util.HashMap;
-	import java.util.List;
-	import java.util.Map;
-	import java.util.UUID;
-	
-	import org.springframework.http.ResponseEntity;
-	import org.springframework.security.crypto.password.PasswordEncoder;
-	import org.springframework.web.bind.annotation.GetMapping;
-	import org.springframework.web.bind.annotation.ModelAttribute;
-	import org.springframework.web.bind.annotation.PathVariable;
-	import org.springframework.web.bind.annotation.PostMapping;
-	import org.springframework.web.bind.annotation.RequestMapping;
-	import org.springframework.web.bind.annotation.RequestParam;
-	import org.springframework.web.bind.annotation.RequestPart;
-	import org.springframework.web.bind.annotation.RestController;
-	import org.springframework.web.multipart.MultipartFile;
-	
-	import com.beauty1nside.common.GridArray;
-	import com.beauty1nside.common.Paging;
-	import com.beauty1nside.hr.dto.EmpDTO;
-	import com.beauty1nside.hr.dto.EmpSearchDTO;
-	import com.beauty1nside.hr.service.EmpService;
-	import com.fasterxml.jackson.core.JsonProcessingException;
-	import com.fasterxml.jackson.databind.JsonMappingException;
-	
-	import jakarta.servlet.http.HttpSession;
-	import lombok.AllArgsConstructor;
-	import lombok.extern.log4j.Log4j2;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.beauty1nside.common.GridArray;
+import com.beauty1nside.common.Paging;
+import com.beauty1nside.hr.dto.EmpDTO;
+import com.beauty1nside.hr.dto.EmpSearchDTO;
+import com.beauty1nside.hr.service.EmpService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
+import jakarta.servlet.http.HttpSession;
+import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 	
 	@Log4j2
 	@RestController
@@ -166,10 +166,10 @@
 	        return ResponseEntity.ok(newEmployeeId);
 	    }
 	    
-	//    @GetMapping("/emp/departments")
-	//    public ResponseEntity<List<Map<String, Object>>> getDepartments() {
-	//        return ResponseEntity.ok(empService.getDepartmentList());
-	//    }
+	    @GetMapping("/emp/departments/{companyNum}")
+	    public ResponseEntity<List<String>> getDepartments(@PathVariable(name="companyNum") int companyNum) {
+	        return ResponseEntity.ok(empService.getDepartments(companyNum));
+	    }
 	
 	
 	    // ✅ 새로운 전체 부서 목록 조회 (부서번호 + 부서이름 반환)
