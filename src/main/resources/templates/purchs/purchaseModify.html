@@ -1,0 +1,325 @@
+<html layout:decorate="~{layouts/layout}"
+      lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<body layout:fragment="content">
+    <style>
+        .form-control { width: 100%; }
+        
+        .button-container { margin-top: 15px; }
+        #custom-container{
+		background-color: #f8f9fa; /* 연한 회색 배경 */
+		padding: 20px;
+		border-radius: 10px;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 박스 그림자 */
+		margin-bottom: 20px;
+	
+		}
+       /* ✅ Toast Grid의 기본 높이를 크게 설정 */
+		#grid {
+		    height: 700px !important; /* 원하는 크기로 늘리기 */
+		    min-height: 600px; /* 최소 크기 */
+		    max-height: 900px; /* 너무 커지지 않도록 설정 */
+		    overflow: auto; /* 스크롤 추가 */
+		}
+		
+		/* ✅ Toast Grid의 가로 스크롤 제거 */
+		.tui-grid-container {
+		    width: 100% !important; /* 전체 너비를 부모 요소에 맞춤 */
+		    max-width: none !important;
+		    overflow-x: hidden !important; /* ✅ 가로 스크롤 강제 제거 */
+		}
+		
+		/* ✅ 내부 요소에서 스크롤 제거 */
+		.tui-grid-body-area {
+		    overflow-x: hidden !important;
+		}
+		
+		/* ✅ 컬럼 자동 크기 조정 */
+		.tui-grid-cell {
+		    white-space: nowrap !important; /* ✅ 줄바꿈 방지 */
+		    overflow: hidden !important;
+		    text-overflow: ellipsis !important; /* 긴 내용은 "..." 처리 */
+		}
+		
+		/* ✅ 동일한 행 강조 효과 */
+		.highlight-row {
+		    animation: flash 1.5s ease-in-out;
+		}
+		
+	
+		
+	
+    </style>
+    
+
+    
+<div class="container mt-4" >
+<h2 class="mb-4">발주서 관리</h2>
+<!-- <p id="companyNum" data-company-num="${session.companyNum}"></p> -->
+	<div class="container">
+	    <!-- 🔹 발주서 정보 -->
+	    <div id="custom-container">
+	        <div class="row g-3">
+	        <!-- ✅ 공통 발주 정보 -->
+				<input type="hidden" id="purchaseNum" th:value="${purchase?.purchaseNum}">
+				<input type="hidden" id="companyNum" th:value="${session.companyNum}">
+				
+	            <div class="col-md-3">
+	                <label class="form-label">일자</label>
+	               <input type="date" class="form-control" id="purchaseDate" th:value="${formattedPurchaseDate}" 
+>
+	            </div>
+	            <div class="col-md-3">
+	                <label class="form-label">담당자</label>
+	                <input type="hidden" class="form-control" id="companyNum" th:value="${session.companyNum}" readonly>
+	                <input type="text" class="form-control" th:value="${purchase?.employeeName}" readonly>
+	                <input type="hidden" class="form-control" id="employeeNum" th:value="${session.employeeNum}" readonly>
+	            </div>
+	            <div class="col-md-3">
+	                <label class="form-label">납기일자</label>
+	                <input type="date" class="form-control" id="purchaseDueDate" th:value="${formattedPurchaseDueDate}">
+	            </div>
+	        </div>
+	
+	        <!-- 부가세율(VAT) 선택 -->
+			<div class="d-flex align-items-center mt-3">
+			    <div class="form-check me-3">
+			        <input class="form-check-input" type="checkbox" id="vatUnchecked"
+			               th:checked="${purchase?.purchaseVatFlag == 0}">
+			        <label class="form-check-label" for="vatUnchecked">부가세율(VAT) 미적용</label>
+			    </div>
+			    <div class="form-check">
+			        <input class="form-check-input" type="checkbox" id="vatChecked"
+			               th:checked="${purchase?.purchaseVatFlag == 1}">
+			        <label class="form-check-label" for="vatChecked">부가세율(VAT) 적용</label>
+			    </div>
+			</div>
+
+	    </div>
+	
+	
+	    <!-- 🔹 Toast Grid -->
+	    <div id="grid" class="tui-grid-container" style="height: 200px;"></div>
+	    <div id="pagination" class="tui-pagination"></div>
+        <script th:inline="javascript">
+		    let optionsData = /*[[${options}]]*/ [];
+		    console.log("✅ Thymeleaf에서 받은 optionsData:", optionsData);
+		</script>
+        
+	 
+	    <div class="button-container text-center mt-3">
+		    <div class="d-flex justify-content-center gap-3">
+		        <!-- 발주 수정 버튼 -->
+		        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#purchModifyConfirm"
+		         th:disabled="${purchase?.purchaseStatus ne '진행중'}">발주 수정</button>
+		
+		        <!-- 발주 취소 버튼 (붉은색) -->
+		        <button class="btn btn-danger" id="purchaseCancle" 
+		        th:disabled="${purchase?.purchaseStatus ne '진행중'}">발주 취소</button>
+		
+		        <!-- 초기화 버튼 -->
+		        <button class="btn btn-secondary">초기화</button>
+		    </div>
+		</div>
+		
+		<!-- ✅ 발주 수정 확인 모달 -->
+		<div th:include="purchs/modal/ModalTemplate :: ModalTemplate (
+		    'purchModifyConfirm', 
+		    'modal-md', 
+		    '발주 수정 확인', 
+		    'purchs/modal/purchModifyConfirm', 
+		    'purchs/modal/purchModifyFooter'
+		)"></div>
+
+	</div>
+	
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+	const header = document.querySelector('meta[name="_csrf_header"]').content;
+	const token = document.querySelector('meta[name="_csrf"]').content;
+    const purchaseNum = document.getElementById("purchaseNum").value;
+    const companyNum = document.getElementById("companyNum").value;
+    
+    console.log("✅ 발주 수정 페이지 로드됨");
+    console.log("✅ purchaseNum:", purchaseNum, "companyNum:", companyNum);
+
+    
+    console.log("✅ Thymeleaf에서 받은 optionsData:", optionsData);
+
+    initPurchaseGrid(optionsData);
+    
+ // ✅ VAT 체크박스 하나만 선택 가능하도록 설정
+    document.getElementById("vatChecked").addEventListener("change", function () {
+        if (this.checked) {
+            document.getElementById("vatUnchecked").checked = false;
+        }
+        updateAllVat();
+    });
+
+    document.getElementById("vatUnchecked").addEventListener("change", function () {
+        if (this.checked) {
+            document.getElementById("vatChecked").checked = false;
+        }
+        updateAllVat();
+    });
+});
+
+function initPurchaseGrid(optionsData) {
+    window.purchaseGrid = new tui.Grid({
+        el: document.getElementById('grid'),
+        scrollX: false,
+        scrollY: true,
+        bodyHeight: 500,
+        columns: [
+            { header: '상품코드', name: 'goodsCode', className: "tui-grid-cell-readonly" },
+            { header: '상품명', name: 'goodsName', className: "tui-grid-cell-readonly" },
+            { header: '옵션코드', name: 'optionCode', className: "tui-grid-cell-readonly" },
+            { header: '옵션명', name: 'optionName', className: "tui-grid-cell-readonly" },
+            { header: '거래처명', name: 'vendorName', className: "tui-grid-cell-readonly" },
+            { header: '수량', name: 'purchaseQuantity', editor: "text" },
+            { header: '단가', name: 'purchaseUnitPrice', editor: "text" },
+            { header: '공급가격', name: 'purchaseSupplyPrice', className: "tui-grid-cell-readonly" },
+            { header: '부가세', name: 'purchaseVat', className: "tui-grid-cell-readonly" }
+        ],
+        rowHeaders: ['checkbox'],
+        data: optionsData  // ✅ 서버에서 받은 옵션 리스트를 그리드에 적용
+    });
+    
+    // ✅ 수량, 단가 변경 시 공급가격 및 부가세 자동 계산
+    window.purchaseGrid.on('afterChange', function (ev) {
+        ev.changes.forEach(change => {
+            const { rowKey, columnName, value } = change;
+
+            if (columnName === "purchaseQuantity" || columnName === "purchaseUnitPrice") {
+                updateSupplyPriceAndVat(rowKey);
+            }
+        });
+    });
+
+    // ✅ VAT 체크박스 변경 시 자동 계산
+    document.getElementById("vatChecked").addEventListener("change", updateAllVat);
+    document.getElementById("vatUnchecked").addEventListener("change", updateAllVat);
+    
+    document.getElementById("purchaseModify").addEventListener("click", function() {
+        // 🔹 공통 정보 가져오기
+        const purchaseNum = parseInt(document.getElementById("purchaseNum").value)||0;
+        const employeeNum = parseInt(document.getElementById("employeeNum").value)||0;
+        const companyNum = parseInt(document.getElementById("companyNum").value)||0;
+        const purchaseDueDate = document.getElementById("purchaseDueDate").value;
+        const purchaseVatFlag = document.getElementById("vatChecked").checked ? 1 : 0;
+        const purchaseRecordeReason = document.getElementById("purchaseRecordeReason").value; // 수정 사유
+
+        // 🔹 Toast Grid에서 체크된 행(row)만 가져오기
+        const checkedRows = window.purchaseGrid.getCheckedRows(); // ✅ 체크된 데이터만 가져오기
+        console.log("✅ 체크된 데이터:", checkedRows);
+
+        if (checkedRows.length === 0) {
+            alert("수정할 항목을 선택해주세요."); 
+            return;
+        }
+
+        // 🔹 서버로 보낼 데이터 객체 생성
+        const requestData = {
+            purchaseNum: purchaseNum,
+            employeeNum: employeeNum,
+            companyNum: companyNum,
+            purchaseDueDate: purchaseDueDate,
+            purchaseVatFlag: purchaseVatFlag,
+            purchaseRecordeReason: purchaseRecordeReason,
+            files: checkedRows.map(row => ({
+                purchaseBodyNum: parseInt(row.purchaseBodyNum)||0, 
+                purchaseQuantity: parseInt(row.purchaseQuantity)||0,
+                purchaseUnitPrice: parseInt(row.purchaseUnitPrice)||0,
+                purchaseSupplyPrice: parseInt(row.purchaseSupplyPrice)||0,
+                purchaseVat: parseInt(row.purchaseVat)||0,
+                optionNum: parseInt(row.optionNum)||0,
+                goodsStandard: row.goodsStandard,
+                companyNum: companyNum
+            }))
+        };
+
+        console.log("✅ 서버로 보낼 데이터:", requestData);
+
+        // 🔹 AJAX 요청 보내기
+        fetch("/purchs/rest/purchase/update", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="_csrf"]').content
+            },
+            body: JSON.stringify(requestData)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("서버 응답 오류");
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("✅ 발주 수정 완료:", data);
+            alert("발주 수정이 완료되었습니다.");
+            location.reload(); // 수정 후 새로고침
+        })
+        .catch(error => {
+            console.error("❌ 발주 수정 중 오류 발생:", error);
+            alert("발주 수정 중 오류가 발생했습니다.");
+        });
+    });
+
+
+}
+
+/**
+ * ✅ 수량과 단가를 기반으로 공급가액(purchaseSupplyPrice) 및 부가세(purchaseVat) 자동 계산
+ */
+function updateSupplyPriceAndVat(rowKey) {
+    const grid = window.purchaseGrid;
+    const rowData = grid.getRow(rowKey);
+
+    const quantity = parseFloat(rowData.purchaseQuantity) || 0;
+    const unitPrice = parseFloat(rowData.purchaseUnitPrice) || 0;
+
+    const supplyPrice = quantity * unitPrice; // 공급가격 계산
+    const vatRate = document.getElementById("vatChecked").checked ? 0.1 : 0; // VAT 적용 여부 확인
+    const vat = supplyPrice * vatRate; // 부가세 계산
+
+    grid.setValue(rowKey, "purchaseSupplyPrice", supplyPrice);
+    grid.setValue(rowKey, "purchaseVat", vat);
+}
+
+/**
+ * ✅ VAT 체크박스 상태에 따라 부가세 자동 업데이트
+ */
+function updateAllVat() {
+    const grid = window.purchaseGrid;
+    grid.getData().forEach((row, index) => {
+        updateSupplyPriceAndVat(index);
+    });
+    
+    
+}
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+</script>
+
+
+</body>
+
+</html>

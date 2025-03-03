@@ -132,6 +132,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // ✅ 세션 스토리지에 데이터 저장
         sessionStorage.setItem("selectedVendorId", rowData.vendorId);
         sessionStorage.setItem("selectedVendorName", rowData.vendorName);
+        sessionStorage.setItem("selectedMarginRate", rowData.marginRate);
         console.log("📢 저장된 데이터:", rowData.vendorId, rowData.vendorName);
     });
 

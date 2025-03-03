@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+</head>
+<body>
+	 <p>해당 발주건을 수정하시겠습니까?</p>
+
+       <div class="mb-3">
+           <label class="form-label">발주 수정 사유</label>
+           <input type="text" class="form-control" id="purchaseRecordeReason" th:value="${purchase?.purchaseRecordeReason}">
+       </div>
+</body>
+</html>

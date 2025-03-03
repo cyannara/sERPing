@@ -9,6 +9,7 @@ import com.beauty1nside.purchs.dto.ProductDTO;
 import com.beauty1nside.purchs.dto.ProductSearchDTO;
 import com.beauty1nside.purchs.controller.ProductRestController;
 import com.beauty1nside.purchs.dto.ProdInsertVO;
+import com.beauty1nside.purchs.dto.ProdUpdateVO;
 import com.beauty1nside.purchs.mapper.productMapper;
 import com.beauty1nside.purchs.service.productService;
 
@@ -77,6 +78,38 @@ public class productServiceImpl implements productService{
 	public List<ProductDTO> getCatelist(int companyNum) {
 		
 		return productMapper.getCatelist(companyNum);
+	}
+
+	@Override
+	public List<ProductDTO> getGoodsOption(String goodsCode, int companyNum) {
+		return productMapper.goodsoptioninfo(goodsCode, companyNum);
+	}
+
+	@Override
+	public void goodUpdate(ProdUpdateVO vo) {
+		log.info("수정 내용 서비스 == {}",vo);
+		productMapper.goodsupdate(vo);
+		
+	}
+
+	@Override
+	public List<ProductDTO> getGoodsNum(ProductSearchDTO dto) {
+		return productMapper.goodsNum(dto);
+	}
+
+	@Override
+	public int goodsNumCount(ProductSearchDTO vo) {
+		return productMapper.goodsNumcount(vo);
+	}
+
+	@Override
+	public List<ProductDTO> getGoodsLotNum(ProductSearchDTO dto) {
+		return productMapper.goodsLotNum(dto);
+	}
+
+	@Override
+	public int goodsLotNumCount(ProductSearchDTO vo) {
+		return productMapper.goodsLotNumcount(vo);
 	}
 	
 

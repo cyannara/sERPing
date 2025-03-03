@@ -3,6 +3,7 @@ package com.beauty1nside.purchs.service;
 import java.util.List;
 
 import com.beauty1nside.purchs.dto.PurchInsertVO;
+import com.beauty1nside.purchs.dto.PurchUpdateVO;
 import com.beauty1nside.purchs.dto.PurchaseDTO;
 import com.beauty1nside.purchs.dto.PurchaseSearchDTO;
 
@@ -18,4 +19,10 @@ public interface purchaseService {
 	//미입고 발주서 조회 
 	public List<PurchaseDTO> nonWarehousinglist(PurchaseSearchDTO dto);
 	int nonwarehousingCount(PurchaseSearchDTO dto);
+	
+	//발주서 상세 조회
+	List<PurchaseDTO>getPurchsinfo(Long purchaseNum,int companyNum);
+	
+	//발주서수정
+	public void purchUpdate(PurchUpdateVO vo);
 }

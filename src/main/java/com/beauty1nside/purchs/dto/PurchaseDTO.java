@@ -59,7 +59,7 @@ public class PurchaseDTO {
 	private String vendorPhone;
 	private int optionNum;
 
-	
+	private String purchaseRecordeReason; //발주서 변경 사유
 	
 	
 }

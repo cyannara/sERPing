@@ -50,12 +50,13 @@
 
 <!-- vendorlist 브랜드 조회 -->
 <select id="vendorlist" resultType="ProductDTO">
-    SELECT VENDOR_ID, VENDOR_NAME
+    SELECT VENDOR_ID, VENDOR_NAME , MARGIN_RATE
     FROM (
         SELECT /*+index_desc(STDR_BRAND PK_GRPWR_VENDOR)*/
                ROWNUM RN,
                VENDOR_ID,
-               VENDOR_NAME             
+               VENDOR_NAME,
+               MARGIN_RATE            
         FROM GRPWR_VENDOR
         where company_num = #{companyNum}
         <include refid="searchVendorInfo"/>  <!-- 검색 조건 포함 -->
@@ -202,8 +203,300 @@
     </if>
 </sql>
 
+<!-- 상품 상세 페이지 -->
+<select id="goodsoptioninfo" resultType="ProductDTO">
+
+SELECT 
+	g.goods_num,
+    g.goods_name,
+    g.goods_code, 
+    g.goods_standard, 
+    g.goods_image, 
+    g.goods_price, 
+    g.goods_cost, 
+    g.goods_supply_price,
+    g.goods_description,
+    g.brand_id, 
+    CASE 
+        WHEN g.goods_use_flag = 0 THEN '사용중' 
+        WHEN g.goods_use_flag = 1 THEN '사용중단' 
+        ELSE '알 수 없음' 
+    END AS goods_use_status,
+    b.brand_name, 
+    g.classification_id, 
+    c.classification_name,
+    g.vendor_id, 
+    v.vendor_name,
+    v.margin_rate,
+    o.option_num,
+    o.option_name,
+    o.option_code,
+    o.option_use_flag,
+    CASE 
+    	WHEN o.option_use_flag = 0 THEN '사용중'
+    	WHEN o.option_use_flag = 1 THEN '사용중단'
+    	ELSE '알 수 없음'
+    END AS option_use_status,
+    o.option_safety_invoice,
+    w.warehouse_name,
+    e.employee_name,
+    
+    -- ✅ 옵션별 LOT 정보 (남은 재고량 합계 - 중복 집계 방지)
+    (SELECT SUM(NVL(wb.WAREHOUSING_REMAINING_QUANTITY, 0))
+     FROM purchs_warehousing_body wb
+     WHERE wb.OPTION_NUM = o.option_num
+    ) AS total_remaining_quantity, 
+
+    -- ✅ 옵션별 안전재고 계산 (정수 변환)
+    TRUNC(
+        (NVL(
+            AVG(d.DELIVERY_TOTAL_QNT), 0) 
+        * 
+        NVL(
+            AVG(TO_NUMBER(wh.WAREHOUSING_DATE - p.PURCHASE_DATE)), 0)  
+        ) 
+        + 
+        ((NVL(
+            AVG(d.DELIVERY_TOTAL_QNT), 0)
+        * 
+        NVL(
+            AVG(TO_NUMBER(wh.WAREHOUSING_DATE - p.PURCHASE_DATE)), 0)  
+        ) / 2)
+    ) AS safety_stock  
+
+FROM purchse_goods g
+JOIN purchse_option o ON g.goods_num = o.goods_num
+JOIN hr_employee e ON g.employee_num = e.employee_num
+JOIN stdr_brand b ON g.brand_id = b.brand_id
+JOIN stdr_classification c ON g.classification_id = c.classification_id
+JOIN grpwr_vendor v ON g.vendor_id = v.vendor_id
+LEFT JOIN stdr_warehouse w ON o.warehouse_id = w.warehouse_id
+LEFT JOIN purchs_warehousing_body wb ON o.option_num = wb.OPTION_NUM -- ✅ 변경된 조인
+LEFT JOIN purchs_warehousing_header wh ON wb.WAREHOUSING_HEADER_NUM = wh.WAREHOUSING_HEADER_NUM -- ✅ 올바른 조인
+LEFT JOIN purchs_purchase_body pb ON o.option_num = pb.OPTION_NUM
+LEFT JOIN purchs_purchase_header p ON pb.PURCHASE_NUM = p.PURCHASE_NUM
+LEFT JOIN bsn_delivery_detail d ON o.option_code = d.OPTION_CODE
+
+-- ✅ WHERE 절로 변경 (HAVING → WHERE)
+WHERE g.goods_code = #{goodsCode}
+AND g.company_num =  #{companyNum}
+
+-- ✅ GROUP BY 추가 (집계 함수 제외한 모든 컬럼 포함)
+GROUP BY 
+	g.goods_num,
+    g.goods_name,
+    g.goods_code, 
+    g.goods_standard, 
+    g.goods_image, 
+    g.goods_price, 
+    g.goods_cost, 
+    g.goods_supply_price,
+    g.goods_description,
+    g.brand_id, 
+    g.goods_use_flag,
+    b.brand_name, 
+    g.classification_id, 
+    c.classification_name,
+    g.vendor_id, 
+    v.vendor_name,
+    v.margin_rate,
+    e.employee_name,
+    o.option_num,
+    o.option_name,
+    o.option_code,
+    o.option_safety_invoice,
+    o.option_use_flag,
+    w.warehouse_name
+
+</select>
 
 
+<!-- 상품 수정 프로시저 호출  -->
+<insert id="goodsupdate" statementType="CALLABLE">
+    {CALL purchs_product_update(
+    	#{goodsNum, mode=IN, jdbcType=NUMERIC},
+        #{goodsName, mode=IN, jdbcType=VARCHAR},
+        #{goodsCost, mode=IN, jdbcType=NUMERIC},
+        #{goodsPrice, mode=IN, jdbcType=NUMERIC},
+        #{goodsSupplyPrice, mode=IN, jdbcType=NUMERIC},
+        #{goodsStandard, mode=IN, jdbcType=VARCHAR},
+        #{goodsDescription, mode=IN, jdbcType=VARCHAR},
+        #{goodsImage, mode=IN, jdbcType=VARCHAR},
+        #{employeeNum, mode=IN, jdbcType=NUMERIC},
+        #{companyNum, mode=IN, jdbcType=NUMERIC},
+        #{files, mode=IN, typeHandler=com.beauty1nside.purchs.OracleArrayProductUpdateHandler}
+    )}
+</insert>
+
+<!-- 상품재고갯수 -->
+<select id="goodsNum" resultType="ProductDTO">
+	WITH AggregatedData AS (
+        SELECT 
+            g.goods_name,
+            g.goods_code,
+            g.goods_standard,
+            g.company_num,
+            o.option_name,
+            o.option_code,
+            o.option_num,
+            b.brand_name,
+            -- ✅ 정확한 입고 수량 합산 (option_num 기준)
+            COALESCE((SELECT SUM(wb.warehousing_total_quantity) 
+                     FROM purchs_warehousing_body wb
+                     WHERE wb.option_num = o.option_num), 0) AS total_input_quantity, 
+            -- ✅ 출고 수량을 OPTION_CODE 기준으로 SUM()
+            COALESCE((SELECT SUM(d.DELIVERY_TOTAL_QNT * TO_NUMBER(REGEXP_SUBSTR(d.GOODS_STANDARD, '\d+', 1, 2))) 
+                     FROM bsn_delivery_detail d
+                     WHERE d.OPTION_CODE = o.OPTION_CODE), 0) AS total_output_quantity,
+            o.option_safety_invoice
+        FROM purchse_goods g 
+        JOIN purchse_option o 
+            ON g.goods_num = o.goods_num
+        JOIN stdr_brand b
+            ON g.brand_id = b.brand_id
+        WHERE g.company_num = #{companyNum}  
+        <include refid="searchgoodsNumInfo"/>  
+        GROUP BY 
+            g.goods_name, g.goods_code, g.goods_standard, g.company_num,
+            o.option_name, o.option_code, o.option_num,
+            b.brand_name, o.option_safety_invoice
+    )
+    SELECT * FROM (
+        SELECT /*+index_desc(purchse_goods PK_PURCHSE_GOODS)*/
+               ROWNUM RN, 
+               goods_name,
+               goods_code,
+               goods_standard,
+               option_name,
+               option_code,
+               option_num,
+               brand_name,
+               total_input_quantity,
+               total_output_quantity,
+               total_input_quantity - total_output_quantity AS total_quantity,
+               option_safety_invoice
+        FROM AggregatedData
+        ORDER BY goods_code DESC, option_code DESC 
+    ) 
+    WHERE RN BETWEEN #{start} AND #{end}  
+</select>
+
+
+<!-- 상품 수 카운트 -->
+<select id="goodsNumcount" resultType="int">
+    WITH AggregatedData AS (
+        SELECT 
+            g.goods_name,
+            g.goods_code,
+            g.goods_standard,
+            g.company_num,
+            o.option_name,
+            o.option_code,
+            o.option_num,
+            b.brand_name,
+            COALESCE(SUM(wb.warehousing_total_quantity), 0) AS total_input_quantity, 
+            COALESCE(SUM(d.delivery_total_qnt * TO_NUMBER(REGEXP_SUBSTR(g.goods_standard, '\d+', 1, 2))), 0) AS total_output_quantity,
+            o.option_safety_invoice
+        FROM purchse_goods g 
+        JOIN purchse_option o 
+            ON g.goods_num = o.goods_num
+        JOIN stdr_brand b
+            ON g.brand_id = b.brand_id
+        LEFT JOIN purchs_warehousing_body wb
+            ON o.option_num = wb.option_num
+        LEFT JOIN bsn_delivery_detail d
+            ON o.option_code = d.option_code
+        WHERE g.company_num = #{companyNum}  <!-- ✅ 기본 WHERE 조건 -->
+        <include refid="searchgoodsNumInfo"/>  <!-- ✅ 추가 검색 조건 -->
+        GROUP BY 
+            g.goods_name, g.goods_code, g.goods_standard, g.company_num,
+            o.option_name, o.option_code, o.option_num,
+            b.brand_name, o.option_safety_invoice
+    )
+    SELECT COUNT(*) FROM AggregatedData
+</select>
+
+<!-- 검색 조건 쿼리 -->
+<sql id="searchgoodsNumInfo">
+    <if test="goodsName != null and goodsName != ''">
+        AND g.goods_name LIKE '%' || #{goodsName} || '%'
+    </if>
+    <if test="brandName != null and brandName != ''">
+        AND b.brand_name LIKE '%' || #{brandName} || '%'
+    </if>
+</sql>
+<!-- 상품 LOT별 재고 조회 -->
+<select id="goodsLotNum" resultType="ProductDTO">
+    WITH AggregatedData AS (
+        SELECT 
+            wb.goods_lot_num,
+            g.goods_code,
+            g.goods_name,
+            o.option_code,
+            o.option_name,
+            wb.option_num,
+            w.warehouse_name,
+            wb.warehouse_id,
+            SUM(wb.warehousing_remaining_quantity) AS total_quantity,  -- ✅ LOT별 재고 합계
+            wh.warehousing_date,
+            wb.goods_consumption_date
+        FROM purchs_warehousing_body wb
+        JOIN purchse_option o 
+            ON o.option_num = wb.option_num
+        JOIN purchse_goods g
+            ON o.goods_num = g.goods_num
+        JOIN purchs_warehousing_header wh
+            ON wb.warehousing_header_num = wh.warehousing_header_num
+        JOIN stdr_warehouse w
+            ON wb.warehouse_id = w.warehouse_id
+        WHERE wb.company_num = #{companyNum}  <!-- ✅ 필수 조건 -->
+        AND wb.option_num = #{optionNum}      <!-- ✅ 필수 조건 -->
+        GROUP BY 
+            wb.goods_lot_num, g.goods_code, g.goods_name, 
+            o.option_code, o.option_name, wb.option_num, 
+            w.warehouse_name, wb.warehouse_id, 
+            wh.warehousing_date, wb.goods_consumption_date
+    )
+    SELECT * FROM (
+        SELECT /*+index_desc(purchs_warehousing_body PK_WAREHOUSING_BODY)*/
+               ROWNUM RN, 
+               goods_lot_num,
+               goods_code,
+               goods_name,
+               option_code,
+               option_name,
+               option_num,
+               warehouse_name,
+               warehouse_id,
+               total_quantity,
+               warehousing_date,
+               goods_consumption_date
+        FROM AggregatedData
+        ORDER BY  goods_code DESC, goods_lot_num DESC
+    ) 
+    WHERE RN BETWEEN #{start} AND #{end}  <!-- ✅ 페이징 적용 -->
+</select>
+
+<!-- 상품 LOT 개수 조회 -->
+<select id="goodsLotNumcount" resultType="int">
+	 SELECT COUNT(*) FROM (
+	    SELECT wb.goods_lot_num
+	    FROM purchs_warehousing_body wb
+	    JOIN purchse_option o 
+	        ON o.option_num = wb.option_num
+	    JOIN purchse_goods g
+	        ON o.goods_num = g.goods_num
+	    JOIN purchs_warehousing_header wh
+	        ON wb.warehousing_header_num = wh.warehousing_header_num
+	    JOIN stdr_warehouse w
+	        ON wb.warehouse_id = w.warehouse_id
+	    WHERE wb.company_num = #{companyNum}
+	    AND wb.option_num = #{optionNum}      
+	    GROUP BY wb.goods_lot_num
+	) AggregatedData  
+ 
+
+</select>
 
 
 </mapper>

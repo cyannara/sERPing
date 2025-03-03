@@ -1,20 +1,20 @@
 <body>
- <script>
+<!--  <script>
 document.addEventListener("DOMContentLoaded", function() {
   // 브라우저 sessionStorage에서 값 가져오기
   const vendorEmail = sessionStorage.getItem("vendorEmail"); 
   const employeeEmail = sessionStorage.getItem("employeeEmail");
 
   // 값이 있으면 폼에 대입
-  if (vendorEmail) {
+  if (employeeEmail) {
     document.getElementById("fromEmail").value = employeeEmail;
   }
-  if (employeeEmail) {
+  if (vendorEmail) {
     document.getElementById("toEmail").value = vendorEmail;
   }
 });
 </script>
-
+ -->
 
    <div class="container my-4">
     <h2 class="mb-4">발주서 보내기</h2>
@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", function() {
       <h4 class="mt-4">수신정보</h4>
       <div class="mb-3">
         <label for="toEmail" class="form-label">메일수신주소</label>
-        <input type="email" id="toEmail" name="toEmail" class="form-control"   required>
+        <input type="email" id="toEmail" name="toEmail" class="form-control" required>
       </div>
       <div class="d-flex justify-content-end">
        <button type="submit" class="btn btn-primary">전송</button>
@@ -55,6 +55,7 @@ document.addEventListener("DOMContentLoaded", function() {
   </div>
   
 <script>
+	
     // 폼 제출을 AJAX 방식으로 처리하여 전송 성공 시 알림 후 페이지 리로드
     document.getElementById("mailForm").addEventListener("submit", function(e) {
       e.preventDefault(); // 기본 폼 제출 중단

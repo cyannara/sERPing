@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.beauty1nside.purchs.dto.PurchInsertVO;
+import com.beauty1nside.purchs.dto.PurchUpdateVO;
 import com.beauty1nside.purchs.dto.PurchaseDTO;
 import com.beauty1nside.purchs.dto.PurchaseSearchDTO;
 import com.beauty1nside.purchs.mapper.purchaseMapper;
@@ -49,6 +50,19 @@ public class purchaseServiceImpl implements purchaseService{
 	@Override
 	public int nonwarehousingCount(PurchaseSearchDTO dto) {
 		return purchaseMapper.nonwarehousingCount(dto);
+	}
+
+	@Override
+	public List<PurchaseDTO> getPurchsinfo(Long purchaseNum, int companyNum) {
+		
+		return purchaseMapper.purchaseinfo(purchaseNum, companyNum);
+	}
+
+	@Override
+	public void purchUpdate(PurchUpdateVO vo) {
+		log.info("수정 내용 서비스 == {}",vo);
+		purchaseMapper.purchsupdate(vo);
+
 	}
 	
 	
