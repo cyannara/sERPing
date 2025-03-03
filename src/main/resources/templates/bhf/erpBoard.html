@@ -35,6 +35,9 @@
 						</div>					
 						<div id="board"></div>
 						<div id="pagination" class="tui-pagination"></div>
+						<div style="text-align : right">
+							<button type="button" class="boardInsert">글 쓰기</button>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -68,7 +71,7 @@
 				{ header : "작성자", name : "employeeName", align: 'center', width: 150},
 				{ header : "작성일", name : "boardDate", align: 'center', width: 150},
 				{
-                    header: "상세",
+                    header: "글보기",
                     name: "moveToPage",
                     width: 50,
                     formatter: ({ row }) => {
@@ -86,6 +89,10 @@
 	            if (button) {
 	                const dataset = button.dataset; // 버튼에서 data-id 값 가져오기
 	                window.location.href = `/bhf/erpBoardDTL?boardId=${dataset.id}`;
+	            }
+	            const insert = event.target.closest(".boardInsert");
+	            if (insert) {
+	                window.location.href = `/bhf/erpBoardInsert`;
 	            }
 	        });
 		

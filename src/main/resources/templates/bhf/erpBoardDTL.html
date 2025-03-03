@@ -8,25 +8,120 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>board</title>>
+    <style>
+        /* 전체 컨테이너 */
+        .board-container {
+		    max-width: 90%; /* 기존보다 더 넓게 설정 */
+		    min-height: 300px; /* 글 내용이 짧아도 박스가 너무 작아지지 않도록 */
+		    margin: 20px auto;
+		    padding: 30px;
+		    border-radius: 10px;
+		    background: #fff;
+		    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+		}
+		
+		/* 제목 스타일 */
+		.board-title {
+		    font-size: 26px;
+		    font-weight: bold;
+		    margin-bottom: 15px;
+		}
+		
+		/* 게시글 정보 */
+		.board-info {
+		    font-size: 16px;
+		    color: #666;
+		    border-bottom: 1px solid #ddd;
+		    padding-bottom: 10px;
+		    margin-bottom: 20px;
+		}
+		
+		/* 내용 스타일 */
+		.board-content {
+		    font-size: 18px;
+		    line-height: 1.8;
+		    min-height: 200px;
+		    white-space: pre-wrap; /* 줄 바꿈 유지 */
+		}
+		
+		/* 버튼 스타일 */
+		.board-buttons {
+		   display: flex;
+	        justify-content: flex-end; /* 버튼들을 오른쪽에 정렬 */
+	        gap: 10px; /* 버튼 사이 간격 */
+	        margin-top: 20px;
+		}
+		
+		.btn {
+		    padding: 10px 20px;
+		    border-radius: 5px;
+		    cursor: pointer;
+		    text-align: center;
+		    text-decoration: none;
+		    border: none;
+		    font-size: 16px;
+		}
+		
+		.btn-back {
+		    background-color: #6c757d;
+		    color: white;
+		}
+		
+        .btn-edit {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        /* 수정/삭제 버튼은 기본적으로 숨김 */
+        .edit-delete-buttons {
+            display: none;
+        }
+    </style>
 </head>
 <body layout:fragment="content">
 	<div class="container">
 		<div class="row">
-			<h3 class="mt-2 mb-2">게시판 글 상세 내용</h3>
+			<h3 class="mt-2 mb-2">게시판 글 내용</h3>
 			<span id="boardId" th:data-board-id="${boardId}"></span>
 			<hr>
+			<div id="boardDetail" class="board-container">
+				<!-- 제목 -->
+				<div id="title" class="board-title"></div>
+				<!-- 작성자, 작성일, 분류 -->
+				<div class="board-info">
+					<span id="category"></span> | 
+					<span id="author"></span> | 
+					<span id="date"></span>
+				</div>
+				<!-- 내용 -->
+				<div id="content" class="board-content"></div>
+				
+				<div class="board-buttons">
+					<!-- history.back() => 브라우저의 내장함수로 이전페이지로 이동하게 해준다 -->
+					<button onclick="history.back()" class="btn btn-back">뒤로가기</button>
+					 <div class="edit-delete-buttons">
+		                <button class="btn btn-edit" id="editBtn">수정</button>
+		                <button class="btn btn-delete" id="deleteBtn">삭제</button>
+		            </div>
+				</div>
+			</div>
 		</div>
 	</div>
-	<h3>문서 템플릿</h3>
-	
-	<div id="editor" class="toastui-editor-contents"></div>
-	
-	<!-- 밑에 패티까지 해서 데이터 가져오는거까지 성공 이제 화면구성하고 데이터 넣기 -->
 	
 	<script th:inline="javascript">
+	
+		const header = document.querySelector('meta[name="_csrf_header"]').content; //서버에서 요구하는 CSRF 헤더이름
+	    const token = document.querySelector('meta[name="_csrf"]').content; //서버에서 생성한 CSRF 토큰 값
+	
+		let sessionEmployeeName = [[${session.employeeName}]];
 		let sessioCompanyNum = [[${session.companyNum}]];
 	    const boardId = document.getElementById("boardId").dataset.boardId
-	    console.log(boardId)
+	    
 	    const url = `http://localhost:81/bhf/rest/board/list?boardId=${boardId}&companyNum=${sessioCompanyNum}`;
 	    fetch(url, {
 	        method: "GET",
@@ -36,8 +131,55 @@
 	    })
 	        .then(result => result.json())
 	        .then(data => {
-	            const editor = document.getElementById('editor')
-	            editor.innerHTML = data.documentTemplate;
+	        	
+	        	 // 데이터가 존재하는지 확인 후 할당
+		        if (data.result && data.data && data.data.contents.length > 0) {
+		            const board = data.data.contents[0]; // 상세 게시글 위치
+		            
+		            document.getElementById("title").innerText = board.boardTitle || "제목 없음";
+		            document.getElementById("category").innerText = `분류: ${board.boardCategory || "없음"}`;
+		            document.getElementById("author").innerText = `작성자: ${board.employeeName || "미상"}`;
+		            document.getElementById("date").innerText = `작성일: ${board.boardDate || "날짜 없음"}`;
+		            document.getElementById("content").innerText = board.boardContent || "내용 없음";
+		            
+		         	// 작성자와 로그인한 사용자가 같으면 수정/삭제 버튼 보이게 함
+                    if (sessionEmployeeName === board.employeeName) {
+                        document.querySelector(".edit-delete-buttons").style.display = "block";
+                    }
+		         	
+                    // 수정 버튼 이벤트 추가
+                    document.getElementById("editBtn").addEventListener("click", () => {
+                        window.location.href = `/bhf/erpBoardModify?boardId=${boardId}`; // 수정 페이지 이동
+                    });
+
+                    // 삭제 버튼 이벤트 추가
+                    document.getElementById("deleteBtn").addEventListener("click", () => {
+                        if (confirm("정말 삭제하시겠습니까?")) {
+                            fetch(`/bhf/rest/board/del?boardId=${boardId}`, {
+                                method: "DELETE",
+                                headers: { 
+                                	"Content-Type": "application/json",
+                                	//위에 변수로 저장한 헤더이름,토큰값 넣어주기
+                		        	'header': header, 
+                		            'X-CSRF-Token': token
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(result => {
+                                if (result.success) {
+                                    alert("삭제되었습니다.");
+                                    window.location.href = "/bhf/erpBoard"; // 목록 페이지로 이동
+                                } else {
+                                    alert("삭제에 실패했습니다.");
+                                }
+                            })
+                            .catch(error => console.error("삭제 오류:", error));
+                        }
+                    });
+		            
+		        } else {
+		            document.getElementById("boardDetail").innerHTML = "<p>게시글을 불러올 수 없습니다.</p>";
+		        }
 	        })
 	        .catch(error => console.error("Error fetching data:", error)); 
 	</script>

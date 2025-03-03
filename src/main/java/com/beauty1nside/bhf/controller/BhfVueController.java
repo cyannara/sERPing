@@ -40,6 +40,18 @@ public class BhfVueController {
 		model.addAttribute("boardId",boardId);
 		return "/bhf/erpBoardDTL";
 	};
+	//게시판 등록 페이지
+	@GetMapping("/erpBoardInsert")
+	public String erpBoardInsert() {
+		return "/bhf/erpBoardInsert";
+	};
+	//게시판 수정 페이지
+	@GetMapping("/erpBoardModify")
+	public String erpBoardModify(@RequestParam("boardId") int boardId, Model model) {
+		
+		model.addAttribute("boardId",boardId);
+		return "/bhf/erpBoardModify";
+	};
 
 	//샘플 페이지
 	@GetMapping("/")
