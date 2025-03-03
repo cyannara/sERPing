@@ -23,21 +23,12 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 <body layout:fragment="content">
 	<div class="container">
 		<div class="row">
-			<h3 class="mt-2 mb-2">교환 및 반품 조회</h3>
+			<h3 class="mt-2 mb-2">CS관리-교환 및 반품 처리</h3>
 			<hr>
 			<div class="col-md-6 mt-2 mb-2">
 				<div class="row">
 					<label class="col-sm-4">신청 일자</label> 
 					<input type="date"class="col-sm-7" id="requestDate"> 
-				</div>
-			</div>
-			<div class="col-md-6 mt-2 mb-2">
-				<div class="row">
-					<label class="col-sm-4">진행 상태</label> 
-					<select name="progressStatus" id="progressStatus" class="col-sm-7">
-						<option value="" selected>선택 하세요.</option>
-						<option value="신청">신청</option>
-					</select>
 				</div>
 			</div>
 			<div class="col-md-12 mt-2 mb-2">
@@ -80,7 +71,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 			<div class="col-md-12 stretch-card mt-2 mb-2">
 				<div class="card">
 					<div class="card-body">
-						<h6 class="mb-4">교환 및 반품 상세</h6>
+						<h6 class="mb-4">교환 및 반품 처리 내역</h6>
 						<p id="returningCodeArea"></p>
 						<div id="returningDtlProcessing"></div>
 						<div id="pagination" class="tui-pagination"></div>
@@ -123,7 +114,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		
 	<script  th:inline="javascript">
 	//회사번호
-	let sessioCompanyNum = [[${session.companyNum}]];
+	let sessionCompanyNum = [[${session.companyNum}]];
 	let departmentNum = [[${session.departmentNum}]];
 	let employeeNum = [[${session.employeeNum}]];
 	</script>
@@ -138,6 +129,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		
 		//페이지가 로드되면 테이블에 데이터가 없을때 뜨는 문구 함수 실행
 		document.addEventListener("DOMContentLoaded",()=>{
+			search();  // DOMContentLoaded 이벤트 후 자동으로 검색 실행
 			REDnodata();
 			REDPnodata();
 		})
@@ -227,12 +219,12 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 				perPage: 5,
 			},
 			columns: [ 
-				//{ header : "상세코드", name : "returningDetailCode"},
+				{ header : "상세코드", name : "returningDetailCode", sortable : true},
 				{ header : "상품명", name : "goodsName"},
 				//{ header : "상품코드", name : "goodsCode"},
 				{ header : "옵션명", name : "optionName"},
 				//{ header : "옵션코드", name : "optionCode"},
-				{ header : "수량", name : "quantity"},
+				{ header : "수량", name : "quantity", sortable : true},
 				{ header : "교환 및 반품", name : "exchangeReturningChoice", sortable : true},
 				//{ header : "사유", name : "returningReason", width: 'auto'},
 				//{ header : "바코드", name : "optionBarcode"},
@@ -330,11 +322,11 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		function search(){
 			// 값 가져와서 변수선언
 			let requestDate = document.querySelector('#requestDate').value;
-			let progressStatus = document.querySelector('#progressStatus').value;
 			// 객체로 담을 변수선언
 			let parameter = {};
 			// 객체 담기
-			parameter.progressStatus = progressStatus;
+			parameter.companyNum = sessionCompanyNum;
+			parameter.progressStatus = '신청';
 			// sql로 선언한 Date는 null값이 들어가면 오류가 나서 null이 아닐때 넣는거로 선언
 			if(requestDate != ''){
 				parameter.requestDate = requestDate;
@@ -351,14 +343,16 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 			//데이터가 없으면 뜨는 문구
 			REnodata();
 		}
+
+
 		
 		// 검색 초기화 함수
 		function reset(){
 			// 입력칸 빈칸으로 변경
 			let requestDate = document.querySelector('#requestDate').value = '';
-			let progressStatus = document.querySelector('#progressStatus').value = '';
+			let progressStatus =  '신청';
 			// 빈 값을 보냄
-			grid.setRequestParams({});
+			grid.setRequestParams({companyNum: sessionCompanyNum, branchOfficeId: branchOfficeId, progressStatus: progressStatus});
 			grid.readData();
 
 			//선택한 반품 코드 초기화
@@ -408,7 +402,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		    };
 		}
 		
-		// 발주 취소 함수
+		// 교환 취소 함수
 		function cancelReturning(cancelRequest) {
 			const header = document.querySelector('meta[name="_csrf_header"]').content;
 		    const token = document.querySelector('meta[name="_csrf"]').content;
@@ -529,7 +523,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		    		
 		    		returningData = {
 		    				employeeNum: employeeNum,
-		    				companyNum : sessioCompanyNum,
+		    				companyNum : sessionCompanyNum,
 		    				branchOfficeId: branchOfficeId,
 		    				returningCode : returningCode,
 		    				returningDetailData: returningDetailData,
@@ -553,7 +547,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		    		
 		    		returningData = {
 		    				employeeNum: employeeNum,
-		    				companyNum : sessioCompanyNum,
+		    				companyNum : sessionCompanyNum,
 		    				branchOfficeId: branchOfficeId,
 		    				returningCode : returningCode,
 		    				returningDetailData: returningDetailData,

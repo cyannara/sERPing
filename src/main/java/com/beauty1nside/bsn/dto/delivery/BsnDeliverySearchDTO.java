@@ -1,19 +1,17 @@
-package com.beauty1nside.bsn.dto;
-
+package com.beauty1nside.bsn.dto.delivery;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
 import lombok.Data;
 
 @Data
-public class OrderSearchDTO {
-	
+public class BsnDeliverySearchDTO {
 	int start;
 	int end;
 	int pageUnit;
-	
 	int companyNum;
 	
 	//발주 요청 검색용
@@ -23,11 +21,5 @@ public class OrderSearchDTO {
 	Date startDate;
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	Date endDate;
-	
-	
-	
-	
-//	public String[] getTypeArr() {
-//		return type == null ?  new String[] {} : type.split("");
-//	}
+	List<String> statusList;
 }

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.beauty1nside.bhf.dto.returninglist.BhfReturnListDTO;
 import com.beauty1nside.bhf.dto.returninglist.BhfReturnListSearchDTO;
+import com.beauty1nside.bsn.dto.cs.BsnCsReturningDetailDTO;
 import com.beauty1nside.bsn.dto.cs.BsnReturnListDTO;
 import com.beauty1nside.bsn.dto.cs.BsnReturningRefusalDTO;
 import com.beauty1nside.bsn.dto.cs.BsnReturningRegistDTO;
@@ -34,6 +35,16 @@ public class BsnCsServiceImpl implements BsnCsService{
 	public List<BsnReturnListDTO> bhfReturningDetail(BhfReturnListSearchDTO dto) {
 		return bsnCsMapper.selectBhfReturningDetail(dto);
 	}
+	
+	@Override
+	public List<BsnCsReturningDetailDTO> getBsnCsReturningDetail(BhfReturnListSearchDTO dto) {
+		return bsnCsMapper.selectBsnCsReturningDetail(dto);
+	}
+	
+	@Override
+	public int getCountOfBsnCsReturningDetail(BhfReturnListSearchDTO dto) {
+		return bsnCsMapper.countBsnCsReturningDetail(dto);
+	}
 
 	//반품 교환 처리
 	@Override
@@ -47,5 +58,9 @@ public class BsnCsServiceImpl implements BsnCsService{
 		bsnCsMapper.cancelBsnCSReturningGoods(bsnReturningRefusalDTO);
 		
 	}
+
+	
+
+	
 
 }

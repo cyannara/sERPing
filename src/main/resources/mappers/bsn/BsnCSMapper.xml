@@ -35,8 +35,10 @@
 	
 	<!-- 검색조건(검색을 안하면 그냥 조회가 되게), 신청만 조회 -->
 	<sql id="searchInfo">
-		company_num = 1
-		AND progress_status = '신청'
+		company_num = #{companyNum}
+		<if test="progressStatus != null and ! progressStatus.equals('')">
+			AND progress_status = #{progressStatus}
+		</if>
 		<if test="requestDate != null and ! requestDate.equals('')">
 			AND TO_CHAR(request_date, 'yyyy-mm-dd') = #{requestDate}
 		</if>
@@ -78,6 +80,60 @@
 			and returning_code = #{returningCode} 
 			)
 		where rn >= #{start}
+	</select>
+	
+	<select id="selectBsnCsReturningDetail" resultType="BsnCsReturningDetailDTO">
+		SELECT CS_RETURNING_GOODS_ID ,
+			   RETURNING_CODE ,
+			   RETURNING_DETAIL_CODE ,
+			   GOODS_CODE ,
+			   GOODS_NAME ,
+			   OPTION_CODE ,
+			   OPTION_NAME ,
+			   OPTION_BARCODE ,
+			   RETURNING_QNT ,
+			   WAREHOUSING_QNT ,
+			   DISUSE_QNT ,
+			   WAREHOUSE_ID ,
+			   EMPLOYEE_NUM ,
+			   COMPANY_NUM ,
+			   EXCHANGE_RETURNING_CHOICE ,
+		   	   GOODS_LOT_NUM ,
+			   COMPLETION_DATE ,
+			   RETURNING_REASON 
+		FROM(
+			SELECT ROW_NUMBER() OVER (
+	                 ORDER BY TO_NUMBER(REGEXP_SUBSTR(CS_RETURNING_GOODS_ID, '\d+')) desc
+	               ) AS RN,
+				   CS_RETURNING_GOODS_ID ,
+				   RETURNING_CODE ,
+				   RETURNING_DETAIL_CODE ,
+				   GOODS_CODE ,
+				   GOODS_NAME ,
+				   OPTION_CODE ,
+				   OPTION_NAME ,
+				   OPTION_BARCODE ,
+				   RETURNING_QNT ,
+				   WAREHOUSING_QNT ,
+				   DISUSE_QNT ,
+				   WAREHOUSE_ID ,
+				   EMPLOYEE_NUM ,
+				   COMPANY_NUM ,
+				   EXCHANGE_RETURNING_CHOICE ,
+			   	   GOODS_LOT_NUM ,
+				   COMPLETION_DATE ,
+				   RETURNING_REASON 
+			FROM bsn_cs_returning_goods
+			WHERE RETURNING_CODE = #{returningCode}
+			
+		)
+		WHERE RN BETWEEN #{start} AND #{end}
+	</select>
+	
+	<select id="countBsnCsReturningDetail">
+			SELECT COUNT(*)
+			FROM   bsn_cs_returning_goods
+			WHERE  RETURNING_CODE = #{returningCode}
 	</select>
 	
 	<insert id="insertBsnCSReturningGoods" statementType="CALLABLE">

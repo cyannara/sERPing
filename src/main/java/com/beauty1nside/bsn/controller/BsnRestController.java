@@ -20,7 +20,9 @@ import com.beauty1nside.bsn.dto.cs.BsnReturningRefusalDTO;
 import com.beauty1nside.bsn.dto.cs.BsnReturningRegistDTO;
 import com.beauty1nside.bsn.dto.delivery.BsnDeliveryDTO;
 import com.beauty1nside.bsn.dto.delivery.BsnDeliveryDetailDTO;
+import com.beauty1nside.bsn.dto.delivery.BsnDeliverySearchDTO;
 import com.beauty1nside.bsn.dto.order.BhfOrderDTO;
+import com.beauty1nside.bsn.dto.order.BsnOrderCancelDTO;
 import com.beauty1nside.bsn.dto.order.BsnOrderDTO;
 import com.beauty1nside.bsn.dto.order.BsnOrderDetailDTO;
 import com.beauty1nside.bsn.service.BsnCsService;
@@ -137,7 +139,7 @@ public class BsnRestController {
 		}
 	}
 	
-	@GetMapping("/orderList")
+	@GetMapping("/order/list")
 	public Object bsnOrder(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
 			@RequestParam(name ="page", defaultValue = "1", required = false) int page,
 			OrderSearchDTO searchDTO, Paging paging) throws JsonMappingException, JsonProcessingException  {
@@ -164,7 +166,7 @@ public class BsnRestController {
 		return result;		
 	};
 	
-	@GetMapping("/orderList/detail")
+	@GetMapping("/order/list/detail")
 	public Object bsnOrderDetail(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
 			@RequestParam(name ="page", defaultValue = "1", required = false) int page,
 			@RequestParam(name = "orderId", defaultValue = "bsn_order12") String orderId,
@@ -188,13 +190,31 @@ public class BsnRestController {
 
 	};
 	
+	@PutMapping("/order/list/cancel")
+	public Object bsnOrderCanel(@RequestBody BsnOrderCancelDTO bsnOrderCancelDTO){
+		Map<String, Object> response = new HashMap<>();
+	
+		try {
+			//bsnOrderService.cancelBsnOrder(bsnOrderCancelDTO);
+			response.put("status", "success");
+	        response.put("message", "취소 성공");
+	        return ResponseEntity.ok(response); // JSON 형태 응답
+			
+		} catch (Exception e) {
+			log.error("취소 실패", e);
+	        response.put("status", "error");
+	        response.put("message", "요청 취소 실패");
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+		}
+	};
+	
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	//출고 조회
 	@GetMapping("/deli")
 	public Object delivery(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
 			@RequestParam(name ="page", defaultValue = "1", required = false) int page,
-			OrderSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException  {
+			BsnDeliverySearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException  {
 	
 		//한 페이지에 출력할 수 : 기본값: 5
 				paging.setPageUnit(perPage);
@@ -207,7 +227,7 @@ public class BsnRestController {
 
 				
 				GridArray grid = new GridArray();
-				Object result = grid.getArray(paging.getPage(), 10, bsnOrderService.getBsnDelivery(dto));
+				Object result = grid.getArray(paging.getPage(), bsnOrderService.getCountOfBsnDelivery(dto), bsnOrderService.getBsnDelivery(dto));
 
 				return result;	
 	}
@@ -230,7 +250,7 @@ public class BsnRestController {
 		dto.setDeliveryId(deliveryId);
 		
 		GridArray grid = new GridArray();
-		Object result = grid.getArray(paging.getPage(), 10, bsnOrderService.getBsnDeliveryDetail(dto) );
+		Object result = grid.getArray(paging.getPage(), bsnOrderService.getCountOfBsnDeliveryDetail(dto), bsnOrderService.getBsnDeliveryDetail(dto) );
 
 		return result;		
 
@@ -254,7 +274,7 @@ public class BsnRestController {
 		dto.setDeliveryDetailId(deliveryDetailId);
 		
 		GridArray grid = new GridArray();
-		Object result = grid.getArray(paging.getPage(), 10, bsnOrderService.getBsnDeliveryLotDetail(dto) );
+		Object result = grid.getArray(paging.getPage(), bsnOrderService.getCountOfBsnDeliveryLotDetail(dto), bsnOrderService.getBsnDeliveryLotDetail(dto) );
 
 		return result;		
 
@@ -262,7 +282,7 @@ public class BsnRestController {
 	
 	
 	
-	//임시 창고
+	//연결할 수 있는 LOT 조회
 	@GetMapping("/goods/lot")
 	public Object goodsLot(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
 			@RequestParam(name ="page", defaultValue = "1", required = false) int page,
@@ -282,7 +302,7 @@ public class BsnRestController {
 				dto.setDeliveryDetailId(deliveryDetailId);
 				
 				GridArray grid = new GridArray();
-				Object result = grid.getArray(paging.getPage(), 10, bsnOrderService.getGoodsWarehouseLot(dto) );
+				Object result = grid.getArray(paging.getPage(), bsnOrderService.getCountOfGoodsWarehouseLot(dto), bsnOrderService.getGoodsWarehouseLot(dto) );
 
 				return result;	
 	}
@@ -306,6 +326,26 @@ public class BsnRestController {
 		}
 		
 	}
+	
+	//출고 LOT 수량 수정
+	@PutMapping("/deli/lot/detail/modify")
+	public ResponseEntity<Map<String, Object>> deliveryLotDetailModify(@RequestBody BsnDeliveryDetailDTO bsnDeliveryDetailDTO){
+		Map<String, Object> response = new HashMap<>();
+		try {
+			bsnOrderService.modifyBsnDeliveryLotDetail(bsnDeliveryDetailDTO);
+				
+			response.put("status", "success");
+		    response.put("message", "LOT 수정 성공");
+		    return ResponseEntity.ok(response); // JSON 형태 응답
+				
+		} catch (Exception e) {
+			log.error("LOT 삭제 실패", e);
+		    response.put("status", "error");
+		    response.put("message", "LOT 수정 실패");
+		    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+		}
+	}
+	
 	//출고 LOT 삭제
 	@DeleteMapping("/deli/lot/detail/delete")
 	public ResponseEntity<Map<String, Object>> deliveryLotDetailDelete(@RequestBody BsnDeliveryDetailDTO bsnDeliveryDetailDTO){
@@ -382,7 +422,28 @@ public class BsnRestController {
 		
 		// grid 배열 처리
 		GridArray grid = new GridArray();
-		Object result = grid.getArray( paging.getPage(), bsnCsService.countBhfReturningList(dto), bsnCsService.bhfReturningDetail(dto) );
+		Object result = grid.getArray( paging.getPage(), bsnCsService.getCountOfBsnCsReturningDetail(dto), bsnCsService.bhfReturningDetail(dto) );
+		return result;
+	}
+	
+	@GetMapping("/cs/returning/record")
+	public Object csReturningRecord(@RequestParam(name = "perPage", defaultValue = "2", required = false) int perPage, 
+			@RequestParam(name = "page", defaultValue = "1", required = false) int page, 
+			BhfReturnListSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
+		// 페이징 유닛 수
+		paging.setPageUnit(perPage);
+		paging.setPage(page);
+		
+		// 페이징 조건
+		dto.setStart(paging.getFirst());
+		dto.setEnd(paging.getLast());
+		
+		// 페이징 처리
+		//paging.setTotalRecord(bsnCsService.countBhfReturningList(dto));
+		
+		// grid 배열 처리
+		GridArray grid = new GridArray();
+		Object result = grid.getArray( paging.getPage(), bsnCsService.getCountOfBsnCsReturningDetail(dto), bsnCsService.getBsnCsReturningDetail(dto) );
 		return result;
 	}
 	
