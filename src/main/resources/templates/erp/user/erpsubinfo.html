@@ -62,9 +62,6 @@
 		.modal-body {
 			padding: 13px !important;
 		}
-		.tui-grid-body-area {
-			height: 217px !important;
-		}
 		.card {
 		    width: 100%;
 		    height: 100%;
@@ -370,45 +367,51 @@
 		//그리드 생성
 		const sublistgrid = new Grid({
 			el : document.getElementById('sublist'), // 컨테이너 엘리먼트
+			scrollX: false,
+		    scrollY: false,
+		    minBodyHeight: 201,
+		    columnOptions: {
+		        resizable: true
+		    },
 			pageOptions : {
 				useClient : false, //페이지 네이션 할꺼면 false // 자동으로 하게할껴면 true
 				perPage : 5, //한페이지에 몇개 보여줄지
 			},
 			//칼럼 정하기
 			columns: [
-				{ header: "구독번호", name: "subscriptionNum", editor: 'text' },
-				{ header: "구독수단", name: "subscriptionMeanName", editor: 'text' },
-				{ header: "구독형태", name: "subscriptionFormName", editor: 'text' },
-				{ header: "구독금액", name: "subscriptionAmount", editor: 'text',
+				{ header: "구독번호", name: "subscriptionNum", editor: 'text', align: "center", width: "100" },
+				{ header: "구독수단", name: "subscriptionMeanName", editor: 'text', align: "center", width: "100" },
+				{ header: "구독형태", name: "subscriptionFormName", editor: 'text', align: "center", width: "100" },
+				{ header: "구독금액", name: "subscriptionAmount", editor: 'text', align: "right",
 					formatter: function({ value }) {
 						return numberFormat(value)+'원';
 						//return value.toLocaleString()+'원';
 				    },
 				},
-				{ header: "구독일시", name: "subscriptionDate", editor: 'text',
+				{ header: "구독일시", name: "subscriptionDate", editor: 'text', align: "center", width: "170",
 					formatter: function({ value }) {
 						return subscriptday(value);
 				    },
 				},
-				{ header: "거래명세서", name: "transactionstatement", editor: 'text',
+				{ header: "거래명세서", name: "transactionstatement", editor: 'text', align: "center", width: "110",
 					formatter: function({ row }) {
-				        return `<button class="btn btn-info btn-sm sub-bill" data-id="${row.subscriptionNum}">거래명세서</button>`;
+				        return `<button class="btn btn-outline-primary btn-sm sub-bill" data-id="${row.subscriptionNum}">거래명세서</button>`;
 				    },
 				},
-				{ header: "세금계산서", name: "taxinvoice", editor: 'text',
+				{ header: "세금계산서", name: "taxinvoice", editor: 'text', align: "center", width: "110",
 					formatter: function({ row }) {
 						if(row.billForm=="EB01"){
 							return `발행불가`;
 						}else{
 							if(row.billNum){
-								return `<button class="btn btn-info btn-sm sub-tax" data-id="${row.subscriptionNum}_1">계산서보기</button>`;
+								return `<button class="btn btn-outline-primary btn-sm sub-tax" data-id="${row.subscriptionNum}_1">계산서보기</button>`;
 							}else{
-					        	return `<button class="btn btn-info btn-sm sub-tax" data-id="${row.subscriptionNum}_2">발행하기</button>`;							
+					        	return `<button class="btn btn-outline-primary btn-sm sub-tax" data-id="${row.subscriptionNum}_2">발행하기</button>`;							
 							}							
 						}
 				    },
 				},
-				{ header: "발행일시", name: "세금계산서", editor: 'text',
+				{ header: "발행일시", name: "세금계산서", editor: 'text', align: "center", width: "170",
 					formatter: function({ row }) {
 						if(row.issueDate && row.billForm=="EB02"){
 							return subscriptday(row.issueDate);
@@ -417,16 +420,16 @@
 						}
 					},
 				},
-				{ header: "현금영수증", name: "cashreceipt", editor: 'text',
+				{ header: "현금영수증", name: "cashreceipt", editor: 'text', align: "center", width: "110",
 					formatter: function({ row }) {
 						if(row.subscriptionMeanName=="무통장" || row.subscriptionMeanName=="계좌이체"){
 							if(row.billForm=="EB02"){
 								return `발행불가`;
 							}else{
 								if(row.billNum){
-									return `<button class="btn btn-info btn-sm sub-cash" data-id="${row.subscriptionNum}_1">영수증보기</button>`;
+									return `<button class="btn btn-outline-primary btn-sm sub-cash" data-id="${row.subscriptionNum}_1">영수증보기</button>`;
 								}else{
-						        	return `<button class="btn btn-info btn-sm sub-cash" data-id="${row.subscriptionNum}_2">발행하기</button>`;							
+						        	return `<button class="btn btn-outline-primary btn-sm sub-cash" data-id="${row.subscriptionNum}_2">발행하기</button>`;							
 								}								
 							}
 						}else{
@@ -434,7 +437,7 @@
 						}
 				    },
 				},
-				{ header: "발행일시", name: "현금영수증", editor: 'text',
+				{ header: "발행일시", name: "현금영수증", editor: 'text', align: "center", width: "170",
 					formatter: function({ row }) {
 						if(row.issueDate && row.billForm=="EB01"){
 							return subscriptday(row.issueDate);
@@ -555,7 +558,7 @@
 						        }
 						    }, 500);
 						}else{
-							alert('계산서 저장에 실패 했습니다');
+							showAlert("계산서 저장에 실패 했습니다", 'danger');
 						}
 					})
 				//기존에 있는거 보여줌	
@@ -615,7 +618,7 @@
 						        }
 						    }, 500);
 						}else{
-							alert('현금영수증 저장에 실패 했습니다');
+							showAlert("현금영수증 저장에 실패 했습니다", 'danger');
 						}
 					})
 		    	}else if(cash[1] == 1){
@@ -628,16 +631,22 @@
 		//구독 상세 그리드
 		const subDetailgrid = new Grid({
 			el : document.getElementById('subDetailgrid'), // 컨테이너 엘리먼트
+			scrollX: false,
+		    scrollY: false,
+		    minBodyHeight: 201,
+		    columnOptions: {
+		        resizable: true
+		    },
 			//칼럼 정하기
 			columns: [
-				{ header: "구독상품명", name: "subscriptionName" },
-				{ header: "구독옵션명", name: "subscriptionOption" },
-				{ header: "구독기간", name: "subscriptionPeriod",
+				{ header: "구독상품명", name: "subscriptionName", },
+				{ header: "구독옵션명", name: "subscriptionOption", },
+				{ header: "구독기간", name: "subscriptionPeriod", align: "center", width:"100",
 					formatter: function({ value }) {
 						return value + '일';
 				    },
 				},
-				{ header: "금액", name: "subscriptionOptionPrice",
+				{ header: "금액", name: "subscriptionOptionPrice", align: "right", width:"120",
 					formatter: function({ value }) {
 						return Number(value).toLocaleString() + '원';
 				    },
