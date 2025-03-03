@@ -258,7 +258,6 @@
 
 
   <script th:inline="javascript">
-  let companyNumSJ = /*[[${session.companyNum}]]*/ null;
   let companyNum = /*[[${session.companyNum}]]*/ null; 
   let departmentNumSJ = 0;
   
@@ -270,7 +269,7 @@
 	            readData: {
 	                url: '/hr/rest/emp/organization',
 	                method: 'GET',
-	                initParams: { companyNum:companyNumSJ , departmentNum:departmentNumSJ  }
+	                initParams: { companyNum:companyNum, departmentNum:0 }
 	            }
 	        },
 	        contentType: 'application/json',
@@ -518,33 +517,15 @@
           $(document).on('click', '.department-tree [data-company-id], .department-tree [data-dept-id]', function(event) {
         	    event.stopPropagation(); // 부모 요소로 이벤트 전파 방지
 
-        	    let companyId = $(this).data('company-id'); // `data-company-id` 값 가져오기
+        	   
         	    let departmentNum = $(this).data('dept-id'); // `data-dept-id` 값 가져오기
 
-        	    if (companyId !== undefined) {
-        	        
-        	        departmentNumSJ=0;
-        	        fetch(`/hr/rest/emp/organization?perPage=5&companyNum=${companyNum}&departmentNum=${departmentNumSJ}&page=1`, {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            "X-CSRF-Token": token
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        grid.resetData(data.data.contents);  // 옵션 테이블 데이터 업데이트
-                        console.log(data);
-                    })
-                    .catch(error => console.error("데이터 요청 실패:", error));
-        	        
-        	        
-        	        
-        	    } else if (departmentNum !== undefined) {
-        	        departmentNumSJ = departmentNum;
+        	    if (departmentNum == undefined) {	        	        
+        	    	departmentNum=0;
+        	    } 
+        	    grid.readData(1,{departmentNum});
 
-        	     // 쿼리 호출
-                    fetch(`/hr/rest/emp/organization?perPage=5&companyNum=${companyNum}&departmentNum=${departmentNumSJ}&page=1`, {
+/*         	         fetch(`/hr/rest/emp/organization?perPage=5&companyNum=${companyNum}&departmentNum=${departmentNumSJ}&page=1`, {
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json',
@@ -554,12 +535,14 @@
                     .then(response => response.json())
                     .then(data => {
                         grid.resetData(data.data.contents);  // 옵션 테이블 데이터 업데이트
+                        grid.setPaginationTotalCount(data.data.pagination.totalCount)
                         console.log(data);
                     })
                     .catch(error => console.error("데이터 요청 실패:", error));
+        	       */
         	        
-        	    }
-        	});
+        	        
+        	}); 
       });
       
       

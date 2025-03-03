@@ -3,10 +3,28 @@
  */
 
 let grid;
+var employeeNum;
 const header = document.querySelector('meta[name="_csrf_header"]').content;
 const token = document.querySelector('meta[name="_csrf"]').content;
 
 document.addEventListener("DOMContentLoaded", function () {
+	
+	document.body.addEventListener("click",function(event){
+		if(event.target.classList.contains("contractBtn")){
+			employeeNum = event.target.getAttribute("data-id");
+			console.log("employeeNum", employeeNum);
+			
+			const contractUrl = `/hr/rest/contract/report?employeeNum=${employeeNum}`;
+			
+			renderPDF(contractUrl);
+			
+			const contractModalEl = document.querySelector("#contractModal");
+			if(contractModalEl){
+				const contractModal = new bootstrap.Modal(contractModalEl);
+				contractModal.show();
+			}
+		}
+	});
 	
    let profileInputIMG = document.querySelector("#profileImage");
    let profileImgView = document.querySelector("#profilePreview");
@@ -26,6 +44,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
     });
+    
+    
 
 	
     initializeGrid();
@@ -132,7 +152,7 @@ function initializeGrid() {
             { header: "이메일", name: "email", align: "center", sortable: true, width: 200 },
             { header: "근로계약서", name: "employeeContract", align: "center", sortable: true, width: 120,
 					formatter: function({ row }) {
-				        return `<button class="btn btn-info btn-sm contractBtn" data-id="${row.employeeId}">보기</button>`;
+				        return `<button class="btn btn-info btn-sm contractBtn" data-id="${row.employeeNum}">보기</button>`;
 				    },
             }
         ],
@@ -169,7 +189,7 @@ function populateFilters() {
     
     if (!positionSelect || !statusSelect || !employmentTypeSelect || !departmentSelect) {
         console.error("❌ populateFilters() 실행 실패! 필터 요소 중 일부가 존재하지 않습니다.");
-        return; // 🔴 요소가 없으면 함수 실행 중단
+        return; // 요소가 없으면 함수 실행 중단
     }
 
     // 기존 옵션 제거
@@ -637,3 +657,76 @@ function openPostcode() {
 console.log("file:::::",file);
 
 
+
+querySelector("#contractBtn").addEventListener("click", ()=>{
+			alert("계약보기 클릭");
+		});
+
+		
+// (1) PDF.js로 PDF 파일을 캔버스에 렌더링
+	function renderPDF(contractUrl) {
+	  const canvas = document.getElementById('pdfCanvas');
+	  const context = canvas.getContext('2d');
+	
+	  // PDF 로드
+	  pdfjsLib.getDocument(contractUrl).promise.then(pdf => {
+	    console.log('PDF loaded, total pages:', pdf.numPages);
+	    // 첫 페이지만 렌더링 (필요시 여러 페이지 지원 가능)
+	    pdf.getPage(1).then(page => {
+	      const scale = 1.5; // 확대/축소 비율
+	      const viewport = page.getViewport({ scale });
+	      // 캔버스 크기 설정
+	      canvas.width = viewport.width;
+	      canvas.height = viewport.height;
+	
+	      // 페이지 렌더링
+	      const renderContext = {
+	        canvasContext: context,
+	        viewport: viewport
+	      };
+	      page.render(renderContext).promise.then(() => {
+	        console.log('Page rendered');
+	      });
+	    });
+	  }).catch(error => {
+	    console.error('PDF 로드 오류:', error);
+	  });
+	}
+	
+	
+	
+  //pdf다운
+  document.getElementById('pdfDown').addEventListener('click', function() {
+	  // 다운로드 엔드포인트 URL 구성 (/purchs/report/reportDownload 엔드포인트 사용)
+	  const contractDownloadUrl = `/hr/rest/contract/report/down?employeeNum=${employeeNum}`;D
+	  console.log("Download URL:", contractDownloadUrl);
+	  // 브라우저를 해당 URL로 이동시켜 파일 다운로드를 유도
+	  window.location.href = contractDownloadUrl;
+	});
+	
+const contractModalElement = document.getElementById("contractModal");
+const contractCloseButton = modalElement.querySelector('[data-bs-dismiss="modal"]');
+  if (contractCloseButton) {
+      contractCloseButton.addEventListener("click", function () {
+          console.log("✅ 인쇄 모달 닫기 버튼 클릭됨!");
+
+          try {
+          	let contractModalInstance = bootstrap.Modal.getInstance("#contractModal") || new bootstrap.Modal("#contractModal");
+              contractModalInstance.hide(); // ✅ Bootstrap 방식으로 모달 닫기
+              
+          } catch (error) {
+              console.warn("❌ Bootstrap 5가 로드되지 않았음. 대체 방식 사용");
+              contractModalElement.classList.remove("show");
+              contractModalElement.style.display = "none";
+              document.body.classList.remove("modal-open");
+
+              setTimeout(() => {
+                  document.querySelectorAll(".modal-backdrop").forEach((element) => element.remove()); // 백그라운드 제거
+              }, 300);
+           
+          }
+      });
+  } else {
+      console.warn("❌ 인쇄 모달 닫기 버튼을 찾을 수 없습니다.");
+  }
+	

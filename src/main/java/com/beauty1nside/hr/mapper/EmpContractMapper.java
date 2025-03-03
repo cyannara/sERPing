@@ -1,6 +1,7 @@
 package com.beauty1nside.hr.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.data.repository.query.Param;
@@ -17,4 +18,7 @@ public interface EmpContractMapper {
     
     // ✅ 계약 목록 조회 (필요하면 추가)
     List<EmpContractDTO> getAllContracts();
+    
+ // 특정 사원의 최신 근로계약서 조회
+    Map<String, Object> getContractData(@Param("employeeNum") Long employeeNum, @Param("companyNum") Long companyNum);
 }

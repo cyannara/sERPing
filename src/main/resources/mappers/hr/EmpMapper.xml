@@ -253,6 +253,7 @@
 		department_name as department_name,
 		NVL(parent_department_num, 0) AS parent_department_num
 		FROM hr_department
+		WHERE company_num = #{companyNum}
 		ORDER BY parent_department_num, department_name
 	</select>
 	
@@ -371,6 +372,9 @@
 	            FROM hr_employee e
 	            LEFT JOIN hr_department d ON e.department_num = d.department_num
 	            <where>
+	                <if test="companyNum != null">
+	                    AND e.company_num = #{companyNum}  <!--  회사 번호 필터 추가 -->
+	                </if>
 	                <if test="departmentNum != null">
 	                    AND e.department_num = #{departmentNum}  <!-- 특정 부서 필터 추가 -->
 	                </if>

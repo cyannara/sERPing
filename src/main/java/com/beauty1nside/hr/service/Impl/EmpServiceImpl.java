@@ -65,9 +65,9 @@ public class EmpServiceImpl implements EmpService {
 	
 
 	@Override
-	public Map<String, Object> getCommonCodes() {
+	public Map<String, Object> getCommonCodes(int companyNum) {
 	    Map<String, Object> codes = new HashMap<>();
-	    codes.put("departments", empMapper.getDepartments());
+	    codes.put("departments", empMapper.getDepartments(companyNum));
 	    codes.put("positions", empMapper.getPositions());
 
 
@@ -140,9 +140,9 @@ public class EmpServiceImpl implements EmpService {
     }
 
 	@Override
-	public List<String> getDepartments() {
+	public List<String> getDepartments(int companyNum) {
 		// TODO Auto-generated method stub
-		return empMapper.getDepartments(); // ✅ 기존 방식 유지
+		return empMapper.getDepartments(companyNum); // ✅ 기존 방식 유지
 	}
 
 	@Override

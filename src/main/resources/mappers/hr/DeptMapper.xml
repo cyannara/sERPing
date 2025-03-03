@@ -39,7 +39,7 @@
 	        LEFT JOIN CMMN ds on d.department_status = ds.cmmn_code  
 	        LEFT JOIN hr_employee e on d.manager_num = e.employee_num and e.authority = 'au002' 
 	    WHERE d.company_num = #{companyNum}  <!-- ✅ 회사 필터 추가 -->
-	    ORDER BY d.department_num
+	    ORDER BY parent_department_num NULLS FIRST, d.department_num
 	</select>
 	
 	

@@ -90,9 +90,9 @@
 			return ResponseEntity.ok().body(result);
 		}
 		
-	    @GetMapping("/emp/common-codes")
-	    public ResponseEntity<Map<String, Object>> getCommonCodes() {
-	        Map<String, Object> result = empService.getCommonCodes();
+	    @GetMapping("/emp/common-codes/{companyNum}")
+	    public ResponseEntity<Map<String, Object>> getCommonCodes(@PathVariable(name="companyNum") int companyNum) {
+	        Map<String, Object> result = empService.getCommonCodes(companyNum);
 	        return ResponseEntity.ok(result);
 	    }	
 	    
