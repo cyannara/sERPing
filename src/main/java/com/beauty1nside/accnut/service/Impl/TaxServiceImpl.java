@@ -34,6 +34,8 @@ public class TaxServiceImpl implements TaxService{
 		
 		total.put("taxNum", pk);
 		
+		
+		
 		taxMapper.insertHeader(from, to, total);
 		taxMapper.insertDetail(pk, detail);
 		
