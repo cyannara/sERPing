@@ -116,7 +116,7 @@
 		         th:disabled="${purchase?.purchaseStatus ne '진행중'}">발주 수정</button>
 		
 		        <!-- 발주 취소 버튼 (붉은색) -->
-		        <button class="btn btn-danger" id="purchaseCancle" 
+		        <button class="btn btn-danger" id="purchaseCancel" 
 		        th:disabled="${purchase?.purchaseStatus ne '진행중'}">발주 취소</button>
 		
 		        <!-- 초기화 버튼 -->
@@ -187,6 +187,42 @@ function initPurchaseGrid(optionsData) {
         ],
         rowHeaders: ['checkbox'],
         data: optionsData  // ✅ 서버에서 받은 옵션 리스트를 그리드에 적용
+    });
+    
+    // ✅ 발주 취소 버튼 클릭 이벤트
+    document.getElementById("purchaseCancel").addEventListener("click", async function () {
+        const purchaseNum = document.getElementById("purchaseNum").value;
+        const companyNum = document.getElementById("companyNum").value;
+
+        if (!purchaseNum || !companyNum) {
+            alert("⚠️ 발주 정보를 찾을 수 없습니다.");
+            return;
+        }
+
+        if (!confirm("정말로 발주를 취소하시겠습니까?")) return;
+
+        try {
+            const response = await fetch("/purchs/rest/purchase/cancel", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    'header': header,
+                    'X-CSRF-Token': token
+                },
+                body: JSON.stringify({ purchaseNum, companyNum })
+            });
+
+            const result = await response.json();
+            if (result.status === "success") {
+                alert("✅ 발주가 취소되었습니다.");
+                location.reload();
+            } else {
+                alert("❌ 발주 취소 실패!");
+            }
+        } catch (error) {
+            console.error("❌ 발주 취소 오류:", error);
+            alert("⚠️ 서버 오류가 발생했습니다.");
+        }
     });
     
     // ✅ 수량, 단가 변경 시 공급가격 및 부가세 자동 계산

@@ -12,6 +12,7 @@
   // PDF.js 워커 경로 설정
   pdfjsLib.GlobalWorkerOptions.workerSrc =
     'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.worker.min.js';
+
 </script>
 
 
@@ -77,6 +78,21 @@
 	  max-height: 100%;       /* 컨테이너 높이 내에서 제한 */
 	}
     
+ 
+  /* 📌 스피너를 화면 중앙에 배치 */
+  .spinner-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+  }
+
     
    
 </style>
@@ -165,6 +181,9 @@
 
 
 <script>
+
+
+
 // (1) PDF.js로 PDF 파일을 캔버스에 렌더링
 	function renderPDF(reportUrl) {
 	  const canvas = document.getElementById('pdfCanvas');
@@ -240,13 +259,31 @@
               // sessionStorage에 저장
               sessionStorage.setItem("vendorEmail", vendorEmail);
               sessionStorage.setItem("employeeEmail", employeeEmail);
+            
               console.log("vendorEmail:", vendorEmail, "employeeEmail:", employeeEmail);
               
               // mailsender 모달 표시
               const mailSenderModalEl = document.getElementById("mailsenderModal");
               if (mailSenderModalEl) {
                   const mailSenderModal = new bootstrap.Modal(mailSenderModalEl);
+                  
                   mailSenderModal.show();
+                  const fromEmailInput = document.getElementById("fromEmail");
+                  const toEmailInput = document.getElementById("toEmail");
+
+                  if (fromEmailInput) {
+                      fromEmailInput.value = employeeEmail || "";
+                      console.log("✅ fromEmail 필드 값 설정 완료:", fromEmailInput.value);
+                  } else {
+                      console.warn("⚠️ fromEmail 입력 필드를 찾을 수 없음.");
+                  }
+
+                  if (toEmailInput) {
+                      toEmailInput.value = vendorEmail || "";
+                      console.log("✅ toEmail 필드 값 설정 완료:", toEmailInput.value);
+                  } else {
+                      console.warn("⚠️ toEmail 입력 필드를 찾을 수 없음.");
+                  }
               } else {
                   console.error("메일 전송 모달(mailsenderModal)을 찾을 수 없습니다.");
               }
@@ -488,6 +525,8 @@
 	      sessionStorage.removeItem("purchaseNum");
 	  });
 	
+	
+	
 	 /*  document.getElementById("mailsenderModal").addEventListener("shown.bs.modal", function () {
 		  console.log("📩 메일 모달 열림: sessionStorage에서 이메일 불러오기");
 
@@ -506,7 +545,7 @@
 
 	
 	// 메일 모달 요소 가져오기 (id가 "mailsenderModal"인 모달)
-	  const emailModal = document.getElementById("mailsenderModal");
+   const emailModal = document.getElementById("mailsenderModal");
 	  if (emailModal) {
 	    // 모달 내부에서 닫기 버튼(예: data-bs-dismiss="modal" 속성)을 찾기
 	    const emailCloseBtn = emailModal.querySelector('[data-bs-dismiss="modal"]');
@@ -551,7 +590,7 @@
 	    });
 	  } else {
 	    console.warn("❌ 메일 모달(mailsenderModal)을 찾을 수 없습니다.");
-	  } 
+	  }  
 </script>
 
 </body>

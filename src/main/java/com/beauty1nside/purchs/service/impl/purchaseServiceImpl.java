@@ -64,6 +64,12 @@ public class purchaseServiceImpl implements purchaseService{
 		purchaseMapper.purchsupdate(vo);
 
 	}
+
+	@Override
+	public boolean cancelPurchase(int companyNum, int purchaseNum) {
+		int result = purchaseMapper.cancelPurchase(companyNum, purchaseNum);
+		return result > 0; // ✅ 성공적으로 변경된 행이 1개 이상이면 true 반환
+	}
 	
 	
 

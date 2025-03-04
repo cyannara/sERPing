@@ -1,6 +1,7 @@
 package com.beauty1nside.purchs.controller;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -15,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +31,7 @@ import com.beauty1nside.purchs.dto.ProductDTO;
 import com.beauty1nside.purchs.dto.ProductSearchDTO;
 import com.beauty1nside.purchs.dto.PurchInsertVO;
 import com.beauty1nside.purchs.dto.PurchUpdateVO;
+import com.beauty1nside.purchs.dto.PurchaseDTO;
 import com.beauty1nside.purchs.dto.PurchaseSearchDTO;
 import com.beauty1nside.purchs.dto.WarehouseInsertVO;
 import com.beauty1nside.purchs.dto.WarehouseSearchDTO;
@@ -40,14 +41,15 @@ import com.beauty1nside.purchs.service.warehouseService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
-import ch.qos.logback.core.model.Model;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 
 @Log4j2	//log4j 가 안되면 버전높은 log4j2 사용
 @RestController
-@AllArgsConstructor
+//@AllArgsConstructor
+@RequiredArgsConstructor
+
 @RequestMapping("/purchs/rest/*")
 public class ProductRestController {
 	final productService productService;
@@ -156,7 +158,11 @@ public class ProductRestController {
 		@PostMapping("/product/uploadGoodsImages")
 		public ResponseEntity<Map<String, Object>> uploadFile(@RequestParam("file") MultipartFile file , ProductDTO dto ) {
 		    Map<String, Object> response = new HashMap<>();
-		    String UPLOAD_DIR = dto.getImgUpload(); //저장경로
+		    //String UPLOAD_DIR = "C:/atest/";
+		    //String UPLOAD_DIR = dto.getImgUpload(); //저장경로
+		    String UPLOAD_DIR ="src/main/resources/static/file/image/purchs/product/";
+		    
+		    log.info("컨트롤러 이미지 저장 경로=====>={}",UPLOAD_DIR);
 
 		    try {
 		        if (file.isEmpty()) {
@@ -177,7 +183,8 @@ public class ProductRestController {
 
 		        // 3️ 파일 저장 경로 설정
 		        Path savePath = Paths.get(UPLOAD_DIR + uniqueFileName);
-		        file.transferTo(savePath.toFile());
+		        Files.write(savePath, file.getBytes());
+		        //file.transferTo(savePath.toFile());
 
 		        // 4️ 응답 데이터 설정
 		        response.put("success", true);
@@ -198,6 +205,8 @@ public class ProductRestController {
 		        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		    }
 		}
+		
+	
 		
 		//상품 등록
 		@PostMapping("/product/insert")
@@ -504,6 +513,25 @@ public class ProductRestController {
 			 }
 			
 		}
+		
+	
+		// ✅ 발주 취소 요청 API
+	    @PostMapping("/purchase/cancel")
+	    public ResponseEntity<Map<String, String>> cancelPurchase(@RequestBody Map<String, Integer> requestData) {
+	        int companyNum = requestData.get("companyNum");
+	        int purchaseNum = requestData.get("purchaseNum");
+
+	        boolean isCanceled = purchaseService.cancelPurchase(companyNum, purchaseNum);
+
+	        Map<String, String> response = new HashMap<>();
+	        if (isCanceled) {
+	            response.put("status", "success");
+	            return ResponseEntity.ok(response);
+	        } else {
+	            response.put("status", "fail");
+	            return ResponseEntity.badRequest().body(response);
+	        }
+	    }
 
 			
 			
