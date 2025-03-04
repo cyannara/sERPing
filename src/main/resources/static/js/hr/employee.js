@@ -124,14 +124,23 @@ const modalElement = document.getElementById("contractModal");
 	    }
 	});
 
-	//이름 검증
+	// 이름 검증
 	const nameInput = document.getElementById("employeeName");
-
-	nameInput.addEventListener("input", function () {
-	    this.value = this.value.replace(/[^가-힣a-zA-Z\s'-.]/g, ""); 
-	});
+	const nameErrorMsg = document.createElement("small"); // 오류 메시지 요소 생성
+	nameErrorMsg.style.color = "red";
+	nameInput.parentNode.appendChild(nameErrorMsg); // 이름 입력 필드 아래에 추가
 	
-
+	nameInput.addEventListener("blur", function () {
+	    const namePattern = /^[가-힣a-zA-Z\s'-.]+$/;
+	
+	    if (!namePattern.test(this.value) || this.value.trim() === "") {
+	        nameErrorMsg.textContent = "한글 또는 영문만 입력 가능합니다.";
+	        this.classList.add("is-invalid"); // Bootstrap 스타일 적용 가능
+	    } else {
+	        nameErrorMsg.textContent = "";
+	        this.classList.remove("is-invalid");
+	    }
+	});
 
 	
 	document.body.addEventListener("click",function(event){
