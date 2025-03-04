@@ -39,8 +39,8 @@ public class AccnutSampleController {
 	@GetMapping("/asset")
 	public String asset(Model model) {
 		
-		String abc = "a1000";
-		model.addAttribute("info", assetService.info(abc) );
+		//String abc = "a1000";
+		//model.addAttribute("info", assetService.info(abc) );
 		
 		return "accnut/asset";
 	};

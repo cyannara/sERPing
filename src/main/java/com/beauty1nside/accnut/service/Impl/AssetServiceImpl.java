@@ -22,9 +22,9 @@ public class AssetServiceImpl implements AssetService{
 		private final AssetMapper assetMapper;
 		
 		@Override
-		public AssetDTO info(String assetsCode) {
+		public AssetDTO info(String assetsName, int companyNum) {
 			// TODO Auto-generated method stub
-			return assetMapper.info(assetsCode);
+			return assetMapper.info(assetsName, companyNum);
 		}
 		
 		@Override

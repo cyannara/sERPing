@@ -36,4 +36,10 @@ public class OtherServiceImpl implements OtherService{
 		return otherMapper.companyInfo(companyNum);
 	}
 	
+	@Override
+	public List<Map<String, Object>> deptList(int companyNum) {
+		// TODO Auto-generated method stub
+		return otherMapper.deptList(companyNum);
+	}
+	
 }

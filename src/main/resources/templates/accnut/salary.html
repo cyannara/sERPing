@@ -26,13 +26,8 @@
 				<div class="col-5 row ">
 					<span class="label-search col-4">부서</span>
 					<select name="department" id="department" class="col-8 input-box">
-						<option value="" selected>부서</option>
-						<option value="1">회사</option>
-						<option value="2">별로</option>
-						<option value="3">부서</option>
-						<option value="4">달라</option>
-						<option value="5">추후</option>
-						<option value="6">출력</option>
+						<option value="" selected>전체</option>
+						
 
 					</select>
 				</div>
@@ -84,8 +79,12 @@
 	</div>
 
 <script>
+	var session = sessionData;
+	console.log(session);
+	
 	document.addEventListener("DOMContentLoaded",()=>{
 		btndisabled();
+		getDept();
 	})
 	
 	var checkArray = [];
@@ -94,7 +93,7 @@
 	
 	const dataSource = {
 		api: {
-			readData: { url: 'http://localhost:81/accnut/rest/salary/list', method: 'GET', initParams: { page: 1 , } },
+			readData: { url: 'http://localhost:81/accnut/rest/salary/list', method: 'GET', initParams: { page: 1 , companyNum: session.companyNum } },
 			
 		},
 		contentType: 'application/json'
@@ -184,6 +183,30 @@
 			document.querySelector('.btnPayment').setAttribute('disabled', 'true');
 		}
 	}
+	
+	function getDept(){
+		const header = document.querySelector('meta[name="_csrf_header"]').content;
+        const token = document.querySelector('meta[name="_csrf"]').content;
+		
+		fetch(`http://localhost:81/accnut/rest/dept/list?companyNum=${session.companyNum}`, {
+			method: "GET",
+			headers: {
+					 	'header': header,
+			                "Content-Type": "application/json",
+			                'X-CSRF-Token': token				
+			 		}
+		}).then(response => response.json())
+		.then(data => {
+			//console.log(data);
+			let department = document.querySelector('#department');
+			for(dept of data.result){
+				let html = `<option value="${dept.departmentNum}">${dept.departmentName}</option>`
+				department.insertAdjacentHTML("beforeend", html);
+				
+			}
+		})
+	}
+	
 	/*
 	*/
 
