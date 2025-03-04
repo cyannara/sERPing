@@ -20,7 +20,7 @@
          th:classappend="${#strings.equals('inventory', param.menu)} ? 'selected' : ''">재고</a>
       <a th:href="@{/hr/employee(menu='hr')}" data="hr"
          th:classappend="${#strings.equals('hr', param.menu)} ? 'selected' : ''">인사</a>
-      <a th:href="@{/(menu='account')}" data="account"
+      <a th:href="@{/accnut/asset(menu='account')}" data="account"
          th:classappend="${#strings.equals('account', param.menu)} ? 'selected' : ''">회계</a>
       <a th:href="@{/bhf/order(menu='branch')}" data="branch"
          th:classappend="${#strings.equals('branch', param.menu)} ? 'selected' : ''">지점</a>
