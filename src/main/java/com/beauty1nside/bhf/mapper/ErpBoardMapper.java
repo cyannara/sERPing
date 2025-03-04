@@ -10,4 +10,10 @@ public interface ErpBoardMapper {
 	public List<ErpBoardListDTO> boardList(ErpBoardListSearchDTO dto);
 	public int count(ErpBoardListSearchDTO dto);
 	
+	public int boardRequest(ErpBoardListDTO dto);
+	
+	public int boardModify(ErpBoardListDTO dto);
+	
+	public int boardDelete(int boardId);
+	
 }

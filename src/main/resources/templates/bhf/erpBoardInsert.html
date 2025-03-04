@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layouts/layout}"
+      lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<title>게시글 등록</title>
+<style>
+        /* 기본 레이아웃 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7fc;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h3 {
+            font-size: 28px;
+            color: #333;
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        hr {
+            border-top: 2px solid #ccc;
+            margin-bottom: 30px;
+        }
+
+        /* 카드 디자인 */
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            background-color: #fff;
+        }
+
+        .card-body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 입력 필드 및 라벨 */
+        .row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .row label {
+            font-size: 16px;
+            color: #333;
+            margin-right: 10px;
+        }
+
+        .row input, .row select, .row textarea {
+            padding: 10px;
+            font-size: 14px;
+            width: 100%;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .row textarea {
+            height: 150px;
+            resize: vertical;
+        }
+
+        /* 버튼 스타일 */
+        button {
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            background-color: #007bff;
+            color: white;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        button:active {
+            background-color: #0056b3;
+        }
+
+        /* 반응형 디자인 */
+        @media (max-width: 768px) {
+            .row {
+                flex-direction: column;
+            }
+
+            .row label {
+                margin-bottom: 5px;
+            }
+
+            .row input, .row select, .row textarea {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body layout:fragment="content">
+	<div class="container">
+        <h3>게시판 글 등록</h3>
+        <hr>
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <label for="boardCategory" class="col-sm-2">분류</label>
+                    <select id="boardCategory" required>
+                        <option value="" disabled selected>분류 선택</option>
+                        <option value="공지">공지</option>
+                        <option value="행사">행사</option>
+                    </select>
+                </div>
+                <div class="row">
+                    <label for="boardTitle" class="col-sm-2">제목</label>
+                    <input type="text" id="boardTitle" placeholder="글 제목을 입력하세요" required>
+                </div>
+                <div class="row">
+                    <label for="employeeName" class="col-sm-2">작성자</label>
+                    <input type="text" id="employeeName" readonly>
+                </div>
+                <div class="row">
+                    <label for="boardContent" class="col-sm-2">내용</label>
+                    <textarea id="boardContent" placeholder="게시글 내용을 입력하세요" required></textarea>
+                </div>
+                <div class="text-center">
+                    <button onclick="submitBoard()">등록</button>
+                    <button onclick="history.back()">취소</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+	    const header = document.querySelector('meta[name="_csrf_header"]').content; //서버에서 요구하는 CSRF 헤더이름
+	    const token = document.querySelector('meta[name="_csrf"]').content; //서버에서 생성한 CSRF 토큰 값
+    
+    	let sessionEmployeeName = [[${session.employeeName}]];
+    	let sessionEmployeeNum = [[${session.employeeNum}]];
+    	let sessioCompanyNum = [[${session.companyNum}]];
+    	
+    	// 페이지가 로드될 때 작성자 자동 입력
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('employeeName').value = sessionEmployeeName;
+        });
+    
+        // 글 등록 함수
+        function submitBoard() {
+        	const today = new Date().toISOString().split('T')[0]; // 'YYYY-MM-DD' 형식
+        	
+            let boardTitle = document.getElementById('boardTitle').value;
+            let employeeName = document.getElementById('employeeName').value;
+            let boardCategory = document.getElementById('boardCategory').value;
+            let boardDate = today;
+            let boardContent = document.getElementById('boardContent').value;
+
+            // 입력값 검증
+            if (!boardTitle || !boardCategory || !boardContent) {
+                alert("모든 필드를 채워주세요.");
+                return;
+            }
+
+            let formData = {
+            	boardTitle: boardTitle,
+            	employeeName: employeeName,
+            	boardCategory: boardCategory,
+            	boardDate: boardDate,
+            	boardContent: boardContent,
+            	companyNum: sessioCompanyNum,
+            	employeeNum: sessionEmployeeNum
+            };
+
+            // 서버로 데이터를 보내는 예시 (AJAX)
+            fetch('/bhf/rest/board/request', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                  	//위에 변수로 저장한 헤더이름,토큰값 넣어주기
+		        	'header': header, 
+		            'X-CSRF-Token': token
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("게시글이 등록되었습니다.");
+                    window.location.href = `/bhf/erpBoard`; // 게시판 목록 페이지로 리디렉션
+                } else {
+                    alert("게시글 등록에 실패했습니다.");
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("오류가 발생했습니다.");
+            });
+        }
+    </script>
+</body>
+</html>

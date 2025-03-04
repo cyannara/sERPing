@@ -27,5 +27,23 @@ public class ErpBoardServiceImpl implements ErpBoardService {
 		
 		return mapper.count(dto);
 	}
+
+	@Override
+	public int boardRequest(ErpBoardListDTO dto) {
+		
+		return mapper.boardRequest(dto);
+	}
+
+	@Override
+	public boolean boardModify(ErpBoardListDTO dto) {
+		
+		return mapper.boardModify(dto) > 0;
+	}
+
+	@Override
+	public boolean boardDelete(int boardId) {
+		
+		return mapper.boardDelete(boardId) > 0;
+	}
 	
 }

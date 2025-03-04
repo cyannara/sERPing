@@ -35,6 +35,9 @@
 						</div>					
 						<div id="board"></div>
 						<div id="pagination" class="tui-pagination"></div>
+						<div style="text-align : right">
+							<button type="button" class="boardInsert">글 쓰기</button>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -66,10 +69,32 @@
 				{ header : "분류", name : "boardCategory", align: 'center', width: 200},
 				{ header : "제목", name : "boardTitle", align: 'center'},
 				{ header : "작성자", name : "employeeName", align: 'center', width: 150},
-				{ header : "작성일", name : "boardDate", align: 'center', width: 150}
+				{ header : "작성일", name : "boardDate", align: 'center', width: 150},
+				{
+                    header: "글보기",
+                    name: "moveToPage",
+                    width: 50,
+                    formatter: ({ row }) => {
+                        return `<button class="move-btn" data-id="${row.boardId}">
+                                  <i class="mdi mdi-arrow-right-bold"></i>
+                                </button>`;
+                    }
+                }
 			],
 			data: dataSource
 		});
+		
+		 document.addEventListener("click", function (event) {
+	            const button = event.target.closest(".move-btn");
+	            if (button) {
+	                const dataset = button.dataset; // 버튼에서 data-id 값 가져오기
+	                window.location.href = `/bhf/erpBoardDTL?boardId=${dataset.id}`;
+	            }
+	            const insert = event.target.closest(".boardInsert");
+	            if (insert) {
+	                window.location.href = `/bhf/erpBoardInsert`;
+	            }
+	        });
 		
 		// 검색 함수
 		function search(){
