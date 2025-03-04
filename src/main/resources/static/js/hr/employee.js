@@ -199,10 +199,10 @@ const modalElement = document.getElementById("contractModal");
             console.log("🔍 등록 버튼 클릭됨!");
 
             // 🔹 입력값 검증 후 실행
-           /* if (!validateEmployeeForm()) {
+            if (!validateEmployeeForm()) {
                 console.warn("⚠️ 필수 입력값이 누락되었습니다. 등록을 중단합니다.");
                 return;
-            }*/
+            }
 
             // 🔹 사원 등록 실행
             registerEmployee();
