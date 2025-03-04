@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.beauty1nside.hr.dto.EmpContractDTO;
+import com.beauty1nside.hr.dto.EmpContractSearchDTO;
 import com.beauty1nside.hr.service.EmpContractService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -103,6 +103,13 @@ public class EmpContractRestController {
 	    response.setHeader("Content-Disposition", "attachment; filename=\"empContract_" + employeeNum + ".pdf\"");
 	    JasperExportManager.exportReportToPdfStream(jasperPrint, response.getOutputStream());
 	}
+    
+    // ✅ 동적 검색 및 페이징 포함 근로계약 조회 API
+    @PostMapping("/search")
+    public List<EmpContractDTO> searchContracts(@RequestBody EmpContractSearchDTO searchDTO) {
+        log.info("📌 근로계약 검색 요청: {}", searchDTO);
+        return empContractService.searchContracts(searchDTO);
+    }
     
 
 }
