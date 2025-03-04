@@ -12,5 +12,5 @@ public class SellingDTO {
 	private int minusQy;
 	int companyNum;
 	int price;
-	int totalPrice;
+	long totalPrice;
 }
