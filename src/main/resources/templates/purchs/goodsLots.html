@@ -1,0 +1,381 @@
+<html layout:decorate="~{layouts/layout}"
+      lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+      
+
+<body layout:fragment="content">
+ 
+    <style>
+	    #custom-container{
+			background-color: #f8f9fa; /* 연한 회색 배경 */
+			padding: 20px;
+			border-radius: 10px;
+			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 박스 그림자 */
+			margin-bottom: 20px;
+		
+		}
+        .container { max-width: 100%; margin: 20px auto; }
+        .header-box { background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 10px; }
+        .search-container { margin-bottom: 15px; }
+        .pagination-container { text-align: center; margin-top: 10px; }
+        .btn-search { background-color: #28a745; color: white; }
+        .btn-reset { background-color: #007bff; color: white; }
+        .btn-register { background-color: #28a745; color: white; margin-top: 10px; }
+        
+       /* ✅ 전체 그리드의 스크롤 제거 */
+		#productGrid {
+		    width: 100% !important;
+		    min-width: 1200px;  /* 최소 너비 설정 */
+		    height: auto !important;
+		}
+
+		
+		/* ✅ 내부 요소에서 강제 스크롤 제거 */
+		.tui-grid-body-area {
+		    overflow: hidden !important;
+		}
+		
+		/* ✅ 세로 스크롤 없애기 */
+		.tui-grid-container {
+		    max-width: 100% !important;
+		    overflow-x: auto !important;  /* 가로 스크롤 가능하도록 변경 */
+		}
+
+		
+		/* 상품명 & 상품코드 병합된 셀 스타일 */
+		.merged-cell {
+		    background-color: #f8f9fa !important; /* 연한 회색 */
+		    font-weight: bold;
+		    text-align: left !important;
+		    vertical-align: middle !important;  /* 수직 중앙 정렬 */
+		    line-height: normal !important;
+		    padding: 15px !important;
+		   
+		}
+	
+		
+		/* ✅ 그리드 전체 테두리 추가 */
+		.tui-grid-container {
+		    border: 1px solid #ddd !important; /* 전체 그리드 박스 테두리 */
+		    border-radius: 5px; /* 둥근 테두리 */
+		    overflow: hidden; /* 모서리 깔끔하게 정리 */
+		}
+		
+		/* ✅ 헤더(컬럼명) 부분 테두리 */
+		.tui-grid-header-area {
+		    border-bottom: 2px solid #ccc !important; /* 헤더와 바디 구분 */
+		}
+		
+		/* ✅ 셀(Cell) 테두리 설정 */
+		.tui-grid-cell {
+		    border-right: 1px solid #ddd !important;
+		    border-bottom: 1px solid #ddd !important;
+		}
+		
+		/* ✅ 마지막 컬럼의 테두리 없애기 (디자인 개선) */
+		.tui-grid-cell:last-child {
+		    border-right: none !important;
+		}
+		
+		/* ✅ 마지막 행의 테두리 없애기 (디자인 개선) */
+		.tui-grid-body-area .tui-grid-cell:last-child {
+		    border-bottom: none !important;
+		}
+		
+		/* ✅ 헤더(컬럼명) 배경색 & 글씨 스타일 */
+		.tui-grid-header-cell {
+		    background-color: #f1f1f1 !important; /* 헤더 배경색 */
+		    font-weight: bold;
+		    text-align: center;
+		    border-right: 1px solid #ddd !important;
+		}
+		
+		/* ✅ 줄 간격 스타일 조정 */
+		.tui-grid-row {
+		    border-bottom: 1px solid #ddd !important;
+		}
+		
+		/* ✅ hover(마우스 오버) 시 강조 효과 */
+		.tui-grid-cell:hover {
+		    background-color: #f9f9f9 !important;
+	}
+
+</style>
+
+
+<div class="container mt-4">
+	<h2 class="mb-4">상품 조회</h2>
+	   <!-- 검색창 -->
+	<div class="search-grid" id="custom-container">
+	    <div class="d-flex flex-wrap align-items-center gap-3">
+	        <div class="d-flex align-items-center">
+	            <span class="label-search me-2">상품명</span>
+	            <input type="text" name="goodsName" id="searchGoodsName" class="form-control w-auto">
+	        </div>
+	        <div class="d-flex align-items-center">
+	            <span class="label-search me-2">브랜드명</span>
+	            <input type="text" name="brandName" id="searchBrandName" class="form-control w-auto">
+	        </div>
+	        <div class="d-flex align-items-center">
+	            <span class="label-search me-2">표시수량</span>
+	            <select name="display_amount" id="product_display_amount" class="form-control w-auto" onchange="changeProductDisplay()">
+	                <option value="10" selected>10</option>
+	                <option value="20">20</option>
+	                <option value="50">50</option>
+	                <option value="100">100</option>
+	            </select>
+	        </div>
+	        <button type="button" class="btn btn-primary ms-auto" onclick="productSearch()">검색</button>
+	        <button type="button" class="btn btn-secondary" onclick="resetFilters()">초기화</button>
+	    </div>
+	</div>
+	
+	<!-- 상품별 그리드 -->
+	<div id="table-container" class="mt-3">
+	    <div id="productGrid"></div>
+	    <div id="pagination" class="tui-pagination"></div>
+	</div>
+	<!-- LOT 정보 (초기에는 숨김) -->
+    <div id="lot-container" class="mt-5" style="display: none;">
+        <h3 class="mb-3">옵션별 LOT 조회</h3>
+        <div id="lotGrid"></div>
+        <div id="lotPagination" class="tui-pagination"></div>
+    </div>
+
+
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("✅ DOMContentLoaded 이벤트 실행");
+    initProductGrid();  // 상품 그리드 초기화
+});
+
+// ✅ 텍스트를 굵게하고 정렬하는 렌더러
+class CustomTextRenderer {
+    constructor(props) {
+        const el = document.createElement('div');
+        el.innerText = props.value;
+        el.style.padding = '10px';
+        el.style.fontWeight = 'bold';
+        el.style.textAlign = 'left';
+        this.el = el;
+    }
+    getElement() {
+        return this.el;
+    }
+}
+
+let productGrid;
+let lotGrid;
+let selectedOptionNum = null;
+let selectedCompanyNum = [[${session.companyNum}]];
+
+function initProductGrid() {
+    console.log("✅ initProductGrid() 실행");
+
+    
+    if (!selectedCompanyNum) {
+        console.error("❌ 세션에서 companyNum 값을 찾을 수 없음.");
+        return;
+    }
+
+    console.log("✅ 설정된 companyNum:", selectedCompanyNum);
+
+    const productDataSource = {
+        api: {  
+            readData: { 
+                url: '/purchs/rest/goods/nums', 
+                method: 'GET',
+                requestOptions: {
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin'
+                },
+                initParams: { 
+                    page: 1,
+                    perPage: 10,
+                    companyNum: selectedCompanyNum
+                }
+            }
+        },
+        contentType: 'application/json',
+        serverSidePagination: true
+    };
+
+    productGrid = new tui.Grid({
+        el: document.getElementById('productGrid'),
+        data: productDataSource, 
+        scrollX :true,
+        scrollY : false,
+        rowHeight: 40,  // ✅ 행 크기 고정 (기본값: auto → 40px로 지정)
+        pageOptions: {
+            useClient: false,
+            perPage: 5,
+        },
+        bodyHeight: 'auto', 
+        columns: [
+            { header: "상품명", name: "goodsName", rowSpan: true, className: "merged-cell", renderer: { type: CustomTextRenderer } },
+            { header: "상품코드", name: "goodsCode", rowSpan: true, className: "merged-cell", renderer: { type: CustomTextRenderer } },
+            { header: "옵션명", name: "optionName" },
+            { header: "옵션번호", name: "optionCode" },
+            { header: "브랜드", name: "brandName" },
+            { header: "규격", name: "goodsStandard"},
+            { header: "입고수량", name: "totalInputQuantity"},
+            { header: "출고수량", name: "totalOutputQuantity"},
+            { header: "총재고", name: "totalQuantity"},
+            { header: "안전재고", name: "optionSafetyInvoice"},
+        ]
+    });
+
+    console.log("✅ 상품 그리드 초기화 완료");
+
+    // 옵션명을 클릭하면 LOT 정보를 가져오는 이벤트 추가
+    productGrid.on("click", function(event) {
+        const rowKey = event.rowKey;
+        const columnName = event.columnName;
+        const rowData = productGrid.getRow(rowKey);
+
+        if (columnName === "optionName" || columnName === "optionCode") {
+            selectedOptionNum = rowData.optionNum;
+            
+
+            if (selectedOptionNum && selectedCompanyNum) {
+                console.log("📢 선택된 옵션:", selectedOptionNum, "회사번호:", selectedCompanyNum);
+                loadLotData(selectedOptionNum, selectedCompanyNum);
+            } else {
+                console.error("❌ 데이터가 부족하여 LOT 조회 실패", rowData);
+            }
+        }
+    });
+}
+
+
+//✅ LOT 데이터 비동기 로드 & 그리드 갱신
+function fetchLotData(optionNum, companyNum) {
+    console.log("📢 fetchLotData 실행: optionNum =", optionNum, "companyNum =", companyNum);
+
+    // ✅ optionNum을 int로 변환 (숫자로 변환 가능할 경우만 처리)
+    let parsedOptionNum = parseInt(optionNum);
+    if (isNaN(parsedOptionNum)) {
+        console.error("❌ optionNum이 숫자가 아닙니다:", optionNum);
+        return;
+    }
+
+    fetch(`/purchs/rest/goodslot/nums?companyNum=${companyNum}&optionNum=${parsedOptionNum}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log("✅ LOT 데이터 응답:", data);
+
+            // ✅ 응답 데이터 검증 후 처리
+            if (data && data.contents && Array.isArray(data.contents)) {
+                console.log("✅ 정상적인 LOT 데이터 확인됨, 그리드 갱신 시작");
+
+                // ✅ LOT 그리드가 초기화되지 않았다면 먼저 초기화
+                if (!lotGrid) {
+                    console.log("🔹 LOT 그리드가 없으므로 초기화 수행");
+                    initLotGrid(() => {
+                        lotGrid.resetData(data.contents);
+                    });
+                } else {
+                    console.log("🔹 LOT 그리드 존재, 데이터 업데이트");
+                    lotGrid.resetData(data.contents);
+                }
+            } else {
+                console.warn("⚠️ LOT 데이터가 비어있음. 그리드 초기화만 수행");
+                lotGrid.resetData([]);
+            }
+        })
+        .catch(error => {
+            console.error("❌ LOT 데이터 요청 실패:", error);
+        });
+}
+
+// ✅ LOT 테이블을 클릭할 때마다 비동기 데이터 갱신
+function loadLotData(optionNum, companyNum) {
+    console.log("📢 LOT 데이터 로드 시작:", optionNum, companyNum);
+
+    // ✅ LOT 테이블을 보이도록 설정
+    document.getElementById("lot-container").style.display = "block";
+
+    // ✅ LOT 데이터 요청
+    fetchLotData(optionNum, companyNum);
+}
+
+
+// ✅ LOT 그리드 초기화 (초기에는 빈 데이터)
+function initLotGrid(callback) {
+    console.log("✅ LOT 그리드 초기화 시작");
+
+    lotGrid = new tui.Grid({
+        el: document.getElementById('lotGrid'),
+        scrollX :false,
+        scrollY : false,
+        data: [],
+        pageOptions: { useClient: false, perPage: 5 },
+        bodyHeight: 'auto',
+        columns: [
+            { header: "LOT 번호", name: "goodsLotNum" },
+            { header: "상품 코드", name: "goodsCode" },
+            { header: "상품명", name: "goodsName" },
+            { header: "옵션 코드", name: "optionCode" },
+            { header: "옵션명", name: "optionName" },
+            { header: "창고명", name: "warehouseName" },
+            { header: "총 재고 수량", name: "totalQuantity" },
+            { header: "입고일", name: "warehousingDate" },
+            { header: "소비기한", name: "goodsConsumptionDate" }
+        ]
+    });
+
+    console.log("✅ LOT 그리드 초기화 완료");
+
+    // ✅ 콜백이 있다면 실행 (데이터 적용)
+    if (typeof callback === "function") {
+        callback();
+    }
+}
+
+
+// ✅ 표시 수량 변경
+function changeProductDisplay() {
+    let gap = parseInt(document.querySelector('#product_display_amount').value);
+    productGrid.setPerPage(gap);
+    productGrid.reloadData();
+}
+
+// ✅ 검색 실행
+function productSearch() {
+    let goodsName = document.querySelector('#searchGoodsName').value;
+    let brandName = document.querySelector('#searchBrandName').value;
+
+    productGrid.setRequestParams({
+        "companyNum": [[${session.companyNum}]],
+        "goodsName": goodsName,
+        "brandName": brandName
+    });
+
+    productGrid.reloadData();
+}
+
+// ✅ 필터 초기화
+function resetFilters() {
+    document.querySelector('#searchGoodsName').value = '';
+    document.querySelector('#searchBrandName').value = '';
+    document.querySelector('#product_display_amount').value = '10';
+
+    productGrid.setRequestParams({
+        "companyNum": [[${session.companyNum}]],
+        "goodsName": '',
+        "brandName": ''
+    });
+
+    productGrid.reloadData();
+}
+
+</script>
+
+</body>
+
+
+

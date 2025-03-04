@@ -168,6 +168,52 @@
     </if>
 </sql>
 
+<!-- 발주서 상세 내용 조회 -->
+<select id="purchaseinfo" resultType="PurchaseDTO">
+select h.purchase_date,
+       h.purchase_due_date,
+       h.purchase_vat_flag,
+       h.purchase_status,
+       h.purchase_num,
+       b.purchase_body_num,
+       b.purchase_quantity,
+       b.purchase_unit_price,
+       b.purchase_supply_price,
+       b.purchase_vat,
+       e.employee_name,    
+       g.goods_name,
+       g.goods_code,
+       g.goods_standard,
+       o.option_name,
+       o.option_code,
+       o.option_num,
+       v.vendor_name
+from purchs_purchase_header h join purchs_purchase_body b 
+on h.purchase_num = b.purchase_num
+                              join grpwr_vendor v
+on h.vendor_id = v.vendor_id
+                              join hr_employee e
+on h.employee_num = e.employee_num
+                              join purchse_option o 
+on o.option_num = b.option_num
+                              join purchse_goods g
+on g.goods_num = o.goods_num
+where h.company_num = #{companyNum}
+and h.purchase_num = #{purchaseNum}
+</select>
+
+<!-- 발주서 수정 프로시저 호출  -->
+<insert id="purchsupdate" statementType="CALLABLE">
+    {CALL purchs_order_update(
+    	#{purchaseNum, mode=IN, jdbcType=NUMERIC},
+        #{employeeNum, mode=IN, jdbcType=NUMERIC},
+        #{companyNum, mode=IN, jdbcType=NUMERIC},
+        #{purchaseDueDate, mode=IN, jdbcType=DATE},
+        #{purchaseVatFlag, mode=IN, jdbcType=NUMERIC},
+        #{purchaseRecordeReason, mode=IN, jdbcType=VARCHAR},
+        #{files, mode=IN, typeHandler=com.beauty1nside.purchs.OracleArrayPurchsModifyHandler}
+    )}
+</insert>
 
 
 

@@ -394,6 +394,29 @@
       });
 
       console.log("✅ Toast Grid 초기화 완료");
+      
+   // ✅ 발주서 클릭 시 상세 페이지로 이동
+      purchaselistGrid.on("click", function(event) {
+          const rowKey = event.rowKey;
+          const columnName = event.columnName;
+          const rowData = purchaselistGrid.getRow(rowKey);
+
+          console.log("✅ 발주서 클릭:", rowData);
+
+          // 특정 컬럼 클릭 시 실행 (예: purchaseNum, vendorName, goodsName 등)
+          if (columnName === "purchaseNum" || columnName === "vendorName" || columnName === "goodsName") {
+              const purchaseNum = rowData.purchaseNum;
+              const companyNum = [[${session.companyNum}]]; // Thymeleaf에서 세션 값 가져오기
+
+              if (purchaseNum && companyNum) {
+                  const url = `/purchs/purchaseModify?purchaseNum=${purchaseNum}&companyNum=${companyNum}`;
+                  window.location.href = url;
+              } else {
+                  console.error("❌ 데이터가 부족하여 페이지 이동 실패", rowData);
+              }
+          }
+      });
+
   }
 
   // 3. 기타 함수들 (검색, 필터 초기화, 표시 수량 변경 등)
@@ -465,6 +488,23 @@
 	      sessionStorage.removeItem("purchaseNum");
 	  });
 	
+	 /*  document.getElementById("mailsenderModal").addEventListener("shown.bs.modal", function () {
+		  console.log("📩 메일 모달 열림: sessionStorage에서 이메일 불러오기");
+
+		  const vendorEmail = sessionStorage.getItem("vendorEmail"); 
+		  const employeeEmail = sessionStorage.getItem("employeeEmail");
+
+		  console.log("📩 저장된 이메일:", { vendorEmail, employeeEmail });
+
+		  if (employeeEmail) {
+		    document.getElementById("fromEmail").value = employeeEmail;
+		  }
+		  if (vendorEmail) {
+		    document.getElementById("toEmail").value = vendorEmail;
+		  }
+		}); */
+
+	
 	// 메일 모달 요소 가져오기 (id가 "mailsenderModal"인 모달)
 	  const emailModal = document.getElementById("mailsenderModal");
 	  if (emailModal) {
@@ -479,20 +519,39 @@
 	        document.body.classList.remove("modal-open");
 	        // 만약 모달 백드롭(overlay)이 있다면 제거
 	        document.querySelectorAll(".modal-backdrop").forEach((element) => element.remove());
+	        
+	        sessionStorage.removeItem("vendorEmail");
+		     sessionStorage.removeItem("employeeEmail");
 	      });
 	    } else {
 	      console.warn("❌ 메일 모달 닫기 버튼을 찾을 수 없습니다.");
 	    }
 	    
+	    if (emailModal) {
+	        const observer = new MutationObserver(() => {
+	            if (!emailModal.classList.contains("show")) {
+	                console.log("✅ 메일 모달이 닫힘 - sessionStorage 삭제");
+	                sessionStorage.removeItem("vendorEmail");
+	                sessionStorage.removeItem("employeeEmail");
+	            }
+	        });
+
+	        observer.observe(emailModal, { attributes: true });
+
+	        console.log("📢 MutationObserver: 메일 모달 감시 시작");
+	    } else {
+	        console.warn("❌ 메일 모달(mailsenderModal)을 찾을 수 없습니다.");
+	    }
+	    
 	    // 모달이 완전히 닫힌 후 sessionStorage에서 이메일 관련 값을 삭제
-	    emailModal.addEventListener("hidden.bs.modal", function () {
+	   emailModal.addEventListener("hidden.bs.modal", function () {
 	      console.log("✅ 메일 모달이 닫혔습니다. 이메일 sessionStorage 값 삭제");
 	      sessionStorage.removeItem("vendorEmail");
 	      sessionStorage.removeItem("employeeEmail");
 	    });
 	  } else {
 	    console.warn("❌ 메일 모달(mailsenderModal)을 찾을 수 없습니다.");
-	  }
+	  } 
 </script>
 
 </body>

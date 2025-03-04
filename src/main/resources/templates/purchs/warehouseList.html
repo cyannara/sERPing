@@ -97,6 +97,8 @@
       <div class="col-auto">
         <label for="searchVendorName" class="form-label">거래처</label>
         <input type="text" id="searchVendorName" class="form-control">
+        <input type="hidden" id="sessionCompanyNum" th:value="${session.companyNum}">
+        
       </div>
       <div class="col-auto">
         <label class="form-label">구매일자</label>
@@ -360,8 +362,8 @@
 
   function changeWarehouseDisplay() {
       let gap = parseInt(document.querySelector('#warehouse_display_amount').value);
-      purchaselistGrid.setPerPage(gap);
-      purchaselistGrid.reloadData();
+      warehouselistGrid.setPerPage(gap);
+      warehouselistGrid.reloadData();
   }
 
   function resetFilters() {
@@ -369,7 +371,7 @@
       document.querySelector('#searchVendorName').value = '';
       document.querySelector('#searchStartDate').value = '';
       document.querySelector('#searchEndDate').value = '';
-      document.querySelector('#purchase_display_amount').value = '';
+      document.querySelector('#warehouse_display_amount').value = '';
       purchaselistGrid.setRequestParams({
           "companyNum": companyNum,
           "goodsName": '',

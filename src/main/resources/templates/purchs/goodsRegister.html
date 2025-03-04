@@ -57,7 +57,6 @@
 	                <label class="form-label">상품분류</label>
 	                <select class="form-select" name="classificationId" id="classificationId">
 	                    <option value="" selected>선택</option>
-	                    <option th:each="cate:${catelist}" th:value="${cate.classificationId}" th:text="${cate.classificationName}"></option>
 	                </select>
                 </div>
 	            <div class="col-md-6">
@@ -88,6 +87,7 @@
 	                <div class="input-group">
 	                    <input type="text" class="form-control" name="vendorName" id="vendorName" th:value="${ProductDTO.vendorName}" data-bs-toggle="modal" data-bs-target="#vendorModal"  readonly>
 	                	<input type="hidden" id="vendorId" name="vendorId"  value="${ProductDTO.vendorId}">
+	                	<input type="hidden" id="marginRate" name="marginRate"  value="${ProductDTO.marginRate}">
 	                	<!-- 거래처 모달 -->
 						    <div th:include="purchs/modal/ModalTemplate :: ModalTemplate (
 						    'vendorModal', 
@@ -192,7 +192,71 @@ const token = document.querySelector('meta[name="_csrf"]').content;
 
 
  document.addEventListener("DOMContentLoaded", function(){
+	 
+	 const companyNum = document.getElementById("companyNum").value;  // ✅ Thymeleaf에서 session 값 가져옴
+     console.log("✅ companyNum:", companyNum);
+
+     fetch(`/purchs/rest/product/catelist?companyNum=${companyNum}`)
+     .then(response => {
+         if (!response.ok) {
+             return response.text().then(text => {
+                 throw new Error(`❌ 서버 응답 오류 (${response.status}): ${text}`);
+             });
+         }
+         return response.json();
+     })
+     .then(data => {
+         console.log("📢 서버 응답 데이터:", data);
+
+         if (!Array.isArray(data)) {  
+             console.error("❌ 서버 응답이 배열이 아닙니다. 데이터 확인 필요:", data);
+             return;
+         }
+
+         const categorySelect = document.getElementById("classificationId");
+
+         if (data.length === 0) {
+             console.warn("⚠️ 카테고리 데이터가 없습니다.");
+             return;
+         }
+
+         data.forEach(category => {
+             let option = document.createElement("option");
+             option.value = category.classificationId;
+             option.textContent = category.classificationName;
+             categorySelect.appendChild(option);
+         });
+     })
+     .catch(error => console.error("❌ 카테고리 로드 중 오류:", error));
     	
+     
+   
+   	    // 원가 입력 시 자동으로 공급가액 계산
+   	    document.getElementById("goodsCost").addEventListener("input", function () {
+   	        let goodsCost = parseFloat(this.value) || 0;
+   	        let marginRate = parseFloat(document.getElementById("marginRate").value) || 0; // 마진율 가져오기
+
+   	        // 공급가액 계산: 원가 * (1 + 마진률 / 100)
+   	        let supplyPrice = parseInt(goodsCost * (1 + (marginRate / 100)));
+
+   	        // 결과 반영
+   	        document.getElementById("goodsSupplyPrice").value = supplyPrice.toFixed(2); // 소수점 2자리까지 표시
+   	    });
+
+   	    // 페이지 로드 시 공급가액 자동 계산 (초기 원가값이 있을 경우)
+   	    let initialGoodsCost = parseFloat(document.getElementById("goodsCost").value) || 0;
+   	    if (initialGoodsCost) {
+   	        document.getElementById("goodsCost").dispatchEvent(new Event("input"));
+   	    }
+
+   	    // 마진율 변경 시 공급가액 재계산 (마진율도 변경 가능할 경우)
+   	    document.getElementById("marginRate").addEventListener("input", function () {
+   	        document.getElementById("goodsCost").dispatchEvent(new Event("input"));
+   	    });
+   
+
+	    
+	    
     	var Grid = tui.Grid;
         //입력 창의 경우 
         const dataSource = [];
@@ -212,6 +276,8 @@ const token = document.querySelector('meta[name="_csrf"]').content;
                 return this.el;
             }
         }
+        
+        
 
         	 grid = new Grid({
             el: document.getElementById('myGrid'), // 컨테이너 엘리먼트
@@ -368,14 +434,17 @@ const token = document.querySelector('meta[name="_csrf"]').content;
 
   	    let selectedVendorName = sessionStorage.getItem("selectedVendorName");
   	    let selectedVendorId = sessionStorage.getItem("selectedVendorId");
+  	    let selectedMarginRate = sessionStorage.getItem("selectedMarginRate");
 
-  	    if (selectedVendorName && selectedVendorId) {
+  	    if (selectedVendorName && selectedVendorId && selectedMarginRate) {
   	        let vendorNameInput = document.getElementById("vendorName");
   	        let vendorIdInput = document.getElementById("vendorId");
+  	        let MarginRateInput = document.getElementById("marginRate");
 
-  	        if (vendorNameInput && vendorIdInput) {
+  	        if (vendorNameInput && vendorIdInput && MarginRateInput) {
   	        	vendorNameInput.value = selectedVendorName;
   	        	vendorIdInput.value = selectedVendorId;
+  	        	MarginRateInput.value = selectedMarginRate;
   	        }
 
   	        console.log("브랜드 선택 완료:", selectedVendorName, selectedVendorId);
