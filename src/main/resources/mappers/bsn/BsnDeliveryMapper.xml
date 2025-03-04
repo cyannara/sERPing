@@ -226,7 +226,7 @@ SELECT ROW_NUMBER() OVER (
        
 FROM purchs_warehousing_body pwb
 LEFT JOIN purchse_option po ON pwb.option_num = po.option_num
-WHERE pwb.company_num = 1
+WHERE pwb.company_num = #{companyNum}
   AND po.option_code = #{optionCode}
   AND warehousing_remaining_quantity > 0
   AND NOT EXISTS (
@@ -244,7 +244,7 @@ WHERE RN BETWEEN #{start} AND #{end}
 <select id="getCountGoodsWarehouseLot" parameterType="BsnDeliveryDetailDTO">
 SELECT COUNT(warehousing_body_num)
 FROM purchs_warehousing_body pwb
-WHERE pwb.company_num = 1
+WHERE pwb.company_num = #{companyNum}
   AND pwb.warehousing_remaining_quantity > 0
   AND EXISTS (
       SELECT 1 

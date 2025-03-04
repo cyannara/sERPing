@@ -118,4 +118,9 @@ FROM bsn_order_detail
 WHERE order_id = #{orderId}
 </select>
 
+<update id="cancelBsnOrder" statementType="CALLABLE">
+call BSN_ORDER_CANCEL(#{orderId}, #{orderCancelReason})
+
+</update>
+
 </mapper>

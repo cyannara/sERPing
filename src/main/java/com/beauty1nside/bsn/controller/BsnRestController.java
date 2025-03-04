@@ -189,13 +189,12 @@ public class BsnRestController {
 		return result;		
 
 	};
-	
 	@PutMapping("/order/list/cancel")
 	public Object bsnOrderCanel(@RequestBody BsnOrderCancelDTO bsnOrderCancelDTO){
 		Map<String, Object> response = new HashMap<>();
 	
 		try {
-			//bsnOrderService.cancelBsnOrder(bsnOrderCancelDTO);
+			bsnOrderService.cancelBsnOrder(bsnOrderCancelDTO);
 			response.put("status", "success");
 	        response.put("message", "취소 성공");
 	        return ResponseEntity.ok(response); // JSON 형태 응답
@@ -288,6 +287,7 @@ public class BsnRestController {
 			@RequestParam(name ="page", defaultValue = "1", required = false) int page,
 			@RequestParam(name = "optionCode", required = false) String optionCode,
 			@RequestParam(name = "deliveryDetailId", required = false) int deliveryDetailId,
+			@RequestParam(name = "companyNum", required = false, defaultValue = "1") int companyNum,
 			BsnDeliveryDetailDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException  {
 	
 		//한 페이지에 출력할 수 : 기본값: 5
@@ -300,6 +300,7 @@ public class BsnRestController {
 				dto.setEnd(paging.getLast());
 				dto.setOptionCode(optionCode);
 				dto.setDeliveryDetailId(deliveryDetailId);
+				dto.setCompanyNum(companyNum);
 				
 				GridArray grid = new GridArray();
 				Object result = grid.getArray(paging.getPage(), bsnOrderService.getCountOfGoodsWarehouseLot(dto), bsnOrderService.getGoodsWarehouseLot(dto) );

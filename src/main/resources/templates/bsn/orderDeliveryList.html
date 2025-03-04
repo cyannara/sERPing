@@ -267,9 +267,10 @@ function formatStatus(status) {
     	return "요구수량미달";
     case 1 :
     	return "요구수량충족";
+    case 2 :
+		return "출고됨";
     }
-    
-    	
+  	
 }
 
 //출고상태 선택(체크된 값)
@@ -398,7 +399,7 @@ columns: [
     //{ header: "옵션코드", name: "optionCode",  },
     { header: "요구수량(규격)", name: "deliveryDemandQnt",  },
     { header: "출고총수량(규격)", name: "deliveryTotalQnt",  },
-    //{ header: "출고준비여부", name: "sufficiencyStatus", formatter: ({ value }) => formatStatus(value), sortable : true},
+    { header: "출고준비여부", name: "sufficiencyStatus", formatter: ({ value }) => formatStatus(value), sortable : true},
 
 ],
 pageOptions: {
