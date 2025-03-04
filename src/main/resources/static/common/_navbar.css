@@ -13,6 +13,20 @@ nav {
     padding: 20px;
     display: flex;
     justify-content: center;
+    > div {
+        width: 80%;
+    }
+    .nav {
+        width: 200px;
+        &:hover {
+            border-radius: 8px;
+        }
+    }
+    .nav-link {
+        i {
+            margin-bottom: 2px;
+        }
+    }
 }
 nav a {
     margin: 0 20px;
@@ -25,8 +39,8 @@ nav a {
 nav a:hover {
     font-weight: 800;
     color: #3f3e91;
-    transform: scale(1.1);
     text-decoration: auto !important;
+    border-radius: 8px;
 }
 
  .selected {
