@@ -7,6 +7,7 @@ import com.beauty1nside.bsn.dto.OrderSearchDTO;
 import com.beauty1nside.bsn.dto.delivery.BsnDeliveryDTO;
 import com.beauty1nside.bsn.dto.delivery.BsnDeliveryDetailDTO;
 import com.beauty1nside.bsn.dto.delivery.BsnDeliveryLotDTO;
+import com.beauty1nside.bsn.dto.delivery.BsnDeliverySearchDTO;
 import com.beauty1nside.bsn.dto.order.BhfOrderDTO;
 import com.beauty1nside.bsn.dto.order.BhfOrderDetailDTO;
 import com.beauty1nside.bsn.dto.order.BsnOrderDTO;
@@ -44,21 +45,35 @@ public interface BsnOrderService {
 	
 	
 	//출고 조회
-	public List<BsnDeliveryDTO> getBsnDelivery(OrderSearchDTO orderSearchDTO);
+	public List<BsnDeliveryDTO> getBsnDelivery(BsnDeliverySearchDTO bsnDeliverySearchDTO);
+	
+	//출고 상세 구하기
+	public int getCountOfBsnDelivery(BsnDeliverySearchDTO bsnDeliverySearchDTO);
 	
 	//출고 상세 조회
 	public List<BsnDeliveryDetailDTO> getBsnDeliveryDetail(BsnDeliveryDTO bsnDeliveryDTO);
+	
+	//출고 상세 카운팅
+	public int getCountOfBsnDeliveryDetail(BsnDeliveryDTO bsnDeliveryDTO);
 	
 	
 	//츨고 LOT 상세 조회
 	public List<BsnDeliveryLotDTO> getBsnDeliveryLotDetail(BsnDeliveryDetailDTO bsnDeliveryDetailDTO);
 	
+	//츨고 LOT 상세 카운팅
+	public int getCountOfBsnDeliveryLotDetail(BsnDeliveryDetailDTO bsnDeliveryDetailDTO);
 	
-	//본사 창고 재고(LOT별)조회 임시
+	//본사 창고 재고(LOT별)조회
 	public List<BsnGoodsLOTDTO> getGoodsWarehouseLot(BsnDeliveryDetailDTO bsnDeliveryDetailDTO);
+	
+	//본사 창고 재고(LOT별)조회 카운팅
+	public int getCountOfGoodsWarehouseLot(BsnDeliveryDetailDTO bsnDeliveryDetailDTO);
 	
 	//출고 LOT 등록(연결)
 	public void registerBsnDeliveryLotDetail(BsnDeliveryDetailDTO bsnDeliveryDetailDTO);
+	
+	//출고 LOT 수량 수정
+	public void modifyBsnDeliveryLotDetail(BsnDeliveryDetailDTO bsnDeliveryDetailDTO);
 	
 	//출고 LOT 제거
 	public void removeBsnDeliveryLotDetail(BsnDeliveryDetailDTO bsnDeliveryDetailDTO);
