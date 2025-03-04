@@ -45,7 +45,7 @@ WHERE progress_status = '신청'
 <select id="getCountOfBhfOrder" resultType="int">
 SELECT COUNT(*) FROM BHF_ORDER
 WHERE progress_status = '신청'
--- AND   company_num = 1
+AND   company_num = #{companyNum}
 <include refid="searchInfoBhfOrder"></include>
 </select>
 

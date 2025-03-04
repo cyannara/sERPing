@@ -13,6 +13,7 @@ import com.beauty1nside.bsn.dto.delivery.BsnDeliveryLotDTO;
 import com.beauty1nside.bsn.dto.delivery.BsnDeliverySearchDTO;
 import com.beauty1nside.bsn.dto.order.BhfOrderDTO;
 import com.beauty1nside.bsn.dto.order.BhfOrderDetailDTO;
+import com.beauty1nside.bsn.dto.order.BsnOrderCancelDTO;
 import com.beauty1nside.bsn.dto.order.BsnOrderDTO;
 import com.beauty1nside.bsn.dto.order.BsnOrderDetailDTO;
 import com.beauty1nside.bsn.mapper.BsnOrderMapper;
@@ -81,6 +82,11 @@ public class BsnOrderServiceImpl implements BsnOrderService {
 	@Override
 	public int getCountOfBsnOrderDetail(BsnOrderDTO bsnOrderDTO) {
 		return bsnOrderMapper.getCountOfBsnOrderDetail(bsnOrderDTO);
+	}
+	//주문 취소
+	@Override
+	public void cancelBsnOrder(BsnOrderCancelDTO bsnOrderCancelDTO) {
+		bsnOrderMapper.cancelBsnOrder(bsnOrderCancelDTO);	
 	}
 	
 	//출고 조회(출고처리페이지)
@@ -170,6 +176,7 @@ public class BsnOrderServiceImpl implements BsnOrderService {
 	        }
 	    }
 	 }
+	
 	
 	
 	

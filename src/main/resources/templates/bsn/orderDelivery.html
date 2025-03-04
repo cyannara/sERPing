@@ -436,7 +436,7 @@ function loadDeliveryLotDetail(deliveryDetailId) {
         .then(data => {
             if (data && data.data && data.data.contents) {
             	const detailData = data.data.contents; // 상세 데이터 저장
-            	console.log(detailData);
+            	//console.log(detailData);
                 deliveryLotDetailGrid.resetData(detailData);
             } else {
                 console.warn("상세 데이터가 없습니다.");
@@ -458,7 +458,7 @@ columns: [
     { header: "유통기한", name: "goodsConsumptionDate", formatter: ({ value }) => formatDate(value, 'order'), width: 'auto', sortable : true},
     { header: "출고가능수량", name: "deliveryPossibleQnt",  },
     { header: "출고예약수량", name: "deliveryQnt",  editor: 'text',},
-    //{ header : "수량수정", name : "detail", formatter : () => '<button class="btn btn-warning btn-sm btnInfo" data-bs-toggle="modal" data-bs-target="#assetdetailModal">수량수정</button>', align: 'center'},
+    
 
 ],
 pageOptions: {
