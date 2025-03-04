@@ -189,6 +189,30 @@ public class BsnRestController {
 		return result;		
 
 	};
+	
+	@GetMapping("/order/list/history")
+	public Object bsnOrderHistory(@RequestParam(name = "perPage", defaultValue = "5", required = false) int perPage,
+			@RequestParam(name ="page", defaultValue = "1", required = false) int page,
+			@RequestParam(name = "orderId", defaultValue = "bsn_order20") String orderId,
+			BsnOrderDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException  {
+		
+		
+		//한 페이지에 출력할 수 : 기본값: 5
+		paging.setPageUnit(perPage);
+		//현재 페이지(기본값: 1)
+		paging.setPage(page);
+		
+		//첫 페이지, 마지막 페이지
+		dto.setStart(paging.getFirst());
+		dto.setEnd(paging.getLast());
+		dto.setOrderId(orderId);
+		
+		GridArray grid = new GridArray();
+		Object result = grid.getArray(paging.getPage(), 10, bsnOrderService.getBsnOrderHistory(dto) );
+
+		return result;		
+
+	};
 	@PutMapping("/order/list/cancel")
 	public Object bsnOrderCanel(@RequestBody BsnOrderCancelDTO bsnOrderCancelDTO){
 		Map<String, Object> response = new HashMap<>();

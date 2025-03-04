@@ -13,6 +13,7 @@ import com.beauty1nside.bsn.dto.order.BhfOrderDetailDTO;
 import com.beauty1nside.bsn.dto.order.BsnOrderCancelDTO;
 import com.beauty1nside.bsn.dto.order.BsnOrderDTO;
 import com.beauty1nside.bsn.dto.order.BsnOrderDetailDTO;
+import com.beauty1nside.bsn.dto.order.BsnOrderHistoryDTO;
 
 public interface BsnOrderService {
 
@@ -43,6 +44,9 @@ public interface BsnOrderService {
 	public List<BsnOrderDetailDTO> getBsnOrderDetail(BsnOrderDTO bsnOrederDTO);
 	//주문상세 수 구하기
 	public int getCountOfBsnOrderDetail(BsnOrderDTO bsnOrederDTO);
+	
+	//주문변경이력조회
+	public List<BsnOrderHistoryDTO> getBsnOrderHistory(BsnOrderDTO bsnOrderDTO);
 	//주문취소
 	public void cancelBsnOrder(BsnOrderCancelDTO bsnOrderCancelDTO);
 	
