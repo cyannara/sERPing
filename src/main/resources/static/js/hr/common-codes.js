@@ -142,8 +142,9 @@ function populateStatusButtons(statuses) {
 
     // "전체" 버튼 추가
     statusGroup.innerHTML += `
-        <input type="radio" class="btn-check" name="searchStatus" id="statusAll" checked value="">
-        <label class="btn btn-outline-primary" for="statusAll">전체</label>
+
+	        <input type="radio" class="btn-check" name="searchStatus" id="statusAll" checked value="">
+	        <label class="btn btn-outline-primary" for="statusAll">전체</label>
     `;
     
     // 상태 버튼 추가 (예상 데이터: ["재직", "퇴직", "휴직"])
