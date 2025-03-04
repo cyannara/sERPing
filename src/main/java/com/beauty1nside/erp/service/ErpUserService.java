@@ -27,6 +27,7 @@ import com.beauty1nside.erp.dto.erpSubscriptionInfoListDTO;
  *  2025.02.20  표하연          사용계약서 정보를 CR 한다
  *  2025.02.21  표하연          결제 목록을 리드한다
  *  2025.02.26  표하연          구독 결제한 현금영수증, 세금계산서 데이터를 삽입한다
+ *  2025.03.04  표하연          정기구독을 등록 한다 ( 결제X )
  *
  *  </pre>
 */
@@ -63,6 +64,14 @@ public interface ErpUserService {
      * @return int
      */
 	public int periodservicepay(Map<String, Object> requestData);
+	
+	/**
+     * 정기 구독 서비스를 등록한다
+     *
+     * @param Map<String, Object>
+     * @return int
+     */
+	public int regularRegister(Map<String, Object> requestData);
 	
 	/**
      * 그룹웨어 옵션 정보를 불러온다
