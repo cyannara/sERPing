@@ -1,6 +1,6 @@
 <body>
-<!--  <script>
-document.addEventListener("DOMContentLoaded", function() {
+<!-- <script>
+
   // 브라우저 sessionStorage에서 값 가져오기
   const vendorEmail = sessionStorage.getItem("vendorEmail"); 
   const employeeEmail = sessionStorage.getItem("employeeEmail");
@@ -12,9 +12,15 @@ document.addEventListener("DOMContentLoaded", function() {
   if (vendorEmail) {
     document.getElementById("toEmail").value = vendorEmail;
   }
-});
+
 </script>
  -->
+	<!-- 로딩 스피너 (정 중앙 배치) -->
+	<!-- <div class="d-flex align-items-center justify-content-center spinner-overlay" style="display:none;">
+	  <div class="spinner-border" role="status">
+	    <span class="visually-hidden">Loading...</span>
+	  </div>
+	</div> -->
 
    <div class="container my-4">
     <h2 class="mb-4">발주서 보내기</h2>
@@ -54,6 +60,7 @@ document.addEventListener("DOMContentLoaded", function() {
       </form>
   </div>
   
+ 
 <script>
 	
     // 폼 제출을 AJAX 방식으로 처리하여 전송 성공 시 알림 후 페이지 리로드
@@ -62,7 +69,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
       const form = e.target;
       const formData = new FormData(form);
-
+      //const spinner = document.querySelector(".spinner-overlay");
+		
+   // 📌 요청 시작 전에 스피너 표시
+      //spinner.style.display = "flex";
+   
       fetch(form.action, {
         method: "POST",
         body: formData
@@ -95,6 +106,10 @@ document.addEventListener("DOMContentLoaded", function() {
             title: '오류 발생',
             text: '메일 전송 중 오류가 발생하였습니다.'
           });
+        })
+        .finally(() => {
+          // 📌 요청 완료 후 스피너 숨기기
+          //spinner.style.display = "none";
         });
       });
   </script>

@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import com.beauty1nside.erp.dto.ContractDTO;
 import com.beauty1nside.erp.dto.ErpSearchDTO;
 import com.beauty1nside.erp.dto.ErpSubOptionDTO;
+import com.beauty1nside.erp.dto.ErpSubscriptionOptionDTO;
 import com.beauty1nside.erp.dto.SubScriptionDTO;
 import com.beauty1nside.erp.dto.SubscriptionDetailDTO;
 import com.beauty1nside.erp.dto.TaxInvoiceDTO;
@@ -179,5 +180,12 @@ public interface ErpUserMapper {
      */
 	public int insertTaxInvoice(TaxInvoiceDTO dto);
 	
+	/**
+     * 구독 옵션 번호에 맞는 정보를 조회해서 보여준다
+     *
+     * @param int
+     * @return ErpSubscriptionOptionDTO
+     */
+	public ErpSubscriptionOptionDTO subscriptionoptionname(int optionNum);
 	
 }

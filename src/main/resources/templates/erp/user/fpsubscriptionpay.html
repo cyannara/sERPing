@@ -595,6 +595,22 @@
 	        		};
 	        		console.log(requestData);
 	        		//여기에 패치하고 
+	        		const url = `/erp/rest/regularRegister`;
+	        		fetch ( url, {
+	        			method : "POST",
+	        			headers :{
+	        				"Content-Type": "application/json",
+	        			},
+	        			body : JSON.stringify(requestData),
+	        		})
+	        		.then(result => result.text())
+	        		.then(result => {
+	        			if(result=="OK"){
+	        				location.href='/erp/erpsubinfo?menu=mypage';
+	        			}else{
+	        				showAlert("정기구독 등록을 실패 했습니다","danger");
+	        			}
+	        		})
 	        		//erp_subscription_info_list테이블에 값이 있으면 업데이트 
 	        		//업데이트할때 subscription_form 정기구독으로
 	        		//인서트할땐 정기구독으로
@@ -705,7 +721,7 @@ document.querySelector(".periodpaygo").addEventListener("click", async function 
 	            pay_method: "card", // 결제 방식
 	            merchant_uid: orderId, // 주문번호 (선택한 구독 옵션 value 조합)
 	            name: "기간 구독서비스", // 결제 상품명
-	            amount: 1, // 결제 금액 (formattedTotalPrice 사용하지 않고 정수로 전달)
+	            amount: formattedTotalPrice, // 결제 금액 (formattedTotalPrice 사용하지 않고 정수로 전달)
 	            buyer_email: "test@example.com",
 	            buyer_name: "홍길동",
 	            buyer_tel: "01012345678",
@@ -718,10 +734,10 @@ document.querySelector(".periodpaygo").addEventListener("click", async function 
 	                payGO(orderId, formattedTotalPrice, window.subscriptionState, dataDay);
 	            } else {
 	            	//alert("결제가 실패했습니다. 오류 메시지: " + rsp.error_msg);
-	                console.log("❌ 결제 실패:", rsp);
+	                showAlert("결제에 실패 했습니다.", 'danger');
 	                console.log("결제가 실패했습니다. 오류 메시지: " + rsp.error_msg+" "+orderId+" "+formattedTotalPrice+"원",window.subscriptionState);
 	                //결제 실패여도 결제로 넘길 예정 (테스트니까)
-	                payGO(orderId, formattedTotalPrice, window.subscriptionState, dataDay);
+	                //payGO(orderId, formattedTotalPrice, window.subscriptionState, dataDay);
 	            }
 	        });
 		}else{

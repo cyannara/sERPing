@@ -9,4 +9,5 @@ public interface OtherService {
 	List<Map<String, Object>> optionList(String goodsName, int companyNum);
 	List<Map<String, Object>> bhfList(int companyNum);
 	Map<String, Object> companyInfo(int companyNum);
+	List<Map<String, Object>> deptList(@Param("companyNum") int companyNum);
 }

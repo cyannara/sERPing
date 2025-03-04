@@ -116,6 +116,18 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
             	</div>
           	</div>
         </div>
+        <div class="row">
+          	<div class="col-md-12  grid-margin stretch-card">
+            	<div class="card">
+              		<div class="card-body">
+                		<h4 class="card-title">주문 변경 이력</h4>
+                		<p class="card-description"></p>
+                		<div id="orderHistory"></div>
+               		 	<div id="pagination" class="tui-pagination"></div>
+              		</div>
+            	</div>
+          	</div>
+        </div>
         <div class="row mt-3">
 	        <div class="col-12 text-center">
 	            <button class="btn btn-danger" id="cancelButton">선택한 주문취소</button>
@@ -216,6 +228,12 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	    	return "취소";
 	    case "VS004" :
 	    	return "지점입고완료";
+	    case "OH01": 
+	    	return "주문등록";
+	    case "OH02": 
+	    	return "주문출고";
+	    case "OH03": 
+	    	return "주문취소";
 	    default:
 	        return "알 수 없음";	
        	
@@ -279,6 +297,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	    	selectedRow = rowData;
 	        loadOrderDetail(rowData.orderId); // 상세 정보 불러오기
 	        
+	        loadOrderHistory(rowData.orderId);
 	     	// 상태가 'VS001'이면 버튼을 보이고, 아니면 숨김
 	     	const cancelButton = document.getElementById('cancelButton');
 	        if (rowData.orderStatus === 'VS001') {
@@ -324,6 +343,33 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	        })
 	        .catch(error => console.error('Error fetching order detail:', error));
 	}
+	function loadOrderHistory(orderId) {
+		if (!orderId) {
+	        console.warn("유효하지 않은 주문 Id입니다.");
+	        return;
+	    }
+		
+	    fetch(`/bsn/rest/order/list/history?orderId=${orderId}`)
+	    	
+	        .then(response => {
+		            if (!response.ok) throw new Error(`HTTP 오류! 상태: ${response.status}`);
+		            return response.json();
+		     })
+		     
+	        .then(data => {
+	            if (data && data.data && data.data.contents) {
+	            	const historyData = data.data.contents; // 상세 데이터 저장
+	            	
+	            	
+	            	//
+	                orderHistoryGrid.resetData(historyData);
+	            } else {
+	                console.warn("상세 데이터가 없습니다.");
+	                orderHistoryGrid.resetData([]); // 빈 배열로 초기화
+	            }
+	        })
+	        .catch(error => console.error('Error fetching order history:', error));
+	}
 	
 	//상세 그리드 형식
 	const orderDetailGrid = new Grid({
@@ -339,6 +385,23 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         { header: "수량", name: "quantity",  },
         //{ header: "단가", name: "unitPrice",  },
         //{ header: "총액", name: "totalPrice",  }
+    ],
+    pageOptions: {
+        useClient: false,
+        perPage: 5
+    }
+	
+	
+	});
+	
+	//이력 그리드 형식
+	const orderHistoryGrid = new Grid({
+    el: document.getElementById('orderHistory'),
+    columns: [
+        { header: "이력유형", name: "historyType", formatter: ({ value }) => formatOrderStatus(value), width:"auto" },
+        { header: "처리일", name: "registerDate", formatter: ({ value }) => formatDate(value, 'order'), width: 'auto', },
+        { header: "이력내용", name: "historyContents",  },
+
     ],
     pageOptions: {
         useClient: false,

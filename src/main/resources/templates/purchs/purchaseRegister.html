@@ -4,6 +4,9 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
 <body layout:fragment="content">
+<!-- ✅ JS 파일 로드 순서 조정 (defer 적용) -->
+	 <script src="/js/purchs/purchseResgister.js"></script>
+	 
     <style>
         .form-control { width: 100%; }
         
@@ -100,7 +103,8 @@
 	    <div class="mb-3 d-flex justify-content-between">
 	        <div>
 	            <button class="btn btn-secondary">주문서 조회</button>
-	            <button class="btn btn-secondary">재고 조회</button>
+	            <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#goodsNumModal">재고 조회</button>
+	           
 	        </div>
 	        <button class="btn btn-primary" id="bttAdd">발주 추가</button>
 	    </div>
@@ -122,8 +126,7 @@
 
 
 
-<!-- ✅ JS 파일 로드 순서 조정 (defer 적용) -->
-	 <script src="/js/purchs/purchseResgister.js"></script>
+
 	
 	 
 <!-- 상품 모달 -->
@@ -133,8 +136,17 @@
   '상품 조회', 
   'purchs/modal/goodsTable', 
   'purchs/modal/brandFooter'
-  )"></div> 
-
+  )"></div>
+  
+   <!-- 상품 모달 -->
+<!--  <div th:include="purchs/modal/ModalTemplate :: ModalTemplate (
+  'goodsNumModal', 
+  'modal-xl', 
+  '상품 재고 조회', 
+  'purchs/modal/goodsNum', 
+  'purchs/modal/brandFooter'
+  )"></div>  
+ -->
 
 	
 </body>

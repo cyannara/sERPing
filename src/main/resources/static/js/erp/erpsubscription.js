@@ -399,7 +399,6 @@ document.addEventListener("DOMContentLoaded", function () {
 	                <ul class="nav flex-column sub-menu rounded-3">
 	                    <li class="nav-item"><a class="nav-link" href="/erp/erpsubinfo?menu=mypage">구독조회</a></li>
 	                    <li class="nav-item"><a class="nav-link" href="/erp/fppay?menu=mypage">구독결제</a></li>
-	                    <li class="nav-item"><a class="nav-link" href="/erp/subpay?menu=mypage">결제수단</a></li>
 	                </ul>
 	            </div>
 	        </li>

@@ -192,7 +192,7 @@ function initPurchaseGrid() {
 	                productGrid.refreshLayout();
 	                console.log("📢 상품 조회 그리드 리프레시 완료");
 	            }, 500);
-	        });
+	        }); 
 	    } else {
 	        console.warn("❌ productGrid가 정의되지 않았습니다.");
 	    }
@@ -415,8 +415,3 @@ function purchaseRegister() {
 
 
 	
-
-
-
-
-

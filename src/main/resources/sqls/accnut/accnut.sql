@@ -237,3 +237,63 @@ ALTER TABLE ACCNUT_DEBT ADD company_num NUMBER(6,0);
 ALTER TABLE ACCNUT_DEALINGS_ACCOUNT_BOOK ADD company_num NUMBER(6,0);
 ALTER TABLE ACCNUT_ASSETS ADD company_num NUMBER(6,0);
 
+-- 추가 컬럼
+alter table accnut_assets add rgno varchar2(1000);
+
+DROP TABLE ACCNUT_TAX_DETAIL;
+-- 추가 테이블
+CREATE TABLE accnut_tax_detail (
+	tax_detail_num	NUMBER(10) 	NOT NULL,
+	tax_num	number(10)		NOT NULL,
+	month	number(10)		NOT NULL,
+	day	number(10)		NOT NULL,
+	option_code	varchar2(100)		NOT NULL,
+	standard	varchar2(100)		NULL,
+	quantity	number(10)		NOT NULL,
+	amount	number(10)		NULL,
+	total	number(10)		NULL,
+	supply_price	number(10)		NULL,
+	tax	number(10)		NULL,
+	note	varchar(500)		NULL
+);
+
+CREATE TABLE accnut_tax_header (
+	tax_num	number(10)		NOT NULL,
+	from_rgno	varchar2(50)		NOT NULL,
+	from_co_name	varchar2(100)		NOT NULL,
+	from_name	varchar2(100)		NOT NULL,
+	from_address	varchar(500)		NULL,
+	from_status	varchar2(100)		NULL,
+	from_cate	varchar2(100)		NULL,
+	from_email	varchar2(100)		NULL,
+	to_rgno	varchar2(50)		NOT NULL,
+	to_co_name	varchar2(100)		NOT NULL,
+	to_name	varchar2(100)		NOT NULL,
+	to_address	varchar(500)		NULL,
+	to_status	varchar2(100)		NULL,
+	to_cate	varchar2(100)		NULL,
+	to_email1	varchar2(100)		NULL,
+	to_email2	varchar2(100)		NULL,
+	rgdate	date	DEFAULT sysdate	NOT NULL,
+	note	varchar(500)		NULL,
+	total	number(10)		NULL,
+	supply	number(10)		NULL,
+	tax	number(10)		NULL,
+	company_num	number(10)		NOT NULL
+);
+
+ALTER TABLE accnut_tax_detail ADD CONSTRAINT PK_ACCNUT_TAX_DETAIL PRIMARY KEY (
+	tax_detail_num
+);
+
+ALTER TABLE accnut_tax_header ADD CONSTRAINT PK_ACCNUT_TAX_HEADER PRIMARY KEY (
+	tax_num
+);
+
+ALTER TABLE accnut_tax_detail ADD CONSTRAINT FK_accnut_tax_TO_tax_detail_1 FOREIGN KEY (
+	tax_num
+)
+REFERENCES accnut_tax_header (
+	tax_num
+);
+

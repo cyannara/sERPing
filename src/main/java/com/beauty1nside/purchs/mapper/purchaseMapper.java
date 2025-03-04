@@ -28,5 +28,8 @@ public interface purchaseMapper {
 								  @Param("companyNum") int companyNum);
 	
 	//발주서 수정 
-		public void purchsupdate (PurchUpdateVO vo);
+	 public void purchsupdate (PurchUpdateVO vo);
+	 
+	 //발주서 삭제
+	 int cancelPurchase(@Param("companyNum") int companyNum, @Param("purchaseNum") int purchaseNum); 
 }

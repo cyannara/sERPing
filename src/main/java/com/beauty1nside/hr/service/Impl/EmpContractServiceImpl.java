@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.beauty1nside.hr.dto.EmpContractDTO;
+import com.beauty1nside.hr.dto.EmpContractSearchDTO;
 import com.beauty1nside.hr.mapper.EmpContractMapper;
 import com.beauty1nside.hr.service.EmpContractService;
 
@@ -72,6 +73,13 @@ public class EmpContractServiceImpl implements EmpContractService {
         } catch (Exception e) {
             throw new RuntimeException("PDF 생성 중 오류 발생: " + e.getMessage());
         }
+    }
+
+    // ✅ 동적 검색 및 페이징 포함 근로계약 조회
+    @Override
+    @Transactional(readOnly = true)
+    public List<EmpContractDTO> searchContracts(EmpContractSearchDTO searchDTO) {
+        return empContractMapper.searchContracts(searchDTO);
     }
 
 }

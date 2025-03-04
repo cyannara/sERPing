@@ -154,27 +154,37 @@
 
                     // 삭제 버튼 이벤트 추가
                     document.getElementById("deleteBtn").addEventListener("click", () => {
-                        if (confirm("정말 삭제하시겠습니까?")) {
-                            fetch(`/bhf/rest/board/del?boardId=${boardId}`, {
-                                method: "DELETE",
-                                headers: { 
-                                	"Content-Type": "application/json",
-                                	//위에 변수로 저장한 헤더이름,토큰값 넣어주기
-                		        	'header': header, 
-                		            'X-CSRF-Token': token
-                                }
-                            })
-                            .then(response => response.json())
-                            .then(result => {
-                                if (result.success) {
-                                    alert("삭제되었습니다.");
-                                    window.location.href = "/bhf/erpBoard"; // 목록 페이지로 이동
-                                } else {
-                                    alert("삭제에 실패했습니다.");
-                                }
-                            })
-                            .catch(error => console.error("삭제 오류:", error));
-                        }
+                    	Swal.fire({
+                    	    icon: 'error',
+                    	    title: 'DELETE',
+                    	    text: '정말 삭제 하시겠습니까?',
+                    	    confirmButtonText: '확인',
+                    	    cancelButtonText: '취소',  // 취소 버튼 텍스트 추가
+                    	    showCancelButton: true,    // 취소 버튼 활성화
+                    	}).then((result) => {
+                    	    if (result.isConfirmed) {  // 확인 버튼 클릭 시
+                    	        fetch(`/bhf/rest/board/del?boardId=${boardId}`, {
+                    	            method: "DELETE",
+                    	            headers: { 
+                    	                "Content-Type": "application/json",
+                    	                'header': header, 
+                    	                'X-CSRF-Token': token
+                    	            }
+                    	        })
+                    	        .then(response => response.json())
+                    	        .then(result => {
+                    	            if (result.success) {
+                    	                showAlert('삭제되었습니다.', 'success');
+                    	                window.location.href = "/bhf/erpBoard"; // 목록 페이지로 이동
+                    	            } else {
+                    	                showAlert('삭제에 실패했습니다.', 'danger');
+                    	            }
+                    	        })
+                    	        .catch(error => console.error("삭제 오류:", error));
+                    	    } else if (result.isDismissed) {  // 취소 버튼 클릭 시
+                    	        showAlert('삭제가 취소되었습니다.', 'info');
+                    	    }
+                    	});
                     });
 		            
 		        } else {

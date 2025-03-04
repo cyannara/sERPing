@@ -119,8 +119,16 @@
 				{ header : "상품명", name : "goodsName", align: 'center'},
 				{ header : "옵션코드", name : "optionCode", align: 'center'},
 				{ header : "옵션명", name : "optionName", align: 'center'},
-				{ header : "규격", name : "goodsStandard", align: 'center'},
-				{ header : "수량", name : "stockQuantity", align: 'center'}
+				{ header : "규격", name : "goodsStandard", align: 'center', width: 150},
+				{ 
+					header : "수량", 
+					name : "stockQuantity", 
+					align: 'center', 
+					width: 150, 
+					formatter: function(ev){
+						return numberFormat(ev.value);
+					}
+				}
 			],
 			data: dataSource
 		});
@@ -133,7 +141,7 @@
 		        // 중복 체크(옵션코드가 동일한 행에 이미 있으면 추가하지 않음)
 		        const check = currentData.find(item => item.optionCode === rowData.optionCode );
 		        if(check){
-		        	alert("이미 추가된 재고입니다.")
+		        	showAlert('이미 추가된 재고입니다.','danger')
 		        }else{	        	
 		        	// 기존 데이터에서 가장 큰 rowKey 찾기 (없으면 0부터 시작) 그 다음 1씩 추가해서 rowkey 만들기
 	                const newRowKey = currentData.length > 0
@@ -167,12 +175,24 @@
 				{ header : "상품명", name : "goodsName", align: 'center'},
 				{ header : "옵션명", name : "optionName", align: 'center'},
 				{ header : "규격", name : "goodsStandard", align: 'center'},
-				{ header : "수량", name : "stockQuantity", align: 'center'},
+				{ 
+					header : "수량", 
+					name : "stockQuantity", 
+					align: 'center',
+					width: 130,
+					formatter: function(ev){
+						return numberFormat(ev.value);
+					}
+				},
 				{ 
 					header : "플러스 수량", 
 					name : "quantity",
 					align: 'center',
 					editor: 'text',
+					width: 130,
+					formatter: function(ev){
+						return numberFormat(ev.value);
+					},
 					onAfterChange: function(ev) { // onAfterChange는 해당 열에 변경이 있을때마다 호출되는 이벤트
 		                // ev.value:사용자가 입력한 값, ev.rowkey:변경된 셀이 어떤 행인지 알려주는 키
 		                // 값이 숫자만 포함하고 있는지 확인
@@ -180,7 +200,7 @@
 		                // 숫자가 아닌 값이 들어왔을 때 
 		                if (!value) {
 		                    grid2.setValue(ev.rowKey, ev.columnName, '');  // 해당 셀을 비웁니다
-		                    alert("수량은 숫자만 입력할 수 있습니다.");
+		                    showAlert('수량은 숫자만 입력할 수 있습니다.','danger');
 		                }else {
 		                	 // 마이너스 수량이 이미 입력되어 있으면, 플러스 수량을 비우지 않음
 		                    if (grid2.getValue(ev.rowKey, "quantity")) {
@@ -194,6 +214,10 @@
 					name : "mediationQuantity", 
 					align: 'center',
 					editor: 'text',
+					width: 130,
+					formatter: function(ev){
+						return numberFormat(ev.value);
+					},
 					onAfterChange: function(ev) { // onAfterChange는 해당 열에 변경이 있을때마다 호출되는 이벤트
 		                // ev.value:사용자가 입력한 값, ev.rowkey:변경된 셀이 어떤 행인지 알려주는 키
 		                // 값이 숫자만 포함하고 있는지 확인
@@ -201,7 +225,7 @@
 		                // 숫자가 아닌 값이 들어왔을 때 
 		                if (!value) {
 		                    grid2.setValue(ev.rowKey, ev.columnName, '');  // 해당 셀을 비웁니다
-		                    alert("수량은 숫자만 입력할 수 있습니다.");
+		                    showAlert('수량은 숫자만 입력할 수 있습니다.','danger');
 		                } else {
 		                	// 플러스 수량이 이미 입력되어 있으면, 마이너스 수량을 비우지 않음
 		                    if (grid2.getValue(ev.rowKey, "mediationQuantity")) {
@@ -210,7 +234,7 @@
 		                }
 		            }
 				},
-				{ header : "조정사유",  name : "mediationReason", align: 'center', editor: 'text'}
+				{ header : "조정사유",  name : "mediationReason", align: 'center', editor: 'text', width: 316}
 			],
 			data: ""
 		});
@@ -221,7 +245,7 @@
 		    let mediationData = grid2.getData(); 
 		    
 		    if (mediationData.length === 0) {
-		        alert("등록할 상품을 선택해주세요.");
+		    	showAlert('등록할 상품을 선택해주세요.','danger');
 		        return;
 		    }
 			// 조정 수량 및 사유 작성 했는지 확인
@@ -232,12 +256,12 @@
 				const mediationReason = mediationData[i].mediationReason;
 				
 				if (quantity === 0 && mediationQuantity === 0) {  // 발주수량이 비어있는지 확인
-		            alert("수량을 입력해주세요.");
+					showAlert('수량을 입력해주세요.','danger');
 		            return;  // 발주수량이 없으면 더 이상 진행하지 않음
 		        }
 				
 			    if (mediationReason === "" || mediationReason === null){
-			    	alert("조정사유를 입력해주세요.");
+			    	showAlert('조정사유를 입력해주세요.','danger');
 		            return;
 			    }
 		    }
@@ -272,18 +296,26 @@
 		    .then(response => response.json())
 		    .then(result => {
 		        if (result) {
-		            alert("조정 등록이 완료되었습니다.");
+		            showAlert('조정 등록이 완료되었습니다.','success');
 		            grid2.resetData([]); // 등록 후 그리드 초기화
 		            MDnodata(); // 데이터 없을떄 나오는 문구
 		            grid.readData(); //변경된값 볼수있게 테이블 새로고침
 		        } else {
-		            alert("조정 등록에 실패했습니다.");
+		            showAlert('조정 등록에 실패했습니다.','danger');
 		        }
 		    })
 		    .catch(error => {
 		        console.error("Error:", error);
-		        alert("서버 오류가 발생했습니다.");
+		        showAlert('서버 오류가 발생했습니다.','danger');
 		    });
+		}
+		
+		// 초기화 버튼 함수
+		function reset(){
+			grid2.resetData([]);
+	     	//테이블 데이터 없을떄 나오는 문구 다시 실행
+			nodata();
+			MDnodata();
 		}
 		
 		// 검색 함수

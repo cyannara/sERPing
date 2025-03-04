@@ -40,6 +40,8 @@
   </div>
 
   <script>
+  	var session = sessionData;
+  
     document.addEventListener("DOMContentLoaded",()=>{
       addRow();
       delRow();
@@ -108,7 +110,8 @@
         													  		  timepicker : false
   		}}},
   		{ header : "삭제", name : "del", formatter : () => '<button class="btn btn-danger btn-sm btnDel"><i class="mdi mdi-delete" style="line-height: 15px;"></i></button>', align: 'center', width: '40'},
-  		{ header : "회사번호", name : "companyNum", formatter : () => '0', hidden: '1'},
+  		{ header : "회사번호", name : "companyNum", formatter : () => `${session.companyNum}`, hidden: '1'
+  			},
   		{ header : "부서", name : "department", formatter : "DT003", hidden: '2'},
       ],
       data : dataSource,
@@ -116,7 +119,7 @@
   	
     function addRow() {
       document.querySelector('#addBtn').addEventListener('click', ()=> {
-        grid.appendRow({ department: "DT003" })
+        grid.appendRow({ department: "DT003", companyNum: session.companyNum })
         //delRow();
       })
 
@@ -137,6 +140,9 @@
     function insertBtn() {
     	grid.blur();
     	grid.request('createData');
+    	grid.resetData([]);
+    	showAlert('등록되었습니다.', 'success')
+    	
     	
     }
     
