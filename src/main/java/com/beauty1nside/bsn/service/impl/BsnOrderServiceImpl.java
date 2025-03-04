@@ -16,6 +16,7 @@ import com.beauty1nside.bsn.dto.order.BhfOrderDetailDTO;
 import com.beauty1nside.bsn.dto.order.BsnOrderCancelDTO;
 import com.beauty1nside.bsn.dto.order.BsnOrderDTO;
 import com.beauty1nside.bsn.dto.order.BsnOrderDetailDTO;
+import com.beauty1nside.bsn.dto.order.BsnOrderHistoryDTO;
 import com.beauty1nside.bsn.mapper.BsnOrderMapper;
 import com.beauty1nside.bsn.service.BsnCustomException;
 import com.beauty1nside.bsn.service.BsnOrderService;
@@ -70,11 +71,12 @@ public class BsnOrderServiceImpl implements BsnOrderService {
 	public List<BsnOrderDTO> getBsnOrder(OrderSearchDTO orderSearchDTO) {
 		return bsnOrderMapper.selectBsnOrder(orderSearchDTO);
 	}
-	//주문 수
+	//주문 조회 수 카운트
 	@Override
 	public int getCountOfBsnOrder(OrderSearchDTO orderSearchDTO) {
 		return bsnOrderMapper.getCountOfBsnOrder(orderSearchDTO);
 	}
+	
 	@Override
 	public List<BsnOrderDetailDTO> getBsnOrderDetail(BsnOrderDTO bsnOrderDTO) {
 		return bsnOrderMapper.selectBsnOrderDetail(bsnOrderDTO);
@@ -83,6 +85,14 @@ public class BsnOrderServiceImpl implements BsnOrderService {
 	public int getCountOfBsnOrderDetail(BsnOrderDTO bsnOrderDTO) {
 		return bsnOrderMapper.getCountOfBsnOrderDetail(bsnOrderDTO);
 	}
+	
+	//주문 변경 이력
+	@Override
+	public List<BsnOrderHistoryDTO> getBsnOrderHistory(BsnOrderDTO bsnOrderDTO) {
+		return bsnOrderMapper.selectBsnOrderHistory(bsnOrderDTO);
+	}
+	
+	
 	//주문 취소
 	@Override
 	public void cancelBsnOrder(BsnOrderCancelDTO bsnOrderCancelDTO) {

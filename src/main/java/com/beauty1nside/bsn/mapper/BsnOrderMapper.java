@@ -16,6 +16,7 @@ import com.beauty1nside.bsn.dto.order.BhfOrderDetailDTO;
 import com.beauty1nside.bsn.dto.order.BsnOrderCancelDTO;
 import com.beauty1nside.bsn.dto.order.BsnOrderDTO;
 import com.beauty1nside.bsn.dto.order.BsnOrderDetailDTO;
+import com.beauty1nside.bsn.dto.order.BsnOrderHistoryDTO;
 
 
 public interface BsnOrderMapper {
@@ -48,6 +49,9 @@ public interface BsnOrderMapper {
 	
 	//주문 상세 조회
 	List<BsnOrderDetailDTO> selectBsnOrderDetail(BsnOrderDTO bsnOrderDTO);
+	
+	//주문 CS기록 조회
+	List<BsnOrderHistoryDTO> selectBsnOrderHistory(BsnOrderDTO bsnOrderDTO);
 	
 	int getCountOfBsnOrderDetail(BsnOrderDTO bsnOrderDTO);
 	
