@@ -9,4 +9,5 @@ public interface TaxMapper {
 	int insertDetail(@Param("pk") int pk, @Param("detail") Map<String, Object> detail);
 	int maxHeader();
 	Map<String, Object> info(int pk);
+	
 }
