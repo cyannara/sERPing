@@ -18,10 +18,10 @@
 		fn_get_cmmn_name(e.employment_type) AS employmentType,
 		d.department_name AS departmentName
 		FROM hr_employee e
-		LEFT JOIN hr_department d ON
+		LEFT JOIN hr_department d ON	
 		e.department_num = d.department_num
-		WHERE e.employee_num =
-		#{employee_num}
+		WHERE e.employee_num = #{employee_num}
+		AND e.company_num = #{companyNum}
 		ORDER BY e.employee_num DESC
 	</select>
 
@@ -29,27 +29,50 @@
 		parameterType="com.beauty1nside.hr.dto.EmpSearchDTO">
 		SELECT * FROM (
 			SELECT ROWNUM rn, employeeNum, employeeId, employeeName, email, phone,
-			hireDate, position, status, employmentType, departmentName
+			hireDate, position, status, employmentType, departmentName, contractStatus
 			FROM (
-			SELECT
-			e.employee_num AS employeeNum,
-			e.employee_id AS employeeId,
-			e.employee_name AS employeeName,
-			e.email AS email,
-			e.phone AS phone,
-			e.hire_date AS hireDate,
-			fn_get_cmmn_name(e.position) AS position,
-			fn_get_cmmn_name(e.status) AS status,
-			fn_get_cmmn_name(e.employment_type) AS employmentType,
-			COALESCE(d.department_name, '부서 없음') AS departmentName
-			FROM hr_employee e
-		<if test="departmentNum == null ">
-			LEFT
-		</if>
-		JOIN hr_department d ON e.department_num = d.department_num
-		<where>
+				SELECT
+				e.employee_num AS employeeNum,
+				e.employee_id AS employeeId,
+				e.employee_name AS employeeName,
+				e.email AS email,
+				e.phone AS phone,
+				e.hire_date AS hireDate,
+				fn_get_cmmn_name(e.position) AS position,
+				fn_get_cmmn_name(e.status) AS status,
+				fn_get_cmmn_name(e.employment_type) AS employmentType,
+				COALESCE(d.department_name, '부서 없음') AS departmentName,
+				
+	            CASE 
+	                WHEN c.contract_num IS NOT NULL THEN '보기'
+	                ELSE '미계약'
+	            END AS contractStatus
+				
+				FROM hr_employee e
+				LEFT JOIN hr_department d ON e.department_num = d.department_num
+            LEFT JOIN (
+                SELECT contract_num, employee_num
+                FROM (
+                    SELECT contract_num, employee_num, 
+                           ROW_NUMBER() OVER (PARTITION BY employee_num ORDER BY contract_start_date DESC) AS rn
+                    FROM hr_employee_contract
+                ) WHERE rn = 1
+            ) c ON e.employee_num = c.employee_num
+            
+            WHERE e.company_num = #{companyNum}
+
+	        <if test="departmentNum != null and departmentNum != ''">
+	            AND e.department_num IN (
+	                SELECT department_num 
+	                FROM hr_department
+	                WHERE company_num = #{companyNum}
+	                START WITH department_num = #{departmentNum}
+	                CONNECT BY PRIOR department_num = parent_department_num
+	            )
+	        </if>
+
 			<include refid="searchInfo"></include>
-		</where>
+            ORDER BY e.employee_num DESC
 		) 
         <![CDATA[
         WHERE ROWNUM <= #{end} 
@@ -114,18 +137,17 @@
 					FROM hr_employee e
 						LEFT JOIN hr_department d ON e.department_num = d.department_num 
 						LEFT JOIN erp_company c ON e.company_num = c.company_num
-					<where>
-						 e.company_num = #{companyNum}    
-			            <if test="departmentNum != 0">
-						    AND (e.department_num = #{departmentNum} 
-							         OR e.department_num in (
-								         SELECT department_num
-								         FROM hr_department
-								         WHERE parent_department_num = #{departmentNum}    
-			                        	 ) 
-	                       	    )
-		                 </if>
-		             </where>
+	        			WHERE e.company_num = #{companyNum}
+				        <if test="departmentNum != 0">
+				            AND (e.department_num IN (
+				                -- ✅ 해당 부서와 모든 하위 부서를 포함하도록 수정
+				                SELECT department_num 
+				                FROM hr_department
+				                WHERE company_num = #{companyNum}
+				                START WITH department_num = #{departmentNum}
+				                CONNECT BY PRIOR department_num = parent_department_num
+				            ))
+				        </if>
 		             ORDER BY e.employee_num DESC
 		             ) a
 		                        <![CDATA[
@@ -198,6 +220,11 @@
 
 
 	<sql id="searchInfo">
+	
+	    <if test="companyNum != null">
+	        AND e.company_num = #{companyNum}  <!-- 🔥 회사번호 검증 추가 -->
+	    </if>
+		
 	    <if test="searchKeyword != null and searchKeyword != ''">
 	        <choose>
 	            <when test="searchType == '전체'">
@@ -220,12 +247,23 @@
 	    </if>
 	
 	    <if test="departmentNum != null and departmentNum != ''">
-	        AND (d.department_num = #{departmentNum}
-	        OR d.parent_department_num = #{departmentNum})
+		    AND e.department_num IN (
+		        SELECT department_num 
+		        FROM hr_department
+		        WHERE company_num = #{companyNum}
+		        START WITH department_num = #{departmentNum} 
+		        CONNECT BY PRIOR department_num = parent_department_num  
+		    )
 	    </if>
 	
 	    <if test="subDepartmentNum != null and subDepartmentNum != ''">
-	        AND d.department_num = #{subDepartmentNum}
+		    AND d.department_num IN (
+		        SELECT department_num 
+		        FROM hr_department
+		        WHERE company_num = #{companyNum}
+		        START WITH department_num = #{subDepartmentNum} 
+		        CONNECT BY PRIOR department_num = parent_department_num
+		    )
 	    </if>
 	
 	    <if test="position != null and position != ''">
@@ -248,6 +286,7 @@
 		department_name as department_name,
 		NVL(parent_department_num, 0) AS parent_department_num
 		FROM hr_department
+		WHERE company_num = #{companyNum}
 		ORDER BY parent_department_num, department_name
 	</select>
 	
@@ -262,10 +301,17 @@
 	<!-- ✅ 하위 부서 목록 조회 추가 -->
 	<select id="getSubDepartments" resultType="map" parameterType="string">
 	    SELECT department_num AS subDepartmentNum,
-	           department_name AS subDepartmentName
+	           department_name AS subDepartmentName,
+	           parent_department_num AS parentDepartmentNum
 	    FROM hr_department
-	    WHERE parent_department_num = #{departmentNum}
-	    ORDER BY department_num
+	    WHERE department_num IN (
+	        SELECT department_num
+	        FROM hr_department
+	        WHERE company_num = #{companyNum}
+	        START WITH parent_department_num = #{departmentNum} -- ✅ 선택한 부서에서 시작
+	        CONNECT BY PRIOR department_num = parent_department_num -- ✅ 하위 부서를 재귀적으로 조회
+	    )
+	    ORDER BY parent_department_num, department_num;
 	</select>
 
 	<!-- 직급 목록 조회 -->
@@ -366,6 +412,9 @@
 	            FROM hr_employee e
 	            LEFT JOIN hr_department d ON e.department_num = d.department_num
 	            <where>
+	                <if test="companyNum != null">
+	                    AND e.company_num = #{companyNum}  <!--  회사 번호 필터 추가 -->
+	                </if>
 	                <if test="departmentNum != null">
 	                    AND e.department_num = #{departmentNum}  <!-- 특정 부서 필터 추가 -->
 	                </if>
@@ -380,11 +429,21 @@
 	</select>
 	
 	
-<!-- ✅ 특정 회사의 사원 개수 조회 -->
+<!-- ✅ 특정 회사의 사원수 조회 -->
 <select id="countEmployeesByCompany" parameterType="com.beauty1nside.hr.dto.EmpSearchDTO" resultType="int">
-    SELECT COUNT(*) FROM hr_employee e
-    LEFT JOIN hr_department d ON e.department_num = d.department_num
-    WHERE e.company_num = #{companyNum}
+	SELECT COUNT(DISTINCT e.employee_num)  
+	FROM hr_employee e
+	LEFT JOIN hr_department d ON e.department_num = d.department_num
+	WHERE e.company_num = #{companyNum}
+	AND (
+	    e.department_num IN (
+	        SELECT DISTINCT department_num FROM hr_department
+	        WHERE company_num = #{companyNum}
+	        START WITH department_num = #{departmentNum}  
+	        CONNECT BY PRIOR department_num = parent_department_num  
+	    )
+	    OR e.department_num IS NULL 
+	)
     <include refid="searchInfo"/> <!-- ✅ 검색 필터 추가 -->
 </select>
 
@@ -405,8 +464,8 @@
                 fn_get_cmmn_name(e.position) AS position,
                 e.position AS positionCode,
                 fn_get_cmmn_name(e.status) AS status,
-                fn_get_cmmn_name(e.employment_type) AS employmentType,  -- ✅ 근무 유형 (공통 코드에서 이름 가져오기)
-                e.employment_type AS employmentTypeCode,  -- ✅ 근무 유형 코드 추가
+                fn_get_cmmn_name(e.employment_type) AS employmentType,  
+                e.employment_type AS employmentTypeCode,
                 d.department_num AS departmentNum,
                 COALESCE(d.department_name, '부서 없음') AS departmentName,
                 d.parent_department_num AS parentDepartmentNum,
@@ -418,6 +477,14 @@
             LEFT JOIN hr_department p ON d.parent_department_num = p.department_num
             LEFT JOIN erp_company c ON e.company_num = c.company_num  
             WHERE e.company_num = #{companyNum}
+            AND e.department_num IN (
+                SELECT department_num FROM hr_department
+                WHERE company_num = #{companyNum}
+                <if test="departmentNum != null">
+                    START WITH department_num = #{departmentNum}
+                    CONNECT BY PRIOR department_num = parent_department_num
+                </if>
+            )
             <include refid="searchInfo"/> 
             ORDER BY e.employee_num DESC
         ) 

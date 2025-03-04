@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.beauty1nside.accnut.mapper.OtherMapper">
 	<select id="optionList" resultType="map">
-		SELECT option_code AS "optionCode", option_name AS "optionName"
+		SELECT option_code AS "optionCode", option_name AS "optionName", goods_price AS "goodsPrice", goods_standard AS "goodsStandard", goods_name AS "goodsName"
 		FROM purchse_option po JOIN purchse_goods pg
 		            ON (po.goods_num = pg.goods_num)
 		WHERE pg.company_num = #{companyNum}
@@ -11,10 +11,30 @@
 	</select>
 
 	<select id="bhfList" resultType="map">
-		SELECT bhf_id AS "bhfId", bhf_name AS "bhfName"
+		SELECT bhf_id AS "bhfId", bhf_name AS "bhfName", bhf_phone AS "bhfPhone", bhf_address AS "bhfAddress", '도소매' AS "bhfStatus", '화장품' AS "bhfCate"
 		FROM bsn_bhf
 		WHERE company_num = #{companyNum}
 		ORDER BY 2
+	</select>
+	
+	<select id="companyInfo" resultType="map">
+		SELECT business_num AS "bsnNum",
+				company_name || '(' || company_eng_name || ')' AS "coName",
+				representation_name AS "representor",
+				company_address AS "address",
+				'도소매 및 소비자용품 수리업' AS "status",
+				'화장품' AS "cate",
+				charger_email AS "email"
+		FROM erp_company
+		WHERE company_num = #{companyNum}
+	
+	</select>
+	
+	<select id="deptList" resultType="map">
+		SELECT department_num AS "departmentNum", department_name AS "departmentName"
+		FROM hr_department
+		WHERE company_num = #{companyNum}
+		AND parent_department_num IS NOT NULL
 	</select>
 	
 </mapper>

@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class BsnDeliveryDetailDTO extends OrderSearchDTO {
+public class BsnDeliveryDetailDTO extends BsnDeliverySearchDTO {
 	private int deliveryDetailId;
 	private String deliveryId;
 	private int orderDetailId;

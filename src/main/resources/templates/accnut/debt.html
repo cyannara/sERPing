@@ -11,7 +11,7 @@
 	<div class="container">
 		<!-- 메뉴이름 -->
 		<div>
-			<h2>채무관리</h3>
+			<h2>채무관리</h2>
 		</div>
 
     <!-- 검색창 -->
@@ -86,7 +86,7 @@
 		</div>
 		
 		<!-- 채무 등록 -->
-		<div th:replace="purchs/ModalTemplate :: ModalTemplate (
+		<div th:replace="purchs/modal/ModalTemplate :: ModalTemplate (
 						    	'debtaddModal', 
 						    	'modal-xl', 
 						    	'채무 등록', 
@@ -95,7 +95,7 @@
 						    )"></div>
 						    
 		<!-- 상세 보기 -->
-		<div th:replace="purchs/ModalTemplate :: ModalTemplate (
+		<div th:replace="purchs/modal/ModalTemplate :: ModalTemplate (
 						    	'debtdetailModal', 
 						    	'modal-xl', 
 						    	'상세 보기', 
@@ -105,6 +105,9 @@
 		
 	</div>
 <script>
+
+	var session = sessionData;
+	
 	document.addEventListener("DOMContentLoaded",()=>{
 		gotobtn();
 		getInfo();
@@ -140,7 +143,7 @@
 	
 	const dataSource = {
 		api: {
-			readData: { url: 'http://localhost:81/accnut/rest/debt/list', method: 'GET', initParams: { page: 1 , amount: 0 } },
+			readData: { url: 'http://localhost:81/accnut/rest/debt/list', method: 'GET', initParams: { page: 1 , amount: 0, companyNum: session.companyNum } },
 			
 		},
 		contentType: 'application/json'

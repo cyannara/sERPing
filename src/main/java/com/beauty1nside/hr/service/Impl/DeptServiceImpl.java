@@ -1,8 +1,10 @@
 package com.beauty1nside.hr.service.Impl;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
@@ -36,40 +38,65 @@ public class DeptServiceImpl implements DeptService {
     
     @Override
     public Map<String, Object> getOrganization(Long companyNum) {
-        // 1️⃣ DB에서 모든 부서 조회
         List<DeptDTO> departments = deptMapper.list(companyNum);
-        DeptDTO companyInfo = deptMapper.getCompanyInfo(companyNum);  // 회사 정보 조회
+        DeptDTO companyInfo = deptMapper.getCompanyInfo(companyNum);
+        log.info("departmentsdepartmentsdepartments={}",departments.size());
 
         Map<Long, DeptDTO> deptMap = new HashMap<>();
         for (DeptDTO dept : departments) {
             deptMap.put(dept.getDepartmentNum(), dept);
-            dept.setTotalEmployeeCount(dept.getEmployeeCount()); // 기본값 설정
+            dept.setTotalEmployeeCount(dept.getEmployeeCount());
         }
 
-        // 2️⃣ 하위 부서 직원 수를 상위 부서에 더함
+        // 🚨 방문한 부서 체크 (중복 방지)
+        Set<Long> visitedDepartments = new HashSet<>();
         for (DeptDTO dept : departments) {
-            if (dept.getParentDepartmentNum() != null) {
-                DeptDTO parentDept = deptMap.get(dept.getParentDepartmentNum());
-                if (parentDept != null) {
-                    parentDept.setTotalEmployeeCount(
-                        parentDept.getTotalEmployeeCount() + dept.getTotalEmployeeCount()
-                    );
-                }
+            if (!visitedDepartments.contains(dept.getDepartmentNum())) {
+                addEmployeeCountToParent(dept, deptMap, visitedDepartments);
             }
         }
 
-        // 3️⃣ 최상위 레벨(회사)의 직원 수 계산
+        // ✅ 부서 없는 직원 수 조회
+        int noDeptEmployees = deptMapper.countEmployeesWithoutDepartment(companyNum);
+
+        // 🚨 부서 직원 합계만 계산 후, **부서 없는 직원만 따로 더하기**
         int totalEmployeeCount = departments.stream()
-            .filter(d -> d.getParentDepartmentNum() == null)
             .mapToInt(DeptDTO::getTotalEmployeeCount)
-            .sum();
-        companyInfo.setTotalEmployeeCount(totalEmployeeCount);
+            .sum() + noDeptEmployees;
+
+        //companyInfo.setTotalEmployeeCount(departments.size());
+        
+        // ✅ 로그 출력 (디버깅)
+        System.out.println("📌 최종 totalEmployeeCount 값: " + totalEmployeeCount);
 
         // 4️⃣ 반환 데이터 구성
         Map<String, Object> result = new HashMap<>();
         result.put("company", companyInfo);
         result.put("departments", departments);
         return result;
+    }
+    
+    /**
+     * 🔥 하위 부서 직원 수를 상위 부서에 재귀적으로 추가하는 메서드 (중복 방지)
+     */
+    private void addEmployeeCountToParent(DeptDTO dept, Map<Long, DeptDTO> deptMap, Set<Long> visited) {
+        if (dept.getParentDepartmentNum() != null) {
+            Long parentNum = dept.getParentDepartmentNum();
+            DeptDTO parentDept = deptMap.get(parentNum);
+            
+            if (parentDept != null) {
+                // 🚨 이미 방문한 부서는 중복 합산 방지 (위치 변경)
+                if (!visited.contains(parentNum)) {
+                    visited.add(parentNum);
+                    addEmployeeCountToParent(parentDept, deptMap, visited);
+                }
+                
+                // ✅ 하위 부서 직원 수를 부모 부서에 합산
+                parentDept.setTotalEmployeeCount(
+                    parentDept.getTotalEmployeeCount() + dept.getTotalEmployeeCount()
+                );
+            }
+        }
     }
 
     @Override
@@ -98,5 +125,10 @@ public class DeptServiceImpl implements DeptService {
     public int getEmployeeCountByDept(Long departmentNum) {
         return deptMapper.countEmployeesByDepartment(departmentNum);
     }
+
+	@Override
+    public int countEmployeesWithoutDepartment(Long companyNum) {
+        return deptMapper.countEmployeesWithoutDepartment(companyNum);
+	}
 
 }

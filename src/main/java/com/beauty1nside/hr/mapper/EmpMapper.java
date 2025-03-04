@@ -19,7 +19,7 @@ public interface EmpMapper {
 	int count(EmpSearchDTO dto);
 	int countForSubDept(EmpSearchDTO dto); // 하위부서 포함 카운트
 	
-    List<String> getDepartments(); // 부서 목록
+    List<String> getDepartments(int companyNum); // 부서 목록
     List<Map<String, Object>> getDepartmentList(); // ✅ 새로 추가 (부서번호 + 부서이름 포함)
     List<Map<String, Object>> getSubDepartments(String departmentNum); // ✅ 하위 부서 조회 추가
     List<String> getPositions(); // 직급 목록

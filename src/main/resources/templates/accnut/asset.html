@@ -11,7 +11,7 @@
 	<div class="container">
 		<!-- 메뉴이름 -->
 		 <div>
-			 <h2>자산관리</h3>
+			 <h2>자산관리</h2>
 		 </div>
 
 		<!-- 검색창 -->
@@ -114,7 +114,7 @@
 			</div>
 		</div>
 		<!-- 자산 등록 -->
-		<div th:replace="purchs/ModalTemplate :: ModalTemplate (
+		<div th:replace="purchs/modal/ModalTemplate :: ModalTemplate (
 						    	'assetaddModal', 
 						    	'modal-xl', 
 						    	'자산 등록', 
@@ -123,7 +123,7 @@
 						    )"></div>
 						    
 		<!-- 상세 보기 -->
-		<div th:replace="purchs/ModalTemplate :: ModalTemplate (
+		<div th:replace="purchs/modal/ModalTemplate :: ModalTemplate (
 						    	'assetdetailModal', 
 						    	'modal-xl', 
 						    	'상세 보기', 
@@ -133,6 +133,8 @@
 		
 	</div>
 <script>
+	var session = sessionData;
+
 	document.addEventListener("DOMContentLoaded",()=>{
 		gotobtn();
 		getInfo();
@@ -174,7 +176,7 @@
 	
 	const dataSource = {
 		api: {
-			readData: { url: 'http://localhost:81/accnut/rest/asset/list', method: 'GET', initParams: { page: 1 }},
+			readData: { url: 'http://localhost:81/accnut/rest/asset/list', method: 'GET', initParams: { page: 1 , companyNum: session.companyNum }},
 			
 		},
 		contentType: 'application/json'
@@ -191,7 +193,7 @@
 			{ header : "자산명", name : "assetsName",  sortable : true},
 			{ header : "구분", name : "section",  sortable : true, width: 50},
 			{ header : "금융기관", name : "financialInstitution",  sortable : true},
-			{ header : "결제정보", name : "financeInformation",  sortable : true},
+			{ header : "통장 및 카드 번호", name : "financeInformation",  sortable : true},
 			{ header : "소유주", name : "owner",  sortable : true},
 			{ header : "금액", name : "amount",  sortable : true},
 			{ header : "등록일", name : "registerDate",  sortable : true},

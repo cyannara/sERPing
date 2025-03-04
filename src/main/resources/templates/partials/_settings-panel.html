@@ -1,6 +1,6 @@
 <body th:fragment="panel">
 <input type="hidden" id="sessionEmployeeNum" th:value="${session.employeeNum}"/>
-<input type="hidden" id="sessionEmployeeName" th:value="${session.sessionEmployeeName}"/>
+<input type="hidden" id="sessionEmployeeName" th:value="${session.employeeName}"/>
 
 <div class="theme-setting-wrapper">
   <div id="settings-trigger"><i class="ti-settings"></i></div>
@@ -20,18 +20,17 @@
     </div>
   </div>
 </div>
-<!--테스트 끝나면 open class 삭제-->
 <div id="right-sidebar" class="settings-panel">
-  <i class="settings-close ti-close"></i>
+  <i class="settings-close ti-close" id="settingsClose"></i>
   <ul class="nav nav-tabs border-top" id="setting-panel" role="tablist">
-    <li class="nav-item" id="empList">
+    <li class="nav-item" id="goback">
+      <a class="nav-link" id="back" data-toggle="tab" href="#todo-section" role="tab" aria-controls="todo-section" aria-expanded="true"><i class="mdi mdi-arrow-left"></i></a>
+    </li>
+    <li id="empList">
       <a class="nav-link active" id="todo-tab" data-toggle="tab" href="#todo-section" role="tab" aria-controls="todo-section" aria-expanded="true">직원목록</a>
     </li>
-    <li class="nav-item" id="roomList">
-      <a class="nav-link" id="chats-tab" data-toggle="tab" href="#chats-section" role="tab" aria-controls="chats-section">채팅</a>
-    </li>
     <li class="nav-item chatroom" id="msgList">
-      <a class="nav-link" id="room-tab" data-toggle="tab" href="#room-section" role="tab" aria-controls="room-section"><i class="mdi mdi-message-text"></i></a>
+      <a class="nav-link" id="room-tab" data-toggle="tab" href="#room-section" role="tab" aria-controls="room-section">채팅</a>
     </li>
   </ul>
   <div class="tab-content" id="setting-content">

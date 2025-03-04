@@ -601,3 +601,34 @@ SELECT -- 'asd' AS result_date,
 ;
 
 select To_DATE('2025-02-25') - 2 from dual;
+
+-- 2025-02-28
+
+SELECT business_num AS "bsnNum",
+company_name || '(' || company_eng_name || ')' AS "companyName",
+representation_name AS "representor",
+company_address AS "address",
+'도소매 및 소비자용품 수리업' AS "status",
+'화장품' AS "cate",
+charger_email AS "email"
+FROM erp_company
+WHERE company_num = 1;
+
+
+
+
+SELECT -- option_code AS "optionCode", option_name AS "optionName"
+        -- goods_price AS "goodsPrice", goods_standard AS "goodsStandard", goods_name AS "goodsName"
+        *
+		FROM purchse_option po JOIN purchse_goods pg
+		            ON (po.goods_num = pg.goods_num)
+		WHERE pg.company_num = 1
+		AND pg.goods_name LIKE '%' || '' || '%'
+		ORDER BY 2;
+        
+        SELECT -- bhf_id AS "bhfId", bhf_name AS "bhfName"
+        -- *
+        bhf_phone AS "bhfPhone", bhf_address AS "bhfAddress", '도소매' AS "status", '화장품' AS "cate"
+		FROM bsn_bhf
+		-- WHERE company_num = #{companyNum}
+		ORDER BY 2;

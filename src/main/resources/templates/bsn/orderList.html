@@ -17,6 +17,9 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		margin-bottom: 20px;
 	
 	}
+	#cancelButton {
+	   visibility: hidden;
+	}
   </style>
 
 </head>
@@ -113,7 +116,30 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
             	</div>
           	</div>
         </div>
-        
+        <div class="row">
+          	<div class="col-md-12  grid-margin stretch-card">
+            	<div class="card">
+              		<div class="card-body">
+                		<h4 class="card-title">주문 변경 이력</h4>
+                		<p class="card-description"></p>
+                		<div id="orderHistory"></div>
+               		 	<div id="pagination" class="tui-pagination"></div>
+              		</div>
+            	</div>
+          	</div>
+        </div>
+        <div class="row mt-3">
+	        <div class="col-12 text-center">
+	            <button class="btn btn-danger" id="cancelButton">선택한 주문취소</button>
+	        </div>
+    	</div>
+        <div th:include="bsn/modal/bsnModalTemplate :: ModalTemplate(
+						    	'cancelModal', 
+						    	'modal-md', 
+						    	'주문 취소', 
+						    	'bsn/modal/bsnOrdListCancel', 
+						    	'bsn/modal/bsnModalFooter')">
+     	</div>
         
         
         
@@ -139,10 +165,31 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
      
     }
     
+  //검색 조건 초기화
+	function reset(){
+		// 라디오 버튼 선택 값 초기화
+	    // "사용안함" 라디오 버튼을 체크하도록 설정
+	    let notSelectRadio = document.querySelector('input[name="optionsRadios"][value="notSelect"]');
+	    if (notSelectRadio) {
+	        notSelectRadio.checked = true;  // "사용안함" 라디오 버튼을 선택 상태로
+	        toggleDateInputs(false);  // 날짜 입력 비활성화
+	    }
+
+		// 시작 날짜와 끝 날짜 초기화
+    	document.getElementById("startDate").value = "";
+    	document.getElementById("endDate").value = "";
+    	// 발주지점 선택 값 초기화
+        document.getElementById("selectBhf").value = "all";
+        console.log(OrderListDataSource);
+
+	}
+    
+  	let selectedRow;
+  	
 	var Grid = tui.Grid;
 	const OrderListDataSource = {
 			api: {
-				readData: { url: '/bsn/rest/orderList', method: 'GET', initParams: { page: 1 }},
+				readData: { url: '/bsn/rest/order/list', method: 'GET', initParams: { page: 1 }},
 			},
 			contentType: 'application/json'
 	};
@@ -161,13 +208,37 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 			{ header : "발주코드", name : "orderCode"},
 			{ header : "지점코드", name : "branchOfficeId"},
 			// { header : "회사번호", name : "companyNum"},
+			{ header : "주문상태", name : "orderStatus", formatter: ({ value }) => formatOrderStatus(value),  sortable : true},
 			{ header : "주문일", name : "orderDate", formatter: ({ value }) => formatDate(value, 'order'), width: 'auto', sortable : true},
 			{ header : "납기일", name : "dueDate", formatter: ({ value }) => formatDate(value, 'due'), width: 'auto', sortable : true},
 			{ header : "비고", name : "remark", width: 'auto'},
 		],
 		data: OrderListDataSource
 	});
-	
+	//상태여부 표기 변경
+	function formatOrderStatus(status) {
+	    if (status === null || status === undefined) return ''; // 데이터가 없으면 빈 문자열 반환
+	    
+	    switch(status){
+	    case "VS001":
+	    	return "진행중";
+	    case "VS002":
+	    	return "완료";
+	    case "VS003":
+	    	return "취소";
+	    case "VS004" :
+	    	return "지점입고완료";
+	    case "OH01": 
+	    	return "주문등록";
+	    case "OH02": 
+	    	return "주문출고";
+	    case "OH03": 
+	    	return "주문취소";
+	    default:
+	        return "알 수 없음";	
+       	
+		}
+	}
 	//그리드 날짜 형식 변경(데이터 수정X, 표기만)
 	function formatDate(dateString, type) {
 	    if (!dateString) return ''; // 데이터가 없으면 빈 문자열 반환
@@ -178,6 +249,12 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	        ? date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }) // "2025년 2월 17일"
 	        : date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }); // "02/17 (월)"
 	}
+
+	
+	
+	
+	
+	
 	//페이지로드 시 자동으로 전체 검색
 	document.addEventListener('DOMContentLoaded', function() {
 	    search();  // DOMContentLoaded 이벤트 후 자동으로 검색 실행
@@ -217,7 +294,17 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	    const rowData = orderList.getRow(rowKey); // 클릭한 행 데이터 가져오기
 	    console.log(rowData.orderId);
 	    if (rowData && rowData.orderId) {
+	    	selectedRow = rowData;
 	        loadOrderDetail(rowData.orderId); // 상세 정보 불러오기
+	        
+	        loadOrderHistory(rowData.orderId);
+	     	// 상태가 'VS001'이면 버튼을 보이고, 아니면 숨김
+	     	const cancelButton = document.getElementById('cancelButton');
+	        if (rowData.orderStatus === 'VS001') {
+	        	cancelButton.style.visibility = 'visible';
+	        } else {
+	        	cancelButton.style.visibility = 'hidden';
+	        }
 	    }
 	});
 	
@@ -228,7 +315,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	        return;
 	    }
 		
-	    fetch(`/bsn/rest/orderList/detail?orderId=${orderId}`)
+	    fetch(`/bsn/rest/order/list/detail?orderId=${orderId}`)
 	    	
 	        .then(response => {
 		            if (!response.ok) throw new Error(`HTTP 오류! 상태: ${response.status}`);
@@ -256,6 +343,33 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	        })
 	        .catch(error => console.error('Error fetching order detail:', error));
 	}
+	function loadOrderHistory(orderId) {
+		if (!orderId) {
+	        console.warn("유효하지 않은 주문 Id입니다.");
+	        return;
+	    }
+		
+	    fetch(`/bsn/rest/order/list/history?orderId=${orderId}`)
+	    	
+	        .then(response => {
+		            if (!response.ok) throw new Error(`HTTP 오류! 상태: ${response.status}`);
+		            return response.json();
+		     })
+		     
+	        .then(data => {
+	            if (data && data.data && data.data.contents) {
+	            	const historyData = data.data.contents; // 상세 데이터 저장
+	            	
+	            	
+	            	//
+	                orderHistoryGrid.resetData(historyData);
+	            } else {
+	                console.warn("상세 데이터가 없습니다.");
+	                orderHistoryGrid.resetData([]); // 빈 배열로 초기화
+	            }
+	        })
+	        .catch(error => console.error('Error fetching order history:', error));
+	}
 	
 	//상세 그리드 형식
 	const orderDetailGrid = new Grid({
@@ -267,9 +381,10 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         { header: "옵션명", name: "optionName", },
         { header: "상품코드", name: "goodsCode",  },
         { header: "옵션코드", name: "optionCode",  },
+        { header: "규격", name: "goodsStandard",  },
         { header: "수량", name: "quantity",  },
-        { header: "단가", name: "unitPrice",  },
-        { header: "총액", name: "totalPrice",  }
+        //{ header: "단가", name: "unitPrice",  },
+        //{ header: "총액", name: "totalPrice",  }
     ],
     pageOptions: {
         useClient: false,
@@ -277,7 +392,134 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
     }
 	
 	
-});
+	});
+	
+	//이력 그리드 형식
+	const orderHistoryGrid = new Grid({
+    el: document.getElementById('orderHistory'),
+    columns: [
+        { header: "이력유형", name: "historyType", formatter: ({ value }) => formatOrderStatus(value), width:"auto" },
+        { header: "처리일", name: "registerDate", formatter: ({ value }) => formatDate(value, 'order'), width: 'auto', },
+        { header: "이력내용", name: "historyContents",  },
+
+    ],
+    pageOptions: {
+        useClient: false,
+        perPage: 5
+    }
+	
+	
+	});
+	
+	////////////////////
+	
+		//취소 사유 입력용 객체 생성
+		function createCancelRequest() {
+			const cancelReasonInput = document.querySelector('#cancelReason');
+		    const cancelReason = cancelReasonInput.value.trim(); // 공백 제거
+
+		    if (!cancelReason) { // 빈 값 체크
+		        showAlert('취소 사유를 입력해주세요!', 'danger');
+		        cancelReasonInput.focus(); // 입력창에 포커스
+		        return null; // 유효하지 않은 입력이면 null 반환
+		    }
+		    
+		    return {
+		        orderId: selectedRow.orderId, // 선택된 주문ID
+		        orderCancelReason: cancelReason //cancelReasonInput.value
+		    };
+		}
+		
+		// 주문 취소 함수
+		function cancelOrder(cancelRequest) {
+			const header = document.querySelector('meta[name="_csrf_header"]').content;
+		    const token = document.querySelector('meta[name="_csrf"]').content;
+			
+		    fetch('/bsn/rest/order/list/cancel', {
+		        method: 'PUT',
+		        headers: {
+		        	'header': header,
+		        	'X-CSRF-Token': token,
+		            'Content-Type': 'application/json'  // JSON 형식으로 보내기
+		        },
+		        body: JSON.stringify(cancelRequest)  // 객체를 JSON으로 변환하여 전송
+		    })
+		    .then(response => response.json())
+		    .then(data => {
+		        if (data.status === "success") {
+		            showAlert('주문 취소 완료', 'success');
+		         	// 그리드 초기화 + 값 초기화
+		            refreshOrderGrid();
+		            document.querySelector('#cancelReason').value = '';
+		           
+		        } else {
+		            showAlert('주문 취소 실패:'+ data.message, 'danger');
+		        }
+
+
+		    }) 
+		}
+		
+		// 모달 인스턴스 생성
+		const cancelModal = new bootstrap.Modal(document.getElementById('cancelModal'));
+
+		// 주문 선택 확인 함수
+		function checkOrderSelection(modal) {
+		    if (selectedRow && selectedRow.orderId) {
+		    	// 모달이 'cancelModal'이면 주문ID 표시
+		        if (modal === cancelModal) {
+		            document.getElementById("cancelOrderId").textContent = selectedRow.orderId;
+		        }
+		        modal.show();
+		    } else {
+		        showAlert('주문을 선택해주세요!', 'danger');
+		    }
+		}
+
+		
+
+		// 주문 취소 버튼 클릭 이벤트
+		document.getElementById('cancelButton').addEventListener('click', () => {
+		    checkOrderSelection(cancelModal); // 거부 모달 띄우기
+		});
+
+		// 공통된 버튼을 다루되, 모달에 따라 다르게 동작하도록 설정
+		document.querySelectorAll('.modal-footer #btn-register').forEach(button => {
+		    button.addEventListener('click', () => {
+		        if (selectedRow && selectedRow.orderId) {
+		            // 현재 show 클래스가 있는 모달 찾기
+		            const activeModal = document.querySelector('.modal.show');
+		            
+		            if (activeModal) {
+		                    if (activeModal.id === 'cancelModal') {
+		                	// 주문 취소용 객체 생성
+		                    const cancelRequest = createCancelRequest();
+		                    if (!cancelRequest) return; // 취소 사유가 없으면 중단
+		                    //주문 취소 처리
+		                    cancelOrder(cancelRequest);
+		                    //console.log(cancelRequest);
+		                    cancelModal.hide();
+		                }
+		            }
+		        } else {
+		            showAlert('주문을 선택해주세요!', 'danger');
+		        }
+		    });
+		});
+
+		document.querySelectorAll('.modal-footer .btn-secondary').forEach(button => {
+		    button.addEventListener('click', () => {
+		        // 현재 활성화된 모달 찾기
+		        const activeModal = document.querySelector('.modal.show');
+
+		        if (activeModal) {
+		            if (activeModal.id === 'cancelModal') {
+	                    document.querySelector('#cancelReason').value = '';
+	                    cancelModal.hide();
+	                }
+		        }
+		    });
+		});
 	
 
 </script>

@@ -6,6 +6,8 @@
     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
     
         <script type="text/javascript">
+        var session = sessionData;
+        	
             //등록 모달이 보여질때
             document.querySelector('#debtaddModal').addEventListener('shown.bs.modal', (e) => {
                 let footer = document.querySelector('#debtaddModal').querySelector('.modal-footer');
@@ -33,7 +35,7 @@
                         param.creditor = creditor.value;
                         param.amount = amount.value;
                         param.registerDate = registerDate.value;
-                        param.companyNum = 0;
+                        param.companyNum = session.companyNum;
                         
                         if(con.querySelector('#interest')){
                             let interest =  con.querySelector('#interest');

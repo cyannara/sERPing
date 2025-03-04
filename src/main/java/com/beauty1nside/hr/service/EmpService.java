@@ -27,7 +27,7 @@ public interface EmpService {
 	List<EmpDTO> listWithSubDept(EmpSearchDTO dto);
 	
 	//공통코드 가져오기
-	Map<String, Object> getCommonCodes();
+	Map<String, Object> getCommonCodes(int companyNum);
 	
     // 사원 등록 (사번 자동 생성)
     void registerEmployee(EmpDTO empDTO);
@@ -38,7 +38,7 @@ public interface EmpService {
     // 이메일 중복 체크 추가
     boolean checkEmailExists(String email);
     
-    List<String> getDepartments(); // ✅ 기존 방식 유지
+    List<String> getDepartments(int companyNum); // ✅ 기존 방식 유지
     List<Map<String, Object>> getDepartmentList(); // ✅ 새로운 방식 추가
     List<Map<String, Object>> getSubDepartments(String departmentNum); // ✅ 하위 부서 조회
     

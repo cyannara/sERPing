@@ -217,12 +217,109 @@
 			</div>
             <!-- 정기 구독 -->
             <div class="tab-pane fade" id="nav-rg" role="tabpanel" aria-labelledby="nav-rg-tab" tabindex="0">
-                <h3>정기 구독 결제 서비스</h3>
+            	<h3>정기 구독 결제 서비스</h3>
+                <div class="d-flex">
+					<div style="width: 800px;" class="me-5">
+		                <div class="section-title">▷ sERPing 정기구독</div>
+		                <table>
+						    <tr>
+						        <th class="regularsubperiod"></th>
+						    </tr>
+						    <tr class="subscribe-options">
+						        <td>
+						            <label for="erp-sub-regular">
+						                <input type="checkbox" id="erp-sub-regular" data-day="20_52800" name="erp-sub-regular" value="20">52,800원
+						            </label>
+						        </td>
+						    </tr>
+						</table>
+		
+		                <div class="section-title regularsubgroup">▷ 그룹웨어 인원 서비스 (기간 맞춤) [필수 선택]</div>
+		                <table>
+						    <tr>
+						        <th>50명 기간맞춤</th>
+						        <th>100명 기간맞춤</th>
+						        <th>무제한 기간맞춤</th>
+						    </tr>
+						    <tr class="regulars-options">
+						        <td>
+						            <label for="group-regulars-50">
+						                <input type="radio" id="group-regulars-50" data-day="21_0" name="group-regulars-option" value="21">0원
+						            </label>
+						        </td>
+						        <td>
+						            <label for="group-regulars-100">
+						                <input type="radio" id="group-regulars-100" data-day="22_26400" name="group-regulars-option" value="22">26,400원
+						            </label>
+						        </td>
+						        <td>
+						            <label for="group-regulars-limit">
+						                <input type="radio" id="group-regulars-limit" data-day="23_52800" name="group-regulars-option" value="23">52,800원
+						            </label>
+						        </td>
+						    </tr>
+						</table>
+		
+		                <div class="section-title">▷ 추가 서비스</div>
+		                <table>
+						    <tr>
+						        <th>서비스명</th>
+						        <th>금액</th>
+						    </tr>
+						    <tr>
+						        <td class="addService-hr">인사관리</td>
+						        <td>
+						            <label for="hr-sub-regulars">
+						                <input type="radio" id="hr-sub-regulars" data-day="24_13200" name="hr-sub-regulars" value="24"> 13,200원
+						            </label>
+						        </td>
+						    </tr>
+						    <tr>
+						        <td class="addService-branch">지점관리</td>
+						        <td>
+						            <label for="branch-sub-regulars">
+						                <input type="radio" id="branch-sub-regulars" data-day="25_13200" name="branch-sub-regulars" value="25"> 13,200원
+						            </label>
+						        </td>
+						    </tr>
+						    <tr>
+						        <td class="addService-account">회계관리</td>
+						        <td>
+						            <label for="account-sub-regulars">
+						                <input type="radio" id="account-sub-regulars" data-day="26_13200" name="account-sub-regulars" value="26"> 13,200원
+						            </label>
+						        </td>
+						    </tr>
+						</table>
+		            </div>
+		            <div class="d-flex align-items-end">
+		            	<table class="payment-table">
+					        <tr>
+					            <th>결제방식</th>
+					            <th>
+					                <select class="select-box" id="regular-payment-method">
+					                    <option data-pay="EP02" value="4879785489563265">카드(4879-7854-8956-3265)</option>
+					                    <option data-pay="EP03" value="112243128654">계좌(112-243-128654)</option>
+					                    <!-- <option value="계좌이체">계좌이체</option> -->
+					                </select>
+					            </th>
+					        </tr>
+					        <tr>
+					            <th>총 결제금액</th>
+					            <td class="regular-total-price">0원</td>
+					        </tr>
+					        <tr>
+					            <td colspan="2"><button class="regular-periodpaygo">등록</button></td>
+					        </tr>
+					    </table>
+		            </div>
+				</div>
             </div>
+            <!-- 정기 구독 끝 -->
         </div>
     </div>
     <!-- JavaScript -->
-    <script th:inline="javascript">
+    <script th:inline="javascript"> 
         setTimeout(async () => {
             console.log("여기는 사용하는곳:", window.subscriptionState);
             
@@ -239,19 +336,26 @@
             
             //기간 구독 결제 서비스 관련
             let tag = "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp";
+            let tag2 = "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp";
             if(window.subscriptionState.subObj == "date"){
             	tag += `현재 기간제 구독중 입니다. [남은기간 : ${window.subscriptionState.subObjdate}일]`;
+            	const today = new Date();
+            	today.setDate(today.getDate() + window.subscriptionState.subObjdate);
+            	tag2 += `${window.subscriptionState.subObjdate}일 이후 매달 ${(today.toISOString().split('T')[0]).split('-')[2]}일 결제`;
             }else{
             	tag += `현재 정기 구독중 입니다. [결제 불가 합니다]`;
             	document.querySelector(".periodpaygo").remove();
             }
             document.querySelector(".subperiod").insertAdjacentHTML("beforeend", tag);
+            document.querySelector(".regularsubperiod").insertAdjacentHTML("beforeend", tag2);
+            
             
             //그룹웨어 인원 추가 서비스
             tag = "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp";
+            let hrpersonnel = await hr_list([[${session.companyNum}]]);
+        	tag += `[${window.subscriptionState.gpOption}명 서비스 사용중 / 현재사원 ${hrpersonnel}명]`;
+        	
             if(window.subscriptionState.groupObj == "date"){
-            	let hrpersonnel = await hr_list([[${session.companyNum}]]);
-            	tag += `[${window.subscriptionState.gpOption}명 서비스 사용중 / 현재사원 ${hrpersonnel}명]`;
             	if(hrpersonnel > 100){
             		document.querySelector("#group-sub-50").remove();
             		document.querySelector("#group-sub-100").remove();
@@ -262,15 +366,50 @@
             }else{
             	tag += `현재 정기 구독중 입니다. [결제 불가 합니다]`;
             }
+            
             document.querySelector(".subgroup").insertAdjacentHTML("beforeend", tag);
+            document.querySelector(".regularsubgroup").insertAdjacentHTML("beforeend", tag);
             //console.log(tag);
             
           //인사, 지점, 회계 서비스 현황
           tag = "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp";
           tag += `[인사관리 : ${window.subscriptionState.hrObjdate}일 / 지점관리 : ${window.subscriptionState.pointObjdate}일 / 회계관리 : ${window.subscriptionState.accountObjdate}일] 남았습니다.`;
           document.querySelector(".addService").insertAdjacentHTML("beforeend", tag);
+          
+          //인사관리 (정기구독)
+          tag2 = "";
+          today = new Date();
+	      today.setDate(today.getDate() + window.subscriptionState.hrObjdate);
+	      if(window.subscriptionState.hrObjdate == 0){
+	    	  tag2 += ` [ 오늘결제 이후 매달 ${(today.toISOString().split('T')[0]).split('-')[2]}일 결제 ]`;
+	      }else{
+	    	  tag2 += ` [ ${window.subscriptionState.hrObjdate}일 이후 매달 ${(today.toISOString().split('T')[0]).split('-')[2]}일 결제 ]`;
+	      }
+	      document.querySelector(".addService-hr").insertAdjacentHTML("beforeend", tag2);
+	      
+			//지점관리 (정기구독)
+			tag2 = "";
+			today = new Date();
+			today.setDate(today.getDate() + window.subscriptionState.pointObjdate);
+			if(window.subscriptionState.pointObjdate == 0){
+				tag2 += ` [ 오늘결제 이후 매달 ${(today.toISOString().split('T')[0]).split('-')[2]}일 결제 ]`;
+			}else{
+				tag2 += ` [ ${window.subscriptionState.pointObjdate}일 이후 매달 ${(today.toISOString().split('T')[0]).split('-')[2]}일 결제 ]`;
+			}
+			document.querySelector(".addService-branch").insertAdjacentHTML("beforeend", tag2);
+			
+			//회계관리 (정기구독)
+			tag2 = "";
+			today = new Date();
+			today.setDate(today.getDate() + window.subscriptionState.accountObjdate);
+			if(window.subscriptionState.accountObjdate == 0){
+				tag2 += ` [ 오늘결제 이후 매달 ${(today.toISOString().split('T')[0]).split('-')[2]}일 결제 ]`;
+			}else{
+				tag2 += ` [ ${window.subscriptionState.accountObjdate}일 이후 매달 ${(today.toISOString().split('T')[0]).split('-')[2]}일 결제 ]`;
+			}
+			document.querySelector(".addService-account").insertAdjacentHTML("beforeend", tag2);
             
-        }, 500);
+        }, 700);
         
         async function hr_list(data){
         	const url = "/erp/rest/hrlist/"+data;
@@ -290,68 +429,72 @@
         
      	// 구독기간에 맞게 가격을 변경
         function remake_date(redate) {
-    let baseDate = window.subscriptionState.subObjdate + redate;
-    //console.log("현재구독기간:", baseDate);
-
-    // 가격 변경 대상 및 배수 설정
-    const elementsToUpdate = [
-        { selector: "#group-sub-100", key: "groupObjdate", multiplier: 1000 },
-        { selector: "#group-sub-limit", key: "groupObjdate", multiplier: 2000 },
-        { selector: "#hr-sub-custom", key: "hrObjdate", multiplier: 500 },
-        { selector: "#branch-sub-custom", key: "pointObjdate", multiplier: 500 },
-        { selector: "#account-sub-custom", key: "accountObjdate", multiplier: 500 }
-    ];
-
-    elementsToUpdate.forEach(({ selector, key, multiplier }) => {
-    	let adjustedDate; // 🔹 변수 선언을 루프 밖에서 수행
-
-        if (key === "groupObjdate") {
-            adjustedDate = baseDate - (window.subscriptionState["subObjdate"] || 0);
-        } else {
-            adjustedDate = baseDate - (window.subscriptionState[key] || 0);
-        }
-        let element = document.querySelector(selector);
-        
-        if (element) {
-            let parentLabel = element.parentElement;
-            let updatedPrice;
-
-            // 특정 옵션 적용 시 가격 조정
-            if (window.subscriptionState.gpOption === "100" && selector === "#group-sub-limit") {
-                updatedPrice = (redate * multiplier) + (window.subscriptionState.groupObjdate * multiplier / 2);
-            } else {
-                updatedPrice = adjustedDate * multiplier;
-            }
-
-            // 가격 업데이트
-            //parentLabel.innerHTML = parentLabel.innerHTML.replace(/\d{1,3}(,\d{3})*원/g, updatedPrice.toLocaleString() + "원");
-            
-            let priceSpan = parentLabel.querySelector(".price-text");
-            if (!priceSpan) {
-                priceSpan = document.createElement("span");
-                priceSpan.classList.add("price-text");
-                parentLabel.appendChild(priceSpan);
-            }
-            priceSpan.textContent = updatedPrice.toLocaleString() + "원";
-            
-            
-            //console.log(`업데이트 시도: ${selector} data-day=${adjustedDate}_${updatedPrice}`);
-
-            element.setAttribute("data-day", `${adjustedDate}_${updatedPrice}`);
-            //console.log("적용 대상:", element); // 실제 요소 확인
-            //console.log("설정할 값:", `${adjustedDate}_${updatedPrice}`);
-
-
-            //console.log(`업데이트된 가격 (${selector}):`, updatedPrice);
-
-            // 마지막 값이 " 0원"이면 display: none 처리
-            /* if (parentLabel.innerHTML.trim().endsWith("0원")) {
-                parentLabel.style.display = "none";
-            } else {
-                parentLabel.style.display = "inline-block";
-            } */
-        }
-    });
+	    let baseDate = window.subscriptionState.subObjdate + redate;
+	    console.log("현재구독기간:", baseDate);
+	
+	    // 가격 변경 대상 및 배수 설정
+	    const elementsToUpdate = [
+	        { selector: "#group-sub-100", key: "groupObjdate", multiplier: 1000 },
+	        { selector: "#group-sub-limit", key: "groupObjdate", multiplier: 2000 },
+	        { selector: "#hr-sub-custom", key: "hrObjdate", multiplier: 500 },
+	        { selector: "#branch-sub-custom", key: "pointObjdate", multiplier: 500 },
+	        { selector: "#account-sub-custom", key: "accountObjdate", multiplier: 500 }
+	    ];
+	
+	    elementsToUpdate.forEach(({ selector, key, multiplier }) => {
+	    	let adjustedDate; // 🔹 변수 선언을 루프 밖에서 수행
+	
+	        if (key === "groupObjdate") {
+	        	if(window.subscriptionState.gpOption === "50"){
+	        		adjustedDate = baseDate;
+	        	}else{
+	            	adjustedDate = baseDate - (window.subscriptionState["subObjdate"] || 0);
+	        	}
+	        } else {
+	            adjustedDate = baseDate - (window.subscriptionState[key] || 0);
+	        }
+	        let element = document.querySelector(selector);
+	        
+	        if (element) {
+	            let parentLabel = element.parentElement;
+	            let updatedPrice;
+	
+	            // 특정 옵션 적용 시 가격 조정
+	            if (window.subscriptionState.gpOption === "100" && selector === "#group-sub-limit") {
+	                updatedPrice = (redate * multiplier) + (window.subscriptionState.groupObjdate * multiplier / 2);
+	            } else {
+	                updatedPrice = adjustedDate * multiplier;
+	            }
+	
+	            // 가격 업데이트
+	            //parentLabel.innerHTML = parentLabel.innerHTML.replace(/\d{1,3}(,\d{3})*원/g, updatedPrice.toLocaleString() + "원");
+	            
+	            let priceSpan = parentLabel.querySelector(".price-text");
+	            if (!priceSpan) {
+	                priceSpan = document.createElement("span");
+	                priceSpan.classList.add("price-text");
+	                parentLabel.appendChild(priceSpan);
+	            }
+	            priceSpan.textContent = updatedPrice.toLocaleString() + "원";
+	            
+	            
+	            //console.log(`업데이트 시도: ${selector} data-day=${adjustedDate}_${updatedPrice}`);
+	
+	            element.setAttribute("data-day", `${adjustedDate}_${updatedPrice}`);
+	            //console.log("적용 대상:", element); // 실제 요소 확인
+	            //console.log("설정할 값:", `${adjustedDate}_${updatedPrice}`);
+	
+	
+	            //console.log(`업데이트된 가격 (${selector}):`, updatedPrice);
+	
+	            // 마지막 값이 " 0원"이면 display: none 처리
+	            /* if (parentLabel.innerHTML.trim().endsWith("0원")) {
+	                parentLabel.style.display = "none";
+	            } else {
+	                parentLabel.style.display = "inline-block";
+	            } */
+	        }
+	    });
 
     // 라디오 버튼 표시 설정
     const radioGroups = [
@@ -378,6 +521,22 @@
 
         
         document.addEventListener("DOMContentLoaded", function () {
+        	//탭바뀔때마다 라디오버튼, 셀렉트버튼 다 체크해제
+        	document.querySelectorAll('button[data-bs-toggle="tab"]').forEach(tab => {
+		        tab.addEventListener("shown.bs.tab", function() {
+		            // 모든 라디오 버튼과 체크박스 해제
+		            document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(input => {
+		                input.checked = false;
+		            });
+		            // 총 결제 금액 초기화
+		            document.querySelector(".regular-total-price").innerHTML = "0원";
+		            document.querySelector(".total-price").innerHTML = "0원";
+		            console.log("탭 변경됨! 모든 체크 해제 완료.");
+		        });
+		    });
+        	
+        	var regular_pay_list = '';
+        	var price_regular = 0;
             document.addEventListener("change", function (event) {
                 let target = event.target;
 
@@ -396,8 +555,72 @@
                         updateSubscriptionSummary(selectedValue, selectedPrice, selectedDataDay);
                     }
                 }
+                
+                if (target.matches('input[name="erp-sub-regular"], input[id="group-regulars-50"], input[id="group-regulars-100"], input[id="group-regulars-limit"], input[name="hr-sub-regulars"], input[name="branch-sub-regulars"], input[name="account-sub-regulars"]')) {
+                    // 선택된 라디오 버튼들의 `data-day` 값 가져오기
+                    let selectedRadios = document.querySelectorAll('input[name="erp-sub-regular"]:checked, input[id="group-regulars-50"]:checked, input[id="group-regulars-100"]:checked, input[id="group-regulars-limit"]:checked, input[name="hr-sub-regulars"]:checked, input[name="branch-sub-regulars"]:checked, input[name="account-sub-regulars"]:checked');
+                    let dataDayList = ''; // `data-day` 값을 저장할 변수
+                    selectedRadios.forEach((radio) => {
+                        let dataDayValue = radio.getAttribute("data-day"); // 예: "22_26400"
+                        let parts = dataDayValue.split('_'); // ['22', '26400']
+                        let price = parseInt(parts[1]); // 가격 부분을 숫자로 변환
+
+                        price_regular += price; // 가격 합산
+                        dataDayList += dataDayValue + '-'; // 여러 개의 값을 "-"로 구분
+                    });
+                    regular_pay_list = dataDayList.slice(0, -1); // 마지막 쉼표 제거
+                    console.log("선택된 data-day 리스트:", regular_pay_list); // 확인용 출력
+                    document.querySelector(".regular-total-price").innerHTML = price_regular.toLocaleString() + "원";
+                }
             });
+            
+            //정기 구독 등록
+            document.querySelector(".regular-periodpaygo").addEventListener("click", function(){
+            	if(price_regular != 0){
+	            	let selectedOption = document.querySelector("#regular-payment-method option:checked");
+	            	let orderId = document.querySelector("#regular-payment-method option:checked").value;
+	            	let paylist = selectedOption.getAttribute("data-pay");
+	            	let companyNum = [[${session.companyNum}]];
+	        		let employeeNum = [[${session.employeeNum}]];
+	        		console.log(employeeNum);
+	        		const requestData = {
+	        				companyNum: companyNum,		//회사번호
+	        				employeeNum : employeeNum,				//결제자(사원ID)
+	        				dataDay: regular_pay_list,			//주문옵션 별 옵션번호_금액  30_25000-70_15000
+	        				price: price_regular,				//최종결제 금액
+	        				paymethod : paylist,						//결제방식
+	        				orderId: orderId,			//카드 또는 계좌 번호로 사용        				
+	        				subscriptionState: subscriptionState,	//현재 사용중인 서비스내역 (객체)
+	        				subscriptionNum: 0						//기본키 결과 반환 하는 공간
+	        		};
+	        		console.log(requestData);
+	        		//여기에 패치하고 
+	        		const url = `/erp/rest/regularRegister`;
+	        		fetch ( url, {
+	        			method : "POST",
+	        			headers :{
+	        				"Content-Type": "application/json",
+	        			},
+	        			body : JSON.stringify(requestData),
+	        		})
+	        		.then(result => result.text())
+	        		.then(result => {
+	        			if(result=="OK"){
+	        				location.href='/erp/erpsubinfo?menu=mypage';
+	        			}else{
+	        				showAlert("정기구독 등록을 실패 했습니다","danger");
+	        			}
+	        		})
+	        		//erp_subscription_info_list테이블에 값이 있으면 업데이트 
+	        		//업데이트할때 subscription_form 정기구독으로
+	        		//인서트할땐 정기구독으로
+            	}else{
+            		showAlert("구독을 선택해주세요","danger");
+            	}
+            });
+            
         });
+        
         
 		/**
 		 * 선택한 구독 옵션을 모아서 콘솔에 출력하는 함수
@@ -498,7 +721,7 @@ document.querySelector(".periodpaygo").addEventListener("click", async function 
 	            pay_method: "card", // 결제 방식
 	            merchant_uid: orderId, // 주문번호 (선택한 구독 옵션 value 조합)
 	            name: "기간 구독서비스", // 결제 상품명
-	            amount: 1, // 결제 금액 (formattedTotalPrice 사용하지 않고 정수로 전달)
+	            amount: formattedTotalPrice, // 결제 금액 (formattedTotalPrice 사용하지 않고 정수로 전달)
 	            buyer_email: "test@example.com",
 	            buyer_name: "홍길동",
 	            buyer_tel: "01012345678",
@@ -511,14 +734,14 @@ document.querySelector(".periodpaygo").addEventListener("click", async function 
 	                payGO(orderId, formattedTotalPrice, window.subscriptionState, dataDay);
 	            } else {
 	            	//alert("결제가 실패했습니다. 오류 메시지: " + rsp.error_msg);
-	                console.log("❌ 결제 실패:", rsp);
+	                showAlert("결제에 실패 했습니다.", 'danger');
 	                console.log("결제가 실패했습니다. 오류 메시지: " + rsp.error_msg+" "+orderId+" "+formattedTotalPrice+"원",window.subscriptionState);
 	                //결제 실패여도 결제로 넘길 예정 (테스트니까)
-	                payGO(orderId, formattedTotalPrice, window.subscriptionState, dataDay);
+	                //payGO(orderId, formattedTotalPrice, window.subscriptionState, dataDay);
 	            }
 	        });
 		}else{
-			alert('구독 서비스를 선택해주세요');
+			showAlert("구독 서비스를 선택해주세요", 'danger');
 		}
     }
 });
@@ -552,19 +775,13 @@ document.querySelector(".periodpaygo").addEventListener("click", async function 
 		.then( result => {
 			console.log("결제 결과" + result);
 			if(result==="OK"){
-				alert("★성공★ 했습니다");
-				//이때 페이지를 이동 시켜버리자!!!
+				location.href='/erp/erpsubinfo?menu=mypage';
 			}else{
-				alert("기간 구독에 실패 했습니다");
+				showAlert("기간 구독에 실패 했습니다", 'danger');
 			}
 		})
 	}
 </script>
-
-
-
-    
-    
 	<style>
         table {
             width: 100%;
@@ -605,7 +822,7 @@ document.querySelector(".periodpaygo").addEventListener("click", async function 
         .payment-table th {
             background-color: #f2f2f2;
         }
-        .total-price {
+        .total-price, .regular-total-price {
             font-size: 24px;
             font-weight: bold;
         }

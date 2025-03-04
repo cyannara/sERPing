@@ -27,10 +27,7 @@
         stompClient.debug = null;
         console.log('stompClient1', stompClient)
 
-        stompClient.connect({}, function (frame) {
-            console.log('Connected: ' + frame);
-
-            // 📌 웹소켓 연결이 완료된 후에만 메시지 전송
+        stompClient.connect({}, function () {
             let username = document.getElementById("username").value;
             stompClient.send("/app/chat.addUser", {}, JSON.stringify({sender: username, type: 'JOIN'}));
 
@@ -53,6 +50,9 @@
         let username = document.getElementById("username").value;
         let message = { sender: username, content: messageInput, type: 'CHAT' };
 
+        // 메세지를 서버로 보냄
+        // 서버가 메세지를 받고 해당 메세지를 /topic/public 채널에 브로드캐스트
+        // stompClient.subscribe()로 의해 showMessage() 실행됨
         stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(message));
     }
 

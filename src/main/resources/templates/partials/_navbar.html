@@ -20,61 +20,13 @@
          th:classappend="${#strings.equals('inventory', param.menu)} ? 'selected' : ''">재고</a>
       <a th:href="@{/hr/employee(menu='hr')}" data="hr"
          th:classappend="${#strings.equals('hr', param.menu)} ? 'selected' : ''">인사</a>
-      <a th:href="@{/(menu='account')}" data="account"
+      <a th:href="@{/accnut/asset(menu='account')}" data="account"
          th:classappend="${#strings.equals('account', param.menu)} ? 'selected' : ''">회계</a>
       <a th:href="@{/bhf/order(menu='branch')}" data="branch"
          th:classappend="${#strings.equals('branch', param.menu)} ? 'selected' : ''">지점</a>
     </nav>
 
     <ul class="navbar-nav navbar-nav-right">
-      <li class="nav-item dropdown">
-        <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-toggle="dropdown">
-          <i class="icon-bell mx-0"></i>
-          <span class="count"></span>
-        </a>
-        <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
-          <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
-          <a class="dropdown-item preview-item">
-            <div class="preview-thumbnail">
-              <div class="preview-icon bg-success">
-                <i class="ti-info-alt mx-0"></i>
-              </div>
-            </div>
-            <div class="preview-item-content">
-              <h6 class="preview-subject font-weight-normal">Application Error</h6>
-              <p class="font-weight-light small-text mb-0 text-muted">
-                Just now
-              </p>
-            </div>
-          </a>
-          <a class="dropdown-item preview-item">
-            <div class="preview-thumbnail">
-              <div class="preview-icon bg-warning">
-                <i class="ti-settings mx-0"></i>
-              </div>
-            </div>
-            <div class="preview-item-content">
-              <h6 class="preview-subject font-weight-normal">Settings</h6>
-              <p class="font-weight-light small-text mb-0 text-muted">
-                Private message
-              </p>
-            </div>
-          </a>
-          <a class="dropdown-item preview-item">
-            <div class="preview-thumbnail">
-              <div class="preview-icon bg-info">
-                <i class="ti-user mx-0"></i>
-              </div>
-            </div>
-            <div class="preview-item-content">
-              <h6 class="preview-subject font-weight-normal">New user registration</h6>
-              <p class="font-weight-light small-text mb-0 text-muted">
-                2 days ago
-              </p>
-            </div>
-          </a>
-        </div>
-      </li>
       <li class="nav-item nav-profile dropdown">
         <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="profileDropdown">
           <img th:src="${session.profileImage}" alt="profile"
@@ -86,10 +38,10 @@
             <i class="mdi mdi-account-circle"></i>
             마이페이지
           </a>
-          <form th:action="@{/logout}" method="post">
-            <a class="dropdown-item mymenu">
+          <form id="logoutForm" th:action="@{/logout}" method="post">
+            <a class="dropdown-item mymenu" onclick="document.getElementById('logoutForm').submit(); return false;">
               <i class="mdi mdi-logout"></i>
-              <input type="submit" value="로그아웃"/>
+              로그아웃
             </a>
           </form>
           <a th:classappend="${#authorization.expression('isAuthenticated()')} ? 'hide'" href="/login">

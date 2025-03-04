@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html 
+lang="en"
+layout:decorate="~{layouts/layout}" 
+xmlns:th="http://www.thymeleaf.org"
+xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+>
+
+<head>
+
+  <style>
+  	#custom-container{
+		background-color: #f8f9fa; /* 연한 회색 배경 */
+		padding: 20px;
+		border-radius: 10px;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 박스 그림자 */
+		margin-bottom: 20px;
+	
+	}
+	.grid-row-selected {
+    	background-color: #e86f6f;  
+	}
+	
+  </style>
+
+</head>
+<body layout:fragment="content">
+  <!-- 페이지 내용 시작 -->
+	<div class="container">
+		<h1>출고 관리</h1>
+		<div class="row mb-3">
+	        <div class="col-12">
+	            <div class="card">
+	                <div class="card-body">
+	                    <h4 class="card-title">검색 조건</h4>
+	                    <p class="card-description">검색 조건을 선택하세요.</p>
+	                        <div class="d-flex align-items-center gap-3">
+	                            <!-- 라디오 버튼 -->
+	                            <div class="d-flex gap-3">
+	                                <div class="form-check">
+	                                    <label class="form-check-label">
+	                                        <input type="radio" class="form-check-input" name="optionsRadios" value="notSelect" checked onclick="toggleDateInputs(false)">
+	                                        사용안함
+	                                    </label>
+	                                </div>
+	                                <div class="form-check">
+	                                    <label class="form-check-label">
+	                                        <input type="radio" class="form-check-input" name="optionsRadios" value="orderDate" onclick="toggleDateInputs(true)">
+	                                        주문일자
+	                                    </label>
+	                                </div>
+	                                <div class="form-check">
+	                                    <label class="form-check-label">
+	                                        <input type="radio" class="form-check-input" name="optionsRadios" value="dueDate" onclick="toggleDateInputs(true)">
+	                                        납기일자
+	                                    </label>
+	                                </div>
+	                            </div>
+	
+	                            <!-- 날짜 입력 -->
+	                            <div class="d-flex gap-3">
+	                                <div>
+	                                    <label for="startDate">시작 날짜</label>
+	                                    <input type="date" class="form-control" id="startDate" name="startDate" disabled>
+	                                </div>
+	                                <div>
+	                                    <label for="endDate">끝 날짜</label>
+	                                    <input type="date" class="form-control" id="endDate" name="endDate" disabled>
+	                                </div>
+	                            </div>
+	                            
+	                            <div class="d-flex flex-column gap-2">
+							        <label>출고 상태</label>
+							        <div class="d-flex gap-3">
+							            <div class="form-check">
+							                <input type="checkbox" class="form-check-input" id="statusPending" name="deliveryStatus" value="DS01">
+							                <label class="form-check-label" for="statusPending">출고준비중</label>
+							            </div>
+							            <div class="form-check">
+							                <input type="checkbox" class="form-check-input" id="statusCompleted" name="deliveryStatus" value="DS02">
+							                <label class="form-check-label" for="statusCompleted">출고완료</label>
+							            </div>
+							            <div class="form-check">
+							                <input type="checkbox" class="form-check-input" id="statusCancelled" name="deliveryStatus" value="DS03">
+							                <label class="form-check-label" for="statusCancelled">출고취소</label>
+							            </div>
+							        </div>
+							    </div>
+	                        </div>
+	
+	                        <div class="form-group m-3">
+	                            <label for="selectBhf">발주지점</label>
+	                            <select class="form-control" id="selectBhf">
+	                            	<option>all</option>
+	                                <option>발주지점1</option>
+	                                <option>발주지점2</option>
+	                                <option>발주지점3</option>
+	                                <option>yedam</option>
+	                            </select>
+	                        </div>
+	                        
+							<div class="col-12 text-center">
+	                        	<button class="btn btn-primary mr-2" onclick="search()">검색</button>
+	                        	<button class="btn btn-light"        onclick="reset()">초기화</button>
+	                        </div>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+		<div class="row">
+        	<div class="col-md-12  grid-margin stretch-card">
+            	<div class="card">
+              		<div class="card-body">
+                		<h4 class="card-title">출고 준비중인 주문 목록</h4>
+                		<p class="card-description">출고 처리할 주문 선택</p>
+                		<div id="orderList"></div>
+               		 	<div id="pagination" class="tui-pagination"></div>
+              		</div>
+            	</div>
+            	
+          	</div>
+          	
+
+        </div>
+        <div class="row">
+          	<div class="col-md-6  grid-margin stretch-card">
+            	<div class="card">
+              		<div class="card-body">
+                		<h4 class="card-title">주문 상세</h4>
+                		<p class="card-description">출고 하기전에 본사 창고에서 해당 상품을 LOT별로 매칭하여 연결</p>
+                		<div id="deliDetail"></div>
+               		 	<div id="pagination" class="tui-pagination"></div>
+               		 	
+              		</div>
+            	</div>
+            	
+          	</div>
+          	<div class="col-md-6 grid-margin stretch-card">
+			    <div class="card">
+			        <div class="card-body">
+			        	<h4 class="card-title">이동 출고 상품의 LOT리스트</h4>
+			            <div id="deliLotDetail"></div>
+			            <div id="pagination" class="tui-pagination"></div>
+			            
+			        </div>
+			    </div>
+			</div>
+
+        </div>
+	</div>
+
+<!-- 모달들  (모달ID, 모달사이즈(modal-xl,...), 모달제목, 모달내용 HTML, 모달풋터 HTML)-->
+      
+       
+    <div th:include="bsn/modal/bsnModalTemplate :: ModalTemplate (
+						    	'registerModal', 
+						    	'modal-lg', 
+						    	'LOT 연결 추가', 
+						    	'bsn/modal/bsnLotRegister', 
+						    	'bsn/modal/bsnModalFooter'
+						    )">
+     </div>
+     
+      
+     <div th:include="bsn/modal/bsnModalTemplate :: ModalTemplate(
+						    	'deleteModal', 
+						    	'modal-md', 
+						    	'LOT 연결 삭제', 
+						    	'bsn/modal/bsnLotDelete', 
+						    	'bsn/modal/bsnModalFooter')">
+     </div>
+     
+     <div th:include="bsn/modal/bsnModalTemplate :: ModalTemplate(
+						    	'confirmModal', 
+						    	'modal-md', 
+						    	'출고 확정', 
+						    	'bsn/modal/bsnDlivConfirm', 
+						    	'bsn/modal/bsnModalFooter')">
+     </div>
+  <!-- 세션정보 -->
+  	  <script th:inline="javascript">
+	  	let companyNum = [[${session.companyNum}]];
+	  	//let employeeNum = [[${session.employeeNum}]];
+	  </script>    
+	   
+<script>
+var Grid = tui.Grid;
+
+tui.Grid.applyTheme('default', {
+	  cell: {
+	    
+	    selectedHead: {
+	      background: '#0b3f73',
+	    },
+	    
+	  }
+	});
+
+let selectDlivyId;
+var selectedRow = null; // 선택된 상품 상세
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    search();  // DOMContentLoaded 이벤트 후 자동으로 검색 실행
+});
+
+
+    
+
+const OrderListDataSource = {
+		api: {
+			readData: { url: '/bsn/rest/deli', method: 'GET', initParams: { page: 1 }},
+		},
+		contentType: 'application/json'
+};
+
+
+
+
+
+//상품 테이블
+const orderList = new Grid({
+		el: document.getElementById('orderList'), // 컨테이너 엘리먼트
+		pageOptions: {
+		useClient: false,
+		perPage: 10,
+	},
+	columns: [ 
+		{ header : "출고ID", name : "deliveryId", sortable : true},
+		{ header : "주문ID", name : "orderId", sortable : true},
+		{ header : "주문명", name : "orderName", width: 'auto',  sortable : true},
+		{ header : "지점코드", name : "branchOfficeId"},
+		{ header : "담당자번호", name : "employeeNum"},
+		// { header : "회사번호", name : "companyNum"},
+		{ header : "주문일", name : "orderDate", formatter: ({ value }) => formatDate(value, 'order'), width: 'auto', sortable : true},
+		{ header : "납기일", name : "dueDate", formatter: ({ value }) => formatDate(value, 'due'), width: 'auto', sortable : true},
+		{ header : "출고일", name : "deliveryDate", formatter: ({ value }) => formatDate(value, 'due'), width: 'auto', sortable : true},
+		{ header : "출고상태", name : "deliveryStatus", formatter: ({ value }) => formatStatus(value), sortable : true},
+		{ header : "비고", name : "remark", width: 'auto'},
+	],
+	data: OrderListDataSource
+});
+
+//그리드 날짜 형식 변경(데이터 수정X, 표기만)
+function formatDate(dateString, type) {
+    if (!dateString) return ''; // 데이터가 없으면 빈 문자열 반환
+    const date = new Date(dateString);
+    if (isNaN(date)) return dateString; // 날짜 변환이 실패하면 원본 유지
+
+    return type === 'order' 
+        ? date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }) // "2025년 2월 17일"
+        : date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }); // "02/17 (월)"
+}
+
+//상태여부 표기 변경
+function formatStatus(status) {
+    if (status === null || status === undefined) return ''; // 데이터가 없으면 빈 문자열 반환
+    switch(status){
+    case "DS01":
+    	return "출고준비중";
+    case "DS02":
+    	return "출고완료";
+    case "DS03":
+    	return "출고취소";
+    	
+    case 0 :
+    	return "요구수량미달";
+    case 1 :
+    	return "요구수량충족";
+    case 2 :
+		return "출고됨";
+    }
+  	
+}
+
+//출고상태 선택(체크된 값)
+function getSelectedStatuses() {
+    const checkboxes = document.querySelectorAll('input[name="deliveryStatus"]:checked');
+    const selectedValues = Array.from(checkboxes).map(cb => cb.value);  // 값만 추출하여 배열로 저장
+    
+    if (selectedValues.length > 0) {
+        // 배열을 반환. MyBatis에서 이를 처리하도록 전달
+        return selectedValues;  // 예: ['DS01', 'DS02']
+    }
+    return []; // 아무것도 선택되지 않았을 때 빈 배열 반환
+}
+
+function toggleDateInputs(enable) {
+    document.getElementById("startDate").disabled = !enable;
+    document.getElementById("endDate").disabled = !enable;
+    
+   
+  }
+//검색 조건 초기화
+function reset(){
+	// 라디오 버튼 선택 값 초기화
+    // "사용안함" 라디오 버튼을 체크하도록 설정
+    let notSelectRadio = document.querySelector('input[name="optionsRadios"][value="notSelect"]');
+    if (notSelectRadio) {
+        notSelectRadio.checked = true;  // "사용안함" 라디오 버튼을 선택 상태로
+        toggleDateInputs(false);  // 날짜 입력 비활성화
+    }
+
+	// 시작 날짜와 끝 날짜 초기화
+	document.getElementById("startDate").value = "";
+	document.getElementById("endDate").value = "";
+	// 발주지점 선택 값 초기화
+    document.getElementById("selectBhf").value = "all";
+
+
+}
+
+function search(){
+	let selectedOption = document.querySelector('input[name="optionsRadios"]:checked').value; // 라디오 버튼 선택 값
+    let startDate = document.getElementById("startDate").value; // 시작 날짜
+    let endDate = document.getElementById("endDate").value; // 끝 날짜
+    let selectedBhf = document.getElementById("selectBhf").value; // 발주지점 선택 값
+    
+    //console.log(selectedOption, startDate, endDate, selectedBhf);
+    
+    let params = {
+    		"deteOption": selectedOption,
+            "startDate": startDate,
+            "endDate": endDate,
+            "branch": selectedBhf,
+            "companyNum": companyNum,
+            "statusList": getSelectedStatuses()
+            
+    };
+    console.log("검색 조건:", params);
+    
+    orderList.readData(1, params, true);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//출고 클릭 시 상세 불러오기
+orderList.on('click', (ev) => {
+	
+    const rowKey = ev.rowKey; // 클릭한 행의 키
+    if (rowKey === null || rowKey === undefined) {
+        return;
+    }
+    
+    //console.log(rowKey);
+    const rowData = orderList.getRow(rowKey); // 클릭한 행 데이터 가져오기
+    selectDlivyId = rowData.deliveryId;
+    
+    console.log("선택한 출고(주문) : " + rowData.deliveryId);
+    
+	 // 주문 상세, LOT 상세 초기화
+    deliveryDetailGrid.resetData([]);
+    deliveryLotDetailGrid.resetData([]);
+    selectedRow = null;
+    
+    
+    if (rowData && rowData.deliveryId) {
+    	loadDeliveryDetail(rowData.deliveryId); // 상세 정보 불러오기
+    }
+});
+
+//불러오는 함수
+function loadDeliveryDetail(deliveryId) {
+	if (!deliveryId) {
+        console.warn("유효하지 않은 주문 Id입니다.");
+        return;
+    }
+	
+    fetch(`/bsn/rest/deli/detail?deliveryId=${deliveryId}`)
+    	
+        .then(response => {
+	            if (!response.ok) throw new Error(`HTTP 오류! 상태: ${response.status}`);
+	            return response.json();
+	     })
+	     
+        .then(data => {
+            if (data && data.data && data.data.contents) {
+            	const detailData = data.data.contents; // 상세 데이터 저장
+            	
+
+                deliveryDetailGrid.resetData(detailData);
+            } else {
+                console.warn("상세 데이터가 없습니다.");
+                //orderDetailGrid.resetData([]); // 빈 배열로 초기화
+            }
+        })
+        .catch(error => console.error('Error fetching order detail:', error));
+}
+
+//상세 그리드 형식
+const deliveryDetailGrid = new Grid({
+el: document.getElementById('deliDetail'),
+columns: [
+    { header: "상품명", name: "goodsName", 
+    //	width: 'auto' ,	
+    },
+    { header: "옵션명", name: "optionName", },
+    //{ header: "옵션코드", name: "optionCode",  },
+    { header: "요구수량(규격)", name: "deliveryDemandQnt",  },
+    { header: "출고총수량(규격)", name: "deliveryTotalQnt",  },
+    { header: "출고준비여부", name: "sufficiencyStatus", formatter: ({ value }) => formatStatus(value), sortable : true},
+
+],
+pageOptions: {
+    useClient: false,
+    perPage: 5
+}
+});
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//출고 클릭 시 LOT상세 불러오기
+deliveryDetailGrid.on('click', (ev) => {
+	
+    const rowKey = ev.rowKey; // 클릭한 행의 키
+    selectedRow = deliveryDetailGrid.getRow(rowKey);
+    if (rowKey === null || rowKey === undefined) {
+        return;
+    }
+    
+    const rowData = deliveryDetailGrid.getRow(rowKey); // 클릭한 행 데이터 가져오기
+    console.log("선택한 출고 상세 ID : " + rowData.deliveryDetailId);
+    
+ 	// LOT 상세 초기화
+    deliveryLotDetailGrid.resetData([]);
+ 	
+    if (rowData && rowData.deliveryDetailId) {
+    	loadDeliveryLotDetail(rowData.deliveryDetailId); // 상세 정보 불러오기
+    }
+});
+
+//불러오는 함수
+function loadDeliveryLotDetail(deliveryDetailId) {
+	if (!deliveryDetailId) {
+        console.warn("유효하지 않은 주문 Id입니다.");
+        return;
+    }
+	
+    fetch(`/bsn/rest/deli/lot/detail?deliveryDetailId=${deliveryDetailId}`)
+    	
+        .then(response => {
+	            if (!response.ok) throw new Error(`HTTP 오류! 상태: ${response.status}`);
+	            return response.json();
+	     })
+	     
+        .then(data => {
+            if (data && data.data && data.data.contents) {
+            	const detailData = data.data.contents; // 상세 데이터 저장
+            	console.log(detailData);
+                deliveryLotDetailGrid.resetData(detailData);
+            } else {
+                console.warn("상세 데이터가 없습니다.");
+                //orderDetailGrid.resetData([]); // 빈 배열로 초기화
+            }
+        })
+        .catch(error => console.error('Error fetching order detail:', error));
+}
+
+//상세 그리드 형식
+const deliveryLotDetailGrid = new Grid({
+el: document.getElementById('deliLotDetail'),
+rowHeaders: ['rowNum'],
+columns: [
+	
+    
+    { header: "LOT번호", name: "goodsLotNum", align: "left"},
+    //{ header: "유통기한", name: "goodsConsumptionDate", formatter: ({ value }) => formatDate(value, 'order'), width: 'auto', sortable : true},
+    //{ header: "출고가능수량", name: "deliveryPossibleQnt",  align: "right"},
+    { header: "연결수량(규격)", name: "deliveryQnt",  sortable : true, align: "right"},
+    
+
+],
+pageOptions: {
+    useClient: false,
+    perPage: 5
+}
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+
+</script>
+</body>
+</html>

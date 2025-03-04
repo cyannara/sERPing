@@ -11,7 +11,7 @@
 	<div class="container">
 		<!-- 메뉴이름 -->
 		<div>
-			<h2>거래대장 조회</h3>
+			<h2>거래대장 조회</h2>
 		</div>
 
     <!-- 검색창 -->
@@ -95,6 +95,8 @@
 	</div>
 
 <script>
+	var session = sessionData;
+
 	document.addEventListener("DOMContentLoaded",()=>{
 		downExcel();
 	})
@@ -102,7 +104,7 @@
 	
 	const dataSource = {
 		api: {
-			readData: { url: 'http://localhost:81/accnut/rest/book/list', method: 'GET', initParams: { page: 1 } },
+			readData: { url: 'http://localhost:81/accnut/rest/book/list', method: 'GET', initParams: { page: 1, companyNum: session.companyNum } },
 			
 		},
 		contentType: 'application/json'

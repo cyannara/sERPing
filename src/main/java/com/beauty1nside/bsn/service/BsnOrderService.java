@@ -7,10 +7,13 @@ import com.beauty1nside.bsn.dto.OrderSearchDTO;
 import com.beauty1nside.bsn.dto.delivery.BsnDeliveryDTO;
 import com.beauty1nside.bsn.dto.delivery.BsnDeliveryDetailDTO;
 import com.beauty1nside.bsn.dto.delivery.BsnDeliveryLotDTO;
+import com.beauty1nside.bsn.dto.delivery.BsnDeliverySearchDTO;
 import com.beauty1nside.bsn.dto.order.BhfOrderDTO;
 import com.beauty1nside.bsn.dto.order.BhfOrderDetailDTO;
+import com.beauty1nside.bsn.dto.order.BsnOrderCancelDTO;
 import com.beauty1nside.bsn.dto.order.BsnOrderDTO;
 import com.beauty1nside.bsn.dto.order.BsnOrderDetailDTO;
+import com.beauty1nside.bsn.dto.order.BsnOrderHistoryDTO;
 
 public interface BsnOrderService {
 
@@ -42,23 +45,41 @@ public interface BsnOrderService {
 	//주문상세 수 구하기
 	public int getCountOfBsnOrderDetail(BsnOrderDTO bsnOrederDTO);
 	
+	//주문변경이력조회
+	public List<BsnOrderHistoryDTO> getBsnOrderHistory(BsnOrderDTO bsnOrderDTO);
+	//주문취소
+	public void cancelBsnOrder(BsnOrderCancelDTO bsnOrderCancelDTO);
 	
 	//출고 조회
-	public List<BsnDeliveryDTO> getBsnDelivery(OrderSearchDTO orderSearchDTO);
+	public List<BsnDeliveryDTO> getBsnDelivery(BsnDeliverySearchDTO bsnDeliverySearchDTO);
+	
+	//출고 상세 구하기
+	public int getCountOfBsnDelivery(BsnDeliverySearchDTO bsnDeliverySearchDTO);
 	
 	//출고 상세 조회
 	public List<BsnDeliveryDetailDTO> getBsnDeliveryDetail(BsnDeliveryDTO bsnDeliveryDTO);
+	
+	//출고 상세 카운팅
+	public int getCountOfBsnDeliveryDetail(BsnDeliveryDTO bsnDeliveryDTO);
 	
 	
 	//츨고 LOT 상세 조회
 	public List<BsnDeliveryLotDTO> getBsnDeliveryLotDetail(BsnDeliveryDetailDTO bsnDeliveryDetailDTO);
 	
+	//츨고 LOT 상세 카운팅
+	public int getCountOfBsnDeliveryLotDetail(BsnDeliveryDetailDTO bsnDeliveryDetailDTO);
 	
-	//본사 창고 재고(LOT별)조회 임시
+	//본사 창고 재고(LOT별)조회
 	public List<BsnGoodsLOTDTO> getGoodsWarehouseLot(BsnDeliveryDetailDTO bsnDeliveryDetailDTO);
+	
+	//본사 창고 재고(LOT별)조회 카운팅
+	public int getCountOfGoodsWarehouseLot(BsnDeliveryDetailDTO bsnDeliveryDetailDTO);
 	
 	//출고 LOT 등록(연결)
 	public void registerBsnDeliveryLotDetail(BsnDeliveryDetailDTO bsnDeliveryDetailDTO);
+	
+	//출고 LOT 수량 수정
+	public void modifyBsnDeliveryLotDetail(BsnDeliveryDetailDTO bsnDeliveryDetailDTO);
 	
 	//출고 LOT 제거
 	public void removeBsnDeliveryLotDetail(BsnDeliveryDetailDTO bsnDeliveryDetailDTO);

@@ -4,7 +4,6 @@
 
 document.addEventListener("DOMContentLoaded", function () {
  
-    applyCommonCodesToModal(); // 모달 공통 코드 적용
     setupEventListeners(); // 이벤트 리스너 연결
 
     // ✅ 초기화 버튼 이벤트 리스너 연결 (id 일치 확인)

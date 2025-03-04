@@ -1,595 +1,627 @@
-<!DOCTYPE html>
-<html layout:decorate="~{layouts/layout}" lang="en"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta charset="UTF-8">
-<title>조직도 관리</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
-  <style>
-    body {
-      font-family: "Inter", sans-serif;
-      background: #f8f9fa;
-    }
-    .container {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-    .header-section {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 10px;
-    }
-    .content-section {
-      display: flex;
-      gap: 20px;
-    }
-    .org-chart {
-      width: 30%;
-      background: white;
-      padding: 20px;
-      border-radius: 5px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-    .employee-table {
-      flex: 1;
-      background: white;
-      padding: 20px;
-      border-radius: 5px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-    .department-tree ul {
-      list-style: none;
-      padding-left: 20px;
-    }
-    .toggle-btn {
-      cursor: pointer;
-      margin-right: 5px;
-    }
-    .select-wrapper {
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-    }
-    #grid {
-      width: 100%;
-      height: 300px;
-    }
-  </style>
-</head>
-
-<body layout:fragment="content">
-
-  <div class="container mt-3">
-    <div class="header-section">
-      <h5 class="fw-bold">인사 관리 / 조직도 관리</h5>
-      <div class="d-flex gap-2">
-		<button id="addDeptBtn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#deptModal">
-		    <i class="fas fa-plus-circle"></i> 부서 추가
-		</button>
-		<button id="editDeptBtn" class="btn btn-secondary" disabled><i class="fas fa-pencil-alt"></i> 부서 수정</button>
-      </div>
-    </div>
-
-    <div class="content-section">
-      <section class="org-chart">
-        <input type="text" class="form-control mb-3" id="deptSearchKW" placeholder="부서 검색 후 [Enter]">
-        <div class="department-tree">
-            <ul>
-                <!-- 회사 정보 -->
-                <li th:data-company-id="${company.companyNum}" class="select-item" id="selectCompanySJ">
-                    <div class="select-wrapper" id="comClick">
-                        <span class="toggle-btn">▼</span> 
-                   		<input type="checkbox" class="dept-checkbox" value="company" disabled />
-                        <span class="select-text" th:text="${company.companyName}" id="selectComKorName"></span> <span> / </span> 
-                        <span class="select-text" th:text="${company.companyEngName}" id="selectComEngName"></span> 
-                        (<span class="count" th:text="${company.totalEmployeeCount}"></span>)
-                    </div>
-                    <ul class="sub-list company-sub-list">
-                        <!-- 본사 & 지점 -->
-	                    <li th:each="dept : ${departments}" th:if="${dept.parentDepartmentNum == null}" 
-	                        th:data-dept-id="${dept.departmentNum}" class="select-item selectTopDept">
-	                        <div class="select-wrapper" id="topDeptClick">
-	                            <span class="toggle-btn">▼</span> 
-	                            <input type="checkbox" class="dept-checkbox" th:value="${dept.departmentNum}" />
-	                            <span class="select-text" th:text="${dept.departmentName}"></span> 
-	                            (<span class="count" th:text="${dept.totalEmployeeCount}"></span>)
-	                        </div>
-	                        <ul class="sub-list">
-                                <!-- 하위 부서 -->
-                            <li th:each="subDept : ${departments}" th:if="${subDept.parentDepartmentNum == dept.departmentNum}" 
-                                th:data-dept-id="${subDept.departmentNum}" class="select-item selectSubDept">
-                                <div class="select-wrapper" id="subDeptClick">
-                                    <input type="checkbox" class="dept-checkbox" th:value="${subDept.departmentNum}" />
-                                    📄 <span class="select-text" th:text="${subDept.departmentName}"></span> 
-                                    (<span class="count" th:text="${subDept.totalEmployeeCount}"></span>)
-                                </div>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </li>
-        </ul>
-    </div>
-  </section>
-
-      <section class="employee-table">
-        <h5 class="fw-bold">사원 목록</h5>
-        <div id="grid"></div>
-      </section>
-    </div>
-    
-    
-    <!-- 사원 정보 / 인사 발령 모달 -->
-<div class="modal fade" id="employeeModal" tabindex="-1" aria-labelledby="employeeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <!-- 모달 헤더 -->
-      <div class="modal-header">
-        <h5 class="modal-title" id="employeeModalLabel">사원 정보</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-
-      <!-- 모달 바디 -->
-      <div class="modal-body">
-        <div class="row">
-          <!-- 프로필 이미지 -->
-          <div class="col-md-3 text-center">
-            <img src="https://via.placeholder.com/150" class="profile-image" id="modalProfileImage" alt="프로필 이미지">
-          </div>
-
-          <!-- 사원 정보 -->
-          <div class="col-md-9">
-            <div class="row mb-2">
-              <label class="col-md-4 fw-bold">사원번호</label>
-              <div class="col-md-8">
-                <input type="text" class="form-control" id="modalEmployeeId" readonly>
-              </div>
-            </div>
-
-            <div class="row mb-2">
-              <label class="col-md-4 fw-bold">사원명</label>
-              <div class="col-md-8">
-                <input type="text" class="form-control" id="modalEmployeeName" readonly>
-              </div>
-            </div>
-
-            <div class="row mb-2">
-              <label class="col-md-4 fw-bold">직급</label>
-              <div class="col-md-8">
-                <input type="text" class="form-control" id="modalPosition" readonly>
-              </div>
-            </div>
-
-            <div class="row mb-2">
-              <label class="col-md-4 fw-bold">부서</label>
-              <div class="col-md-8">
-                <input type="text" class="form-control" id="modalDepartment" readonly>
-              </div>
-            </div>
-
-            <div class="row mb-2">
-              <label class="col-md-4 fw-bold">입사일</label>
-              <div class="col-md-8">
-                <input type="date" class="form-control" id="modalHireDate" readonly>
-              </div>
-            </div>
-
-            <div class="row mb-2">
-              <label class="col-md-4 fw-bold">연락처</label>
-              <div class="col-md-8">
-                <input type="text" class="form-control" id="modalPhone" readonly>
-              </div>
-            </div>
-
-            <div class="row mb-2">
-              <label class="col-md-4 fw-bold">이메일</label>
-              <div class="col-md-8">
-                <input type="email" class="form-control" id="modalEmail" readonly>
-              </div>
-            </div>
-
-            <!-- 인사 발령 시 보일 부분 (숨김 처리) -->
-            <div id="transferFields" style="display: none;">
-              <hr>
-              <div class="row mb-2">
-                <label class="col-md-4 fw-bold">이전 직급</label>
-                <div class="col-md-8">
-                  <input type="text" class="form-control" id="modalOldPosition" readonly>
-                </div>
-              </div>
-
-              <div class="row mb-2">
-                <label class="col-md-4 fw-bold">이전 부서</label>
-                <div class="col-md-8">
-                  <input type="text" class="form-control" id="modalOldDepartment" readonly>
-                </div>
-              </div>
-
-              <div class="row mb-2">
-                <label class="col-md-4 fw-bold">발령 직급</label>
-                <div class="col-md-8">
-                  <select class="form-select" id="modalNewPosition"></select>
-                </div>
-              </div>
-
-              <div class="row mb-2">
-                <label class="col-md-4 fw-bold">발령 부서</label>
-                <div class="col-md-8">
-                  <select class="form-select" id="modalNewDepartment"></select>
-                </div>
-              </div>
-
-              <div class="row mb-2">
-                <label class="col-md-4 fw-bold">발령 사유</label>
-                <div class="col-md-8">
-                  <textarea class="form-control" id="modalReason" rows="2"></textarea>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 모달 푸터 -->
-      <div class="modal-footer d-flex justify-content-center">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-      </div>
-    </div>
-  </div>
-</div>
-    
-  </div>
-
-
-  <script th:inline="javascript">
-  let companyNumSJ = /*[[${company.companyNum}]]*/ null;
-  let companyNum = /*[[${session.companyNum}]]*/ null; 
-  let departmentNumSJ = 0;
-  
-  const header = document.querySelector('meta[name="_csrf_header"]').content;
-  const token = document.querySelector('meta[name="_csrf"]').content;
-  
-  const dataSource = {
-	        api: {
-	            readData: {
-	                url: '/hr/rest/emp/organization',
-	                method: 'GET',
-	                initParams: { companyNum:companyNumSJ , departmentNum:departmentNumSJ  }
-	            }
-	        },
-	        contentType: 'application/json',
-	    };
-  
-  
-  function formatPhoneNumber(phoneNumber) {
-	    if (!phoneNumber) return ""; // 값이 없으면 빈 문자열 반환
-	    phoneNumber = phoneNumber.replace(/\D/g, ""); // 숫자 이외의 문자 제거
-
-	    if (phoneNumber.length === 11) {
-	        return phoneNumber.replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3");
-	    } else if (phoneNumber.length === 10) {
-	        return phoneNumber.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3");
+	<!DOCTYPE html>
+	<html layout:decorate="~{layouts/layout}" lang="en"
+	      xmlns:th="http://www.thymeleaf.org"
+	      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	      xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+	<meta charset="UTF-8">
+	<title>조직도 관리</title>
+	  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+	  <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css">
+	  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+	  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	  <script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+	  <style>
+	    body {
+	      font-family: "Inter", sans-serif;
+	      background: #f8f9fa;
 	    }
-	    return phoneNumber; // 위 조건에 해당하지 않으면 원본 반환
+	    .container {
+	      display: flex;
+	      flex-direction: column;
+	      gap: 15px;
+	    }
+	    .header-section {
+	      display: flex;
+	      flex-direction: column;
+	      align-items: flex-start;
+	      gap: 10px;
+	    }
+	    .content-section {
+	      display: flex;
+	      gap: 20px;
+	    }
+	    .org-chart {
+	      width: 30%;
+	      background: white;
+	      padding: 20px;
+	      border-radius: 5px;
+	      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+	    }
+	    .employee-table {
+	      flex: 1;
+	      background: white;
+	      padding: 20px;
+	      border-radius: 5px;
+	      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+	    }
+	    .department-tree ul {
+	      list-style: none;
+	      padding-left: 20px;
+	    }
+	    .toggle-btn {
+	      cursor: pointer;
+	      margin-right: 5px;
+	    }
+	    .select-wrapper {
+	      cursor: pointer;
+	      display: inline-flex;
+	      align-items: center;
+	      gap: 5px;
+	    }
+	    #grid {
+	      width: 100%;
+	      height: 300px;
+	    }
+	    .profile-image {
+	    width: 150px; /* 가로 크기 고정 */
+	    height: auto; /* 세로 크기는 비율 유지 */
+	    border-radius: 5px; /* 선택적: 모서리 둥글게 */
+	    object-fit: contain; /* 이미지 비율 유지 */
 	}
-  
-  // 모달 열기 함수 (전역 함수로 정의)
-  function openEmployeeModal(mode, data) {
-	  console.log("📌 모달 데이터:", data); // 🔥 데이터 확인
-	  
-    $("#employeeModalLabel").text(mode === "transfer" ? "인사 발령" : "사원 정보");
-
-    $("#modalEmployeeId").val(data.employeeId);
-    $("#modalEmployeeName").val(data.employeeName);
-    $("#modalPosition").val(data.position);
-    $("#modalDepartment").val(data.departmentName);
-    // hireDate 포맷팅
-    $("#modalHireDate").val(data.hireDate ? data.hireDate.split("T")[0] : ""); 
-    // 연락처 자동 포맷 적용
-    $("#modalPhone").val(formatPhoneNumber(data.phone));
-    $("#modalEmail").val(data.email);
-    $("#modalProfileImage").attr("src", data.profileImage || "https://via.placeholder.com/150");
-
-    if (mode === "transfer") {
-      $("#transferFields").show();
-      $("#transferBtn").show();
-      $("#saveBtn").hide();
-    } else {
-      $("#transferFields").hide();
-      $("#transferBtn").hide();
-      $("#saveBtn").show();
-    }
-
-    $("#employeeModal").modal('show');
-  }
-
-      $(document).ready(function () {
-    	  
-    	    // ✅ 부서 추가 버튼 클릭 시 모달 열기
-    	    $("#addDeptBtn").click(function () {
-    	        $("#deptParent").val(""); // 기본값 설정
-    	        $("#deptName").val("");
-    	        $("#deptModal").modal("show");
-    	    });
-
-    	    // ✅ 부서 추가 버튼 클릭 시 API 호출
-    	    $("#saveDeptBtn").click(function() {
-    	        let selectedParent = $("#deptParent option:selected");
-    	        let deptData = {
-    	            departmentName: $("#deptName").val(),
-    	            parentDepartmentNum: selectedParent.val() || null, // 최상위 부서면 null
-    	            companyNum: companyNum, // 세션에서 가져오기
-    	            departmentType: selectedParent.data("type") || "DT003",  // 기본값 설정
-    	        };
-
-    	        console.log("📌 부서 추가 요청 데이터:", deptData);
-
-    	        $.ajax({
-    	            url: "/hr/rest/dept/add",
-    	            type: "POST",
-    	            contentType: "application/json",
-    	            data: JSON.stringify(deptData),
-    	            beforeSend: function(xhr) {
-    	                xhr.setRequestHeader(header, token); // ✅ CSRF 토큰 추가
-    	            },
-    	            success: function(response) {
-    	                alert("✅ 부서 추가 성공!");
-    	                $("#deptModal").modal("hide");
-    	                location.reload();
-    	            },
-    	            error: function(xhr, status, error) {
-    	                alert("❌ 부서 추가 실패! " + xhr.responseText);
-    	            }
-    	        });
-    	    });
-    	    
-		// 부서 수정 버튼 클릭시
-		
-	    // 체크박스 클릭 시 부서 수정 버튼 활성화
-	    $(document).on("change", ".dept-checkbox", function () {
-	        let selectedDept = $(".dept-checkbox:checked");
+	  </style>
+	</head>
 	
-	        if (selectedDept.length === 1) {
-	            $("#editDeptBtn").prop("disabled", false); // 버튼 활성화
-	        } else {
-	            $("#editDeptBtn").prop("disabled", true); // 버튼 비활성화
-	        }
-	    });
-		
-		
-	    // ✅ 부서 수정 버튼 클릭 시 모달 열기
-	    $(document).on("click", "#editDeptBtn", function () {
-	        let selectedDept = $(".dept-checkbox:checked");
-
-	        if (selectedDept.length !== 1) {
-	            alert("수정할 부서를 하나만 선택하세요.");
-	            return;
-	        }
-
-	        let departmentNum = selectedDept.val(); // 선택된 부서 ID 가져오기
-	        console.log("📌 선택된 부서 ID:", departmentNum); // 디버깅용
-
-	        // ✅ 선택된 부서 정보 가져오기 (AJAX 요청)
-	        $.ajax({
-	            url: `/hr/rest/dept/get/${departmentNum}`, // 부서 정보를 가져오는 API 호출
-	            type: "GET",
-	            contentType: "application/json",
-	            beforeSend: function(xhr) {
-	                xhr.setRequestHeader(header, token); // CSRF 토큰 추가
-	            },
-	            success: function(response) {
-	                console.log("📌 부서 정보 응답:", response); // 디버깅용
-
-	                // ✅ 부서 정보 모달에 채우기
-	                $("#editDeptId").val(response.departmentNum);  // 부서 ID
-	                $("#editDeptName").val(response.departmentName); // 부서명
-	                $("#editDeptStatus").val(response.departmentStatus); // 부서 상태
-
-	                // ✅ 모달 열기
-	                $("#editDeptModal").modal("show");
-	            },
-	            error: function(xhr, status, error) {
-	                alert("❌ 부서 정보를 불러오지 못했습니다.");
-	                console.error("❌ 오류:", xhr.responseText);
-	            }
-	        });
-	    });
-		
-		
-		$("#saveEditDeptBtn").click(function () {
-		    let deptId = $("#editDeptId").val();
-		    let updatedDeptName = $("#editDeptName").val().trim();
-		    let updatedDeptStatus = $("#editDeptStatus").val();
-		
-		    if (!updatedDeptName) {
-		        alert("부서명을 입력하세요.");
-		        return;
-		    }
-		
-		    // ✅ 비활성화하려면 소속된 사원이 없어야 함
-		    if (updatedDeptStatus === "DU002") {
-		        $.ajax({
-		            url: `/hr/rest/dept/employees/${deptId}`, // 부서 내 사원 수 확인 API
-		            type: "GET",
-		            success: function(response) {
-		            	
-		            	console.log("📌 부서 직원 수:", response.employeeCount); // 디버깅
-		                console.log("📌 응답 데이터:", response); // 🔥 데이터 확인
-		                
-		                if (response.employeeCount > 0) {
-		                    alert("해당 부서에 소속된 사원이 있어 비활성화할 수 없습니다.");
-		                } else {
-		                    console.log("📌 사원 없음 → 부서 비활성화 진행"); // 🔥 디버깅용 로그
-		                    updateDepartment(deptId, updatedDeptName, updatedDeptStatus);
-		                }
-		            },
-		            error: function() {
-		                alert("부서 상태 확인 중 오류 발생");
-		            }
-		        });
-		    } else {
-		    	updateDepartment(deptId, updatedDeptName, updatedDeptStatus);
-		    }
-		});
-		
-		// ✅ 부서 업데이트 함수
-		function updateDepartment(deptId, updatedDeptName, updatedDeptStatus) {
-		    let deptData = {
-		        departmentNum: deptId,
-		        departmentName: updatedDeptName,
-		        departmentStatus: updatedDeptStatus
-		    };
-		
-		    $.ajax({
-		        url: "/hr/rest/dept/update",
-		        type: "PUT",
-		        contentType: "application/json",
-		        data: JSON.stringify(deptData),
-		        beforeSend: function(xhr) {
-		            xhr.setRequestHeader(header, token); // ✅ CSRF 토큰 추가
-		        },
-		        success: function(response) {
-		            alert("✅ 부서 수정 성공!");
-		            $("#editDeptModal").modal("hide");
-		            location.reload();
-		        },
-		        error: function(xhr, status, error) {
-		            alert("❌ 부서 수정 실패! " + xhr.responseText);
-		        }
-		    });
-		}
-
-    	  
-
-    	  
-    	  
-          $(".company-sub-list, .sub-list").show();
-
-          // 부서 트리 토글 기능만 유지
-          $(document).on("click", ".toggle-btn", function (event) {
-              event.stopPropagation();
-              let $targetList = $(this).closest("li").children("ul.sub-list");
-              $targetList.slideToggle(200);
-              $(this).text($(this).text() === "▼" ? "▶" : "▼");
-          });
-
-          // Toast Grid 초기화 (데이터 없이)
-          const grid = new tui.Grid({
-              el: document.getElementById("grid"),
-              pageOptions: { useClient: false, perPage: 5 },
-              data: dataSource,
-              columns: [
-                  { header: "사원 ID", name: "employeeId" },
-                  { header: "사원명", name: "employeeName" },
-                  { header: "이메일", name: "email" },
-                  { header: "직급", name: "position" },
-                  { header: "부서", name: "departmentName" }
-              ]
-          });
-
-          
-          // Toast Grid 클릭 이벤트 (모달 열기)
-          grid.on('click', function(ev) {
-            if (ev.rowKey !== null) {
-              let rowData = grid.getRow(ev.rowKey); // 선택한 행의 데이터 가져오기
-              openEmployeeModal("view", rowData);
-            }
-          });
-
-          
-          
-       // 부서 선택 시 데이터 로드
-          $(document).on('click', '.department-tree [data-company-id], .department-tree [data-dept-id]', function(event) {
-        	    event.stopPropagation(); // 부모 요소로 이벤트 전파 방지
-
-        	    let companyId = $(this).data('company-id'); // `data-company-id` 값 가져오기
-        	    let departmentNum = $(this).data('dept-id'); // `data-dept-id` 값 가져오기
-
-        	    if (companyId !== undefined) {
-        	        
-        	        departmentNumSJ=0;
-        	        fetch(`/hr/rest/emp/organization?perPage=5&companyNum=${companyNumSJ}&departmentNum=${departmentNumSJ}&page=1`, {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            "X-CSRF-Token": token
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        grid.resetData(data.data.contents);  // 옵션 테이블 데이터 업데이트
-                        console.log(data);
-                    })
-                    .catch(error => console.error("데이터 요청 실패:", error));
-        	        
-        	        
-        	        
-        	    } else if (departmentNum !== undefined) {
-        	        departmentNumSJ = departmentNum;
-
-        	     // 쿼리 호출
-                    fetch(`/hr/rest/emp/organization?perPage=5&companyNum=${companyNumSJ}&departmentNum=${departmentNumSJ}&page=1`, {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            "X-CSRF-Token": token
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        grid.resetData(data.data.contents);  // 옵션 테이블 데이터 업데이트
-                        console.log(data);
-                    })
-                    .catch(error => console.error("데이터 요청 실패:", error));
-        	        
-        	    }
-        	});
-      });
-      
-      
-      
-
-
-
-      
-  </script>
-  
-	<!-- ✅ 부서 추가 모달 -->
-	<div class="modal fade" id="deptModal" tabindex="-1" aria-labelledby="deptModalLabel" aria-hidden="true">
-	  <div class="modal-dialog">
+	<body layout:fragment="content">
+	
+	  <div class="container mt-3">
+	    <h2>부서 관리</h2>
+	    <div class="header-section">
+	      <div class="d-flex gap-2">
+			<button id="addDeptBtn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#deptModal">
+			    <i class="fas fa-plus-circle"></i> 부서 추가
+			</button>
+			<button id="editDeptBtn" class="btn btn-secondary" disabled><i class="fas fa-pencil-alt"></i> 부서 수정</button>
+	      </div>
+	    </div>
+	
+	    <div class="content-section">
+	      <section class="org-chart">
+	        <!-- <input type="text" class="form-control mb-3" id="deptSearchKW" placeholder="부서 검색 후 [Enter]"> -->
+	        <div class="department-tree">
+	            <ul>
+	                <!-- 회사 정보 -->
+	                <li th:data-company-id="${company.companyNum}" class="select-item" id="selectCompanySJ">
+	                    <div class="select-wrapper" id="comClick">
+	                        <span class="toggle-btn">▼</span> 
+	                   		<input type="checkbox" class="dept-checkbox" value="company" disabled />
+	                        <span class="select-text" th:text="${company.companyName}" id="selectComKorName"></span> <span> / </span> 
+	                        <span class="select-text" th:text="${company.companyEngName}" id="selectComEngName"></span> 
+	                        (<span class="count" th:text="${company.totalEmployeeCount}"></span>)
+	                    </div>
+	                    <ul class="sub-list company-sub-list">
+	                        <!-- 본사 & 지점 -->
+		                    <li th:each="dept : ${departments}" th:if="${dept.parentDepartmentNum == null}" 
+		                        th:data-dept-id="${dept.departmentNum}" class="select-item selectTopDept">
+		                        <div class="select-wrapper" id="topDeptClick">
+		                            <span class="toggle-btn">▼</span> 
+		                            <input type="checkbox" class="dept-checkbox" th:value="${dept.departmentNum}" />
+		                            <span class="select-text" th:text="${dept.departmentName}"></span> 
+		                            (<span class="count" th:text="${dept.totalEmployeeCount}"></span>)
+		                        </div>
+		                        <ul class="sub-list">
+	                                <!-- 하위 부서 -->
+	                            <li th:each="subDept : ${departments}" th:if="${subDept.parentDepartmentNum == dept.departmentNum}" 
+	                                th:data-dept-id="${subDept.departmentNum}" class="select-item selectSubDept">
+	                                <div class="select-wrapper" id="subDeptClick">
+	                                    <input type="checkbox" class="dept-checkbox" th:value="${subDept.departmentNum}" />
+	                                    📄 <span class="select-text" th:text="${subDept.departmentName}"></span> 
+	                                    (<span class="count" th:text="${subDept.totalEmployeeCount}"></span>)
+	                                </div>
+	                            </li>
+	                        </ul>
+	                    </li>
+	                </ul>
+	            </li>
+	        </ul>
+	    </div>
+	  </section>
+	
+	      <section class="employee-table">
+	        <h5 class="fw-bold">사원 목록</h5>
+	        <div id="grid"></div>
+	      </section>
+	    </div>
+	    
+	    
+	    <!-- 사원 정보 / 인사 발령 모달 -->
+	<div class="modal fade" id="employeeModal" tabindex="-1" aria-labelledby="employeeModalLabel" aria-hidden="true">
+	  <div class="modal-dialog modal-lg">
 	    <div class="modal-content">
 	      <!-- 모달 헤더 -->
 	      <div class="modal-header">
-	        <h5 class="modal-title" id="deptModalLabel">부서 추가</h5>
+	        <h5 class="modal-title" id="employeeModalLabel">사원 정보</h5>
 	        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 	      </div>
 	
 	      <!-- 모달 바디 -->
 	      <div class="modal-body">
-	        <form id="addDeptForm">
-	          <!-- ✅ 상위 부서 선택 -->
-	          <div class="mb-3">
-	            <label class="fw-bold">상위 부서</label>
-	            <select class="form-select" id="deptParent">
-	              <option value="">(최상위 부서)</option>
-	              <option th:each="dept : ${departments}" th:value="${dept.departmentNum}" th:text="${dept.departmentName}"></option>
-	            </select>
+	        <div class="row">
+	          <!-- 프로필 이미지 -->
+	          <div class="col-md-3 text-center">
+	            <img src="https://via.placeholder.com/150" class="profile-image" id="modalProfileImage" alt="프로필 이미지">
 	          </div>
 	
-	          <!-- ✅ 부서명 입력 -->
+	          <!-- 사원 정보 -->
+	          <div class="col-md-9">
+	            <div class="row mb-2">
+	              <label class="col-md-4 fw-bold">사원번호</label>
+	              <div class="col-md-8">
+	                <input type="text" class="form-control" id="modalEmployeeId" readonly>
+	              </div>
+	            </div>
+	
+	            <div class="row mb-2">
+	              <label class="col-md-4 fw-bold">사원명</label>
+	              <div class="col-md-8">
+	                <input type="text" class="form-control" id="modalEmployeeName" readonly>
+	              </div>
+	            </div>
+	
+	            <div class="row mb-2">
+	              <label class="col-md-4 fw-bold">직급</label>
+	              <div class="col-md-8">
+	                <input type="text" class="form-control" id="modalPosition" readonly>
+	              </div>
+	            </div>
+	
+	            <div class="row mb-2">
+	              <label class="col-md-4 fw-bold">부서</label>
+	              <div class="col-md-8">
+	                <input type="text" class="form-control" id="modalDepartment" readonly>
+	              </div>
+	            </div>
+	
+	            <div class="row mb-2">
+	              <label class="col-md-4 fw-bold">입사일</label>
+	              <div class="col-md-8">
+	                <input type="date" class="form-control" id="modalHireDate" readonly>
+	              </div>
+	            </div>
+	
+	            <div class="row mb-2">
+	              <label class="col-md-4 fw-bold">연락처</label>
+	              <div class="col-md-8">
+	                <input type="text" class="form-control" id="modalPhone" readonly>
+	              </div>
+	            </div>
+	
+	            <div class="row mb-2">
+	              <label class="col-md-4 fw-bold">이메일</label>
+	              <div class="col-md-8">
+	                <input type="email" class="form-control" id="modalEmail" readonly>
+	              </div>
+	            </div>
+	
+	            <!-- 인사 발령 시 보일 부분 (숨김 처리) -->
+	            <div id="transferFields" style="display: none;">
+	              <hr>
+	              <div class="row mb-2">
+	                <label class="col-md-4 fw-bold">이전 직급</label>
+	                <div class="col-md-8">
+	                  <input type="text" class="form-control" id="modalOldPosition" readonly>
+	                </div>
+	              </div>
+	
+	              <div class="row mb-2">
+	                <label class="col-md-4 fw-bold">이전 부서</label>
+	                <div class="col-md-8">
+	                  <input type="text" class="form-control" id="modalOldDepartment" readonly>
+	                </div>
+	              </div>
+	
+	              <div class="row mb-2">
+	                <label class="col-md-4 fw-bold">발령 직급</label>
+	                <div class="col-md-8">
+	                  <select class="form-select" id="modalNewPosition"></select>
+	                </div>
+	              </div>
+	
+	              <div class="row mb-2">
+	                <label class="col-md-4 fw-bold">발령 부서</label>
+	                <div class="col-md-8">
+	                  <select class="form-select" id="modalNewDepartment"></select>
+	                </div>
+	              </div>
+	
+	              <div class="row mb-2">
+	                <label class="col-md-4 fw-bold">발령 사유</label>
+	                <div class="col-md-8">
+	                  <textarea class="form-control" id="modalReason" rows="2"></textarea>
+	                </div>
+	              </div>
+	            </div>
+	          </div>
+	        </div>
+	      </div>
+	
+	      <!-- 모달 푸터 -->
+	      <div class="modal-footer d-flex justify-content-center">
+	        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	    
+	  </div>
+	
+	
+	  <script th:inline="javascript">
+	  let companyNum = /*[[${session.companyNum}]]*/ null; 
+	  let departmentNumSJ = 0;
+	  
+	  const header = document.querySelector('meta[name="_csrf_header"]').content;
+	  const token = document.querySelector('meta[name="_csrf"]').content;
+	  
+	  const dataSource = {
+		        api: {
+		            readData: {
+		                url: '/hr/rest/emp/organization',
+		                method: 'GET',
+		                initParams: { companyNum:companyNum, departmentNum:0 }
+		            }
+		        },
+		        contentType: 'application/json',
+		    };
+	  
+	  
+	  function formatPhoneNumber(phoneNumber) {
+		    if (!phoneNumber) return ""; // 값이 없으면 빈 문자열 반환
+		    phoneNumber = phoneNumber.replace(/\D/g, ""); // 숫자 이외의 문자 제거
+	
+		    if (phoneNumber.length === 11) {
+		        return phoneNumber.replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3");
+		    } else if (phoneNumber.length === 10) {
+		        return phoneNumber.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3");
+		    }
+		    return phoneNumber; // 위 조건에 해당하지 않으면 원본 반환
+		}
+	  
+	  // 모달 열기 함수 (전역 함수로 정의)
+	  function openEmployeeModal(mode, data) {
+		  console.log("📌 모달 데이터:", data); // 🔥 데이터 확인
+		  
+	    $("#employeeModalLabel").text(mode === "transfer" ? "인사 발령" : "사원 정보");
+	
+	    $("#modalEmployeeId").val(data.employeeId);
+	    $("#modalEmployeeName").val(data.employeeName);
+	    $("#modalPosition").val(data.position);
+	    $("#modalDepartment").val(data.departmentName);
+	    // hireDate 포맷팅
+	    $("#modalHireDate").val(data.hireDate ? data.hireDate.split("T")[0] : ""); 
+	    // 연락처 자동 포맷 적용
+	    $("#modalPhone").val(formatPhoneNumber(data.phone));
+	    $("#modalEmail").val(data.email);
+	    $("#modalProfileImage").attr("src", data.profileImage || "https://via.placeholder.com/150");
+	
+	    if (mode === "transfer") {
+	      $("#transferFields").show();
+	      $("#transferBtn").show();
+	      $("#saveBtn").hide();
+	    } else {
+	      $("#transferFields").hide();
+	      $("#transferBtn").hide();
+	      $("#saveBtn").show();
+	    }
+	
+	    $("#employeeModal").modal('show');
+	  }
+	
+	      $(document).ready(function () {
+	    	  
+	    	    // ✅ 부서 추가 버튼 클릭 시 모달 열기
+	    	    $("#addDeptBtn").click(function () {
+	    	        $("#deptParent").val(""); // 기본값 설정
+	    	        $("#deptName").val("");
+	    	        $("#deptModal").modal("show");
+	    	    });
+	
+	    	    // ✅ 부서 추가 버튼 클릭 시 API 호출
+	    	    $("#saveDeptBtn").click(function() {
+	    	        let selectedParent = $("#deptParent option:selected");
+	    	        let deptData = {
+	    	            departmentName: $("#deptName").val(),
+	    	            parentDepartmentNum: selectedParent.val() || null, // 최상위 부서면 null
+	    	            companyNum: companyNum, // 세션에서 가져오기
+	    	            departmentType: selectedParent.data("type") || "DT003",  // 기본값 설정
+	    	        };
+	
+	    	        console.log("📌 부서 추가 요청 데이터:", deptData);
+	
+	    	        $.ajax({
+	    	            url: "/hr/rest/dept/add",
+	    	            type: "POST",
+	    	            contentType: "application/json",
+	    	            data: JSON.stringify(deptData),
+	    	            beforeSend: function(xhr) {
+	    	                xhr.setRequestHeader(header, token); // ✅ CSRF 토큰 추가
+	    	            },
+	    	            success: function(response) {
+	    	                alert("✅ 부서 추가 성공!");
+	    	                $("#deptModal").modal("hide");
+	    	                location.reload();
+	    	            },
+	    	            error: function(xhr, status, error) {
+	    	                alert("❌ 부서 추가 실패! " + xhr.responseText);
+	    	            }
+	    	        });
+	    	    });
+	    	    
+			// 부서 수정 버튼 클릭시
+			
+		    // 체크박스 클릭 시 부서 수정 버튼 활성화
+		    $(document).on("change", ".dept-checkbox", function () {
+		        let selectedDept = $(".dept-checkbox:checked");
+		
+		        if (selectedDept.length === 1) {
+		            $("#editDeptBtn").prop("disabled", false); // 버튼 활성화
+		        } else {
+		            $("#editDeptBtn").prop("disabled", true); // 버튼 비활성화
+		        }
+		    });
+			
+			
+		    // ✅ 부서 수정 버튼 클릭 시 모달 열기
+		    $(document).on("click", "#editDeptBtn", function () {
+		        let selectedDept = $(".dept-checkbox:checked");
+	
+		        if (selectedDept.length !== 1) {
+		            alert("수정할 부서를 하나만 선택하세요.");
+		            return;
+		        }
+	
+		        let departmentNum = selectedDept.val(); // 선택된 부서 ID 가져오기
+		        console.log("📌 선택된 부서 ID:", departmentNum); // 디버깅용
+	
+		        // ✅ 선택된 부서 정보 가져오기 (AJAX 요청)
+		        $.ajax({
+		            url: `/hr/rest/dept/get/${departmentNum}`, // 부서 정보를 가져오는 API 호출
+		            type: "GET",
+		            contentType: "application/json",
+		            beforeSend: function(xhr) {
+		                xhr.setRequestHeader(header, token); // CSRF 토큰 추가
+		            },
+		            success: function(response) {
+		                console.log("📌 부서 정보 응답:", response); // 디버깅용
+	
+		                // ✅ 부서 정보 모달에 채우기
+		                $("#editDeptId").val(response.departmentNum);  // 부서 ID
+		                $("#editDeptName").val(response.departmentName); // 부서명
+		                $("#editDeptStatus").val(response.departmentStatus); // 부서 상태
+	
+		                // ✅ 모달 열기
+		                $("#editDeptModal").modal("show");
+		            },
+		            error: function(xhr, status, error) {
+		                alert("❌ 부서 정보를 불러오지 못했습니다.");
+		                console.error("❌ 오류:", xhr.responseText);
+		            }
+		        });
+		    });
+			
+			
+			$("#saveEditDeptBtn").click(function () {
+			    let deptId = $("#editDeptId").val();
+			    let updatedDeptName = $("#editDeptName").val().trim();
+			    let updatedDeptStatus = $("#editDeptStatus").val();
+			
+			    if (!updatedDeptName) {
+			        alert("부서명을 입력하세요.");
+			        return;
+			    }
+			
+			    // ✅ 비활성화하려면 소속된 사원이 없어야 함
+			    if (updatedDeptStatus === "DU002") {
+			        $.ajax({
+			            url: `/hr/rest/dept/employees/${deptId}`, // 부서 내 사원 수 확인 API
+			            type: "GET",
+			            success: function(response) {
+			            	
+			            	console.log("📌 부서 직원 수:", response.employeeCount); // 디버깅
+			                console.log("📌 응답 데이터:", response); // 🔥 데이터 확인
+			                
+			                if (response.employeeCount > 0) {
+			                    alert("해당 부서에 소속된 사원이 있어 비활성화할 수 없습니다.");
+			                } else {
+			                    console.log("📌 사원 없음 → 부서 비활성화 진행"); // 🔥 디버깅용 로그
+			                    updateDepartment(deptId, updatedDeptName, updatedDeptStatus);
+			                }
+			            },
+			            error: function() {
+			                alert("부서 상태 확인 중 오류 발생");
+			            }
+			        });
+			    } else {
+			    	updateDepartment(deptId, updatedDeptName, updatedDeptStatus);
+			    }
+			});
+			
+			// ✅ 부서 업데이트 함수
+			function updateDepartment(deptId, updatedDeptName, updatedDeptStatus) {
+			    let deptData = {
+			        departmentNum: deptId,
+			        departmentName: updatedDeptName,
+			        departmentStatus: updatedDeptStatus
+			    };
+			
+			    $.ajax({
+			        url: "/hr/rest/dept/update",
+			        type: "PUT",
+			        contentType: "application/json",
+			        data: JSON.stringify(deptData),
+			        beforeSend: function(xhr) {
+			            xhr.setRequestHeader(header, token); // ✅ CSRF 토큰 추가
+			        },
+			        success: function(response) {
+			            alert("✅ 부서 수정 성공!");
+			            $("#editDeptModal").modal("hide");
+			            location.reload();
+			        },
+			        error: function(xhr, status, error) {
+			            alert("❌ 부서 수정 실패! " + xhr.responseText);
+			        }
+			    });
+			}
+	
+	    	  
+	
+	    	  
+	    	  
+	          $(".company-sub-list, .sub-list").show();
+	
+	          // 부서 트리 토글 기능만 유지
+	          $(document).on("click", ".toggle-btn", function (event) {
+	              event.stopPropagation();
+	              let $targetList = $(this).closest("li").children("ul.sub-list");
+	              $targetList.slideToggle(200);
+	              $(this).text($(this).text() === "▼" ? "▶" : "▼");
+	          });
+	
+	          // Toast Grid 초기화 (데이터 없이)
+	          const grid = new tui.Grid({
+	              el: document.getElementById("grid"),
+	              pageOptions: { useClient: false, perPage: 5 },
+	              data: dataSource,
+	              columns: [
+	                  { header: "사원 ID", name: "employeeId" },
+	                  { header: "사원명", name: "employeeName" },
+	                  { header: "이메일", name: "email" },
+	                  { header: "직급", name: "position" },
+	                  { header: "부서", name: "departmentName" }
+	              ]
+	          });
+	
+	          
+	          // Toast Grid 클릭 이벤트 (모달 열기)
+	          grid.on('click', function(ev) {
+	            if (ev.rowKey !== null) {
+	              let rowData = grid.getRow(ev.rowKey); // 선택한 행의 데이터 가져오기
+	              openEmployeeModal("view", rowData);
+	            }
+	          });
+	
+	          
+	          
+	       // 부서 선택 시 데이터 로드
+	          $(document).on('click', '.department-tree [data-company-id], .department-tree [data-dept-id]', function(event) {
+	        	    event.stopPropagation(); // 부모 요소로 이벤트 전파 방지
+	
+	        	   
+	        	    let departmentNum = $(this).data('dept-id'); // `data-dept-id` 값 가져오기
+	        	    
+	        	    console.log("📌 선택한 부서 번호:", departmentNum);
+	
+	        	    if (departmentNum == undefined) {	        	        
+	        	    	departmentNum=0;
+	        	    } 
+	        	    grid.readData(1,{departmentNum});
+	
+	        	    /*fetch(`/hr/rest/emp/organization?perPage=5&companyNum=${companyNum}&departmentNum=${departmentNumSJ}&page=1`, {
+	                        method: 'GET',
+	                        headers: {
+	                            'Content-Type': 'application/json',
+	                            "X-CSRF-Token": token
+	                        }
+	                    })
+	                    .then(response => response.json())
+	                    .then(data => {
+	                        grid.resetData(data.data.contents);  // 옵션 테이블 데이터 업데이트
+	                        grid.setPaginationTotalCount(data.data.pagination.totalCount)
+	                        console.log(data);
+	                    })
+	                    .catch(error => console.error("데이터 요청 실패:", error));*/
+	        	       
+	        	        
+	        	        
+	        	}); 
+	      });
+	      
+	      
+	      
+	
+	
+	
+	      
+	  </script>
+	  
+		<!-- ✅ 부서 추가 모달 -->
+		<div class="modal fade" id="deptModal" tabindex="-1" aria-labelledby="deptModalLabel" aria-hidden="true">
+		  <div class="modal-dialog">
+		    <div class="modal-content">
+		      <!-- 모달 헤더 -->
+		      <div class="modal-header">
+		        <h5 class="modal-title" id="deptModalLabel">부서 추가</h5>
+		        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		      </div>
+		
+		      <!-- 모달 바디 -->
+		      <div class="modal-body">
+		        <form id="addDeptForm">
+		          <!-- ✅ 상위 부서 선택 -->
+		          <div class="mb-3">
+		            <label class="fw-bold">상위 부서</label>
+		            <select class="form-select" id="deptParent">
+		              <option value="">(최상위 부서)</option>
+		              <option th:each="dept : ${departments}" th:value="${dept.departmentNum}" th:text="${dept.departmentName}"></option>
+		            </select>
+		          </div>
+		
+		          <!-- ✅ 부서명 입력 -->
+		          <div class="mb-3">
+		            <label class="fw-bold">부서명</label>
+		            <input type="text" class="form-control" id="deptName" required>
+		          </div>
+		        </form>
+		      </div>
+		
+		      <!-- 모달 푸터 -->
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+		        <button type="button" class="btn btn-primary" id="saveDeptBtn">저장</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+		
+	<!-- ✅ 부서 수정 모달 -->
+	<div class="modal fade" id="editDeptModal" tabindex="-1" aria-labelledby="editDeptModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <!-- 모달 헤더 -->
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="editDeptModalLabel">부서 수정</h5>
+	        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	      </div>
+	
+	      <!-- 모달 바디 -->
+	      <div class="modal-body">
+	        <form id="editDeptForm">
+	          <input type="hidden" id="editDeptId">  <!-- 부서 ID 저장 -->
+	
+	          <!-- ✅ 부서명 수정 -->
 	          <div class="mb-3">
 	            <label class="fw-bold">부서명</label>
-	            <input type="text" class="form-control" id="deptName" required>
+	            <input type="text" class="form-control" id="editDeptName" required>
+	          </div>
+	
+	          <!-- ✅ 활성화 여부 -->
+	          <div class="mb-3">
+	            <label class="fw-bold">상태</label>
+	            <select class="form-select" id="editDeptStatus">
+	              <option value="DU001">운영중</option>
+	              <option value="DU002">비활성</option>
+	            </select>
 	          </div>
 	        </form>
 	      </div>
@@ -597,55 +629,14 @@
 	      <!-- 모달 푸터 -->
 	      <div class="modal-footer">
 	        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-	        <button type="button" class="btn btn-primary" id="saveDeptBtn">저장</button>
+	        <button type="button" class="btn btn-primary" id="saveEditDeptBtn">저장</button>
 	      </div>
 	    </div>
 	  </div>
 	</div>
 	
-<!-- ✅ 부서 수정 모달 -->
-<div class="modal fade" id="editDeptModal" tabindex="-1" aria-labelledby="editDeptModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <!-- 모달 헤더 -->
-      <div class="modal-header">
-        <h5 class="modal-title" id="editDeptModalLabel">부서 수정</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-
-      <!-- 모달 바디 -->
-      <div class="modal-body">
-        <form id="editDeptForm">
-          <input type="hidden" id="editDeptId">  <!-- 부서 ID 저장 -->
-
-          <!-- ✅ 부서명 수정 -->
-          <div class="mb-3">
-            <label class="fw-bold">부서명</label>
-            <input type="text" class="form-control" id="editDeptName" required>
-          </div>
-
-          <!-- ✅ 활성화 여부 -->
-          <div class="mb-3">
-            <label class="fw-bold">상태</label>
-            <select class="form-select" id="editDeptStatus">
-              <option value="DU001">운영중</option>
-              <option value="DU002">비활성</option>
-            </select>
-          </div>
-        </form>
-      </div>
-
-      <!-- 모달 푸터 -->
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-        <button type="button" class="btn btn-primary" id="saveEditDeptBtn">저장</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-  
-  
-</body>
-</html>
+	
+	  
+	  
+	</body>
+	</html>

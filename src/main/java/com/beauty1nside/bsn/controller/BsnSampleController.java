@@ -11,6 +11,8 @@ import com.beauty1nside.common.Paging;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @Log4j2	//log4j 가 안되면 버전높은 log4j2 사용
 
@@ -21,12 +23,12 @@ public class BsnSampleController {
 	
 	//final private BsnOrderService bsnOrderService;
 
-	//샘플 페이지
+	
 	@GetMapping("/")
 	public String sample() {
 		return "redirect:/bsn/order";
 	};
-	
+	///////////////////////////////////////////////////
 	@GetMapping("/test")
 	public String test() {
 		return "/bsn/sample";
@@ -42,11 +44,12 @@ public class BsnSampleController {
 	public String test3() {
 		return "/bsn/testOrder";
 	};
-	
+	///////////////////////////////////////////////////
+
 	
 	@GetMapping("/order")
 	public String order() {
-		return "redirect:/bsn/orderRegist";
+		return "redirect:/bsn/order/Regist";
 	};
 	
 	
@@ -71,6 +74,12 @@ public class BsnSampleController {
 		return "/bsn/orderDelivery";
 	};
 	
+	@GetMapping("/delivery/list")
+	public String deliveryList() {
+		
+		return "/bsn/orderDeliveryList";
+	};
+	
 	@GetMapping("/order/cs")
 	public String orderCS() {
 		
@@ -81,6 +90,11 @@ public class BsnSampleController {
 		
 		return "/bsn/orderReturning";
 	};
+	
+	@GetMapping("/order/cs/returning/list")
+	public String returningList() {
+		return "/bsn/orderReturningList";
+	}
 	
 	
 }

@@ -2,7 +2,7 @@ package com.beauty1nside.erp.service.impl;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +40,7 @@ import lombok.extern.log4j.Log4j2;
  *  2025.02.20  표하연          사용계약서 정보를 CR 한다
  *  2025.02.21  표하연          결제 목록을 리드한다
  *  2025.02.26  표하연          구독 결제한 현금영수증, 세금계산서 데이터를 삽입한다
+ *  2025.03.04  표하연          정기구독을 등록 한다 ( 결제X )
  *
  *  </pre>
 */
@@ -209,6 +210,44 @@ public class ErpUserServiceImpl implements ErpUserService {
 		}
 		log.info("결제정보 : "+requestData);
 		return 1;
+	}
+	
+	/**
+     * 정기 구독 서비스를 등록한다
+     *
+     * @param Map<String, Object>
+     * @return int
+     */
+	@Override
+	@Transactional
+	public int regularRegister(Map<String, Object> requestData) {
+		String[] tempList = ((String) requestData.get("dataDay")).split("-");
+		int[] optionList = new int[tempList.length];
+		int[] priceList = new int[tempList.length];
+
+		for (int i = 0; i < tempList.length; i++) {
+		    String[] parts = tempList[i].split("_");
+		    // 옵션 값 저장
+		    optionList[i] = Integer.parseInt(parts[0]);
+		    // 가격 값 저장
+		    priceList[i] = Integer.parseInt(parts[1]); 
+		    //옵션 값을 이용해서 구독이름 및 옵션 정보 가져옴
+		    log.info( "구독정보 : {}",erpUserMapper.subscriptionoptionname(optionList[i]) );
+		    
+		    //CS에 등록할 구독 정보 처리중
+		}
+
+		// 데이터 확인 출력
+		System.out.println("dataDayList: " + Arrays.toString(optionList));
+		System.out.println("priceList: " + Arrays.toString(priceList));
+		
+		
+		
+		
+		
+		
+		
+		return 0;
 	}
 
 	/**

@@ -42,6 +42,7 @@ import com.beauty1nside.accnut.service.JsonQueryService;
 import com.beauty1nside.accnut.service.OtherService;
 import com.beauty1nside.accnut.service.SalaryBookService;
 import com.beauty1nside.accnut.service.SellingService;
+import com.beauty1nside.accnut.service.TaxService;
 import com.beauty1nside.common.GridArray;
 import com.beauty1nside.common.GridData;
 import com.beauty1nside.common.Paging;
@@ -70,6 +71,7 @@ public class AccnutRestController {
 	RestTemplate restTemplate;
 	final OtherService otherService;
 	final SellingService sellingService;
+	final TaxService taxService;
 	
 	
 	// 목록 조회 ------------------------------------------------------------------------------------------
@@ -333,6 +335,44 @@ public class AccnutRestController {
 		return result;
 	}
     
+    @GetMapping("company/info")
+    public ResponseEntity<Map<String, Object>> companyInfo(@RequestParam int companyNum) {
+    	Map<String, Object> response = new HashMap<>();
+    	try {
+    		Map<String, Object> result = otherService.companyInfo(companyNum);
+	        response.put("status", "success");
+	        response.put("message", "조회 성공");
+	        response.put("result", result);
+	        return ResponseEntity.ok(response); // JSON 형태 응답
+	    } catch (Exception e) {
+	        log.error("조회 실패", e);
+	        response.put("status", "error");
+	        response.put("message", "조회 실패");
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+	    }
+    	
+    }
+    
+    @GetMapping("dept/list")
+    public ResponseEntity<Map<String, Object>> deptList(@RequestParam int companyNum) {
+    	Map<String, Object> response = new HashMap<>();
+    	try {
+    		List<Map<String, Object>> result = otherService.deptList(companyNum);
+	        response.put("status", "success");
+	        response.put("message", "조회 성공");
+	        response.put("result", result);
+	        return ResponseEntity.ok(response); // JSON 형태 응답
+	    } catch (Exception e) {
+	        log.error("조회 실패", e);
+	        response.put("status", "error");
+	        response.put("message", "조회 실패");
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+	    }
+    	
+    }
+    
+    
+    
     
 	// 삽입 ----------------------------------------------------------------------------------------------
 	
@@ -391,6 +431,22 @@ public class AccnutRestController {
 		return Collections.singletonMap("result", true);
 	}
 	
+	@PostMapping("/tax/insert")
+	public ResponseEntity<Map<String, Object>> taxInsert(@RequestBody Map<String, Object> dto) {
+	    Map<String, Object> response = new HashMap<>();
+	    log.info(dto);
+	    try {
+	    	taxService.insert(dto);
+	        response.put("status", "success");
+	        response.put("message", "등록 성공");
+	        return ResponseEntity.ok(response); // JSON 형태 응답
+	    } catch (Exception e) {
+	        log.error("등록 실패", e);
+	        response.put("status", "error");
+	        response.put("message", "등록 실패");
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+	    }
+	}
 	
 	
 	
@@ -400,6 +456,8 @@ public class AccnutRestController {
 	@PutMapping("/salary/update")
 	public ResponseEntity<Map<String, Object>> salaryUpdate(@RequestBody List<SalaryBookDTO> dtoList) {
 		int total = 0;
+		int companyNum= dtoList.get(0).getCompanyNum();
+		
 		for(SalaryBookDTO dto : dtoList) {
 			total += dto.getPaymentAmount();
 		}
@@ -410,7 +468,7 @@ public class AccnutRestController {
 	    	// 급여통장에서 빠짐
 	    	NHService nh = new NHService();
 	    	// 급여통장 조회
-	    	AssetDTO assetDTO = assetService.info("01");
+	    	AssetDTO assetDTO = assetService.info("급여", companyNum);
 	    	// 급여통장 핀어카운트 조회
 	    	String finAcno = nh.getFinAcno(assetDTO);
 	    	nh.withdraw(finAcno, String.valueOf(total));

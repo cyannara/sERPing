@@ -118,4 +118,36 @@ FROM bsn_order_detail
 WHERE order_id = #{orderId}
 </select>
 
+<select id="selectBsnOrderHistory" resultType="BsnOrderHistoryDTO">
+SELECT HISTORY_NUM ,
+	   ORDER_ID ,
+       HISTORY_TYPE ,
+       REGISTER_DATE ,
+       HISTORY_CONTENTS 
+FROM
+(
+SELECT 
+/*+ INDEX_DESC(bsn_cs_change_history PK_bsn_cs_change_history) */ 
+ROWNUM RN,
+HISTORY_NUM ,
+ORDER_ID ,
+HISTORY_TYPE ,
+REGISTER_DATE ,
+HISTORY_CONTENTS 
+FROM   bsn_cs_change_history
+WHERE  order_id = #{orderId}
+<![CDATA[
+AND ROWNUM <= #{end}
+]]>
+)
+WHERE RN >= #{start}
+</select>
+
+
+
+<update id="cancelBsnOrder" statementType="CALLABLE">
+call BSN_ORDER_CANCEL(#{orderId}, #{orderCancelReason})
+
+</update>
+
 </mapper>

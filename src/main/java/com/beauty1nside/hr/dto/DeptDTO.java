@@ -1,6 +1,8 @@
 package com.beauty1nside.hr.dto;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.ibatis.type.Alias;
 
@@ -28,7 +30,9 @@ public class DeptDTO {
     private Long companyNum;         // 소속 회사 번호
     private String companyName;
     private String companyEngName;
-    private Integer employeeCount; 
-    private Integer totalEmployeeCount; // 하위 부서 포함 직원 수
+    private int employeeCount; 
+    private int totalEmployeeCount; // 하위 부서 포함 직원 수
     
+    // 부서별 직원 ID 저장 (중복 제거용)
+    private Set<Long> employeeIds = new HashSet<>();
 }

@@ -44,6 +44,7 @@ import lombok.extern.log4j.Log4j2;
  *  2025.02.18  표하연          결제 모듈 등록
  *  2025.02.20  표하연          전자계약 모듈 등록 / 구독내역 리스트 전달
  *  2025.02.26  표하연          계산서 처리 내역 등록
+ *  2025.03.04  표하연          정기구독을 등록 한다 ( 결제X )
  *
  *  </pre>
 */
@@ -125,6 +126,21 @@ public class ErpUserRestController {
 	public String periodservicepay(@RequestBody Map<String, Object> requestData) {
 		//log.info("결제정보 : "+requestData);
 		int num = erpUserService.periodservicepay(requestData);
+		if(num == 1) {
+			return "OK";
+		}
+		return "NO";
+	}
+	
+	/**
+     * 정기구독 정보를 등록 한다.
+     *
+     * @return Map<String, String>
+     */
+	@PostMapping("/regularRegister")
+	public String regularRegister(@RequestBody Map<String, Object> requestData) {
+		log.info("결제정보 : "+requestData);
+		int num = erpUserService.regularRegister(requestData);
 		if(num == 1) {
 			return "OK";
 		}

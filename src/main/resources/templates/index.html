@@ -11,6 +11,7 @@
 </head>
 <body layout:fragment="content">
 <input type="hidden" id="sessionEmployeeNum" th:value="${session.employeeNum}"/>
+<input type="hidden" id="sessionAuthority" th:value="${session.authority}"/>
   <div class="row">
     <div class="col-md-12 grid-margin">
       <div class="row">
@@ -27,15 +28,9 @@
     <li class="nav-item" role="presentation">
       <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">일정</button>
     </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="approval-tab" data-bs-toggle="tab" data-bs-target="#approval-tab-pane" type="button" role="tab" aria-controls="approval-tab-pane" aria-selected="false">결재</button>
+    <li class="nav-item" role="presentation" id="approval-tab">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#approval-tab-pane" type="button" role="tab" aria-controls="approval-tab-pane" aria-selected="false">결재</button>
     </li>
-<!--    <li class="nav-item" role="presentation">-->
-<!--      <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">Contact</button>-->
-<!--    </li>-->
-  <!--  <li class="nav-item" role="presentation">-->
-  <!--    <button class="nav-link" id="disabled-tab" data-bs-toggle="tab" data-bs-target="#disabled-tab-pane" type="button" role="tab" aria-controls="disabled-tab-pane" aria-selected="false" disabled>Disabled</button>-->
-  <!--  </li>-->
   </ul>
   <div class="tab-content" id="myTabContent">
     <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">

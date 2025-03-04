@@ -145,6 +145,8 @@
 	        subscription_option_num = #{subscriptionOptionNum},
 	        subscription_name_num = #{subscriptionNameNum},
 	        subscription_form = #{subscriptionForm},
+	        subscription_mean = null,
+	        subscription_mean_num = null
 	    </set>
 	    WHERE subscription_num = #{subscriptionNum}
 	</update>
@@ -164,7 +166,9 @@
 			#{subscriptionNameNum}, 
 			#{subscriptionOptionNum}, 
 			#{subscriptionEndDate}, 
-			sysdate
+			sysdate,
+			null,
+			null
 		)
 	</insert>
 	
@@ -323,5 +327,19 @@
             #{pdfAddress}, #{issueCompany}, #{companyCode}, sysdate
         )
     </insert>
+    
+    <!-- 
+     * 구독옵션 변호를 이용하여 구독옵션정보 및 구독이름을 가져온다
+     *
+     * @param int
+     * @return ErpSubscriptionOptionDTO
+	-->
+	<select id="subscriptionoptionname" resultType="ErpSubscriptionOptionDTO">
+		select *
+		from erp_subscription_option o
+		left join erp_subscription_name n
+		on o.subscription_name_num = n.subscription_name_num
+		where subscription_option_num = #{optionNum}
+	</select>
 
 </mapper>

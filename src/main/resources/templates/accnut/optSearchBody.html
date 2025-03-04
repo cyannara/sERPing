@@ -23,7 +23,7 @@
 			</div>
 			<div class="row">
 				<span class="col-3">옵션명</span>
-				<select name="optName" id="optName" class="col-9" onchange="returnValue()">
+				<select name="optName" id="optName" class="col-9" onchange="returnValue(); modalClose();">
 					<option value="">상품을 먼저 검색해주세요</option>
 
 				</select>
@@ -57,7 +57,7 @@
 				 }
 				 // 상품 정보가 있으면 옵션태그 생성
 				 for(opt of data.result){
-				 	let html = `<option value="${opt.optionCode}">${opt.optionName}</option>`;
+				 	let html = `<option value="${opt.optionCode}" data-price="${opt.goodsPrice}" data-standard="${opt.goodsStandard}">${opt.goodsName}-${opt.optionName}</option>`;
 				 	optSelect.insertAdjacentHTML("beforeend", html);
 				 }
 				 // 옵션태그 처음 생성되었을 때 onchange 실행 안되서 강제로 실행
@@ -66,7 +66,23 @@
 	}
 
 	function returnValue() {
-		document.querySelector("#optCode").value = document.querySelector("#optName").value;
+		if(document.querySelector("#optCode")){
+			document.querySelector("#optCode").value = document.querySelector("#optName").value;
+		}
+		if(document.querySelector("#taxgrid")){
+			let opt = document.querySelector("#optName").selectedOptions[0];
+			console.log(opt);
+			console.log(rowData);
+			let newRow = {};
+			newRow.amount = opt.dataset.price;
+			newRow.day = rowData.day;
+			newRow.month = rowData.month;
+			newRow.note = rowData.note;
+			newRow.optionCode = opt.value;
+			newRow.quantity = rowData.quantity;
+			newRow.standard = opt.dataset.standard;
+			grid.setRow(rowData.rowKey, newRow);
+		}
 	}
 	
 	

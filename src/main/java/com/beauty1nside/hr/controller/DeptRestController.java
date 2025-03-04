@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.beauty1nside.hr.dto.DeptDTO;
 import com.beauty1nside.hr.service.DeptService;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -31,9 +32,19 @@ public class DeptRestController {
 	
 	// 부서 목록 조회
 	@GetMapping("/dept/list")
-    public List<DeptDTO> list(@RequestParam Long companyNum) {
-        return deptService.list(companyNum);
-    }
+    public ResponseEntity<?> list(HttpSession session) {
+	    // ✅ 세션에서 `companyNum` 가져오기
+	    Long sessionCompanyNum = (Long) session.getAttribute("companyNum");
+
+	    if (sessionCompanyNum == null || sessionCompanyNum <= 0) {
+	        return ResponseEntity.status(403).body("잘못된 접근입니다. (세션에 회사번호 없음)");
+	    }
+
+	    // ✅ 회사 번호를 기반으로 부서 목록 조회
+	    List<DeptDTO> departments = deptService.list(sessionCompanyNum);
+	    
+	    return ResponseEntity.ok(departments);
+	}
 	
     // 회사 정보 조회
     @GetMapping("/companyInfo")
@@ -43,7 +54,12 @@ public class DeptRestController {
     
     // 부서 추가 API
     @PostMapping("/dept/add")
-    public ResponseEntity<String> addDepartment(@RequestBody DeptDTO dept) {
+    public ResponseEntity<String> addDepartment(@RequestBody DeptDTO dept, HttpSession session) {
+    	log.info("session={}",session);
+    	Long companyNum =  (Long) session.getAttribute("companyNum"); // 세션에서 companyNum 가져오기
+        if (companyNum == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
         // ✅ 필수값 검증
         if (dept.getDepartmentName() == null || dept.getDepartmentName().trim().isEmpty()) {
             return ResponseEntity.badRequest().body("❌ 부서명은 필수 입력 사항입니다.");
@@ -86,7 +102,7 @@ public class DeptRestController {
     }
 
     // ✅ 특정 부서의 직원 수 조회 API
-    @GetMapping("/employees/{departmentNum}")
+    @GetMapping("/dept/employees/{departmentNum}")
     public ResponseEntity<?> getEmployeeCount(@PathVariable Long departmentNum) {
         int employeeCount = deptService.getEmployeeCountByDept(departmentNum);
         return ResponseEntity.ok(Map.of("employeeCount", employeeCount));

@@ -8,4 +8,6 @@ import org.apache.ibatis.annotations.Param;
 public interface OtherMapper {
 	List<Map<String, Object>> optionList(@Param("goodsName") String goodsName, @Param("companyNum") int companyNum);
 	List<Map<String, Object>> bhfList(@Param("companyNum") int companyNum);
+	Map<String, Object> companyInfo(@Param("companyNum") int companyNum);
+	List<Map<String, Object>> deptList(@Param("companyNum") int companyNum);
 }

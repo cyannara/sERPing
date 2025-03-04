@@ -26,8 +26,69 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 </head>
 <body layout:fragment="content">
   <!-- 페이지 내용 시작 -->
-	<div>
+	<div class="container">
 		<h1>출고 관리</h1>
+		<div class="row mb-3">
+	        <div class="col-12">
+	            <div class="card">
+	                <div class="card-body">
+	                    <h4 class="card-title">검색 조건</h4>
+	                    <p class="card-description">검색 조건을 선택하세요.</p>
+	                        <div class="d-flex align-items-center gap-3">
+	                            <!-- 라디오 버튼 -->
+	                            <div class="d-flex gap-3">
+	                                <div class="form-check">
+	                                    <label class="form-check-label">
+	                                        <input type="radio" class="form-check-input" name="optionsRadios" value="notSelect" checked onclick="toggleDateInputs(false)">
+	                                        사용안함
+	                                    </label>
+	                                </div>
+	                                <div class="form-check">
+	                                    <label class="form-check-label">
+	                                        <input type="radio" class="form-check-input" name="optionsRadios" value="orderDate" onclick="toggleDateInputs(true)">
+	                                        주문일자
+	                                    </label>
+	                                </div>
+	                                <div class="form-check">
+	                                    <label class="form-check-label">
+	                                        <input type="radio" class="form-check-input" name="optionsRadios" value="dueDate" onclick="toggleDateInputs(true)">
+	                                        납기일자
+	                                    </label>
+	                                </div>
+	                            </div>
+	
+	                            <!-- 날짜 입력 -->
+	                            <div class="d-flex gap-3">
+	                                <div>
+	                                    <label for="startDate">시작 날짜</label>
+	                                    <input type="date" class="form-control" id="startDate" name="startDate" disabled>
+	                                </div>
+	                                <div>
+	                                    <label for="endDate">끝 날짜</label>
+	                                    <input type="date" class="form-control" id="endDate" name="endDate" disabled>
+	                                </div>
+	                            </div>
+	                        </div>
+	
+	                        <div class="form-group m-3">
+	                            <label for="selectBhf">발주지점</label>
+	                            <select class="form-control" id="selectBhf">
+	                            	<option>all</option>
+	                                <option>발주지점1</option>
+	                                <option>발주지점2</option>
+	                                <option>발주지점3</option>
+	                                <option>yedam</option>
+	                            </select>
+	                        </div>
+	                        
+							<div class="col-12 text-center">
+	                        	<button class="btn btn-primary mr-2" onclick="search()">검색</button>
+	                        	<button class="btn btn-light"        onclick="reset()">초기화</button>
+	                        </div>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
 		<div class="row">
         	<div class="col-md-12  grid-margin stretch-card">
             	<div class="card">
@@ -63,6 +124,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 			            <p class="card-description">LOT연결을 추가하거나 수정, 삭제를 할 수 있다. </p>
 			         	<div class="d-flex justify-content-end gap-3 mt-3">
 			                <button type="button" class="btn btn-primary px-4" id="registerButton">추가</button>
+			                <button type="button" class="btn btn-warning px-4" id="modifyButton">수정</button>
 			                <button type="button" class="btn btn-danger px-4" id="deleteButton">삭제</button>
 			            </div>
 			            
@@ -99,6 +161,14 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 						    	'modal-md', 
 						    	'LOT 연결 삭제', 
 						    	'bsn/modal/bsnLotDelete', 
+						    	'bsn/modal/bsnModalFooter')">
+     </div>
+     
+     <div th:include="bsn/modal/bsnModalTemplate :: ModalTemplate(
+						    	'modifyModal', 
+						    	'modal-md', 
+						    	'LOT 연결 수량 수정', 
+						    	'bsn/modal/bsnLotModify', 
 						    	'bsn/modal/bsnModalFooter')">
      </div>
      
@@ -147,6 +217,9 @@ const OrderListDataSource = {
 };
 
 
+
+
+
 //상품 테이블
 const orderList = new Grid({
 		el: document.getElementById('orderList'), // 컨테이너 엘리먼트
@@ -163,7 +236,7 @@ const orderList = new Grid({
 		// { header : "회사번호", name : "companyNum"},
 		{ header : "주문일", name : "orderDate", formatter: ({ value }) => formatDate(value, 'order'), width: 'auto', sortable : true},
 		{ header : "납기일", name : "dueDate", formatter: ({ value }) => formatDate(value, 'due'), width: 'auto', sortable : true},
-		{ header : "출고일", name : "delivaryDate", formatter: ({ value }) => formatDate(value, 'due'), width: 'auto', sortable : true},
+		//{ header : "출고일", name : "delivaryDate", formatter: ({ value }) => formatDate(value, 'due'), width: 'auto', sortable : true},
 		{ header : "출고상태", name : "deliveryStatus", formatter: ({ value }) => formatStatus(value), sortable : true},
 		{ header : "비고", name : "remark", width: 'auto'},
 	],
@@ -200,21 +273,47 @@ function formatStatus(status) {
     
     	
 }
+
+function toggleDateInputs(enable) {
+    document.getElementById("startDate").disabled = !enable;
+    document.getElementById("endDate").disabled = !enable;
+    
+   
+  }
+//검색 조건 초기화
+function reset(){
+	// 라디오 버튼 선택 값 초기화
+    // "사용안함" 라디오 버튼을 체크하도록 설정
+    let notSelectRadio = document.querySelector('input[name="optionsRadios"][value="notSelect"]');
+    if (notSelectRadio) {
+        notSelectRadio.checked = true;  // "사용안함" 라디오 버튼을 선택 상태로
+        toggleDateInputs(false);  // 날짜 입력 비활성화
+    }
+
+	// 시작 날짜와 끝 날짜 초기화
+	document.getElementById("startDate").value = "";
+	document.getElementById("endDate").value = "";
+	// 발주지점 선택 값 초기화
+    document.getElementById("selectBhf").value = "all";
+
+
+}
+
 function search(){
-	//let selectedOption = document.querySelector('input[name="optionsRadios"]:checked').value; // 라디오 버튼 선택 값
-    //let startDate = document.getElementById("startDate").value; // 시작 날짜
-    //let endDate = document.getElementById("endDate").value; // 끝 날짜
-    //let selectedBhf = document.getElementById("selectBhf").value; // 발주지점 선택 값
+	let selectedOption = document.querySelector('input[name="optionsRadios"]:checked').value; // 라디오 버튼 선택 값
+    let startDate = document.getElementById("startDate").value; // 시작 날짜
+    let endDate = document.getElementById("endDate").value; // 끝 날짜
+    let selectedBhf = document.getElementById("selectBhf").value; // 발주지점 선택 값
     
     //console.log(selectedOption, startDate, endDate, selectedBhf);
     
     let params = {
-    		//"companyNum": companyNum,
-    		//"deteOption": selectedOption,
-            //"startDate": startDate,
-            //"endDate": endDate,
-            //"branch": selectedBhf,
-            "companyNum": companyNum
+    		"deteOption": selectedOption,
+            "startDate": startDate,
+            "endDate": endDate,
+            "branch": selectedBhf,
+            "companyNum": companyNum,
+            "statusList": ['DS01']
             
     };
     console.log("검색 조건:", params);
@@ -337,7 +436,7 @@ function loadDeliveryLotDetail(deliveryDetailId) {
         .then(data => {
             if (data && data.data && data.data.contents) {
             	const detailData = data.data.contents; // 상세 데이터 저장
-            	console.log(detailData);
+            	//console.log(detailData);
                 deliveryLotDetailGrid.resetData(detailData);
             } else {
                 console.warn("상세 데이터가 없습니다.");
@@ -358,8 +457,8 @@ columns: [
     { header: "LOT번호", name: "goodsLotNum", },
     { header: "유통기한", name: "goodsConsumptionDate", formatter: ({ value }) => formatDate(value, 'order'), width: 'auto', sortable : true},
     { header: "출고가능수량", name: "deliveryPossibleQnt",  },
-    { header: "출고예약수량", name: "deliveryQnt",  },
-    { header : "수량수정", name : "detail", formatter : () => '<button class="btn btn-warning btn-sm btnInfo" data-bs-toggle="modal" data-bs-target="#assetdetailModal">수량수정</button>', align: 'center'},
+    { header: "출고예약수량", name: "deliveryQnt",  editor: 'text',},
+    
 
 ],
 pageOptions: {
@@ -369,18 +468,7 @@ pageOptions: {
 });
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function refreshGrid() {
 
-		    // 그리드 데이터 갱신
-		    orderList.reloadData();
-
-		 	// 등록 후 상세 데이터 새로 불러오기
-		    //loadDeliveryDetail(selectedRow.deliveryId); // 주문 상세 새로 불러오기
-		    
-
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //LOT등록(연결) 처리
 function registerLotData() {
@@ -419,7 +507,7 @@ function registerLotData() {
 		        qntSum += item.deliveryQnt; // 숫자로 변환한 후 더하기
 
 		        if (selectedRow.deliveryDemandQnt <totalSum + qntSum) { 
-		            showAlert('연결된 출고 수량들의 합이 요구 수량을 초과할 수 없습니다.', 'danger');
+		            showAlert('연결된 출고 수량들의 합이 요구 수량을 초과할 수는 없습니다.', 'danger');
 		            return;
 		        }
 		        
@@ -457,7 +545,7 @@ function registerLot(dlvyDTO) {
         if (data.status === "success") {
             showAlert('LOT 등록(연결) 성공', 'success');
          	// 값 초기화 + 값 초기화
-            refreshGrid();
+            orderList.reloadData();
             loadDeliveryDetail(selectedRow.deliveryId);
         	loadDeliveryLotDetail(dlvyDTO.deliveryDetailId); // 상세 정보 불러오기
 
@@ -511,7 +599,7 @@ function deleteLot(dlvyDTO) {
         if (data.status === "success") {
             showAlert('LOT 삭제 성공', 'success');
          	// 값 초기화 + 값 초기화
-            refreshGrid();
+            orderList.reloadData();
             loadDeliveryDetail(selectedRow.deliveryId);
         	loadDeliveryLotDetail(dlvyDTO.deliveryDetailId); // 상세 정보 불러오기
 
@@ -519,6 +607,58 @@ function deleteLot(dlvyDTO) {
            
         } else {
             showAlert('LOT 삭제 실패:'+ data.message, 'danger');
+        }
+
+
+    }) 
+}
+////////////////////////////////////////////////////////////////
+//LOT 수량 수정
+function modifyLotData() {
+
+		const selectedModifyRows = deliveryLotDetailGrid.getCheckedRows(); // 선택된 행 가져오기(모달창에서 체크한 것만)
+
+	   	const requestData = selectedModifyRows.map(row => ({
+	   		   deliveryLotDetailNum:Number(row.deliveryLotDetailNum),
+	   		   deliveryQnt:Number(row.deliveryQnt)
+	   	}));
+	   	
+		 //console.log(requestData);
+		 let dlvyDTO = {
+			deliveryDetailId: selectedRow.deliveryDetailId,
+			lotDetails: requestData
+		 };
+		 console.log("수정 정보 : " + dlvyDTO);
+		 modifyLot(dlvyDTO);
+		 //modifyModal.hide();
+}
+
+function modifyLot(dlvyDTO) {
+	const header = document.querySelector('meta[name="_csrf_header"]').content;
+    const token = document.querySelector('meta[name="_csrf"]').content;
+	
+    fetch('/bsn/rest/deli/lot/detail/modify', {
+        method: 'PUT',
+        headers: {
+        	'header': header,
+        	'X-CSRF-Token': token,
+            'Content-Type': 'application/json'  // JSON 형식으로 보내기
+        },
+        body: JSON.stringify(dlvyDTO)  // 객체를 JSON으로 변환하여 전송
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === "success") {
+            showAlert('LOT 수정 성공', 'success');
+         	// 값 초기화 + 값 초기화
+            orderList.reloadData();
+            loadDeliveryDetail(selectedRow.deliveryId);
+        	loadDeliveryLotDetail(dlvyDTO.deliveryDetailId); // 상세 정보 불러오기
+
+         	
+           
+        } else {
+            showAlert('LOT 수정 실패:'+ data.message, 'danger');
         }
 
 
@@ -559,7 +699,7 @@ function confirmDelivery() {
         if (data.status === "success") {
             showAlert('출고 완료', 'success');
          	// 값 초기화 + 값 초기화
-            refreshGrid();
+            orderList.reloadData();
             deliveryDetailGrid.resetData([]);
             deliveryLotDetailGrid.resetData([]);
             selectedRow = null;
@@ -590,6 +730,7 @@ function confirmDelivery() {
 const registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
 const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
 const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal')); 
+const modifyModal = new bootstrap.Modal(document.getElementById('modifyModal')); 
 
 // 상품 선택 확인 함수
 function checkGoodsSelection(modal) {
@@ -600,13 +741,14 @@ function checkGoodsSelection(modal) {
     }
 }
 
-// 주문 등록 버튼 클릭 이벤트
+// LOT 등록 버튼 클릭 이벤트
 document.getElementById('registerButton').addEventListener('click', () => {
 	checkGoodsSelection(registerModal); // 등록 모달 띄우기
 });
 
-// 주문 거부 버튼 클릭 이벤트
+// LOT 거부 버튼 클릭 이벤트
 document.getElementById('deleteButton').addEventListener('click', () => {
+	deliveryLotDetailGrid.finishEditing();
 	
 	// 먼저 상품이 선택되었는지 확인
     if (!selectedRow || !selectedRow.optionCode) {
@@ -627,6 +769,52 @@ document.getElementById('deleteButton').addEventListener('click', () => {
  	// 삭제 모달 띄우기
     deleteModal.show(); 
 });
+// LOT 수량 수정 버튼 클릭이벤트
+document.getElementById('modifyButton').addEventListener('click', () => {
+	deliveryLotDetailGrid.finishEditing();
+	
+	// 먼저 상품이 선택되었는지 확인
+    if (!selectedRow || !selectedRow.optionCode) {
+        // 상품이 선택되지 않았다면 checkGoodsSelection을 호출하여 상품 선택을 유도
+        checkGoodsSelection(modifyModal);
+        return;
+    }
+
+    // 상품이 선택되었으면, LOT 체크된 행이 있는지 확인
+    const selectedModifyRows = deliveryLotDetailGrid.getCheckedRows(); // 체크된 행 가져오기
+
+    if (selectedModifyRows.length === 0) {
+        // 체크된 행이 없으면 경고 메시지 표시
+        showAlert('선택한 LOT가 없습니다. 체크를 확인해주세요.', 'danger');
+        return;
+    }
+    
+ 	// 모든 행 데이터 가져오기(LOT상세의 수량들 합)
+    const allData = deliveryLotDetailGrid.getData(); 
+    let totalSum = allData.reduce((sum, row) => sum + Number(row.deliveryQnt || 0), 0);
+    if (selectedRow.deliveryDemandQnt <totalSum) { 
+        showAlert('연결된 출고 수량들의 합이 요구 수량을 초과할 수는 없습니다.', 'danger');
+        return;
+    }
+    
+ 	// requestData 생성 전, 각 row에 대해 deliveryQnt가 deliveryPossibleQnt보다 큰지 확인
+	for (const row of selectedModifyRows) {
+	    const deliveryQnt = Number(row.deliveryQnt);
+	    const deliveryPossibleQnt = Number(row.deliveryPossibleQnt); // 예상 가능한 출고 수량 (이 값을 row에서 가져와야 함)
+	        
+	    // deliveryQnt가 deliveryPossibleQnt보다 크면 경고 메시지 출력하고 함수 종료
+	    if (deliveryQnt > deliveryPossibleQnt) {
+	        showAlert(`출고 가능 수량을 초과한 사항이 있습니다.`, 'danger');
+	        return;
+	    }
+	}
+	
+	
+
+ 	// 수정 모달 띄우기
+    modifyModal.show(); 
+});
+
 
 
 // 출고 확정 버튼 클릭 이벤트
@@ -684,9 +872,15 @@ document.querySelectorAll('.modal-footer #btn-register').forEach(button => {
 					
 					/////////////////////////////
                     deleteModal.hide();
+                } else if (activeModal.id === 'modifyModal') {
+    				//LOT 수량 수정 처리 ///////////////
+    				modifyLotData();
+    				
+    				/////////////////////////////
+                    modifyModal.hide();
                 } 
                 
-            }
+            } 
         } else {
             showAlert('상품을 선택해주세요!', 'danger');
         }
@@ -708,6 +902,8 @@ document.querySelectorAll('.modal-footer .btn-secondary').forEach(button => {
                 registerGrid.reloadData();
             } else if (activeModal.id === 'deleteModal') {
                 deleteModal.hide();
+            } else if (activeModal.id === 'modifyModal') {
+            	modifyModal.hide();
             } else if (activeModal.id === 'confirmModal') {
             	confirmModal.hide();
             }

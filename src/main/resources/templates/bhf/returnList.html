@@ -105,9 +105,9 @@
 			},
 			columns: [ 
 				{ header : "교환및반품 코드", name : "returningCode", align: 'center'},
-				{ header : "신청일자", name : "requestDate", align: 'center'},
-				{ header : "진행상태", name : "progressStatus", align: 'center'},
-				{ header : "비고", name : "returnRemark", align: 'center'}
+				{ header : "신청일자", name : "requestDate", align: 'center', width: 110},
+				{ header : "진행상태", name : "progressStatus", align: 'center', width: 100},
+				{ header : "비고", name : "returnRemark", align: 'center', width: 225}
 			],
 			data: dataSource
 		});
@@ -144,9 +144,17 @@
 			columns: [ 
 				{ header : "상품명", name : "goodsName", align: 'center'},
 				{ header : "옵션명", name : "optionName", align: 'center'},
-				{ header : "수량", name : "quantity", align: 'center'},
-				{ header : "교환 및 반품", name : "exchangeReturningChoice", align: 'center'},
-				{ header : "사유", name : "returningReason", align: 'center'}
+				{ 
+					header : "수량", 
+					name : "quantity", 
+					align: 'center', 
+					width: 80,
+					formatter: function(ev){
+						return numberFormat(ev.value);
+					}
+				},
+				{ header : "교환 및 반품", name : "exchangeReturningChoice", align: 'center', width: 100},
+				{ header : "사유", name : "returningReason", align: 'center', width: 167}
 			],
 			data: ""
 		});

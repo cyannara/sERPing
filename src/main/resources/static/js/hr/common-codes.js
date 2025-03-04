@@ -15,7 +15,8 @@ let authos = []; // 권한 저장
 
 // 공통 코드 데이터 불러오는 함수
 function loadCommonCodes() {
-    fetch('/hr/rest/emp/common-codes')
+	console.log("공통코드JS companyNum",sessionData.companyNum);
+    fetch('/hr/rest/emp/common-codes/'+sessionData.companyNum)
         .then(response => response.json())
         .then(data => {
             console.log("공통 코드 로드됨:", data); // 데이터 확인용
@@ -38,6 +39,7 @@ function loadCommonCodes() {
             commonCodes.employmentTypes = employmentTypes;
             commonCodes.auths = auths;
 
+			
             // ✅ 필터 & 모달 UI 업데이트
             populateDepartmentSelect(departments);
             populatePositionSelect(positions);
@@ -140,8 +142,9 @@ function populateStatusButtons(statuses) {
 
     // "전체" 버튼 추가
     statusGroup.innerHTML += `
-        <input type="radio" class="btn-check" name="searchStatus" id="statusAll" checked value="">
-        <label class="btn btn-outline-primary" for="statusAll">전체</label>
+
+	        <input type="radio" class="btn-check" name="searchStatus" id="statusAll" checked value="">
+	        <label class="btn btn-outline-primary" for="statusAll">전체</label>
     `;
     
     // 상태 버튼 추가 (예상 데이터: ["재직", "퇴직", "휴직"])
