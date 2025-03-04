@@ -14,7 +14,7 @@
 			<hr>
 			<div class="col-md-6 mt-2 mb-5">
 				<div class="row">
-					<label class="col-sm-4">발주 일자</label> 
+					<label class="col-sm-4">요청 일자</label> 
 					<input type="date"class="col-sm-5" id="orderDate"> 
 					<button type="button" class="col-sm-2" onclick="search()">검색</button>
 				</div>
@@ -121,9 +121,9 @@
 			},
 			columns: [ 
 				{ header : "출고번호", name : "deliveryId", align: 'center'},
-				{ header : "발주서코드", name : "orderCode", align: 'center'},
+				{ header : "요청서코드", name : "orderCode", align: 'center'},
 				{ header : "출고일자", name : "deliveryDate", align: 'center'},
-				{ header : "발주일자", name : "orderDate", align: 'center'},
+				{ header : "요청일자", name : "orderDate", align: 'center'},
 				{ header : "납기일자", name : "dueDate", align: 'center'},
 				{ header : "비고", name : "remark", align: 'center', width: 400}
 			],
@@ -166,14 +166,33 @@
 				{ header : "상품명", name : "goodsName", align: 'center'},
 				{ header : "옵션명", name : "optionName", align: 'center'},
 				{ header : "규격", name : "goodsStandard", align: 'center', width: 200},
-				{ header : "발주수량", name : "quantity", align: 'center', width: 150},
-				{ header : "낱개수량", name : "stockQuantity", align: 'center', width: 150}, //창고에 들어갈 수량
+				{ 
+					header : "요청수량", 
+					name : "quantity", 
+					align: 'center',
+					width: 150,
+					formatter: function(ev){
+						return numberFormat(ev.value);
+					}
+				},
+				{   //창고에 들어갈 수량
+					header : "낱개수량", 
+					name : "stockQuantity", 
+					align: 'center', 
+					width: 150,
+					formatter: function(ev){
+						return numberFormat(ev.value);
+					}
+				},
 				{ 
 					header : "입고수량(box)", 
 					name : "inQuantity",
 					align: 'center',
 					editor: 'text',
 					width: 150,
+					formatter: function(ev){
+						return numberFormat(ev.value);
+					},
 					onAfterChange: function(ev) {
 						
 						let rowKey = ev.rowKey;
@@ -199,14 +218,14 @@
 				        // 입고수량에 숫자를 제외한 값들이 들어오면
 				        if (!/^[0-9]*$/.test(ev.value)) {
 		                    grid2.setValue(ev.rowKey, ev.columnName, '');  // 해당 셀을 비웁니다
-		                    alert("수량은 숫자만 입력할 수 있습니다.");
+		                    showAlert('수량은 숫자만 입력할 수 있습니다.','danger');
 		                }else{
 		                	inQuantity = Number(inQuantity); //입력하고 넘기니까 문자로 변해서 숫자로 지정
 		                	grid2.setValue(rowKey, "inQuantity", inQuantity);
 		                }
 					}
 				},
-				{ header : "재발주수량",  name : "reorder", hidden : 1},
+				{ header : "재요청수량",  name : "reorder", hidden : 1},
 				{ header : "반품수량",  name : "returnNum", hidden : 1}
 			],
 			data: ""
@@ -220,7 +239,7 @@
 			
  			// 테이블에 데이터가 있는지 확인
 			if (gooddsInData.length === 0) {
-		        alert("입고할 상품을 추가해주세요.");
+		        showAlert('입고할 상품을 추가해주세요.','danger');
 		        return;
 		    }
 			// 발주 수량을 적었는지 확인
@@ -229,7 +248,7 @@
 				const stockQuantity = Number(gooddsInData[i].stockQuantity); // 문자열을 숫자로 변환(0도 비교하기 위해서)
 				
 			    if (stockQuantity === 0 || stockQuantity === "" || stockQuantity === null) {  // 수량이 비어있는지 확인
-		            alert("입고수량을 입력해주세요.");
+			    	showAlert('입고수량을 입력해주세요.','danger');
 		            return;  // 수량이 없으면 더 이상 진행하지 않음
 		        }
 		    }
@@ -275,13 +294,13 @@
 		    .then(response => response.json())
 		    .then(data => {
 		        if (data.status === "success") {
-		            alert("상품 입고 등록 성공");
+		        	showAlert('상품 입고 등록 성공','success');
 		         	// 등록 후 초기화
 		            grid2.resetData([]);
 		            grid.readData();
 		           
 		        } else {
-		            alert("교환 및 반품 등록 실패: " + data.message);
+		        	showAlert('교환 및 반품 등록 실패:','danger' + data.message);
 		        }
 		        //테이블 데이터 없을떄 나오는 문구 다시 실행
 		        nodata();

@@ -5,12 +5,12 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
 <meta charset="UTF-8">
-<title>상품 발주 조회</title>
+<title>입고 요청 조회</title>
 </head>
 <body layout:fragment="content">
 	<div class="container">
 		<div class="row">
-			<h3 class="mt-2 mb-2">상품 발주 조회</h3>
+			<h3 class="mt-2 mb-2">입고 요청 조회</h3>
 			<hr>
 			<div class="col-md-6 mt-2 mb-2">
 				<div class="row">
@@ -34,7 +34,7 @@
 			</div>
 			<div class="col-md-6 mt-2 mb-2">
 				<div class="row">
-					<label class="col-sm-4">발주 일자</label> 
+					<label class="col-sm-4">요청 일자</label> 
 					<input type="date"class="col-sm-7" id="orderDate"> 
 				</div>
 			</div>
@@ -56,7 +56,7 @@
 			<div class="col-md-12 stretch-card mt-2 mb-5">
 				<div class="card">
 					<div class="card-body">
-						<h6 class="mb-4">발주서</h6>
+						<h6 class="mb-4">요청서</h6>
 						<div id="orderList"></div>
 						<div id="pagination" class="tui-pagination"></div>
 					</div>
@@ -66,7 +66,7 @@
 				<div class="card">
 					<div class="card-body">
 						<div id="rayout-container" class="row mb-3">
-							<h6 class=" col-sm-9">발주서 상세</h6>
+							<h6 class=" col-sm-9">요청서 상세</h6>
 							<span class="label-search col-sm-1" style="font-size: 1em">표시수량</span>
 							<select name="display_amount" id="display_amount" class="col-sm-1 input-box" onchange="changeDisplay()">
 								<option value="5" selected>5</option>
@@ -85,10 +85,10 @@
 				</div>
 			</div>
 			<div class="col-md-12 mt-2 mb-2" id="cancelSection" style="display: none">
-				<h6 class="mb-3">상품 발주 취소사유</h6>
+				<h6 class="mb-3">상품 요청 취소사유</h6>
 				<div class="row">
 					<input type="text"class="col-sm-11" id="ordCancle"> 
-					<button class="col-sm-1" id="cancelButton" onclick="orderCancle()">발주 취소</button>
+					<button class="col-sm-1" id="cancelButton" onclick="orderCancle()">요청 취소</button>
 				</div>
 			</div>
 		</div>
@@ -152,12 +152,12 @@
 				perPage: 5,
 			},
 			columns: [ 
-				{ header : "발주서코드", name : "orderCode", align: 'center'},
+				{ header : "요청서코드", name : "orderCode", align: 'center'},
 				{ header : "지점", name : "branchOfficeId", align: 'center'},
-				{ header : "발주일자", name : "orderDate", align: 'center'},
+				{ header : "요청일자", name : "orderDate", align: 'center'},
 				{ header : "납기일자", name : "dueDate", align: 'center'},
 				{ header : "진행상태", name : "progressStatus", align: 'center'},
-				{ header : "비고", name : "remark", align: 'center'}
+				{ header : "비고", name : "remark", align: 'center', width: 400}
 			],
 			data: dataSource
 		});
@@ -220,13 +220,21 @@
 				perPage: 5,
 			},
 			columns: [ 
-				{ header : "발주서코드", name : "orderCode", align: 'center'},
+				{ header : "요청서코드", name : "orderCode", align: 'center'},
 				{ header : "상품코드", name : "goodsCode", align: 'center'},
 				{ header : "상품명", name : "goodsName", align: 'center'},
 				{ header : "옵션코드", name : "optionCode", align: 'center'},
 				{ header : "옵션명", name : "optionName", align: 'center'},
-				{ header : "규격", name : "goodsStandard", align: 'center', width: 150},
-				{ header : "수량", name : "quantity", align: 'center', width: 150}
+				{ header : "규격", name : "goodsStandard", align: 'center', width: 130},
+				{ 
+					header : "수량", 
+					name : "quantity", 
+					align: 'center', 
+					width: 130,
+					formatter: function(ev){
+						return numberFormat(ev.value);
+					}
+				}
 			],
 			data: []
 		});
@@ -238,7 +246,7 @@
 			
 			// 취소사유 확인
  			if(!orderCancelReason){
-				alert("취소 사유를 작성해주세요.");
+				showAlert('취소 사유를 작성해주세요.','danger');
 			    return;
 			}  
 			
@@ -258,7 +266,7 @@
  		    })
  		   	.then(response => response.text()) // 컨트롤에서 문자열로 반환해서 .text 사용
  		    .then(message => {
- 		        alert(message); // "발주가 취소되었습니다." 메시지 출력
+ 		    	showAlert(message,'success'); // "발주가 취소되었습니다." 메시지 출력
 
   		        // 진행 상태 '취소'로 변경
  		        grid.setValue(cancelKey, "progressStatus", "취소");
@@ -270,7 +278,7 @@
  		    })
  		    .catch(error => {
  		        console.error("취소 요청 실패:", error);
- 		        alert("발주 취소 중 오류가 발생했습니다.");
+ 		        showAlert('요청 취소 중 오류가 발생했습니다.','danger');
  		    }); 
 			
 		}
@@ -329,7 +337,7 @@
 		function OLDnodata(){
 			setTimeout( () => {
 				let nodata = document.querySelectorAll('.tui-grid-layer-state-content p')[1];
-				nodata.innerHTML = '발주서를 선택 해주세요';
+				nodata.innerHTML = '요청서를 선택 해주세요';
 			}, 100)
 		}
 
@@ -345,7 +353,7 @@
 			       const options = {
 			         				includeHiddenColumns: true,
 			         				//onlySelected: true,
-			         				fileName: '발주상품',
+			         				fileName: '요청상품',
 			       					};
 			       grid2.export('xlsx', options);
 		     })
