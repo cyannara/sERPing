@@ -40,6 +40,7 @@ public class DeptServiceImpl implements DeptService {
     public Map<String, Object> getOrganization(Long companyNum) {
         List<DeptDTO> departments = deptMapper.list(companyNum);
         DeptDTO companyInfo = deptMapper.getCompanyInfo(companyNum);
+        log.info("departmentsdepartmentsdepartments={}",departments.size());
 
         Map<Long, DeptDTO> deptMap = new HashMap<>();
         for (DeptDTO dept : departments) {
@@ -63,7 +64,10 @@ public class DeptServiceImpl implements DeptService {
             .mapToInt(DeptDTO::getTotalEmployeeCount)
             .sum() + noDeptEmployees;
 
-        companyInfo.setTotalEmployeeCount(totalEmployeeCount);
+        companyInfo.setTotalEmployeeCount(departments.size());
+        
+        // ✅ 로그 출력 (디버깅)
+        System.out.println("📌 최종 totalEmployeeCount 값: " + totalEmployeeCount);
 
         // 4️⃣ 반환 데이터 구성
         Map<String, Object> result = new HashMap<>();

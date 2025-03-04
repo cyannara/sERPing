@@ -78,6 +78,7 @@ public class HrController {
 
 	    // ✅ 세션에서 가져온 companyNum으로 조직도 조회
 	    Map<String, Object> organization = deptService.getOrganization(sessionCompanyNum);
+	    System.out.println("📌 조직도 데이터: " + organization);
 	    model.addAttribute("company", organization.get("company"));
 	    model.addAttribute("departments", organization.get("departments"));
 	    return "hr/organization";

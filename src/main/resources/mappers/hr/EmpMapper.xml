@@ -29,7 +29,7 @@
 		parameterType="com.beauty1nside.hr.dto.EmpSearchDTO">
 		SELECT * FROM (
 			SELECT ROWNUM rn, employeeNum, employeeId, employeeName, email, phone,
-			hireDate, position, status, employmentType, departmentName
+			hireDate, position, status, employmentType, departmentName, contractStatus
 			FROM (
 				SELECT
 				e.employee_num AS employeeNum,
@@ -41,15 +41,28 @@
 				fn_get_cmmn_name(e.position) AS position,
 				fn_get_cmmn_name(e.status) AS status,
 				fn_get_cmmn_name(e.employment_type) AS employmentType,
-				COALESCE(d.department_name, '부서 없음') AS departmentName
+				COALESCE(d.department_name, '부서 없음') AS departmentName,
+				
+	            CASE 
+	                WHEN c.contract_num IS NOT NULL THEN '보기'
+	                ELSE '미계약'
+	            END AS contractStatus
+				
 				FROM hr_employee e
 				LEFT JOIN hr_department d ON e.department_num = d.department_num
-	            WHERE e.company_num = #{companyNum}
-
+            LEFT JOIN (
+                SELECT contract_num, employee_num
+                FROM (
+                    SELECT contract_num, employee_num, 
+                           ROW_NUMBER() OVER (PARTITION BY employee_num ORDER BY contract_start_date DESC) AS rn
+                    FROM hr_employee_contract
+                ) WHERE rn = 1
+            ) c ON e.employee_num = c.employee_num
+            
+            WHERE e.company_num = #{companyNum}
 
 	        <if test="departmentNum != null and departmentNum != ''">
 	            AND e.department_num IN (
-	                -- ✅ 특정 부서 및 모든 하위 부서 포함
 	                SELECT department_num 
 	                FROM hr_department
 	                WHERE company_num = #{companyNum}
@@ -234,12 +247,23 @@
 	    </if>
 	
 	    <if test="departmentNum != null and departmentNum != ''">
-	        AND (d.department_num = #{departmentNum}
-	        OR d.parent_department_num = #{departmentNum})
+		    AND e.department_num IN (
+		        SELECT department_num 
+		        FROM hr_department
+		        WHERE company_num = #{companyNum}
+		        START WITH department_num = #{departmentNum} 
+		        CONNECT BY PRIOR department_num = parent_department_num  
+		    )
 	    </if>
 	
 	    <if test="subDepartmentNum != null and subDepartmentNum != ''">
-	        AND d.department_num = #{subDepartmentNum}
+		    AND d.department_num IN (
+		        SELECT department_num 
+		        FROM hr_department
+		        WHERE company_num = #{companyNum}
+		        START WITH department_num = #{subDepartmentNum} 
+		        CONNECT BY PRIOR department_num = parent_department_num
+		    )
 	    </if>
 	
 	    <if test="position != null and position != ''">
@@ -454,7 +478,6 @@
             LEFT JOIN erp_company c ON e.company_num = c.company_num  
             WHERE e.company_num = #{companyNum}
             AND e.department_num IN (
-                -- ✅ 특정 부서 및 하위 부서 포함
                 SELECT department_num FROM hr_department
                 WHERE company_num = #{companyNum}
                 <if test="departmentNum != null">
