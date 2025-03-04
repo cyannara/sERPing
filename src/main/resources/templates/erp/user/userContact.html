@@ -225,7 +225,7 @@
 		            //계약정보를 인풋박스에 넣음 // 전자서명 못하게 막아버림
 		           	inputInsert(result);
 		        } else {
-		            alert("계약정보 불러오기 실패");
+		            showAlert('계약정보 불러오기 실패했습니다', 'danger');
 		            return;
 		        }
 		    })
@@ -272,7 +272,7 @@
 	        // contract1이 비어있을 경우 경고 및 포커스
 	        if (!contract1.value.trim()) {
 	            contract1.focus();
-	            alert(`[${contract1.placeholder}] 값을 입력해주세요`);
+	            showAlert(`[${contract1.placeholder}] 값을 입력해주세요`, 'primary');
 	            return;
 	        }
 	        let fields = [
@@ -307,14 +307,14 @@
 	            let input = document.getElementById(field.id);
 	            if (input && input.value.trim() !== field.placeholder) {
 	                input.focus();
-	                alert(`[${field.placeholder}] 값을 입력해주세요`);
+	                showAlert(`[${field.placeholder}] 값을 입력해주세요.`, 'primary');
 	                return;
 	            }
 	            contractData[field.id] = input.value.trim();
 	        }
 	        
 	        if (!isCanvasSigned()) {
-	            alert("전자 서명을 해주세요!");
+	            showAlert(`전자 서명을 해주세요.`, 'primary');
 	            return;
 	        }
 	        
@@ -371,16 +371,15 @@
 			        .then(response => response.json())
 			        .then(isSuccess => {
 				        if (isSuccess) {
-				            //alert("계약서 등록 성공");
 				            location.reload();
 				            return;
 				        } else {
-				            alert("계약서 등록에 실패 했습니다");
+				            showAlert("계약서 등록에 실패 했습니다", 'danger');
 				            return;
 				        }
 				    })
 	        	}else{
-	        		alert("전자서명이 이상합니다");
+	        		showAlert("전사명이 상이 합니다.", 'danger');
 	        		return;
 	        	}
 	        }
@@ -458,7 +457,7 @@
 		    return new Promise((resolve, reject) => {
 		        const canvas = document.getElementById("drawCanvas");
 		        if (!isCanvasSigned()) {
-		            alert("전자 서명을 해주세요!");
+		            showAlert("전자 서명을 해주세요", 'danger');
 		            resolve(""); // 서명이 없으면 빈 값 반환
 		            return;
 		        }
@@ -474,7 +473,7 @@
 		                if (data !== "FAIL") {
 		                    resolve(data); // 업로드된 파일명을 반환
 		                } else {
-		                    alert("업로드 실패");
+		                    showAlert("업로드 실패 했습니다", 'danger');
 		                    resolve(""); // 실패 시 빈 값 반환
 		                }
 		            })

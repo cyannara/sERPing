@@ -17,6 +17,7 @@ import com.beauty1nside.erp.dto.ErpEmployeeDTO;
  *   수정일      수정자          수정내용
  *  -------    --------    ---------------------------
  *  2025.02.16  표하연          최초 생성
+ *  2025.03.02  표하연          회사정보를 업데이트 한다
  *
  *  </pre>
 */
@@ -36,4 +37,11 @@ public interface ErpAdminLoginService {
      * @return boolean
      */
 	public boolean loginCount(@Param("employeeId") String employeeId);
+	
+	/**
+     * 회사정보를 업데이트 한다
+     *
+     * @return void
+     */
+	public void companystateupdate();
 }

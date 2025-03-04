@@ -13,6 +13,7 @@
 	*   수정일      수정자          수정내용
 	*  ======    =======    ==============================
 	*  2025.02.16  표하연          최초생성
+	*  2025.03.02  표하연          회사정보 업데이트
 	*
 	*  </pre>
 ======================================================== -->
@@ -42,4 +43,23 @@
 		where employee_id = #{employeeId}
 	</select>
 	
+	<!-- 
+     * 회사정보 업데이트
+     *
+     * @return int
+	-->
+	<update id="companystateupdate">
+		<![CDATA[
+			update erp_company
+			set service_state = 'EC03'
+			where company_num in (
+			    select s.company_num
+			    from erp_company e
+			    left join erp_subscription_info_list s
+			    on e.company_num = s.company_num
+			    where s.subscription_end_date <= sysdate-1
+			    and s.subscription_name_num in (1,6)
+			)
+		]]>
+	</update>
 </mapper>

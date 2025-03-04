@@ -1,6 +1,7 @@
 package com.beauty1nside.erp.dto;
 
 import lombok.Data;
+import lombok.ToString;
 
 /**
  * ERP 관련 페이지 네이션을 위한 기초 데이터
@@ -19,6 +20,7 @@ import lombok.Data;
  *  </pre>
 */
 @Data
+@ToString(callSuper = true)  // 부모 클래스 필드도 toString()에 포함
 public class ErpSearchDTO extends ErpSearchListDTO {
 	int start;
 	int end;

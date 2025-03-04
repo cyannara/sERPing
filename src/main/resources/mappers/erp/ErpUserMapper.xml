@@ -145,6 +145,8 @@
 	        subscription_option_num = #{subscriptionOptionNum},
 	        subscription_name_num = #{subscriptionNameNum},
 	        subscription_form = #{subscriptionForm},
+	        subscription_mean = null,
+	        subscription_mean_num = null
 	    </set>
 	    WHERE subscription_num = #{subscriptionNum}
 	</update>
@@ -164,7 +166,9 @@
 			#{subscriptionNameNum}, 
 			#{subscriptionOptionNum}, 
 			#{subscriptionEndDate}, 
-			sysdate
+			sysdate,
+			null,
+			null
 		)
 	</insert>
 	
