@@ -49,7 +49,6 @@
 
 	        <if test="departmentNum != null and departmentNum != ''">
 	            AND e.department_num IN (
-	                -- ✅ 특정 부서 및 모든 하위 부서 포함
 	                SELECT department_num 
 	                FROM hr_department
 	                WHERE company_num = #{companyNum}
@@ -234,12 +233,23 @@
 	    </if>
 	
 	    <if test="departmentNum != null and departmentNum != ''">
-	        AND (d.department_num = #{departmentNum}
-	        OR d.parent_department_num = #{departmentNum})
+		    AND e.department_num IN (
+		        SELECT department_num 
+		        FROM hr_department
+		        WHERE company_num = #{companyNum}
+		        START WITH department_num = #{departmentNum} 
+		        CONNECT BY PRIOR department_num = parent_department_num  
+		    )
 	    </if>
 	
 	    <if test="subDepartmentNum != null and subDepartmentNum != ''">
-	        AND d.department_num = #{subDepartmentNum}
+		    AND d.department_num IN (
+		        SELECT department_num 
+		        FROM hr_department
+		        WHERE company_num = #{companyNum}
+		        START WITH department_num = #{subDepartmentNum} 
+		        CONNECT BY PRIOR department_num = parent_department_num
+		    )
 	    </if>
 	
 	    <if test="position != null and position != ''">
@@ -454,7 +464,6 @@
             LEFT JOIN erp_company c ON e.company_num = c.company_num  
             WHERE e.company_num = #{companyNum}
             AND e.department_num IN (
-                -- ✅ 특정 부서 및 하위 부서 포함
                 SELECT department_num FROM hr_department
                 WHERE company_num = #{companyNum}
                 <if test="departmentNum != null">
