@@ -38,10 +38,10 @@
             <i class="mdi mdi-account-circle"></i>
             마이페이지
           </a>
-          <form th:action="@{/logout}" method="post">
-            <a class="dropdown-item mymenu">
+          <form id="logoutForm" th:action="@{/logout}" method="post">
+            <a class="dropdown-item mymenu" onclick="document.getElementById('logoutForm').submit(); return false;">
               <i class="mdi mdi-logout"></i>
-              <input type="submit" value="로그아웃"/>
+              로그아웃
             </a>
           </form>
           <a th:classappend="${#authorization.expression('isAuthenticated()')} ? 'hide'" href="/login">
