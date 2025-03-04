@@ -55,8 +55,15 @@
             <div id="employeeGrid"></div>
         </div>
     </div>
+    
+    <!-- 인사 발령 추가 버튼 -->
+    <div class="row mt-3">
+        <div class="col text-end">
+            <button class="btn btn-warning" id="openHistoryModalBtn">+ 인사 발령 등록</button>
+        </div>
+    </div>
 
-    <!-- 🔲 인사 발령 이력 -->
+    <!-- 인사 발령 이력 -->
     <div class="row mt-3">
         <div class="col">
             <h5>인사 발령 이력</h5>
@@ -64,12 +71,7 @@
         </div>
     </div>
 
-    <!-- 🔘 인사 발령 추가 버튼 -->
-    <div class="row mt-3">
-        <div class="col text-end">
-            <button class="btn btn-warning" id="openHistoryModalBtn">+ 인사 발령 등록</button>
-        </div>
-    </div>
+
 </div>
 
 <!-- 인사 발령 등록 모달 -->
@@ -93,22 +95,27 @@
                         <option value="근무 형태 변경">근무 형태 변경</option>
                     </select>
                 </div>
+                
                 <div class="mb-3">
                     <label class="fw-bold">새 직급</label>
                     <select class="form-select" id="modalNewPosition"></select>
                 </div>
+                
                 <div class="mb-3">
                     <label class="fw-bold">새 부서</label>
                     <select class="form-select" id="modalNewDepartment"></select>
                 </div>
+                
                 <div class="mb-3">
                     <label class="fw-bold">발령 사유</label>
                     <textarea class="form-control" id="modalReason"></textarea>
                 </div>
+                
                 <div class="mb-3">
                     <label class="fw-bold">적용일</label>
                     <input type="date" class="form-control" id="modalEffectiveDate">
                 </div>
+                
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
@@ -125,25 +132,13 @@ document.addEventListener("DOMContentLoaded", function () {
     loadCommonCodes();
 
     var Grid = tui.Grid;
-    let employeeGrid, historyGrid;
-    let selectedEmployee = null;
+    let employeeGrid;
     var positionList = [];
+    var departmentList = [];
+    var employmentTypeList = [];
+    var authList = [];
 
-    setTimeout(() => {
-        // ✅ 직급 목록 매핑
-        positionList = positions.map(pos => ({
-            text: pos.CMMNNAME,
-            value: pos.CMMNCODE
-        }));
-        console.log("📌 직급 목록 로드 완료:", positionList);
-
-        // ✅ Grid 컬럼을 동적으로 업데이트
-        employeeGrid.setColumns(getUpdatedColumns());
-        
-        // ✅ 데이터 다시 불러오기
-        employeeGrid.readData();
-    }, 500);
-
+    
     // ✅ 초기 Grid 설정
     function initializeEmployeeGrid() {
         const dataSource = {
@@ -171,31 +166,105 @@ document.addEventListener("DOMContentLoaded", function () {
                 header: "순번",
                 width: 50,
             }],
+            rowHeaders: ['checkbox'],
             columns: getUpdatedColumns(), // 컬럼 설정 함수 호출
             data: dataSource,
-            rowHeaders: ['checkbox']
         });
     }
 
+    // ✅ 공통 코드 로드 후 select 옵션 업데이트
+    setTimeout(() => {
+        // ✅ 직급 목록 매핑
+        positionList = positions.map(pos => ({
+            text: pos.CMMNNAME,
+            value: pos.CMMNCODE
+        }));
+        
+        // ✅ 부서 목록 매핑 (수정됨)
+        departmentList = departments.map(dept => ({
+            text: dept.DEPARTMENT_NAME, // 화면에 표시할 부서명
+            value: dept.DEPARTMENT_NUM  // 실제 DB 저장할 부서번호
+        }));
+        
+        // ✅ 근무 유형 목록 매핑
+        employmentTypeList = employmentTypes.map(empt => ({
+            text: empt.CMMNNAME, 
+            value: empt.CMMNCODE  
+        }));
+        
+        // ✅ 근무 유형 목록 매핑
+        authList = auths.map(auth => ({
+            text: auth.CMMNNAME, 
+            value: auth.CMMNCODE  
+        }));
+        
+        console.log("📌 직급 목록 로드 완료:", positionList);
+        console.log("📌 부서 목록 로드 완료:", departmentList);
+        console.log("📌 근무 유형 목록 로드 완료:", employmentTypeList);
+        console.log("📌 권한 목록 로드 완료:", authList);
+        
+        // ✅ Grid 컬럼을 동적으로 업데이트
+        employeeGrid.setColumns(getUpdatedColumns());
+        
+        // ✅ 데이터 다시 불러오기
+        employeeGrid.readData();
+    }, 500);
+
+
+    
     // ✅ 컬럼 동적 업데이트 함수
     function getUpdatedColumns() {
         return [
             { header: "사원번호", name: "employeeId", width: 100 },
             { header: "사원명", name: "employeeName", width: 150 },
             { header: "직급", name: "position", width: 100 },
-            { header: "새직급", name: "newPosition", width: 100 },
+            { header: "새 직급", name: "newPosition", width: 100 },
             {
-                header: "거래방법",
+                header: "새 직급",
                 name: "newPosition",
                 formatter: positionFormatter,
                 align: 'center',
                 editor: {
                     type: "select",
-                    options: { listItems: positionList }
+                    options: { listItems: positionList}
                 }
             },
             { header: "부서", name: "departmentName", width: 150 },
+            { header: "새 부서", name: "newDepartment", width: 100 },
+            {
+                header: "새 부서",
+                name: "newDepartment",
+                formatter: departmentFormatter,
+                align: 'center',
+                editor: {
+                    type: "select",
+                    options: { listItems: departmentList  }
+                }
+            },
             { header: "근무 유형", name: "employmentType", align: "center", sortable: true, width: 100 },
+            { header: "새 근무 유형", name: "newEmploymentType", align: "center", sortable: true, width: 100 },
+            {
+                header: "새 근무 유형",
+                name: "newEmploymentType",
+                formatter: employmentTypeFormatter,
+                align: 'center',
+                editor: {
+                    type: "select",
+                    options: { listItems: employmentTypeList }
+                }
+            },
+            { header: "권한", name: "authority", align: "center", sortable: true, width: 100 },
+            { header: "새 권한", name: "newAuthority", width: 100 },
+            {
+                header: "새 권한",
+                name: "newAuthority",
+                formatter: authFormatter,
+                align: 'center',
+                editor: {
+                    type: "select",
+                    options: { listItems: authList}
+                }
+            },
             { header: "입사일", name: "hireDate", align: "center", sortable: true, width: 150, formatter: ({ value }) => value?.split('T')[0] || '' },
         ];
     }
@@ -211,12 +280,20 @@ document.addEventListener("DOMContentLoaded", function () {
         const department = departmentList.find(item => item.value === value);
         return department ? department.text : value;
     }
-
-    // ✅ 근무 유형 Formatter
+    
+    // ✅ 근무우형 Formatter
     function employmentTypeFormatter({ value }) {
         const employmentType = employmentTypeList.find(item => item.value === value);
         return employmentType ? employmentType.text : value;
     }
+    
+    // ✅ 근무우형 Formatter
+    function authFormatter({ value }) {
+        const auth = authList.find(item => item.value === value);
+        return auth ? auth.text : value;
+    }
+
+
 
     initializeEmployeeGrid(); // 초기 Grid 생성
 });
