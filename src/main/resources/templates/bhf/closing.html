@@ -136,7 +136,15 @@
 				{ header : "상품명", name : "goodsName", align: 'center'},
 				{ header : "옵션코드", name : "optionCode", align: 'center', width: 100},
 				{ header : "옵션명", name : "optionName", align: 'center'},
-				{ header : "판매량", name : "bnfSleQy", align: 'center', width: 80}
+				{ 
+					header : "판매량",
+					name : "bnfSleQy", 
+					align: 'center', 
+					width: 80,
+					formatter: function(ev){
+						return numberFormat(ev.value);
+					}
+				}
 			],
 			data: ""
 		});
@@ -176,7 +184,7 @@
 
 		    function processExcel(file) {
 		    	if (!file.name.endsWith(".xlsx")) {
-	                alert("엑셀 파일만 업로드 가능합니다.");
+	                showAlert('엑셀 파일만 업로드 가능합니다.','danger');
 	                return;
 	            }
 	    	
@@ -212,12 +220,12 @@
 		    }
 
 		    function fillInputBoxes(row) {
-		        document.getElementById("businessReserves").value = row["영업 준비금"] || "";
-		        document.getElementById("cashAmount").value = row["현금 금액"] || "";
-		        document.getElementById("cashPresent").value = row["현금 시재"] || "";
-		        document.getElementById("cardAmount").value = row["카드 금액"] || "";
-		        document.getElementById("saleAmount").value = row["매출 금액"] || "";
-		        document.getElementById("transferAmount").value = row["이체 금액"] || "";
+		        document.getElementById("businessReserves").value = numberFormat(row["영업 준비금"]) || "";
+		        document.getElementById("cashAmount").value = numberFormat(row["현금 금액"]) || "";
+		        document.getElementById("cashPresent").value = numberFormat(row["현금 시재"]) || "";
+		        document.getElementById("cardAmount").value = numberFormat(row["카드 금액"]) || "";
+		        document.getElementById("saleAmount").value = numberFormat(row["매출 금액"]) || "";
+		        document.getElementById("transferAmount").value = numberFormat(row["이체 금액"]) || "";
 		    }
 		    
 		});
@@ -226,26 +234,26 @@
 			let close = grid.getData();
 			
 			if (close.length === 0) {
-		        alert("엑셀을 넣어서 값을 추가해주세요.");
+		        showAlert('엑셀을 넣어서 값을 추가해주세요.','danger');
 		        return;
 		    }
 			
 			let closingDate = document.getElementById('closingDate').value;
 			
 			if(!closingDate){
-				 alert("마감일자를 선택해주세요.");
+				showAlert('마감일자를 선택해주세요.','danger');
 			     return;
 			}
 			
 		    const requestData = {
-		    	branchOfficeId: document.getElementById("branchOfficeId").value,
-		    	closingDate: document.getElementById("closingDate").value,
-		        businessReserves: document.getElementById("businessReserves").value,
-		        cashAmount: document.getElementById("cashAmount").value,
-		        cashPresent: document.getElementById("cashPresent").value,
-		        cardAmount: document.getElementById("cardAmount").value,
-		        saleAmount: document.getElementById("saleAmount").value,
-		        transferAmount: document.getElementById("transferAmount").value,
+		    	branchOfficeId: document.getElementById("branchOfficeId").value.replaceAll(",",""), //.replaceAll(",","") ,를 없애서 넣겠다
+		    	closingDate: document.getElementById("closingDate").value.replaceAll(",",""),
+		        businessReserves: document.getElementById("businessReserves").value.replaceAll(",",""),
+		        cashAmount: document.getElementById("cashAmount").value.replaceAll(",",""),
+		        cashPresent: document.getElementById("cashPresent").value.replaceAll(",",""),
+		        cardAmount: document.getElementById("cardAmount").value.replaceAll(",",""),
+		        saleAmount: document.getElementById("saleAmount").value.replaceAll(",",""),
+		        transferAmount: document.getElementById("transferAmount").value.replaceAll(",",""),
 		        companyNum: sessioCompanyNum,
 		        files: grid.getData()  // Grid 데이터 포함
 		    };
@@ -263,9 +271,8 @@
 		    .then(response => response.json())
 		    .then(data => {
 		    	if (data.status === "success") {
-		            alert("마감 정산 등록 성공");
+		            showAlert('마감 정산 등록 성공','success');
 		         	// 등록 후 초기화
-		         	document.getElementById('branchOfficeId').value = "";
 					document.getElementById('closingDate').value = "";
 					document.getElementById("businessReserves").value = ""
 			        document.getElementById("cashAmount").value = ""
@@ -276,7 +283,7 @@
 		            grid.resetData([]); 
 		           
 		        } else {
-		            alert("마감 정산 등록 실패: " + data.message);
+		            showAlert('마감 정산 등록 실패: ','danger' + data.message);
 		        }
 		    })
 		    .catch(error => console.error("업로드 실패", error)); 

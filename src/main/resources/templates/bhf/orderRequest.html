@@ -7,7 +7,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
 <meta charset="UTF-8">
-<title>상품 발주 요청</title>
+<title>상품 입고 요청</title>
 
 <!-- Bootstrap -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -36,7 +36,7 @@
 
 	<div class="container">
 		<div class="row">
-			<h3 class="mt-2 mb-2">상품 발주 요청</h3>
+			<h3 class="mt-2 mb-2">상품 입고 요청</h3>
 			<hr>
 			<div class="col-md-6 mt-2 mb-2">
 				<div class="row">
@@ -63,7 +63,8 @@
 						<div class="row mb-3">
 							<label class="col-sm-2">상품명</label> 
 							<input type="text" class="col-sm-7" id="goodsName">
-							<button type="button" class="col-sm-2" onclick="search()">검색</button>
+							<div class="col-sm-1"></div>
+							<button type="button" class="col-sm-2 btn btn-primary" onclick="search()">검색</button>
 						</div>
 						<div id="goods"></div>
 						<div id="pagination" class="tui-pagination"></div>
@@ -82,7 +83,7 @@
 			<div class="col-md-12 stretch-card mt-3 mb-5">
 				<div class="card">
 					<div class="card-body">
-						<h6 class="mb-4">발주서 작성</h6>
+						<h6 class="mb-4">요청서 작성</h6>
 						<div id="order"></div>
 						<div id="pagination" class="tui-pagination"></div>
 						<div style="text-align : center">
@@ -190,7 +191,7 @@
 		        // 중복 체크(옵션코드가 동일한 행에 이미 있으면 추가하지 않음)
 		        const check = currentData.find(item => item.optionCode === rowData.optionCode );
 		        if(check){
-		        	alert("이미 추가된 옵션입니다.")
+		        	showAlert('이미 추가된 옵션입니다.','danger')
 		        }else{	        	
 		        	// 기존 데이터에서 가장 큰 rowKey 찾기 (없으면 0부터 시작) 그 다음 1씩 추가해서 rowkey 만들기
 	                const newRowKey = currentData.length > 0
@@ -223,12 +224,16 @@
 				{ header : "상품명", name : "goodsName", align: 'center'},
 				{ header : "옵션코드", name : "optionCode", align: 'center'},
 				{ header : "옵션명", name : "optionName", align: 'center'},
-				{ header : "규격", name : "goodsStandard", align: 'center'},
+				{ header : "규격", name : "goodsStandard", align: 'center', width: 150},
 				{ 
-					header : "발주수량", 
+					header : "요청수량", 
 					name : "quantity", 
 					align: 'center',
+					width: 150,
 					editor: 'text',
+					formatter: function(ev){
+						return numberFormat(ev.value);
+					},
 					onAfterChange: function(ev) { // onAfterChange는 해당 열에 변경이 있을때마다 호출되는 이벤트
 		                // ev.value:사용자가 입력한 값, ev.rowkey:변경된 셀이 어떤 행인지 알려주는 키
 		                // 값이 숫자만 포함하고 있는지 확인
@@ -236,7 +241,7 @@
 		                // 숫자가 아닌 값이 들어왔을 때 
 		                if (!value) {
 		                    grid3.setValue(ev.rowKey, ev.columnName, '');  // 해당 셀을 비웁니다
-		                    alert("발주수량은 숫자만 입력할 수 있습니다.");
+		                    showAlert('요청수량은 숫자만 입력할 수 있습니다.','danger');
 		                }
 		            }
 				}
@@ -251,19 +256,19 @@
 			
 			// 납기일자 있는지 확인
 			if(!dueDt){
-				 alert("납기일자를 선택해주세요.");
+				 showAlert('납기일자를 선택해주세요.','danger');
 			     return;
 			}
 			// 발주 테이블에 데이터가 있는지 확인
 			if (orderData.length === 0) {
-		        alert("발주할 상품을 추가해주세요.");
+				showAlert('요청할 상품을 추가해주세요.','danger');
 		        return;
 		    }
 			// 발주 수량을 적었는지 확인
 			for (let i = 0; i < orderData.length; i++) {
 				const quantity = Number(orderData[i].quantity); // 문자열을 숫자로 변환(0도 비교하기 위해서)
 			    if (quantity === 0 || quantity === "" || quantity === null) {  // 발주수량이 비어있는지 확인
-		            alert("발주수량을 입력해주세요.");
+			    	showAlert('요청수량을 입력해주세요.','danger');
 		            return;  // 발주수량이 없으면 더 이상 진행하지 않음
 		        }
 		    }
@@ -288,16 +293,15 @@
 		    .then(response => response.json())
 		    .then(data => {
 		        if (data.status === "success") {
-		            alert("발주 등록 성공");
+		            showAlert('요청 등록 성공','success');
 		         	// 등록 후 초기화
-		         	document.getElementById('branchOfficeId').value = "";
 					document.getElementById('dueDate').value = "";
 					document.getElementById('remark').value = "";
 		            grid2.resetData([]);
 		            grid3.resetData([]);  
 		           
 		        } else {
-		            alert("발주 등록 실패: " + data.message);
+		        	showAlert('요청 등록 실패','danger'+ data.message);
 		        }
 		        //테이블 데이터 없을떄 나오는 문구 다시 실행
 		        OPnodata();

@@ -109,7 +109,7 @@
 			    .catch(error => console.error("데이터 요청 실패:", error));
                 
             } else {
-                alert("검색어를 입력하세요.");
+                showAlert('검색어를 입력하세요.','dnager');
             }
         }
 
@@ -136,7 +136,7 @@
 				{ header : "옵션명", name : "optionName", align: 'center'},
 				{ header : "바코드", name : "optionBarcode", align: 'center'},
 				{ header : "상품LOT", name : "goodsLotNum", align: 'center'},
-				{ header : "유통기한", name : "goodsConsumptionDate", align: 'center'}
+				{ header : "유통기한", name : "goodsConsumptionDate", align: 'center', width: 150}
 			],
 			data: ""
 		});
@@ -149,7 +149,7 @@
 	            // 중복 체크(lot와유통기한 동일한 행이 이미 있으면 추가하지 않음)
 	            const check = currentData.find(item => item.goodsLotNum === rowData.goodsLotNum);
 	            if (check) {
-	                alert("이미 추가된 상품 입니다.");
+	                showAlert('이미 추가된 상품 입니다.','danger');
 	            } else {
 	                // 기존 데이터에서 가장 큰 rowKey 찾기 (없으면 0부터 시작) 그 다음 1씩 추가해서 rowkey 만들기
 	                const newRowKey = currentData.length > 0
@@ -184,12 +184,16 @@
 				{ header : "옵션명", name : "optionName", align: 'center'},
 				{ header : "바코드", name : "optionBarcode", hidden: 1},
 				{ header : "상품LOT", name : "goodsLotNum", align: 'center'},
-				{ header : "유통기한", name : "goodsConsumptionDate", align: 'center'},
+				{ header : "유통기한", name : "goodsConsumptionDate", align: 'center', width: 140},
 				{ 
 					header : "수량", 
 					name : "quantity", 
 					align: 'center',
 					editor: 'text',
+					width: 130,
+					formatter: function(ev){
+						return numberFormat(ev.value);
+					},
 					onAfterChange: function(ev) { // onAfterChange는 해당 열에 변경이 있을때마다 호출되는 이벤트
 		                // ev.value:사용자가 입력한 값, ev.rowkey:변경된 셀이 어떤 행인지 알려주는 키
 		                // 값이 숫자만 포함하고 있는지 확인
@@ -197,7 +201,7 @@
 		                // 숫자가 아닌 값이 들어왔을 때 
 		                if (!value) {
 		                    grid2.setValue(ev.rowKey, ev.columnName, '');  // 해당 셀을 비웁니다
-		                    alert("수량은 숫자만 입력할 수 있습니다.");
+		                    showAlert('수량은 숫자만 입력할 수 있습니다.','danger');
 		                }
 		            }
 				},
@@ -206,6 +210,7 @@
 					name : "exchangeReturningChoice", 
 					formatter: 'listItemText',
 					align: 'center',
+					width: 140,
 					editor: {
 						type: "select",
 						options: { listItems : [
@@ -216,7 +221,7 @@
 					}
 					
 				},
-				{ header : "사유", name : "returningReason", editor: 'text'}
+				{ header : "사유", name : "returningReason", editor: 'text', width: 270}
 			],
 			data: ""
 		});
@@ -227,7 +232,7 @@
 			
 			// 교환,반품 테이블에 데이터가 있는지 확인
 			if (returnData.length === 0) {
-		        alert("교환 및 반품할 상품을 추가해주세요.");
+		        showAlert('교환 및 반품할 상품을 추가해주세요.','danger');
 		        return;
 		    }
 			// 발주 수량을 적었는지 확인
@@ -237,15 +242,15 @@
 				const reason = returnData[i].returningReason;
 				
 			    if (quantity === 0 || quantity === "" || quantity === null) {  // 수량이 비어있는지 확인
-		            alert("수량을 입력해주세요.");
+			    	showAlert('수량을 입력해주세요.','danger');
 		            return;  // 수량이 없으면 더 이상 진행하지 않음
 		        }
 			    if (choice !== "교환" && choice !== "반품"){
-			    	alert("교환,반품 둘중 하나를 선택 하세요.");
+			    	showAlert('교환,반품 둘중 하나를 선택 하세요.','danger');
 			    	return;
 			    }
 			    if (reason === "" || reason === null){
-			    	alert("사유를 작성 해주세요.");
+			    	showAlert('사유를 작성 해주세요.','danger');
 			    	return
 			    }
 		    }
@@ -269,7 +274,7 @@
 		    .then(response => response.json())
 		    .then(data => {
 		        if (data.status === "success") {
-		            alert("교환 및 반품 등록 성공");
+		            showAlert('교환 및 반품 등록 성공','success');
 		         	// 등록 후 초기화
 		         	document.getElementById('branchOfficeId').value = "";
 					document.getElementById('returnRemark').value = "";
@@ -278,7 +283,7 @@
 		            grid2.resetData([]);  
 		           
 		        } else {
-		            alert("교환 및 반품 등록 실패: " + data.message);
+		            showAlert('교환 및 반품 등록 실패: ','danger' + data.message);
 		        }
 		        //테이블 데이터 없을떄 나오는 문구 다시 실행
 		        nodata();

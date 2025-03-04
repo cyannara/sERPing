@@ -169,7 +169,7 @@
 
             // 입력값 검증
             if (!boardTitle || !boardCategory || !boardContent) {
-                alert("모든 필드를 채워주세요.");
+            	showAlert('모든 필드를 채워주세요.','danger');
                 return;
             }
 
@@ -197,15 +197,15 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert("게시글이 등록되었습니다.");
+                    showAlert('게시글이 등록되었습니다.','success');
                     window.location.href = `/bhf/erpBoard`; // 게시판 목록 페이지로 리디렉션
                 } else {
-                    alert("게시글 등록에 실패했습니다.");
+                    showAlert('게시글 등록에 실패했습니다.','danger');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert("오류가 발생했습니다.");
+                showAlert('오류가 발생했습니다.','danger');
             });
         }
     </script>
