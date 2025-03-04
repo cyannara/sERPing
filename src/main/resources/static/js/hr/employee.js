@@ -13,6 +13,20 @@ document.addEventListener("DOMContentLoaded", function () {
         populateFilters(); // 필터 로딩 함수 실행
     }, 100);
 	
+	//주민번호 입력값 검증
+    // 첫 번째 주민번호 입력 필드
+    const firstSsnInput = document.getElementById("firstSsn");
+    firstSsnInput.addEventListener("input", function () {
+        this.value = this.value.replace(/\D/g, "").slice(0, 6); // 숫자가 아니면 제거, 6자리 제한
+    });
+
+    // 두 번째 주민번호 입력 필드
+    const secondSsnInput = document.getElementById("secondSsn");
+    secondSsnInput.addEventListener("input", function () {
+        this.value = this.value.replace(/\D/g, "").slice(0, 7); // 숫자가 아니면 제거, 7자리 제한
+    });
+	
+	
 const modalElement = document.getElementById("contractModal");
   const closeButton = modalElement.querySelector('[data-bs-dismiss="modal"]');
   if (closeButton) {
@@ -50,27 +64,75 @@ const modalElement = document.getElementById("contractModal");
 		});
 	
 	//연락처 검증
-    const phoneInput = document.getElementById("phone");
-    if (!phoneInput) {
-        console.error("❌ 'phone' ID를 가진 요소를 찾을 수 없습니다!");
-        return;
-    }
+	const phoneInput = document.getElementById("phone");
+	
+	if (!phoneInput) {
+	    console.error("❌ 'phone' ID를 가진 요소를 찾을 수 없습니다!");
+	} else {
+	    phoneInput.addEventListener("input", function () {
+	        let value = this.value.replace(/\D/g, ""); // 숫자 이외 문자 제거
+	
+	        if (value.length > 11) {
+	            value = value.substring(0, 11); // 11자리까지만 입력 가능
+	        }
+	
+	        // 📌 번호 유형에 따라 하이픈 적용
+	        if (/^(010|011|016|017|018|019)/.test(value)) {
+	            // 🔹 휴대폰 번호 (010, 011, 016, 017, 018, 019) - 11자리
+	            if (value.length === 11) {
+	                value = value.replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3"); // 010-1234-5678 형식
+	            } else if (value.length === 10) {
+	                value = value.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3"); // 구형 10자리 번호 (예: 011-123-4567)
+	            }
+	        } else if (/^02/.test(value)) {
+	            // 🔹 서울 지역번호 (02) - 9~10자리
+	            if (value.length === 10) {
+	                value = value.replace(/(\d{2})(\d{4})(\d{4})/, "$1-$2-$3"); // 02-1234-5678 형식
+	            } else if (value.length === 9) {
+	                value = value.replace(/(\d{2})(\d{3})(\d{4})/, "$1-$2-$3"); // 02-123-4567 형식
+	            }
+	        } else if (/^(0[3-9][0-9])/.test(value)) {
+	            // 🔹 일반 지역번호 (031, 032, 051 등) - 10자리
+	            if (value.length === 10) {
+	                value = value.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3"); // 031-123-4567 형식
+	            } else if (value.length === 9) {
+	                value = value.replace(/(\d{3})(\d{2})(\d{4})/, "$1-$2-$3"); // 031-12-3456 형식 (드물게 존재)
+	            }
+	        }
+	
+	        this.value = value; // 변환된 값 적용
+	    });
+	}
+	
+	
 
-    phoneInput.addEventListener("input", function () {
-        let value = this.value.replace(/\D/g, ""); // 숫자 이외 문자 제거
-        if (value.length > 11) value = value.substring(0, 11); // 11자리까지만 입력 가능
+	//이메일 검증
+	const emailInput = document.getElementById("email");
+	const emailErrorMsg = document.createElement("small"); // 오류 메시지 요소 생성
+	emailErrorMsg.style.color = "red";
+	emailInput.parentNode.appendChild(emailErrorMsg); // 이메일 입력 필드 아래에 추가
+	
+	emailInput.addEventListener("blur", function () {
+	    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+	
+	    if (!emailPattern.test(this.value)) {
+	        emailErrorMsg.textContent = "올바른 이메일 주소를 입력하세요.";
+	        this.classList.add("is-invalid"); // Bootstrap 스타일 적용 가능
+	    } else {
+	        emailErrorMsg.textContent = "";
+	        this.classList.remove("is-invalid");
+	    }
+	});
 
-        // 010, 011, 016, 017, 018, 019 (휴대폰)
-        else if (/^(01[016789])/.test(value)) {
-            if (value.length === 10) {
-                value = value.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3"); // 구형 10자리 번호
-            } else if (value.length === 11) {
-                value = value.replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3"); // 일반 11자리 번호
-            }
-        }
+	//이름 검증
+	const nameInput = document.getElementById("employeeName");
 
-        this.value = value; // 변환된 값 적용
-    });
+	nameInput.addEventListener("input", function () {
+	    this.value = this.value.replace(/[^가-힣a-zA-Z\s'-.]/g, ""); 
+	});
+	
+
+
 	
 	document.body.addEventListener("click",function(event){
     if (event.target.classList.contains("contractBtn")) {
