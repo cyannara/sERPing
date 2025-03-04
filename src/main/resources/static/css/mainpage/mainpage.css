@@ -1,3 +1,6 @@
+.lock {
+    pointer-events: none;
+}
 .approval {
     .search-grid > .row {
         display: flex;

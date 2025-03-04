@@ -2,6 +2,7 @@ package com.beauty1nside.mainpage.controller;
 
 import com.beauty1nside.common.GridArray;
 import com.beauty1nside.common.Paging;
+import com.beauty1nside.hr.dto.DeptDTO;
 import com.beauty1nside.mainpage.dto.ApprovalDTO;
 import com.beauty1nside.mainpage.dto.ApprovalSearchDTO;
 import com.beauty1nside.mainpage.dto.ScheduleDTO;
@@ -9,7 +10,6 @@ import com.beauty1nside.mainpage.service.ScheduleService;
 import com.beauty1nside.stdr.dto.DocumentDTO;
 import com.beauty1nside.mainpage.service.ApprovalService;
 import com.beauty1nside.security.service.CustomerUser;
-import com.beauty1nside.stdr.dto.StdrDeptDTO;
 import com.beauty1nside.stdr.service.StdrDeptService;
 import com.beauty1nside.utils.DateTimeUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -165,8 +165,8 @@ public class MainpageRestController {
   }
   
   @GetMapping("/dept")
-  public List<StdrDeptDTO> getDeptList(@AuthenticationPrincipal CustomerUser user) {
+  public List<DeptDTO> getDeptList(@AuthenticationPrincipal CustomerUser user) {
     Long companyNum = user.getUserDTO().getCompanyNum();
-    return stdrDeptService.deptList(companyNum);
+    return stdrDeptService.hqDeptList(companyNum);
   }
 }
