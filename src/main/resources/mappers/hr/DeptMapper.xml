@@ -32,14 +32,14 @@
 	            SELECT COUNT(*) 
 	            FROM hr_employee he 
 	            WHERE he.department_num = d.department_num 
-	            AND he.company_num = #{companyNum}  <!-- ✅ 회사 필터 추가 -->
+	            AND he.company_num = #{companyNum}  
 	        ) AS employeeCount  
 	     FROM HR_DEPARTMENT d
 	        LEFT JOIN CMMN dt on d.department_type = dt.cmmn_code  
 	        LEFT JOIN CMMN ds on d.department_status = ds.cmmn_code  
 	        LEFT JOIN hr_employee e on d.manager_num = e.employee_num and e.authority = 'au002' 
-	    WHERE d.company_num = #{companyNum}  <!-- ✅ 회사 필터 추가 -->
-	    ORDER BY d.department_num
+	    WHERE d.company_num = #{companyNum} 
+	    ORDER BY e.employee_num,COALESCE(d.parent_department_num, d.department_num), d.department_num
 	</select>
 	
 	
@@ -79,5 +79,12 @@
 	    WHERE DEPARTMENT_NUM = #{departmentNum}
 	</select>
 
+	<!-- 부서가 없는 직원수 -->
+	<select id="countEmployeesWithoutDepartment" parameterType="long" resultType="int">
+	    SELECT COUNT(*) 
+	    FROM hr_employee 
+	    WHERE company_num = #{companyNum} 
+	    AND department_num IS NULL
+	</select>
 
 </mapper>

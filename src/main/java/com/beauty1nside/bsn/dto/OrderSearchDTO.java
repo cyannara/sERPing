@@ -17,12 +17,12 @@ public class OrderSearchDTO {
 	int companyNum;
 	
 	//발주 요청 검색용
+	String branch;
 	String deteOption;
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	Date startDate;
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	Date endDate;
-	String branch;
 	
 	
 	

@@ -4,9 +4,10 @@
 
 // ✅ 부서 목록 가져오기
 function loadDepartments() {
-    fetch("/hr/rest/emp/departments")
+    fetch('/hr/rest/emp/departments/'+sessionData.companyNum)
         .then(response => response.json())
         .then(data => {
+			console.log("datadata",data);
             let departmentSelect = document.getElementById("modalDepartment");
             departmentSelect.innerHTML = '<option value="">선택</option>';
             data.forEach(dept => {
@@ -21,6 +22,7 @@ function loadSubDepartments(parentDeptId) {
     fetch(`/hr/rest/emp/sub-departments?parentDeptId=${parentDeptId}`)
         .then(response => response.json())
         .then(data => {
+			
             let subDeptSelect = document.getElementById("modalSubDepartment");
             subDeptSelect.innerHTML = '<option value="">선택</option>';
             data.forEach(dept => {

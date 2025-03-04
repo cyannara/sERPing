@@ -23,7 +23,7 @@
 			</div>
 			<div class="row">
 				<span class="col-3">옵션명</span>
-				<select name="optName" id="optName" class="col-9" onchange="returnValue()">
+				<select name="optName" id="optName" class="col-9" onchange="returnValue(); modalClose();">
 					<option value="">상품을 먼저 검색해주세요</option>
 
 				</select>
@@ -70,8 +70,8 @@
 			document.querySelector("#optCode").value = document.querySelector("#optName").value;
 		}
 		if(document.querySelector("#taxgrid")){
-			let opt = document.querySelector("#optName");
-			console.log(opt.dataset.price);
+			let opt = document.querySelector("#optName").selectedOptions[0];
+			console.log(opt);
 			console.log(rowData);
 			let newRow = {};
 			newRow.amount = opt.dataset.price;
@@ -83,8 +83,6 @@
 			newRow.standard = opt.dataset.standard;
 			grid.setRow(rowData.rowKey, newRow);
 		}
-		
-		
 	}
 	
 	

@@ -3,10 +3,106 @@
  */
 
 let grid;
+var employeeNum;
 const header = document.querySelector('meta[name="_csrf_header"]').content;
 const token = document.querySelector('meta[name="_csrf"]').content;
 
 document.addEventListener("DOMContentLoaded", function () {
+
+    setTimeout(() => {
+        populateFilters(); // 필터 로딩 함수 실행
+    }, 100);
+	
+const modalElement = document.getElementById("contractModal");
+  const closeButton = modalElement.querySelector('[data-bs-dismiss="modal"]');
+  if (closeButton) {
+      closeButton.addEventListener("click", function () {
+          console.log("✅ 인쇄 모달 닫기 버튼 클릭됨!");
+
+          try {
+          	let modalInstance = bootstrap.Modal.getInstance("#contractModal") || new bootstrap.Modal("#contractModal");
+              modalInstance.hide(); // ✅ Bootstrap 방식으로 모달 닫기
+              
+          } catch (error) {
+              console.warn("❌ Bootstrap 5가 로드되지 않았음. 대체 방식 사용");
+              modalElement.classList.remove("show");
+              modalElement.style.display = "none";
+              document.body.classList.remove("modal-open");
+
+              setTimeout(() => {
+                  document.querySelectorAll(".modal-backdrop").forEach((element) => element.remove()); // 백그라운드 제거
+              }, 300);
+           
+          }
+      });
+  } else {
+      console.warn("❌ 근로계약서 모달 닫기 버튼을 찾을 수 없습니다.");
+  }
+	
+	
+	 //pdf다운
+	  document.getElementById('pdfDown').addEventListener('click', function() {
+		  // 다운로드 엔드포인트 URL 구성 (/purchs/report/reportDownload 엔드포인트 사용)
+		  const contractDownloadUrl = `/hr/rest/contract/report/down?employeeNum=${employeeNum}`;
+		  console.log("Download URL:", contractDownloadUrl);
+		  // 브라우저를 해당 URL로 이동시켜 파일 다운로드를 유도
+		  window.location.href = contractDownloadUrl;
+		});
+	
+	//연락처 검증
+    const phoneInput = document.getElementById("phone");
+    if (!phoneInput) {
+        console.error("❌ 'phone' ID를 가진 요소를 찾을 수 없습니다!");
+        return;
+    }
+
+    phoneInput.addEventListener("input", function () {
+        let value = this.value.replace(/\D/g, ""); // 숫자 이외 문자 제거
+        if (value.length > 11) value = value.substring(0, 11); // 11자리까지만 입력 가능
+
+        // 010, 011, 016, 017, 018, 019 (휴대폰)
+        else if (/^(01[016789])/.test(value)) {
+            if (value.length === 10) {
+                value = value.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3"); // 구형 10자리 번호
+            } else if (value.length === 11) {
+                value = value.replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3"); // 일반 11자리 번호
+            }
+        }
+
+        this.value = value; // 변환된 값 적용
+    });
+	
+	document.body.addEventListener("click",function(event){
+    if (event.target.classList.contains("contractBtn")) {
+        employeeNum = event.target.getAttribute("data-id");
+        console.log("📌 선택된 employeeNum:", employeeNum);
+
+        const contractUrl = `/hr/rest/contract/report?employeeNum=${employeeNum}`;
+        const contractModalEl = document.querySelector("#contractModal");
+
+        // 📌 서버에서 계약서 존재 여부 확인
+        fetch(contractUrl, { method: 'HEAD' })
+            .then(response => {
+                if (response.ok) {
+                    console.log("✅ 근로 계약서 존재함. PDF 렌더링 시작");
+                    renderPDF(contractUrl);
+                } else {
+                    console.warn("❌ 근로 계약서 없음!");
+                    renderPDF(""); // PDF가 없을 경우 빈 값 전달하여 메시지 표시
+                }
+
+                // 📌 모달 표시
+                if (contractModalEl) {
+                    const contractModal = new bootstrap.Modal(contractModalEl);
+                    contractModal.show();
+                }
+            })
+            .catch(error => {
+                console.error("🚨 근로 계약서 확인 중 오류 발생:", error);
+                alert("⚠️ 근로 계약서 확인 중 오류가 발생했습니다. 나중에 다시 시도해주세요.");
+            });
+    }
+});
 	
    let profileInputIMG = document.querySelector("#profileImage");
    let profileImgView = document.querySelector("#profilePreview");
@@ -26,6 +122,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
     });
+    
+    
 
 	
     initializeGrid();
@@ -128,12 +226,16 @@ function initializeGrid() {
             { header: "재직 상태", name: "status", align: "center", sortable: true, width: 100, formatter: formatCommonCode('status') },
             { header: "근무 유형", name: "employmentType", align: "center", sortable: true, width: 100, formatter: formatCommonCode('employmentType') },
             { header: "입사일", name: "hireDate", align: "center", sortable: true, width: 150, formatter: ({ value }) => value?.split('T')[0] || '' },
-            { header: "연락처", name: "phone", align: "center", sortable: true, width: 150, formatter: formatPhoneNumber  },
+            { header: "연락처", name: "phone", align: "center", sortable: true, width: 150, formatter: ({ value }) => formatPhoneNumberForDB(value) },
             { header: "이메일", name: "email", align: "center", sortable: true, width: 200 },
             { header: "근로계약서", name: "employeeContract", align: "center", sortable: true, width: 120,
 					formatter: function({ row }) {
-				        return `<button class="btn btn-info btn-sm contractBtn" data-id="${row.employeeId}">보기</button>`;
-				    },
+					    if (row.contractStatus === "보기") {
+					        return `<button class="btn btn-info btn-sm contractBtn" data-id="${row.employeeNum}">보기</button>`;
+					    } else {
+					        return `<span class="text-danger">미계약</span>`;
+					    }
+					},
             }
         ],
         data: dataSource,
@@ -149,7 +251,7 @@ function loadCommonCodes() {
         .then(response => response.json())
         .then(data => {
             commonCodes = data;
-            populateFilters(); // 필터 UI 업데이트
+            //populateFilters(); // 필터 UI 업데이트
             populateModals(); // 모달 UI 업데이트
         })
         .catch(error => console.error("공통 코드 로딩 실패:", error));
@@ -166,10 +268,15 @@ function populateFilters() {
     const statusSelect = document.getElementById("statusFilter");
     const employmentTypeSelect = document.getElementById("employmentTypeFilter");
     const departmentSelect = document.getElementById("departmentFilter");
-    
+ 
+	console.log("🔎 positionSelect:", document.getElementById("positionFilter"));
+	console.log("🔎 statusSelect:", document.getElementById("statusFilter"));
+	console.log("🔎 employmentTypeSelect:", document.getElementById("employmentTypeFilter"));
+	console.log("🔎 departmentSelect:", document.getElementById("departmentFilter")); 
+	    
     if (!positionSelect || !statusSelect || !employmentTypeSelect || !departmentSelect) {
         console.error("❌ populateFilters() 실행 실패! 필터 요소 중 일부가 존재하지 않습니다.");
-        return; // 🔴 요소가 없으면 함수 실행 중단
+        return; // 요소가 없으면 함수 실행 중단
     }
 
     // 기존 옵션 제거
@@ -404,6 +511,8 @@ function registerEmployee() {
 	
 	let employmentId = document.querySelector("input[name='modalEmploymentType']:checked")?.id;
 	let employmentValue = employmentId ? employmentId.substring(employmentId.lastIndexOf("_") + 1) : "";
+	let phone = document.getElementById("phone")?.value || "";
+    let formattedPhone = formatPhoneNumberForDB(phone); // 변환된 전화번호
 	
 	let profileInputIMG = document.querySelector("#profileImage");
     const file = profileInputIMG.files[0];
@@ -413,7 +522,7 @@ function registerEmployee() {
     formData.append("employeeId", document.getElementById("employeeIdInput")?.value || "");
 	formData.append("employeeName",document.getElementById("employeeName")?.value || "");
 	formData.append("email",document.getElementById("email")?.value || "");
-	formData.append("phone",document.getElementById("phone")?.value || "");
+	formData.append("phone", formattedPhone);
 	formData.append("hireDate",document.getElementById("hireDate")?.value || "");
 	formData.append("departmentNum",document.getElementById("modalSubDepartment")?.value || 0);
 	formData.append("position",document.getElementById("modalPosition")?.value || "");
@@ -520,8 +629,8 @@ function registerEmployee() {
     .then(response => response.text())
     .then(message => {
         alert(message);
-        return;
         location.reload();
+        return;
     })
     .catch(error => console.error("❌ 등록 실패:", error));
     
@@ -534,9 +643,9 @@ let globalSubDepartments = [];
 
 // ✅ 모달 공통 코드 데이터 로드
 function populateModalData() {
-    console.log("🔹 모달 공통 코드 데이터 불러오는 중...");
-
-    fetch("/hr/rest/emp/common-codes")
+    console.log("🔹 모달 공통 코드 데이터 불러오는 중..."+sessionData.companyNum);
+	
+    fetch("/hr/rest/emp/common-codes/"+sessionData.companyNum)
         .then(response => response.json())
         .then(data => {
             if (!data) {
@@ -544,19 +653,28 @@ function populateModalData() {
                 return;
             }
 
-            console.log("📥 불러온 공통 코드 데이터:", data);
+            console.log("📥 불러온 공통 코드 데이터123123:", data);
 
             // ✅ 전역 변수에 부서 및 하위 부서 저장
-            globalDepartments = data.departments;  
+            globalDepartments = data.departments.filter(dept => dept.PARENT_DEPARTMENT_NUM == 0 );  
+            console.log("globalDepartments",globalDepartments);
+            
+            let tag = `<option value="">선택</option>`;
+            globalDepartments.forEach(glovalDept => {
+				console.log("glovalDept",glovalDept);
+				tag += `<option value="${glovalDept.DEPARTMENT_NUM}">${glovalDept.DEPARTMENT_NAME}</option>`;
+			})
             globalSubDepartments = data.departments.filter(dept => dept.PARENT_DEPARTMENT_NUM !== null); // 하위 부서만 저장
 
             // ✅ 부서 (Department) 선택 리스트 설정
             const departmentSelect = document.getElementById("modalDepartment");
-            departmentSelect.innerHTML = `
+            console.log("tag",tag);
+            departmentSelect.innerHTML = tag;
+/*             `
                 <option value="">선택</option>
                 <option value="1">본사</option>
                 <option value="8">지점</option>
-            `;
+            `;*/
 
             // ✅ 하위 부서 초기화 (모든 하위 부서 표시)
             populateSubDepartments("");
@@ -635,5 +753,61 @@ function openPostcode() {
 
 
 console.log("file:::::",file);
+
+
+
+querySelector("#contractBtn").addEventListener("click", ()=>{
+			alert("계약보기 클릭");
+		});
+
+		
+// (1) PDF.js로 PDF 파일을 캔버스에 렌더링
+	function renderPDF(contractUrl) {
+	  const canvas = document.getElementById('pdfCanvas');
+	  const context = canvas.getContext('2d');
+	
+	  // PDF 로드
+	  pdfjsLib.getDocument(contractUrl).promise.then(pdf => {
+	    console.log('PDF loaded, total pages:', pdf.numPages);
+	    // 첫 페이지만 렌더링 (필요시 여러 페이지 지원 가능)
+	    pdf.getPage(1).then(page => {
+	      const scale = 1.5; // 확대/축소 비율
+	      const viewport = page.getViewport({ scale });
+	      // 캔버스 크기 설정
+	      canvas.width = viewport.width;
+	      canvas.height = viewport.height;
+	
+	      // 페이지 렌더링
+	      const renderContext = {
+	        canvasContext: context,
+	        viewport: viewport
+	      };
+	      page.render(renderContext).promise.then(() => {
+	        console.log('Page rendered');
+	      });
+	    });
+	  }).catch(error => {
+	    console.error('PDF 로드 오류:', error);
+	  });
+	}
+	
+	
+	
+ 
+	
+
+
+
+function formatPhoneNumberForDB(value) {
+    if (!value) return "";
+    value = value.replace(/\D/g, ""); // 숫자 이외 문자 제거
+
+    if (value.length === 11) {
+        return value.replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3");
+    } else if (value.length === 10) {
+        return value.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3");
+    }
+    return value;
+};
 
 

@@ -93,6 +93,10 @@ public class ErpAdminLoginController {
 			 			Model model,
 			 			HttpSession session) {
 		
+		//관리하는 회사들 정보를 업데이트 한다 역정규화로 발생한 처리
+		//스케쥴러로 매일 밤 12시에 1번만 하게 해야하는데 임시방편으로 사용중
+		erpAdminLoginService.companystateupdate();
+		
 		//비밀번호 암호화 (입력되는 비밀번호는 암호화 안해도 됨)
 		//employeePw = passwordEncoder.encode(employeePw);
 		//log.info(employeePw);

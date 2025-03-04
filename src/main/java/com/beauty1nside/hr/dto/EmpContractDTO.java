@@ -57,9 +57,16 @@ public class EmpContractDTO {
     private Double bonus; // 상여금
     private Double additionalPay; // 추가 수당
     
-    private Integer salaryPaymentDate;  // ✅ 급여 지급일 (1~31)
-    private String paymentMethod;  // ✅ 급여 지급 방식 (BANK / CASH)
+    private Integer salaryPaymentDate;  // 급여 지급일 (1~31)
+    private String paymentMethod;  // 급여 지급 방식 (계좌이체 / 직접지급)
     
     private String annualLeavePolicy = "근로기준법에 따라 부여";  
     private String socialInsurance = "고용보험, 산재보험, 국민연금, 건강보험 가입";  
+    
+    private String employeeName;
+    private String companyName;
+
+    
+    
+    
 }

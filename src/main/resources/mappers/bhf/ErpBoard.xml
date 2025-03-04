@@ -2,6 +2,25 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.beauty1nside.bhf.mapper.ErpBoardMapper">
 
+	<delete id="boardDelete" parameterType="int">
+        DELETE FROM grpwr_board WHERE board_id = #{boardId}
+    </delete>
+
+	<update id="boardModify" parameterType="ErpBoardListDTO">
+        UPDATE grpwr_board
+        SET 
+            board_title = #{boardTitle},
+            board_content = #{boardContent},
+            board_category = #{boardCategory},
+            board_date = #{boardDate}
+        WHERE board_id = #{boardId} AND company_num = #{companyNum}
+    </update>
+
+	<insert id="boardRequest" parameterType="ErpBoardListDTO">
+		insert into grpwr_board (board_id, board_title, board_content, board_category, board_date, employee_name, employee_num, company_num)
+		values (board_id_seq.nextval, #{boardTitle}, #{boardContent}, #{boardCategory}, #{boardDate}, #{employeeName}, #{employeeNum}, #{companyNum})
+	</insert>
+
 	<select id="boardList" resultType="ErpBoardListDTO" parameterType="ErpBoardListSearchDTO">
 		select	board_id,
 				board_title,

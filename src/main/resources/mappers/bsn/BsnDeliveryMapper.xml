@@ -38,15 +38,21 @@ SELECT ROW_NUMBER() OVER (
 FROM bsn_delivery bd
 LEFT JOIN bsn_order bo ON bo.order_id = bd.order_id
 WHERE bd.company_num = #{companyNum}
-AND   bd.delivery_status = 'DS01'
 <include refid="searchInfoBsnDLV"></include>
 )
 WHERE RN BETWEEN #{start} AND #{end}
 
 </select>
 
-<!-- 출고 목록 수량 -->
+<!-- 출고 목록 수량(준비중만) -->
+<select id="getCountBsnDelivery">
+SELECT COUNT(*)
+FROM bsn_delivery bd
+JOIN bsn_order bo ON bo.order_id = bd.order_id
+WHERE bd.company_num = #{companyNum}
+<include refid="searchInfoBsnDLV"></include>
 
+</select>
 
 <!-- 출고 상세 목록-->
 <select id="selectBsnDeliveryDetail"  parameterType="BsnDeliveryDTO">
@@ -87,6 +93,12 @@ WHERE RN BETWEEN #{start} AND #{end}
 </select>
 
 <!-- 출고 상세 목록 수량-->
+<select id="getCountBsnDeliveryDetail"  parameterType="BsnDeliveryDTO">
+SELECT COUNT(delivery_detail_id)
+FROM bsn_delivery_detail
+WHERE delivery_id = #{deliveryId}
+</select>
+
 
 <!-- 출고 LOT 상세 목록-->
 <select id="selectBsnDeliveryLotDetail" parameterType="BsnDeliveryDetailDTO">
@@ -132,27 +144,37 @@ WHERE bdl.delivery_detail_id = #{deliveryDetailId}
 WHERE RN BETWEEN #{start} AND #{end}
 </select>
 <!-- 출고 LOT 상세 목록 수량-->
+<select id="getCountBsnDeliveryLotDetail" parameterType="BsnDeliveryDetailDTO">
+SELECT COUNT(delivery_lot_detail_num)
+FROM bsn_delivery_lot_detail
+WHERE delivery_detail_id = #{deliveryDetailId}
+</select>
 
 <!-- 검색조건 -->
 <sql id="searchInfoBsnDLV">
 	 
 	<if test="deteOption != null and deteOption == 'orderDate' and  startDate != null">
-		AND bo.order_date >= #{startDate}
+		AND order_date >= #{startDate}
 	</if>
 	<if test="deteOption != null and deteOption == 'orderDate' and  endDate != null">
 		<![CDATA[
-		AND bo.order_date <= #{endDate}
-... < #{endDate}
+		AND order_date <= #{endDate}
 		]]>
 	</if>
 	
 	<if test="deteOption != null and deteOption =='dueDate' and  startDate != null">
-		AND bo.due_date >= #{startDate}
+		AND due_date >= #{startDate}
 	</if>
 	<if test="deteOption != null and deteOption == 'dueDate' and  endDate != null">
 		<![CDATA[
-		AND bo.due_date <= #{endDate}
+		AND due_date <= #{endDate}
 		]]>
+	</if>
+	<if test="statusList != null and !statusList.isEmpty()">
+		AND delivery_status IN
+		<foreach item="status" collection="statusList" open="(" separator="," close=")">
+       		#{status}
+    	</foreach>
 	</if>
 	
 	
@@ -165,6 +187,14 @@ WHERE RN BETWEEN #{start} AND #{end}
 
 <!-- 창고 LOT별 조회(임시) -->
 <select id="selectGoodsWarehouseLot" parameterType="BsnDeliveryDetailDTO">
+SELECT warehousing_body_num, 
+       option_num, 
+       option_code, 
+       goods_lot_num, 
+       warehousing_remaining_quantity,
+       goods_consumption_date
+FROM
+(
 SELECT ROW_NUMBER() OVER (
               ORDER BY pwb.goods_consumption_date ASC
        ) AS RN, 
@@ -196,7 +226,7 @@ SELECT ROW_NUMBER() OVER (
        
 FROM purchs_warehousing_body pwb
 LEFT JOIN purchse_option po ON pwb.option_num = po.option_num
-WHERE pwb.company_num = 1
+WHERE pwb.company_num = #{companyNum}
   AND po.option_code = #{optionCode}
   AND warehousing_remaining_quantity > 0
   AND NOT EXISTS (
@@ -206,9 +236,30 @@ WHERE pwb.company_num = 1
         AND bdl.delivery_detail_id = #{deliveryDetailId}
   )
 ORDER BY pwb.goods_consumption_date ASC
-
+)
+WHERE RN BETWEEN #{start} AND #{end}
 
 </select>
+<!-- 창고 LOT별 조회 카운팅 -->
+<select id="getCountGoodsWarehouseLot" parameterType="BsnDeliveryDetailDTO">
+SELECT COUNT(warehousing_body_num)
+FROM purchs_warehousing_body pwb
+WHERE pwb.company_num = #{companyNum}
+  AND pwb.warehousing_remaining_quantity > 0
+  AND EXISTS (
+      SELECT 1 
+      FROM purchse_option po 
+      WHERE po.option_num = pwb.option_num
+        AND po.option_code = #{optionCode}
+  )
+  AND NOT EXISTS (
+      SELECT 1 
+      FROM BSN_DELIVERY_LOT_DETAIL bdl
+      WHERE bdl.goods_lot_num = pwb.goods_lot_num
+        AND bdl.delivery_detail_id = #{deliveryDetailId}
+  )
+</select>
+
 
 <insert id="insertBsnDeliveryLotDetail" statementType="CALLABLE">
 call Bsn_Dlv_Lot_Register( 
@@ -216,6 +267,13 @@ call Bsn_Dlv_Lot_Register(
        #{lotDetails, typeHandler=com.beauty1nside.bsn.BsnDeliDtlArrayTypeHandler}  
 ) 
 </insert>
+
+<update id="updateBsnDeliveryLotDetail" statementType="CALLABLE">
+call BSN_DLV_LOT_MODIFY( 
+       #{deliveryDetailId},
+       #{lotDetails, typeHandler=com.beauty1nside.bsn.BsnDeliDtlArrayTypeHandler}  
+) 
+</update>
 
 <delete id="deleteBsnDeliveryLotDetail" statementType="CALLABLE">
 call BSN_DLV_LOT_REMOVE(

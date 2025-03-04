@@ -23,6 +23,7 @@ public class BsnReturnListDTO  extends BhfReturnListDTO {
 //	private String exchangeReturningChoice;
 //	private String returningReason;
 	
+	private String returningDetailCode;
 	private String goodsCode;
 	private String optionCode;
 	private String optionBarcode;

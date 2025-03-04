@@ -7,7 +7,10 @@
 </head>
 <body>
 	<div id="registerGrid"></div>
-	
+	<script th:inline="javascript">
+	  	let companyNum = [[${session.companyNum}]];
+
+	  </script>  
 	<script>
         let registerGrid;
 
@@ -38,19 +41,20 @@
             if (registerGrid) {
             	
                 console.log(selectedRow);
-                loadLotDetail(selectedRow.optionCode, selectedRow.deliveryDetailId);
+                //console.log(companyNum);
+                loadLotDetail(selectedRow.optionCode, selectedRow.deliveryDetailId, companyNum);
                 registerGrid.reloadData();
                 registerGrid.refreshLayout();
             }
         });
         
-        async function loadLotDetail(optionCode, deliveryDetailId) {
-        	if (!optionCode || !deliveryDetailId) {
+        async function loadLotDetail(optionCode, deliveryDetailId, companyNum ) {
+        	if (!optionCode || !deliveryDetailId || !companyNum) {
                 console.warn("유효하지 않은 상세정보입니다.");
                 return;
             }
         	
-            fetch(`http://localhost:81/bsn/rest/goods/lot?optionCode=${optionCode}&deliveryDetailId=${deliveryDetailId}`)
+            fetch(`/bsn/rest/goods/lot?optionCode=${optionCode}&deliveryDetailId=${deliveryDetailId}&companyNum=${companyNum}`)
             	
                 .then(response => {
         	            if (!response.ok) throw new Error(`HTTP 오류! 상태: ${response.status}`);

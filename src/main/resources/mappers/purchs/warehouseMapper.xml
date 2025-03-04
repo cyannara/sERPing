@@ -63,10 +63,10 @@
 
 <sql id="searchWarehousingListInfo">
     <if test="goodsName != null and goodsName != ''">
-        AND g.goods_name = #{goodsName}
+        AND g.goods_name LIKE '%' || #{goodsName} || '%'
     </if>
     <if test="vendorName != null and vendorName != ''">
-        AND v.vendor_name = #{vendorName}
+        AND v.vendor_name LIKE '%' || #{vendorName} || '%' 
     </if>
     <if test="startDate != null">
         AND h.warehousing_date >= TO_DATE(#{startDate}, 'YYYY-MM-DD')

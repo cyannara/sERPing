@@ -230,6 +230,7 @@ function subManagement(data) {
 				}
 			}
 			
+			//페이지 접속했을 경우
 			//지점 관리 기능
 			if(window.location.href.includes("/bhf/")){
 				if(parseInt(subscriptionState.pointObjdate) <= -10){
@@ -248,16 +249,16 @@ function subManagement(data) {
 				}
 			}
 			//회계처리
-    		//아직 메뉴 없음
+			if(window.location.href.includes("/accnut/")){
+				if(!window.location.href.includes("/accnut/selling_select")){
+					if(parseInt(subscriptionState.hrObjdate) <= 0){
+						showAlert('결제 후 이용가능합니다.', 'danger');
+						window.location.href = "/accnut/selling_select";
+					}
+				}
+			}
 			
-			
-			
-			
-			
-			
-			
-			
-			
+			//페이지 링크 삭제
 			//지점
 			if(parseInt(subscriptionState.pointObjdate) <= 0){
 			    let branchLink = document.querySelector('nav.menu a[data="branch"]');
@@ -282,15 +283,25 @@ function subManagement(data) {
 			    }
 		    }
 		    
-		    //회계처리
-		    //아직 메뉴 없음
-		    
-		    
-		    
-			
+		    //회계관리
+		    if(parseInt(subscriptionState.accountObjdate) <= 0){
+			    if (currentUrl.includes("/accnut/") || currentUrl.includes("menu=account")) {
+				    document.querySelectorAll(".nav-item a.nav-link").forEach(link => {
+				        let href = link.getAttribute("href");
+				        if (href && href.includes("/accnut/") && !href.includes("/accnut/selling_select")) {
+				            link.removeAttribute("href");
+				            link.style.pointerEvents = "none";
+				            link.style.color = "#aaa";
+				            link.style.cursor = "default";
+				        }
+				    });
+			    }
+		    }
 			
 		//일반 사용자인 경우에만
 		}else{
+			
+			//페이지 링크 접근시
 			//서비스 계약 만료된 일반 사용자
 			if (window.location.href !== window.location.origin + "/") { 
 			    if (parseInt(subscriptionState.subObjdate) <= -10) {
@@ -317,20 +328,16 @@ function subManagement(data) {
 				}
 			}
 			//회계처리
-    		//아직 메뉴 없음
+			if(window.location.href.includes("/accnut/")){
+				if(!window.location.href.includes("/accnut/selling_select")){
+					if(parseInt(subscriptionState.hrObjdate) <= 0){
+						showAlert('결제 후 이용가능합니다.', 'danger');
+						window.location.href = "/accnut/selling_select";
+					}
+				}
+			}
 			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
+			//페이지 링크 삭제
 			//지점
 			if(parseInt(subscriptionState.pointObjdate) <= 0){
 			    let branchLink = document.querySelector('nav.menu a[data="branch"]');
@@ -355,10 +362,20 @@ function subManagement(data) {
 			    }
 		    }
 		    
-		    //회계처리
-		    //아직 메뉴 없음
-			
-			
+		    //회계관리
+		    if(parseInt(subscriptionState.accountObjdate) <= 0){
+			    if (currentUrl.includes("/accnut/") || currentUrl.includes("menu=account")) {
+				    document.querySelectorAll(".nav-item a.nav-link").forEach(link => {
+				        let href = link.getAttribute("href");
+				        if (href && href.includes("/accnut/") && !href.includes("/accnut/selling_select")) {
+				            link.removeAttribute("href");
+				            link.style.pointerEvents = "none";
+				            link.style.color = "#aaa";
+				            link.style.cursor = "default";
+				        }
+				    });
+			    }
+		    }
 		}
 	}, 500);
     

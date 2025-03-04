@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,11 +26,12 @@ import org.springframework.web.multipart.MultipartFile;
 import com.beauty1nside.common.GridArray;
 import com.beauty1nside.common.Paging;
 import com.beauty1nside.purchs.dto.ProdInsertVO;
+import com.beauty1nside.purchs.dto.ProdUpdateVO;
 import com.beauty1nside.purchs.dto.ProductDTO;
 import com.beauty1nside.purchs.dto.ProductSearchDTO;
 import com.beauty1nside.purchs.dto.PurchInsertVO;
+import com.beauty1nside.purchs.dto.PurchUpdateVO;
 import com.beauty1nside.purchs.dto.PurchaseSearchDTO;
-import com.beauty1nside.purchs.dto.WarehouseDTO;
 import com.beauty1nside.purchs.dto.WarehouseInsertVO;
 import com.beauty1nside.purchs.dto.WarehouseSearchDTO;
 import com.beauty1nside.purchs.service.productService;
@@ -38,6 +40,7 @@ import com.beauty1nside.purchs.service.warehouseService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
+import ch.qos.logback.core.model.Model;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -51,10 +54,29 @@ public class ProductRestController {
 	final purchaseService purchaseService;
 	final warehouseService warehouseService;
 	
+	// ✅ 카테고리 목록 조회 (companyNum 기준)
+	@GetMapping("/product/catelist")
+    public ResponseEntity<?> getCategoryList(@RequestParam("companyNum") int companyNum) {
+        System.out.println("📢 요청받은 companyNum: " + companyNum); // ✅ 서버 로그 확인
+
+        List<ProductDTO> categoryList = productService.getCatelist(companyNum);
+
+        if (categoryList == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("❌ 데이터베이스에서 카테고리 목록을 가져오지 못했습니다.");
+        }
+
+        if (categoryList.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("⚠️ 카테고리 데이터 없음");
+        }
+
+        return ResponseEntity.ok(categoryList);
+    }
+	
 	//브랜드 모달 데이터 조회 
 	@GetMapping("/brand/list")
 	public Object brandList(@RequestParam(name="perPage",defaultValue="2", required = false) int perPage,
 							@RequestParam(name="page", defaultValue = "1" ,required = false) int page,
+							@RequestParam(name="companyNum", required=true) int companyNum,  // ✅ 회사번호 필수
 							@ModelAttribute ProductSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
 		
 	
@@ -81,6 +103,7 @@ public class ProductRestController {
 	@GetMapping("/vendor/list")
 	public Object vendorList(@RequestParam(name="perPage",defaultValue="2", required = false) int perPage,
 							@RequestParam(name="page", defaultValue = "1" ,required = false) int page,
+							@RequestParam(name="companyNum", required=true) int companyNum,  // ✅ 회사번호 필수
 							@ModelAttribute ProductSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
 		
 		
@@ -106,6 +129,7 @@ public class ProductRestController {
 		@GetMapping("/warehouse/list")
 		public Object warehouseList(@RequestParam(name="perPage",defaultValue="2", required = false) int perPage,
 								@RequestParam(name="page", defaultValue = "1" ,required = false) int page,
+								@RequestParam(name="companyNum", required=true) int companyNum,  // ✅ 회사번호 필수
 								@ModelAttribute ProductSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
 			
 			
@@ -132,7 +156,7 @@ public class ProductRestController {
 		@PostMapping("/product/uploadGoodsImages")
 		public ResponseEntity<Map<String, Object>> uploadFile(@RequestParam("file") MultipartFile file , ProductDTO dto ) {
 		    Map<String, Object> response = new HashMap<>();
-		    String UPLOAD_DIR = dto.getImgUpload();
+		    String UPLOAD_DIR = dto.getImgUpload(); //저장경로
 
 		    try {
 		        if (file.isEmpty()) {
@@ -374,8 +398,115 @@ public class ProductRestController {
 				return result;
 			
 			}
+			
+			//상품 수정
+			@PostMapping("/product/update")
+			// Map을 같이 사용해서 status,message 등을 사용 가능하다
+			// ProdInsertVO 안에 List<ProInsertDtlVO> files 있어서 ProInsertDtlVO를 따로 넣지 않아도 된다.
+			public ResponseEntity<Map<String,Object>> productUpdate(@RequestBody ProdUpdateVO prodUpdateVO){
+				log.info("컨트롤러====={}",prodUpdateVO);
+				Map<String, Object> response = new HashMap<>();
+				 try {
+					productService.goodUpdate(prodUpdateVO);
+					response.put("status", "success");
+					response.put("message", "제품 수정 성공");
+					return ResponseEntity.ok(response);
+				 } catch(Exception e) {
+					 e.printStackTrace(); // 🔥 로그 출력 추가
+					 log.error("수정실패", e);
+					 response.put("status", "error");
+					 response.put("message", "서버 오류 발생: " + e.getMessage()); // 🔥 오류 메시지 반환
+					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+				 }
+				
+			}
+			
+	//상품별 재고 조회  
+		@GetMapping("/goods/nums")
+		public Object goodsNumList(@RequestParam(name="perPage",defaultValue="2", required = false) int perPage,
+								   @RequestParam(name="page", defaultValue = "1" ,required = false) int page,
+								   @RequestParam(name="companyNum", required=true) int companyNum,  // ✅ 회사번호 필수
+								   @ModelAttribute ProductSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
+			// 회사 번호를 DTO에 설정 (필수)
+		    dto.setCompanyNum(companyNum); 
 
+			//페이징 유닛 수 
+			paging.setPageUnit(perPage);
+			paging.setPage(page);
+			
+			//페이징 조건
+			dto.setStart(paging.getFirst());
+			dto.setEnd(paging.getLast());
+			
+			//페이징 처리 
+			paging.setTotalRecord(productService.goodsNumCount(dto));
+			
+			//grid배열 처리 
+			GridArray grid = new GridArray();
+			Object result = grid.getArray(paging.getPage(), productService.goodsNumCount(dto),productService.getGoodsNum(dto));
+			return result;
+		
+		}
+		
+		//lot별 재고 조회  
+		@GetMapping("/goodslot/nums")
+		public Object goodsLotNumlist(@RequestParam(name="perPage",defaultValue="10", required = false) int perPage,
+		                              @RequestParam(name="page", defaultValue = "1" ,required = false) int page,
+		                              @RequestParam(name="companyNum", required=true) int companyNum,  
+		                              @RequestParam(name="optionNum", required=true) int optionNum,  
+		                              @ModelAttribute ProductSearchDTO dto, Paging paging) throws JsonMappingException, JsonProcessingException {
+		    
+		    // 회사번호 & 옵션번호 설정
+		    dto.setCompanyNum(companyNum);
+		    dto.setOptionNum(optionNum);
+
+		    // 페이징 설정
+		    paging.setPageUnit(perPage);
+		    paging.setPage(page);
+		    
+		    // 페이징 조건
+		    dto.setStart(paging.getFirst());
+		    dto.setEnd(paging.getLast());
+		    
+		    // 전체 레코드 수 조회
+		    int totalCount = productService.goodsLotNumCount(dto);
+		    paging.setTotalRecord(totalCount);
+		    
+		    // LOT 데이터 조회
+		    List<ProductDTO> lotList = productService.getGoodsLotNum(dto);
+
+		    // JSON 응답 데이터 포맷
+		    Map<String, Object> result = new HashMap<>();
+		    result.put("contents", lotList);
+		    result.put("totalCount", totalCount);
+
+		    return ResponseEntity.ok(result);
+		}
+		
+		//상품 수정
+		@PostMapping("/purchase/update")
+		// Map을 같이 사용해서 status,message 등을 사용 가능하다
+		// ProdInsertVO 안에 List<ProInsertDtlVO> files 있어서 ProInsertDtlVO를 따로 넣지 않아도 된다.
+		public ResponseEntity<Map<String,Object>> purchsUpdate(@RequestBody PurchUpdateVO purchUpdateVO){
+			log.info("컨트롤러====={}",purchUpdateVO);
+			Map<String, Object> response = new HashMap<>();
+			 try {
+				purchaseService.purchUpdate(purchUpdateVO);
+				response.put("status", "success");
+				response.put("message", "발주서 수정 성공");
+				return ResponseEntity.ok(response);
+			 } catch(Exception e) {
+				 e.printStackTrace(); // 🔥 로그 출력 추가
+				 log.error("수정실패", e);
+				 response.put("status", "error");
+				 response.put("message", "서버 오류 발생: " + e.getMessage()); // 🔥 오류 메시지 반환
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+			 }
+			
+		}
+
+			
+			
+		
 
 }
-
-	

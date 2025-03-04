@@ -92,7 +92,12 @@
 				
 				<th rowspan="6" class="sero realRight">공<br><br>급<br><br>받<br><br>는<br><br>자</th>
 				<th class="right fontBlue menuTh"><span class="star">*</span> 등록<br>번호</th>
-				<td class="right inputTh"></td>
+				<td class="right inputTh">
+					<select name="bhf" id="bhf" class="form-control form-control-sm" onchange="displayBhf()">
+						<option value="">지점을 선택해주세요</option>
+						
+					</select>
+				</td>
 				<th class="right fontBlue menuTh">종사업장<br>번호</th>
 				<td class="right inputTh"></td>
 			</tr>
@@ -143,15 +148,15 @@
 				<th class="menuTh totals"><span class="star">*</span> 작성일자</th>
 				<td colspan="2" class="totals longTd nopadding"><input type="date" name="regiserDate" id="regiserDate" class="form-control form-control-sm" onchange="gridmonthchange()"></td>
 				<th class="menuTh totals" >비고</th>
-				<td colspan="2" class="totals longTd"></td>
+				<td colspan="2" class="totals longTd"><input type="text" name="note" id="note" class="form-control form-control-sm"></td>
 			</tr>
 			<tr>
 				<th class="menuTh totals">&nbsp;&nbsp;합계금액</th>
-				<td class="totals "></td>
+				<td class="totals" id="total">0</td>
 				<th class="menuTh totals">공급가액</th>
-				<td class="totals"></td>
+				<td class="totals" id="supplyPrice">0</td>
 				<th class="menuTh totals">세액</th>
-				<td class="totals"></td>
+				<td class="totals" id="tax">0</td>
 			</tr>
 		</table>
 		<!-- 품목 추가 버튼 -->
@@ -161,6 +166,14 @@
 		</div>
 		<!-- 그리드로 정보 입력 -->
 		<div id="taxgrid"></div>
+		<!-- 등록 초기화 버튼 -->
+		<div class="row">
+			<div class="col-4"></div>
+			<button type="button" class="col-1" onclick="resetBtn()">초기화</button>
+			<div class="col-2"></div>
+			<button type="button" class="col-1" onclick="insertBtn()">등록</button>
+			<div class="col-4"></div>
+		</div>
 		 <!-- 상품 검색 모달 -->
 		<div th:replace="purchs/ModalTemplate :: ModalTemplate (
 						    	'optSearchModal', 
@@ -169,6 +182,7 @@
 						    	'accnut/optSearchBody', 
 						    	'accnut/optSearchFooter'
 						    )"></div>
+		
 	</div>
 	
 <script>
@@ -176,9 +190,13 @@
 	var result = {};
 	var rowData = {};
 	
+	var modalElement = document.getElementById('optSearchModal');
+	var modalInstance = new bootstrap.Modal(modalElement);
+	
 	document.addEventListener("DOMContentLoaded", ()=> {
 		getCompanyInfo(session.companyNum);
-		delRow();
+		gridClick();
+		getBhf();
 	})
 	
 	function getCompanyInfo(coNum){
@@ -210,10 +228,43 @@
 		el : document.querySelector('#taxgrid'),
 		columns: [
 			{ header : "월", name : "month", width: 10, align:"center"},
-			{ header : "일", name : "day", width: 10, editor:"text", align:"center"},
-			{ header : "품목", name : "optionCode", editor:"text", align:"center"},
+			{ header : "일", name : "day", width: 10, editor:"text", align:"center", onAfterChange: (ev)=> {
+																												let newValue = ev.value.replace(/[^0-9]/g, "");
+																												// 날짜로 마지막 일수 가져오기
+																												let date = document.querySelector('#regiserDate').value;
+																												let last = new Date(date.substr(0, 4), date.substr(5, 2), 0);
+																												// 마지막 일수보다 크면 마지막 일수로 조정
+																												if(newValue > last.getDate()){
+																													newValue = `${last.getDate()}`;
+																												}
+
+																												if(ev.value != newValue){
+																													grid.setValue(ev.rowKey, "day", newValue, false);	
+																												} 
+																											}
+			},
+			{ header : "품목", name : "optionCode", align:"center"},
 			{ header : "규격", name : "standard", align:"center"},
-			{ header : "수량", name : "quantity", editor:"text", align:"center", width: 50},
+			{ header : "수량", name : "quantity", editor:"text", align:"center", width: 50, onAfterChange: (ev)=> {
+																													let newValue = ev.value.replace(/[^0-9]/g, "");
+																													let rowValue = grid.getRow(ev.rowKey);
+																													
+																													
+																													if(ev.value != newValue){
+																														grid.setValue(ev.rowKey, "quantity", newValue, false);
+																														grid.setValue(ev.rowKey, "total", newValue * rowValue.amount, false);
+																														grid.setValue(ev.rowKey, "supplyPrice", newValue * rowValue.amount * 0.9, false);
+																														grid.setValue(ev.rowKey, "tax", newValue * rowValue.amount * 0.1, false);
+																													} else {
+																														grid.setValue(ev.rowKey, "total", ev.value * rowValue.amount, false);
+																														grid.setValue(ev.rowKey, "supplyPrice", ev.value * rowValue.amount * 0.9, false);
+																														grid.setValue(ev.rowKey, "tax", ev.value * rowValue.amount * 0.1, false);
+																													}
+																													
+																													displayTotal();
+																												}
+				
+			},
 			{ header : "단가", name : "amount", align:"center"},
 			{ header : "합계", name : "total", align:"center"},
 			{ header : "공급가액", name : "supplyPrice", align:"center"},
@@ -239,15 +290,14 @@
 		grid.setColumnValues("month", month)
 	}
 	
-	function delRow() {
+	function gridClick() {
       grid.on("click", (ev)=>{
         if(ev.columnName == 'del'){
         	grid.removeRow(ev.rowKey);
+        	displayTotal();
         }
         if(ev.columnName == 'optionCode'){
         	rowData = grid.getRow(ev.rowKey);
-        	const modalElement = document.getElementById('optSearchModal');
-        	const modalInstance = new bootstrap.Modal(modalElement);
             modalInstance.show();
             
         }
@@ -256,30 +306,90 @@
 	
 	// 모달 열렸을 때 닫기 버튼 찾아서 닫기 할 함수
 	document.getElementById('optSearchModal').addEventListener('shown.bs.modal', function () {
-		const modalElement = document.getElementById("optSearchModal");
 	    const closeButton = modalElement.querySelector('[data-bs-dismiss="modal"]');
-	    console.log('닫기',closeButton);
 	    if (closeButton) {
 	        closeButton.addEventListener("click", function () {
-	        	try {
-	            	let modalInstance = bootstrap.Modal.getInstance("#optSearchModal") || new bootstrap.Modal("#optSearchModal");
-	                modalInstance.hide(); // ✅ Bootstrap 방식으로 모달 닫기
-	                
-	            } catch (error) {
-	                console.warn("❌ Bootstrap 5가 로드되지 않았음. 대체 방식 사용");
-	                modalElement.classList.remove("show");
-	                modalElement.style.display = "none";
-	                document.body.classList.remove("modal-open");
-
-	                setTimeout(() => {
-	                    document.querySelectorAll(".modal-backdrop").forEach((element) => element.remove()); // 백그라운드 제거
-	                }, 300);
-	                
-	            }   	
+	        	modalClose();
 	        })
 	    }    
 	})
+	
+	function modalClose(){
+		try {
+            modalInstance.hide();
+        		                
+        } catch (error) {
+            console.warn("❌ Bootstrap 5가 로드되지 않았음. 대체 방식 사용");
+            modalElement.classList.remove("show");
+            modalElement.style.display = "none";
+            document.body.classList.remove("modal-open");
+
+            setTimeout(() => {
+                document.querySelectorAll(".modal-backdrop").forEach((element) => element.remove()); // 백그라운드 제거
+            }, 300);
+            
+        }
+	}
+	
+	function displayTotal() {
 		
+		let totalInput = document.querySelector('#total');
+		let supplyPriceInput = document.querySelector('#supplyPrice');
+		let taxInput = document.querySelector('#tax');
+		
+		let total = 0;
+		let supply = 0;
+		let tax = 0;
+		
+		let gridData = grid.getData();
+		for(row of gridData){
+			total += row.total;
+			supply += row.supplyPrice;
+			tax += row.tax;
+		}
+		
+		totalInput.innerHTML = total;
+		supplyPriceInput.innerHTML = supply;
+		taxInput.innerHTML = tax;
+	}
+	
+	function resetBtn() {
+		document.querySelector('#regiserDate').value = "";
+		document.querySelector('#note').value = "";
+		grid.resetData([{}]);
+		displayTotal();
+		
+	}
+	
+	function insertBtn() {
+		
+	}
+	
+	function getBhf(){
+		const header = document.querySelector('meta[name="_csrf_header"]').content;
+        const token = document.querySelector('meta[name="_csrf"]').content;
+		
+		fetch(`http://localhost:81/accnut/rest/bhf/list?companyNum=${session.companyNum}`, {
+			method: "GET",
+			headers: {
+					 	'header': header,
+			                "Content-Type": "application/json",
+			                'X-CSRF-Token': token				
+			 		}
+		}).then(response => response.json())
+		.then(data => {
+			//console.log(data);
+			let officeId = document.querySelector("#bhf");
+			for(bhf of data.result){
+				let html = `<option value="${bhf.bhfName}">${bhf.bhfName}</option>`;
+				officeId.insertAdjacentHTML("beforeend", html);
+			}
+		});
+	}
+	
+	function displayBhf() {
+		
+	}
 </script>
 </body>
 </html>

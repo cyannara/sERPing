@@ -3,7 +3,6 @@ package com.beauty1nside.hr.service;
 import java.util.List;
 
 import com.beauty1nside.hr.dto.EmpContractDTO;
-import com.beauty1nside.hr.dto.EmpContractSearchDTO;
 
 
 public interface EmpContractService {
@@ -16,5 +15,7 @@ public interface EmpContractService {
 
     // 전체 계약 목록 조회
     List<EmpContractDTO> getAllContracts();
+    
+    byte[] generateContractPdf(Long employeeNum, Long companyNum);
 
 }

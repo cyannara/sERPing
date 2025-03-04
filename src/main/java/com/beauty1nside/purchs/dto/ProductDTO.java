@@ -1,5 +1,7 @@
 package com.beauty1nside.purchs.dto;
 
+import java.sql.Date;
+
 import org.springframework.beans.factory.annotation.Value;
 
 import groovy.transform.builder.Builder;
@@ -33,12 +35,12 @@ public class ProductDTO {
 	private String brandName;
 	
 	private Long employeeNum;
-	private String emloyeeName;
+	private String employeeName;
 	
 	private Long vendorId;
 	private String vendorName;
 	
-	
+	private int marginRate;
 	private int companyNum;
 	
 	//옵션
@@ -46,6 +48,8 @@ public class ProductDTO {
 	private String optionCode;
 	private String optionName;
 	private int optionSafetyInvoice;
+	private int optionUseFlag;
+	
 	
 	private Long warehouseId;
 	private String warehouseName;
@@ -53,6 +57,22 @@ public class ProductDTO {
 	//파일 이미지 업로드
 	@Value("${img.upload}")
 	private String imgUpload;
+	
+
+	private int safetyStock; //안전재고 계산 값
+	private int totalRemainingQuantity; 	//상품옵션당 갯수
+	private String 	goodsUseStatus; //상품 사용 유무 글자
+	private int goodsUseFlag; //상품 사용 유무 플래그
+	private String optionUseStatus;
+	
+	private int totalInputQuantity; //입고수량(개당)
+	private int totalOutputQuantity; //출고수량(개당)
+	private int totalQuantity;//총재고수량(개당)
+	
+	private String goodsLotNum;
+	private Date goodsConsumptionDate;
+	private Date warehousingDate;
+	
 	
 
 	

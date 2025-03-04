@@ -25,12 +25,12 @@
 <div class="container mt-3">
     <h2>인사 발령 관리</h2>
 
-    <!-- 🔍 검색 필터 -->
+    <!-- 🔍 사원 검색 -->
     <div class="search-box bg-light p-3 rounded shadow-sm">
         <div class="row align-items-center">
-            <div class="col-md-2 text-end"><label class="fw-bold">검색 기준</label></div>
+            <div class="col-md-2 text-end"><label class="fw-bold">사원 검색</label></div>
             <div class="col-md-3">
-                <select class="form-select" id="searchCategory">
+                <select class="form-select" id="employeeSearchCategory">
                     <option value="전체">전체</option>
                     <option value="employeeName">사원명</option>
                     <option value="employeeId">사원ID</option>
@@ -38,130 +38,149 @@
                 </select>
             </div>
             <div class="col-md-5">
-                <input type="text" class="form-control" placeholder="검색어 입력 후 [Enter]" id="searchKeyword">
+                <input type="text" class="form-control" id="employeeSearchKeyword" placeholder="검색어 입력 후 [Enter]">
             </div>
         </div>
-
         <div class="row mt-2">
             <div class="col text-center">
-                <button class="btn btn-primary" id="searchBtn">조회</button>
-                <button class="btn btn-outline-success" id="resetBtn">초기화</button>
+                <button class="btn btn-primary" id="searchEmployeeBtn">조회</button>
             </div>
         </div>
     </div>
 
-    <!-- 🔘 인사 발령 등록 버튼 -->
-    <div class="row mt-3">
-        <div class="col text-end">
-            <button class="btn btn-warning" id="registerHistoryBtn">+ 인사 발령 등록</button>
-        </div>
-    </div>
-
-    <!-- 🔲 TOAST UI GRID -->
+    <!-- 🔲 사원 목록 -->
     <div class="row mt-3">
         <div class="col">
-            <div id="grid"></div>
+            <h5>사원 목록</h5>
+            <div id="employeeGrid"></div>
         </div>
     </div>
 
+    <!-- 🔲 인사 발령 이력 -->
+    <div class="row mt-3">
+        <div class="col">
+            <h5>인사 발령 이력</h5>
+            <div id="historyGrid"></div>
+        </div>
+    </div>
+
+    <!-- 🔘 인사 발령 추가 버튼 -->
+    <div class="row mt-3">
+        <div class="col text-end">
+            <button class="btn btn-warning" id="openHistoryModalBtn">+ 인사 발령 등록</button>
+        </div>
+    </div>
 </div>
+
+<!-- 📌 인사 발령 등록 모달 -->
+<div class="modal fade" id="historyModal" tabindex="-1" aria-labelledby="historyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">인사 발령 등록</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="fw-bold">대상 사원</label>
+                    <input type="text" class="form-control" id="modalEmployeeName" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="fw-bold">변경 유형</label>
+                    <select class="form-select" id="modalChangeType">
+                        <option value="직급 변경">직급 변경</option>
+                        <option value="부서 이동">부서 이동</option>
+                        <option value="근무 형태 변경">근무 형태 변경</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="fw-bold">새 직급</label>
+                    <select class="form-select" id="modalNewPosition"></select>
+                </div>
+                <div class="mb-3">
+                    <label class="fw-bold">새 부서</label>
+                    <select class="form-select" id="modalNewDepartment"></select>
+                </div>
+                <div class="mb-3">
+                    <label class="fw-bold">발령 사유</label>
+                    <textarea class="form-control" id="modalReason"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="fw-bold">적용일</label>
+                    <input type="date" class="form-control" id="modalEffectiveDate">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                <button class="btn btn-primary" id="saveHistoryBtn">저장</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <!-- 📌 JavaScript -->
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    let historyGrid;
+    let employeeGrid, historyGrid;
+    let selectedEmployee = null;
+    fetchEmployeeList(); 
 
-    // ✅ TUI Grid 초기화
-    function initializeGrid() {
-        historyGrid = new tui.Grid({
-            el: document.getElementById('grid'),
+    // ✅ 사원 목록 Grid 초기화
+    function initializeEmployeeGrid() {
+        employeeGrid = new tui.Grid({
+            el: document.getElementById('employeeGrid'),
             columns: [
-                { header: "이력 번호", name: "historyNum", width: 80 },
-                { header: "대상 사원", name: "employeeNum", width: 100 },
-                { header: "변경 유형", name: "changeType", width: 120 },
-                { header: "기존 직급", name: "previousPosition", width: 120 },
-                { header: "새 직급", name: "newPosition", width: 120 },
-                { header: "기존 부서", name: "previousDepartmentNum", width: 120 },
-                { header: "새 부서", name: "newDepartmentNum", width: 120 },
-                { header: "적용일", name: "effectiveDate", width: 120 },
-                { header: "승인 상태", name: "approvalStatus", width: 100 },
-                { header: "발령 처리자", name: "processedBy", width: 100 },
-                {
-                    header: "승인",
-                    name: "approve",
-                    width: 80,
-                    formatter: ({ row }) =>
-                        `<button class="approve-btn btn btn-success btn-sm" data-id="${row.historyNum}">✅</button>`
-                },
-                {
-                    header: "반려",
-                    name: "reject",
-                    width: 80,
-                    formatter: ({ row }) =>
-                        `<button class="reject-btn btn btn-danger btn-sm" data-id="${row.historyNum}">❌</button>`
-                }
-            ]
+                { header: "사원번호", name: "employeeId", width: 100 },
+                { header: "사원명", name: "employeeName", width: 150 },
+                { header: "직급", name: "position", width: 100 },
+                { header: "부서", name: "department", width: 150 },
+            ],
+            rowHeaders: ['checkbox']
         });
 
-        fetchHistoryList();
+        fetchEmployeeList();
     }
 
-    // ✅ 인사발령 목록 조회
-    function fetchHistoryList() {
-        fetch('/hr/rest/history/list')
-            .then(response => response.json())
-            .then(data => {
-                console.log("📌 인사발령 데이터:", data);
-                historyGrid.resetData(data.historyList);
-            })
-            .catch(error => console.error("❌ 인사발령 목록 조회 실패:", error));
+    // ✅ 인사 발령 이력 Grid 초기화
+    function initializeHistoryGrid() {
+        historyGrid = new tui.Grid({
+            el: document.getElementById('historyGrid'),
+            columns: [
+                { header: "변경 유형", name: "changeType", width: 120 },
+                { header: "새 직급", name: "newPosition", width: 120 },
+                { header: "새 부서", name: "newDepartment", width: 120 },
+                { header: "적용일", name: "effectiveDate", width: 120 }
+            ]
+        });
     }
 
-    // ✅ 인사발령 승인
-    function approveHistory(historyNum) {
-        fetch(`/hr/rest/history/approve/${historyNum}`, { method: "PUT" })
-        .then(response => response.text())
-        .then(message => {
-            alert(message);
-            fetchHistoryList();
+    function fetchEmployeeList() {
+        fetch('/hr/rest/emp/list')
+        .then(response => response.json())
+        .then(data => {
+            console.log("📥 불러온 사원 데이터:", data);
+            if (Array.isArray(data.data?.contents)) { 
+                employeeGrid.resetData(data.data.contents);
+            } else {
+                console.error("❌ 잘못된 데이터 형식:", data);
+            }
         })
-        .catch(error => console.error("❌ 승인 실패:", error));
+        .catch(error => console.error("❌ 사원 목록 불러오기 실패:", error));
     }
 
-    // ✅ 인사발령 반려
-    function rejectHistory(historyNum) {
-        const reason = prompt("반려 사유를 입력하세요:");
-        if (!reason) return;
-
-        fetch(`/hr/rest/history/reject/${historyNum}?rejectReason=${encodeURIComponent(reason)}`, { method: "PUT" })
-        .then(response => response.text())
-        .then(message => {
-            alert(message);
-            fetchHistoryList();
-        })
-        .catch(error => console.error("❌ 반려 실패:", error));
-    }
-
-    // ✅ 이벤트 리스너 추가 (승인 / 반려)
-    document.addEventListener("click", function (event) {
-        if (event.target.classList.contains("approve-btn")) {
-            approveHistory(event.target.dataset.id);
-        } else if (event.target.classList.contains("reject-btn")) {
-            rejectHistory(event.target.dataset.id);
+    document.getElementById("searchEmployeeBtn").addEventListener("click", fetchEmployeeList);
+    fetchEmployeeList();
+    document.getElementById("openHistoryModalBtn").addEventListener("click", function () {
+        if (!selectedEmployee) {
+            alert("사원을 선택하세요.");
+            return;
         }
+        new bootstrap.Modal(document.getElementById('historyModal')).show();
     });
 
-    // ✅ 검색 버튼 이벤트
-    document.getElementById("searchBtn").addEventListener("click", function () {
-        fetchHistoryList();
-    });
-
-    // ✅ 인사발령 등록 버튼
-    document.getElementById("registerHistoryBtn").addEventListener("click", function () {
-        alert("📌 인사발령 등록 기능 추가 예정!");
-    });
-
-    initializeGrid();
+    initializeEmployeeGrid();
+    initializeHistoryGrid();
 });
 </script>
 

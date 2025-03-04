@@ -149,7 +149,37 @@ document.addEventListener("DOMContentLoaded", function () {
 	console.log("DOMContentLoaded 이벤트 실행 = 스크립트 실행")
     initProductGrid();
 });
+//✅ 텍스트를 굵게하고 정렬하는 렌더러
+class CustomTextRenderer {
+    constructor(props) {
+        const el = document.createElement('div');
+        el.innerText = props.value;
+        el.style.padding = '10px';
+        el.style.fontWeight = 'bold';
+        el.style.textAlign = 'left';
+        this.el = el;
+    }
+    getElement() {
+        return this.el;
+    }
+}
 
+//✅ 대표이미지를 표시하는 렌더러
+ class ImageRenderer {
+    constructor(props) {
+        const el = document.createElement('div');
+        el.style.textAlign = 'center';
+        if (props.value) {
+            el.innerHTML = `<img src="/images/${props.value}" alt="상품 이미지" width="50" height="50" style="border-radius: 5px;">`;
+        } else {
+            el.innerText = "이미지 없음";
+        }
+        this.el = el;
+    }
+    getElement() {
+        return this.el;
+    }
+}
 let productGrid;
 
 function initProductGrid() {
@@ -207,6 +237,8 @@ function initProductGrid() {
 
         productGrid = new tui.Grid({
             el: document.getElementById('productGrid'),
+            scrollX :false,
+            scrollY : false,
             data: productDataSource,  
             pageOptions: {
                 useClient: false,
@@ -217,9 +249,6 @@ function initProductGrid() {
                 { header: "상품명",
                   name: "goodsName", 
                   rowSpan: true,
-                  
-                  scrollX :false,
-                  scrollY : false,
                   renderer: {
                       type: CustomTextRenderer
                   },
@@ -252,6 +281,31 @@ function initProductGrid() {
         });
         
         console.log("✅ Toast Grid 초기화 완료");
+        
+     // ✅ 옵션명 클릭 시 상세 페이지 이동 (goodsCode, companyNum만 전달)
+        productGrid.on("click", function(event) {
+            const rowKey = event.rowKey;
+            const columnName = event.columnName;
+            const rowData = productGrid.getRow(rowKey);
+            console.log("클릭")
+            
+            if (columnName === "optionName" ||columnName === "optionCode" || columnName === "goodsName" || columnName === "goodsCode" ) {  // 옵션명을 클릭했을 때만 실행
+                const goodsCode = rowData.goodsCode;
+                const companyNum = [[${session.companyNum}]];
+
+                if (goodsCode && companyNum) {
+                	
+                	const url = `/purchs/info?goodsCode=${goodsCode}&companyNum=${companyNum}`;
+                	window.location.href = url;
+
+                	
+                } else {
+                    console.error("❌ 데이터가 부족하여 페이지 이동 실패", rowData);
+                }
+            }
+        });
+
+
 
 }
 
@@ -291,37 +345,8 @@ function resetFilters() {
     productGrid.reloadData();
 }
 
-//✅ 텍스트를 굵게하고 정렬하는 렌더러
-class CustomTextRenderer {
-    constructor(props) {
-        const el = document.createElement('div');
-        el.innerText = props.value;
-        el.style.padding = '10px';
-        el.style.fontWeight = 'bold';
-        el.style.textAlign = 'left';
-        this.el = el;
-    }
-    getElement() {
-        return this.el;
-    }
-}
 
-//✅ 대표이미지를 표시하는 렌더러
- class ImageRenderer {
-    constructor(props) {
-        const el = document.createElement('div');
-        el.style.textAlign = 'center';
-        if (props.value) {
-            el.innerHTML = `<img src="/images/${props.value}" alt="상품 이미지" width="50" height="50" style="border-radius: 5px;">`;
-        } else {
-            el.innerText = "이미지 없음";
-        }
-        this.el = el;
-    }
-    getElement() {
-        return this.el;
-    }
-}
+
 </script>
 
 </body>

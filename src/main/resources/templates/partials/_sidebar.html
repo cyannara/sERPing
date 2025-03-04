@@ -41,7 +41,7 @@
 						<li class="nav-item"><a class="nav-link"
 							th:href="@{/bsn/delivery(menu='sales')}">이동출고관리</a></li>
 						<li class="nav-item"><a class="nav-link"
-							th:href="@{/bsn/delivery(menu='sales')}">이동출고조회(미완)</a></li>
+							th:href="@{/bsn/delivery/list(menu='sales')}">이동출고조회</a></li>
 					</ul>
 				</div>
 			
@@ -55,7 +55,7 @@
 						<li class="nav-item"><a class="nav-link"
 							th:href="@{/bsn/order/cs/returning(menu='sales')}">CS관리</a></li>
 						<li class="nav-item"><a class="nav-link"
-							th:href="@{/bsn/order/cs/returning(menu='sales')}">CS조회</a></li>
+							th:href="@{/bsn/order/cs/returning/list(menu='sales')}">CS조회</a></li>
 					</ul>
 				</div>
 			</li>
@@ -80,7 +80,7 @@
 						<li class="nav-item"><a class="nav-link"
 							th:href="@{/purchs/goodslist(menu='inventory')}">상품조회</a></li>
 						<li class="nav-item"><a class="nav-link"
-							th:href="@{/pages/ui-features/typography.html(menu='inventory')}">상품재고조회</a></li>
+							th:href="@{/purchs/goodsLots(menu='inventory')}">상품재고조회</a></li>
 					</ul>
 				</div>
 			</li>
@@ -160,7 +160,7 @@
 				<div class="collapse" id="ui-basic-3">
 					<ul class="nav flex-column sub-menu">
 						<li class="nav-item"><a class="nav-link"
-							th:href="@{/hr/organization(menu='hr')}">조직도 조회</a></li>
+							th:href="@{/hr/organization_list(menu='hr')}">조직도 조회</a></li>
 						<li class="nav-item"><a class="nav-link"
 							th:href="@{/hr/organization(menu='hr')}">부서 관리</a></li>
 					</ul>
