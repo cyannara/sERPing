@@ -73,21 +73,36 @@ const modalElement = document.getElementById("contractModal");
     });
 	
 	document.body.addEventListener("click",function(event){
-		if(event.target.classList.contains("contractBtn")){
-			employeeNum = event.target.getAttribute("data-id");
-			console.log("employeeNum", employeeNum);
-			
-			const contractUrl = `/hr/rest/contract/report?employeeNum=${employeeNum}`;
-			
-			renderPDF(contractUrl);
-			
-			const contractModalEl = document.querySelector("#contractModal");
-			if(contractModalEl){
-				const contractModal = new bootstrap.Modal(contractModalEl);
-				contractModal.show();
-			}
-		}
-	});
+    if (event.target.classList.contains("contractBtn")) {
+        employeeNum = event.target.getAttribute("data-id");
+        console.log("📌 선택된 employeeNum:", employeeNum);
+
+        const contractUrl = `/hr/rest/contract/report?employeeNum=${employeeNum}`;
+        const contractModalEl = document.querySelector("#contractModal");
+
+        // 📌 서버에서 계약서 존재 여부 확인
+        fetch(contractUrl, { method: 'HEAD' })
+            .then(response => {
+                if (response.ok) {
+                    console.log("✅ 근로 계약서 존재함. PDF 렌더링 시작");
+                    renderPDF(contractUrl);
+                } else {
+                    console.warn("❌ 근로 계약서 없음!");
+                    renderPDF(""); // PDF가 없을 경우 빈 값 전달하여 메시지 표시
+                }
+
+                // 📌 모달 표시
+                if (contractModalEl) {
+                    const contractModal = new bootstrap.Modal(contractModalEl);
+                    contractModal.show();
+                }
+            })
+            .catch(error => {
+                console.error("🚨 근로 계약서 확인 중 오류 발생:", error);
+                alert("⚠️ 근로 계약서 확인 중 오류가 발생했습니다. 나중에 다시 시도해주세요.");
+            });
+    }
+});
 	
    let profileInputIMG = document.querySelector("#profileImage");
    let profileImgView = document.querySelector("#profilePreview");
@@ -215,8 +230,12 @@ function initializeGrid() {
             { header: "이메일", name: "email", align: "center", sortable: true, width: 200 },
             { header: "근로계약서", name: "employeeContract", align: "center", sortable: true, width: 120,
 					formatter: function({ row }) {
-				        return `<button class="btn btn-info btn-sm contractBtn" data-id="${row.employeeNum}">보기</button>`;
-				    },
+					    if (row.contractStatus === "보기") {
+					        return `<button class="btn btn-info btn-sm contractBtn" data-id="${row.employeeNum}">보기</button>`;
+					    } else {
+					        return `<span class="text-danger">미계약</span>`;
+					    }
+					},
             }
         ],
         data: dataSource,

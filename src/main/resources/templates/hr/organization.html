@@ -76,8 +76,8 @@
 	<body layout:fragment="content">
 	
 	  <div class="container mt-3">
+	    <h2>부서 관리</h2>
 	    <div class="header-section">
-	      <h5 class="fw-bold">인사 관리 / 조직도 관리</h5>
 	      <div class="d-flex gap-2">
 			<button id="addDeptBtn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#deptModal">
 			    <i class="fas fa-plus-circle"></i> 부서 추가
@@ -88,7 +88,7 @@
 	
 	    <div class="content-section">
 	      <section class="org-chart">
-	        <input type="text" class="form-control mb-3" id="deptSearchKW" placeholder="부서 검색 후 [Enter]">
+	        <!-- <input type="text" class="form-control mb-3" id="deptSearchKW" placeholder="부서 검색 후 [Enter]"> -->
 	        <div class="department-tree">
 	            <ul>
 	                <!-- 회사 정보 -->
@@ -519,13 +519,15 @@
 	
 	        	   
 	        	    let departmentNum = $(this).data('dept-id'); // `data-dept-id` 값 가져오기
+	        	    
+	        	    console.log("📌 선택한 부서 번호:", departmentNum);
 	
 	        	    if (departmentNum == undefined) {	        	        
 	        	    	departmentNum=0;
 	        	    } 
 	        	    grid.readData(1,{departmentNum});
 	
-	/*         	         fetch(`/hr/rest/emp/organization?perPage=5&companyNum=${companyNum}&departmentNum=${departmentNumSJ}&page=1`, {
+	        	    /*fetch(`/hr/rest/emp/organization?perPage=5&companyNum=${companyNum}&departmentNum=${departmentNumSJ}&page=1`, {
 	                        method: 'GET',
 	                        headers: {
 	                            'Content-Type': 'application/json',
@@ -538,8 +540,8 @@
 	                        grid.setPaginationTotalCount(data.data.pagination.totalCount)
 	                        console.log(data);
 	                    })
-	                    .catch(error => console.error("데이터 요청 실패:", error));
-	        	       */
+	                    .catch(error => console.error("데이터 요청 실패:", error));*/
+	        	       
 	        	        
 	        	        
 	        	}); 

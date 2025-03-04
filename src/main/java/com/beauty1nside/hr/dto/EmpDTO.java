@@ -54,5 +54,6 @@ public class EmpDTO {
     private String secondSsn; //주민번호 뒷자리
     private Long parentDepartmentNum;  // ✅ 상위 부서 번호 추가
     private String parentDepartmentName;  // ✅ 상위 부서명 추가
+    private String contractStatus;
     
 }
