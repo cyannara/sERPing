@@ -74,7 +74,9 @@ public class ProductDTO {
 	private Date warehousingDate;
 	
 	
-
+	// ✅ 사용 여부 필터 추가
+    private Boolean useGoods;
+    private Boolean unUseGoods;
 	
 	
 }

@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BsnGoodsLOTDTO  extends ProductSearchDTO{
+public class BsnGoodsLOTDTO {
 	private String goodsLotNum;
 	private Date goodsConsumptionDate;
 	private int warehousingStandardQuantity;
