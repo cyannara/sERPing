@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beauty1nside.accnut.mapper.TaxMapper">
+	
+	<select id="maxHeader">
+		SELECT NVL(MAX(tax_num), 0) + 1 
+		FROM accnut_tax_header
+	</select>
+	
+	
+
+
+
+
+
+
+</mapper>

@@ -72,6 +72,16 @@
 	.row {
 		padding: 0 15px;
 	}
+	.flexArea {
+		display: flex;
+	}
+	.textMail {
+		text-align: center;
+		line-height: 2rem;
+	}
+	.height-15 {
+		height: 15px;
+	}
 
 </style>
 </head>
@@ -91,9 +101,9 @@
 				<td class="left inputTh"></td>
 				
 				<th rowspan="6" class="sero realRight">공<br><br>급<br><br>받<br><br>는<br><br>자</th>
-				<th class="right fontBlue menuTh"><span class="star">*</span> 등록<br>번호</th>
+				<th class="right fontBlue menuTh"><span class="star">*</span>등록<br>번호</th>
 				<td class="right inputTh">
-					<select name="bhf" id="bhf" class="form-control form-control-sm" onchange="displayBhf()">
+					<select name="bhf" id="bhf" class="form-control form-control-sm height-15" onchange="displayBhf()">
 						<option value="">지점을 선택해주세요</option>
 						
 					</select>
@@ -108,16 +118,16 @@
 				<td class="left inputTh" id="representor1"></td>
 				
 				<th class="right fontBlue menuTh"><span class="star">*</span> 상호</th>
-				<td class="right inputTh"></td>
+				<td class="right inputTh" id="name2"></td>
 				<th class="right fontBlue menuTh"><span class="star">*</span> 성명</th>
-				<td class="right inputTh"></td>
+				<td class="right inputTh" id="manager2"></td>
 			</tr>
 			<tr>
 				<th class="left fontRed menuTh">사업장</th>
 				<td colspan="3" class="left longTh" id="address1"></td>
 				
 				<th class="right fontBlue menuTh">사업장</th>
-				<td colspan="3" class="right longTh"></td>
+				<td colspan="3" class="right longTh" id="address2"></td>
 			</tr>
 			<tr>
 				<th class="left fontRed menuTh">업태</th>
@@ -126,29 +136,54 @@
 				<td class="left inputTh" id="cate1"></td>
 				
 				<th class="right fontBlue menuTh">업태</th>
-				<td class="right inputTh"></td>
+				<td class="right inputTh" id="status2"></td>
 				<th class="right fontBlue menuTh">종목</th>
-				<td class="right inputTh"></td>
+				<td class="right inputTh" id="cate2"></td>
 			</tr>
 			<tr>
 				<th rowspan="2" class="left fontRed menuTh">이메일</th>
 				<td colspan="3" rowspan="2" class="left longTh" id="email1"></td>
 				
 				<th class="right fontBlue menuTh">이메일</th>
-				<td colspan="3" class="right longTh"></td>
+				<td colspan="3" class="right longTh" id="email2">
+					<div class="flexArea">
+						<input type="text" name="email2Head" id="email2Head" class="form-control form-control-sm height-15">
+						<span class="textMail">@</span>
+						<select id="email2Tail" class="form-control form-control-sm height-15" onchange="changeDomain(this)">
+							<option value="" selected>도메인</option>
+							<option value="naver.com">네이버</option>
+					        <option value="gmail.com">G메일</option>
+					        <option value="daum.net">다음</option>
+					        <option value="hotmail.com">핫메일</option>
+						
+						</select>
+					</div>
+				</td>
 			</tr>
 			<tr>
 				<th class="right fontBlue menuTh">이메일</th>
-				<td colspan="3" class="right longTh"></td>
+				<td colspan="3" class="right longTh" id="email3">
+					<div class="flexArea">
+						<input type="text" name="email3Head" id="email3Head" class="form-control form-control-sm height-15">
+						<span class="textMail">@</span>
+						<select id="email3Tail" class="form-control form-control-sm height-15" onchange="changeDomain(this)">
+							<option value="" selected>도메인</option>
+							<option value="naver.com">네이버</option>
+					        <option value="gmail.com">G메일</option>
+					        <option value="daum.net">다음</option>
+					        <option value="hotmail.com">핫메일</option>
+						</select>			
+					</div>
+				</td>
 			</tr>
 		</table>
 		<!-- 합계 테이블 -->
 		<table class="table total">
 			<tr>
 				<th class="menuTh totals"><span class="star">*</span> 작성일자</th>
-				<td colspan="2" class="totals longTd nopadding"><input type="date" name="regiserDate" id="regiserDate" class="form-control form-control-sm" onchange="gridmonthchange()"></td>
+				<td colspan="2" class="totals longTd nopadding"><input type="date" name="regiserDate" id="regiserDate" class="form-control form-control-sm height-15" onchange="gridmonthchange()"></td>
 				<th class="menuTh totals" >비고</th>
-				<td colspan="2" class="totals longTd"><input type="text" name="note" id="note" class="form-control form-control-sm"></td>
+				<td colspan="2" class="totals longTd"><input type="text" name="note" id="note" class="form-control form-control-sm height-15"></td>
 			</tr>
 			<tr>
 				<th class="menuTh totals">&nbsp;&nbsp;합계금액</th>
@@ -351,6 +386,15 @@
 		totalInput.innerHTML = total;
 		supplyPriceInput.innerHTML = supply;
 		taxInput.innerHTML = tax;
+		
+		let totalinfo = {};
+		totalinfo.total = total;
+		totalinfo.supply = supply;
+		totalinfo.tax = tax;
+		totalinfo.date = document.querySelector('#regiserDate').value;
+		totalinfo.note = document.querySelector('#note').value;
+		
+		result.total = totalinfo;
 	}
 	
 	function resetBtn() {
@@ -362,6 +406,35 @@
 	}
 	
 	function insertBtn() {
+		result.to.email2 = document.querySelector('#email2Head').value + "@" + document.querySelector('#email2Tail').value; 
+		result.to.email3 = document.querySelector('#email3Head').value + "@" + document.querySelector('#email3Tail').value;
+		result.total.date = document.querySelector('#regiserDate').value;
+		result.total.companyNum = session.companyNum;
+		result.detail = grid.getData();
+		console.log(result);
+		
+		const header = document.querySelector('meta[name="_csrf_header"]').content;
+        const token = document.querySelector('meta[name="_csrf"]').content;
+		
+		fetch("http://localhost:81/accnut/rest/tax/insert", {
+			method: "POST",
+			headers: {
+					 	'header': header,
+			                "Content-Type": "application/json",
+			                'X-CSRF-Token': token				
+			 		},
+			body: JSON.stringify(result) // result 객체를 JSON 형식으로 변환(JSON.parse는 JSON을 객체로 변환)
+		})
+		 .then(response => response.json())
+		 .then(data => { 
+			// console.log(data);
+			 	if(data.status == "success"){
+			 		showAlert('지급 처리 되었습니다.', 'success');				 		
+				 	
+			 	} else {
+			 		showAlert('지급 처리에 실패하였습니다. 다시 시도해주세요.', 'danger');
+			 	}
+		 });
 		
 	}
 	
@@ -381,15 +454,38 @@
 			//console.log(data);
 			let officeId = document.querySelector("#bhf");
 			for(bhf of data.result){
-				let html = `<option value="${bhf.bhfName}">${bhf.bhfName}</option>`;
+				let html = `<option value="${bhf.bhfId}" data-phone="${bhf.bhfPhone}" data-address="${bhf.bhfAddress}" data-status="${bhf.bhfStatus}" data-cate="${bhf.bhfCate}" data-name="${bhf.bhfName}">${bhf.bhfName}</option>`;
 				officeId.insertAdjacentHTML("beforeend", html);
 			}
 		});
 	}
 	
 	function displayBhf() {
+		let bhf = document.querySelector("#bhf").selectedOptions[0];
+		console.log(bhf);
+		let array = ["name", "address", "status", "cate" ] // "manager", 
+		let to = {};
+		for(key of array){
+			document.querySelector(`#${key}2`).innerHTML = bhf.dataset[`${key}`];
+			to[`${key}`] = bhf.dataset[`${key}`];
+		}
+		document.querySelector('#manager2').innerHTML = bhf.dataset.name;
+		to.manager = bhf.dataset.name;
+		to.id = bhf.value;		
+		result.to = to;
 		
 	}
+	
+	function changeDomain(select) {
+        // 선택된 값 가져오기
+        let selectedText = select.options[select.selectedIndex].text;
+        let selectedValue = select.value;
+
+        // 선택된 항목이 "직접 입력"이 아니면 도메인으로 변경
+        if (selectedValue) {
+            select.options[select.selectedIndex].text = selectedValue;
+        }
+    }
 </script>
 </body>
 </html>

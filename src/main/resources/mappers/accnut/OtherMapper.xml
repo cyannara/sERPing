@@ -30,4 +30,11 @@
 	
 	</select>
 	
+	<select id="deptList" resultType="map">
+		SELECT department_num AS "departmentNum", department_name AS "departmentName"
+		FROM hr_department
+		WHERE company_num = #{companyNum}
+		AND parent_department_num IS NOT NULL
+	</select>
+	
 </mapper>
