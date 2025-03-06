@@ -32,19 +32,6 @@
 		<java.version>17</java.version>
 		<lombok.version>1.18.36</lombok.version>
 	</properties>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>jaspersoft-third-party</id>
-			<url>http://jaspersoft.jfrog.io/jaspersoft/third-party-ce-artifacts/</url>
-		</pluginRepository>
-		
-	</pluginRepositories>
-	<repositories>
-		<repository>
-	<id>jaspersoft-third-party</id>
-	<url>http://jaspersoft.jfrog.io/jaspersoft/third-party-ce-artifacts/</url>
-</repository>
-	</repositories>
 
 	<dependencies>
 		<dependency>
@@ -169,19 +156,19 @@
 		            <groupId>com.lowagie</groupId>
 		            <artifactId>itext</artifactId>
 		        </exclusion>
-<!--		        <exclusion>
+		        <exclusion>
 				    <groupId>org.olap4j</groupId>
 				    <artifactId>olap4j</artifactId>
-		        </exclusion>-->
+		        </exclusion>
     	</exclusions>
 	</dependency>
 	
 	<!-- https://mvnrepository.com/artifact/org.olap4j/olap4j -->
-<!--	<dependency>
+	<dependency>
 	    <groupId>org.olap4j</groupId>
 	    <artifactId>olap4j</artifactId>
 	    <version>1.2.0</version>
-	</dependency>-->
+	</dependency>
 
 	<dependency>
 	    <groupId>com.lowagie</groupId>
