@@ -149,12 +149,24 @@
 			<artifactId>jasperreports</artifactId>
 			<version>6.4.0</version>
 			   <exclusions>
-        <exclusion>
-            <groupId>com.lowagie</groupId>
-            <artifactId>itext</artifactId>
-        </exclusion>
-    </exclusions>
-		</dependency>
+	        <exclusion>
+	            <groupId>com.lowagie</groupId>
+	            <artifactId>itext</artifactId>
+	        </exclusion>
+	        <exclusion>
+	    <groupId>org.olap4j</groupId>
+	    <artifactId>olap4j</artifactId>
+	        </exclusion>
+    	</exclusions>
+	</dependency>
+	
+	<!-- https://mvnrepository.com/artifact/org.olap4j/olap4j -->
+	<dependency>
+	    <groupId>org.olap4j</groupId>
+	    <artifactId>olap4j</artifactId>
+	    <version>1.2.0</version>
+	</dependency>
+
 	<dependency>
 	    <groupId>com.lowagie</groupId>
 	    <artifactId>itext</artifactId>
