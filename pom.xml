@@ -32,7 +32,14 @@
 		<java.version>17</java.version>
 		<lombok.version>1.18.36</lombok.version>
 	</properties>
-		<repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>jaspersoft-third-party</id>
+			<url>http://jaspersoft.jfrog.io/jaspersoft/third-party-ce-artifacts/</url>
+		</pluginRepository>
+		
+	</pluginRepositories>
+	<repositories>
 		<repository>
 	<id>jaspersoft-third-party</id>
 	<url>http://jaspersoft.jfrog.io/jaspersoft/third-party-ce-artifacts/</url>
